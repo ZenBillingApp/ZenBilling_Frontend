@@ -72,6 +72,11 @@ const config = {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
       },
+      fontFamily: {
+        Satisfy : ['Satisfy'],
+        Caveat : ['Caveat'],
+      },
+
     },
   },
   plugins: [require("tailwindcss-animate"),require('tailwindcss-debug-screens'),],
