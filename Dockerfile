@@ -1,0 +1,21 @@
+# Choisir une image de base
+FROM node:latest
+
+# Définir le répertoire de travail
+WORKDIR /app
+
+# Copier les fichiers de package et installer les dépendances
+COPY package*.json ./
+RUN npm install
+
+# Copier le reste du code source de l'application
+COPY . .
+
+# Construire l'application
+RUN npm run build
+
+# Exposer le port (le port par défaut de Next.js est 3000)
+EXPOSE 3000
+
+# Commande pour démarrer l'application
+CMD ["npm", "start"]
