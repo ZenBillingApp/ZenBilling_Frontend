@@ -32,7 +32,7 @@ export default function layout({ children }: Props) {
   return (
     <div className="flex h-full w-full">
       <Sidebar items={menuItems} />
-      <div className="w-full h-full p-6">{children}</div>
+      <div className="w-full h-full overflow-auto p-6">{children}</div>
     </div>
   );
 }

@@ -40,6 +40,9 @@ export default function Page({}: Props) {
   const router = useRouter();
 
   const [invoices, setInvoices] = React.useState<Invoice[]>([]);
+  const [search, setSearch] = React.useState<string>(
+    searchParams.get("search") || ""
+  );
   const [filter, setFilter] = React.useState<string>(
     searchParams.get("filter") || "all"
   );
@@ -51,8 +54,9 @@ export default function Page({}: Props) {
         setLoading(true);
         const response = await fetch(
           process.env.NEXT_PUBLIC_API_URL +
-            "/api/invoices" +
-            `${filter === "all" ? "" : `?status=${filter}`}`,
+            "/api/invoices?" +
+            `${filter === "all" ? "" : `status=${filter}&`}` +
+            `${search ? `search=${search}` : ""}`,
           {
             method: "GET",
             headers: {
@@ -66,15 +70,20 @@ export default function Page({}: Props) {
         }
 
         const data = await response.json();
-        setInvoices(data.rows);
+        setInvoices(data.invoices.rows);
       } catch (error) {
         console.error(error);
       } finally {
         setLoading(false);
       }
     };
-    fetchInvoices();
-  }, [filter]);
+
+    const delayDebounceFn = setTimeout(() => {
+      fetchInvoices();
+    }, 300);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [filter, search]);
 
   const handleChangeFilter = (filter: string) => {
     setFilter(filter);
@@ -94,8 +103,8 @@ export default function Page({}: Props) {
             New Invoice
           </Button>
         </div>
-        <div className="flex flex-col w-full overflow-auto gap-6">
-          <div className="flex justify-between gap-6">
+        <div className="flex flex-col w-full gap-6">
+          <div className="flex flex-col gap-6 xl:flex-row xl:justify-between">
             <div className="flex w-1/2 gap-2">
               <Button
                 variant={filter === "all" ? "default" : "outline"}
@@ -117,8 +126,12 @@ export default function Page({}: Props) {
               </Button>
             </div>
 
-            <div className="flex w-2/6 p-2  gap-6">
-              <Input placeholder="Search" />
+            <div className="flex w-full py-2 gap-6 xl:w-2/6">
+              <Input
+                placeholder="Search"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
               <Button className="flex gap-2">
                 <Search size={16} />
                 Search
@@ -128,8 +141,8 @@ export default function Page({}: Props) {
         </div>
       </div>
       {loading ? (
-        <div className="flex justify-center items-center w-full h-full">
-          <ClipLoader color="#009933" />
+        <div className="flex justify-center items-center w-full h-full ">
+          <ClipLoader color="#009933" size={50} />
         </div>
       ) : (
         <Table>
@@ -160,7 +173,7 @@ export default function Page({}: Props) {
                   <TableCell>{invoice.client.first_name}</TableCell>
                   <TableCell>{invoice.client.last_name}</TableCell>
                   <TableCell>{invoice.status}</TableCell>
-                  <TableCell>{invoice.items.length} </TableCell>
+                  <TableCell>{invoice.items.length}</TableCell>
                   <TableCell>{invoice.total_amount} €</TableCell>
                   <TableCell>{invoice.due_date}</TableCell>
                 </TableRow>

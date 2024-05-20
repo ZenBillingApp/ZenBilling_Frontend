@@ -126,7 +126,7 @@ export default function Page({}: Props) {
   }
 
   return (
-    <div className={cn("flex flex-col w-full h-full p-6 gap-6 ")}>
+    <div className={cn("flex flex-col w-full h-full p-6 gap-6  ")}>
       <div className="flex flex-col w-full gap-6">
         <div className="flex w-full justify-between ">
           <h1 className="text-s font-light">
@@ -143,8 +143,8 @@ export default function Page({}: Props) {
           {data?.user?.first_name}&apos;s Dashboard
         </h1>
       </div>
-      <div className="flex w-full gap-6">
-        <Card className="flex items-center w-1/3 p-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <Card className="flex items-center w-full p-4 gap-6">
           <div
             className={cn(
               "flex items-center justify-center p-2 rounded-full bg-primary"
@@ -157,14 +157,14 @@ export default function Page({}: Props) {
           </div>
           <div className="flex flex-col w-full">
             <CardTitle className="text-xl font-semibold">
-              Unpaid invoice
+              Pending invoice
             </CardTitle>
             <h1 className="text-4xl font-light">
               {data?.numberOfUnpaidInvoices || 0}
             </h1>
           </div>
         </Card>
-        <Card className="flex items-center w-1/3 p-4 gap-6">
+        <Card className="flex items-center w-full p-4 gap-6">
           <div
             className={cn(
               "flex items-center justify-center p-2 rounded-full bg-primary"
@@ -179,7 +179,7 @@ export default function Page({}: Props) {
             </h1>
           </div>
         </Card>
-        <Card className="flex items-center w-1/3 p-4 gap-6">
+        <Card className="flex items-center w-full p-4 gap-6">
           <div
             className={cn(
               "flex items-center justify-center p-2 rounded-full bg-primary"
@@ -200,7 +200,7 @@ export default function Page({}: Props) {
           </div>
         </Card>
       </div>
-      <div className="flex w-1/2 h-full overflow-auto gap-6">
+      <div className="flex w-full h-full  gap-6 2xl:w-1/2">
         <Card className="flex flex-col justify-between w-full h-full  p-4 gap-6">
           <Table className="w-full h-full ">
             <TableHeader>

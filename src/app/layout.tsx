@@ -21,7 +21,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <>
       <html lang="en" suppressHydrationWarning>
-        <body className={cn("h-full", inter.className)}>
+        <body className={cn("h-full", "debug-screens", inter.className)}>
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
