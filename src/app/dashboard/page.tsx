@@ -71,20 +71,28 @@ export default function Page({}: Props) {
     setLoading(true);
     setError(false);
     try {
-      const response = await fetch(
-        process.env.NEXT_PUBLIC_API_URL + "/api/dashboard",
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_KEY}`,
-          },
-          cache: "no-cache",
-        }
-      );
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+      const apiKey = process.env.NEXT_PUBLIC_API_KEY;
+
+      if (!apiUrl || !apiKey) {
+        throw new Error(
+          "API URL or API Key is not defined in environment variables"
+        );
+      }
+
+      const response = await fetch(`${apiUrl}/api/dashboard`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`,
+        },
+        cache: "no-cache",
+      });
+
       if (!response.ok) {
         throw new Error("Error fetching data");
       }
+
       const data = await response.json();
       setData(data);
     } catch (error) {
