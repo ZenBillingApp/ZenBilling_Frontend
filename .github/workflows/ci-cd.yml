@@ -35,6 +35,10 @@ jobs:
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
+    - name: Transfer stack.yml to server
+      run: |
+          scp -o StrictHostKeyChecking=no zenbilling_front.yml ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/zenbilling/
+  
     - name: Deploy to Docker Swarm
       run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "docker stack deploy --compose-file stack.yml ZenBilling"
+        ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "docker stack deploy --compose-file /zenbilling/zenbilling_front.yml ZenBilling"
