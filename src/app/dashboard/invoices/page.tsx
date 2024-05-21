@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -37,16 +37,11 @@ type Invoice = {
 };
 
 export default function Page({}: Props) {
-  const searchParams = useSearchParams();
   const router = useRouter();
 
   const [invoices, setInvoices] = React.useState<Invoice[]>([]);
-  const [search, setSearch] = React.useState<string>(
-    searchParams.get("search") || ""
-  );
-  const [filter, setFilter] = React.useState<string>(
-    searchParams.get("filter") || "all"
-  );
+  const [search, setSearch] = React.useState<string>("");
+  const [filter, setFilter] = React.useState<string>("all");
   const [loading, setLoading] = React.useState<boolean>(true);
 
   React.useEffect(() => {
