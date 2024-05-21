@@ -232,10 +232,11 @@ export default function Page({}: Props) {
             <TableRow key={item.item_id}>
               <TableCell>{item.description}</TableCell>
               <TableCell>{item.quantity}</TableCell>
-              <TableCell>{item.unit_price}</TableCell>
+              <TableCell>${item.unit_price}</TableCell>
               <TableCell>{item.vat_rate}</TableCell>
-              <TableCell>{item.vat_amount}</TableCell>
+              <TableCell>${item.vat_amount}</TableCell>
               <TableCell>
+                $
                 {item.unit_price * item.quantity +
                   (item.vat_rate / 100) * item.unit_price * item.quantity}
               </TableCell>
@@ -248,13 +249,13 @@ export default function Page({}: Props) {
           <div className="flex justify-between">
             <h2 className="text-sm font-semibold">Total Amount (VAT excl.)</h2>
             <p className="flex w-24 text-sm items-start text-right">
-              {totalAmountWithoutVAT.toFixed(2)}
+              ${totalAmountWithoutVAT.toFixed(2)}
             </p>
           </div>
           <div className="flex justify-between">
             <h2 className="text-sm font-semibold">Total Amount (VAT incl.)</h2>
             <p className="flex w-24 text-sm items-start text-right">
-              {totalAmount.toFixed(2)}
+              ${totalAmount.toFixed(2)}
             </p>
           </div>
         </div>

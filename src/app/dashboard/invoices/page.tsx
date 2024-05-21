@@ -33,6 +33,7 @@ type Invoice = {
   status: string;
   total_amount: number;
   due_date: string;
+  invoice_date: string;
 };
 
 export default function Page({}: Props) {
@@ -71,6 +72,7 @@ export default function Page({}: Props) {
 
         const data = await response.json();
         setInvoices(data.invoices.rows);
+        console.log(data);
       } catch (error) {
         console.error(error);
       } finally {
@@ -153,6 +155,7 @@ export default function Page({}: Props) {
             <TableHead>Status</TableHead>
             <TableHead>Lines</TableHead>
             <TableHead>Amount</TableHead>
+            <TableHead>Invoice date</TableHead>
             <TableHead>Due date</TableHead>
           </TableHeader>
           <TableBody>
@@ -174,8 +177,13 @@ export default function Page({}: Props) {
                   <TableCell>{invoice.client.last_name}</TableCell>
                   <TableCell>{invoice.status}</TableCell>
                   <TableCell>{invoice.items.length}</TableCell>
-                  <TableCell>{invoice.total_amount} €</TableCell>
-                  <TableCell>{invoice.due_date}</TableCell>
+                  <TableCell>${invoice.total_amount}</TableCell>
+                  <TableCell>
+                    {new Date(invoice.invoice_date).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell>
+                    {new Date(invoice.due_date).toLocaleDateString()}
+                  </TableCell>
                 </TableRow>
               ))
             )}
