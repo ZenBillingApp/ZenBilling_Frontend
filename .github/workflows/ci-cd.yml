@@ -41,4 +41,4 @@ jobs:
   
     - name: Deploy to Docker Swarm
       run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "docker stack deploy --compose-file /zenbilling/zenbilling_front.yml ZenBilling"
+        ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "docker stack deploy --compose-file /zenbilling/zenbilling_front.yml zenBilling"
