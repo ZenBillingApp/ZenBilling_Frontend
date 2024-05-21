@@ -37,7 +37,7 @@ jobs:
 
     - name: Transfer stack.yml to server
       run: |
-          scp -o StrictHostKeyChecking=no zenbilling_front.yml ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/zenbilling/
+        scp -o StrictHostKeyChecking=no zenbilling_front.yml ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/zenbilling/zenbilling_front.yml
   
     - name: Deploy to Docker Swarm
       run: |
