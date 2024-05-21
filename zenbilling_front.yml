@@ -7,7 +7,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:8080
+      - NEXT_PUBLIC_API_URL=http://212.132.111.107:8080
       - NEXT_PUBLIC_API_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJpYXQiOjE3MTYzMTg2MzUsImV4cCI6MTcxNjMyMjIzNX0.Xx40k6p8XVLvzTFI-4g1NhR0gAbm3WDMr5E4CIThi48
     networks:
       - app-network
