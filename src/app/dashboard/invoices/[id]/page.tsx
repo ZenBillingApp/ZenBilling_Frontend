@@ -276,7 +276,7 @@ export default function Page({}: Props) {
                 value={invoice?.status}
                 onValueChange={(value) => handleChangeStatus(value)}
               >
-                <SelectTrigger className="border-0 p-0 h-fit gap-2 focus:outline-none focus:ring-0 focus:border-0 focus-within:border-0 focus-within:ring-0 focus:ring-offset-0">
+                <SelectTrigger className="border-0 p-0 h-fit gap-2 bg-transparent focus:outline-none focus:ring-0 focus:border-0 focus-within:border-0 focus-within:ring-0 focus:ring-offset-0">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -318,7 +318,7 @@ export default function Page({}: Props) {
                   )}
                 >
                   {invoice?.due_date ? formattedDueDate : "Select a date"}
-                  <ChevronDownIcon size={16} className="ml-2" />
+                  <ChevronDownIcon size={16} className="ml-2 opacity-50" />
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0">
@@ -339,7 +339,7 @@ export default function Page({}: Props) {
                 value={invoice?.payments?.payment_method ?? "N/A"}
                 onValueChange={(value) => handleChangePaymentMethod(value)}
               >
-                <SelectTrigger className="border-0 p-0 h-fit gap-2 focus:outline-none focus:ring-0 focus:border-0 focus-within:border-0 focus-within:ring-0 focus:ring-offset-0">
+                <SelectTrigger className="border-0 bg-transparent p-0 h-fit gap-2 focus:outline-none focus:ring-0 focus:border-0 focus-within:border-0 focus-within:ring-0 focus:ring-offset-0">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
