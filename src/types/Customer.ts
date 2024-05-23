@@ -1,3 +1,5 @@
+import { Invoice } from './Invoice';
+
 export interface Customer {
     city: string;
     client_id: number;
@@ -12,11 +14,5 @@ export interface Customer {
     street_address: string;
     user_id: number;
     invoice_count: number;
-    invoices: Array<{
-        invoice_id: number;
-        invoice_date: string;
-        due_date: string;
-        total_amount: number;
-        status: string;
-    }>;
+    invoices: Invoice[];
 }

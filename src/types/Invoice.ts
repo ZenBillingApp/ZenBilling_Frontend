@@ -35,9 +35,9 @@ export interface Invoice {
     status: string;
     total_amount: number;
     due_date: string;
-    payments: Array<{
+    payments: {
         payment_method: "cash" | "credit_card" | "bank_transfer";
         amount: number;
         payment_date: Date;
-    }>;
+    };
 }
