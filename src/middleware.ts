@@ -1,24 +1,24 @@
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
-import { getCookie } from 'cookies-next'
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+import { getCookie } from 'cookies-next';
+import { i18nRouter } from 'next-i18n-router';
+import i18nConfig from '../i18nConfig';
 
-// This function can be marked `async` if using `await` inside
+// Cette fonction peut être marquée `async` si l'utilisation de `await` est nécessaire à l'intérieur
 export async function middleware(request: NextRequest) {
-    const token = getCookie('token', { req: request })
-    
-    if (!token) {
-        return NextResponse.redirect(new URL('/login', request.url))
+    // Utilisation de getCookie avec l'argument { req: request } pour récupérer le cookie côté serveur
+    const token = getCookie("token", { req: request });
+
+    // Si le token n'existe pas et que l'utilisateur n'est pas déjà sur la page de login
+    if (!token && !request.nextUrl.pathname.includes('/login')) {
+        return NextResponse.redirect(new URL('/login', request.url));
     }
 
-    if (request.nextUrl.pathname === '/') {
-        console.log('Redirecting to /dashboard')
-        return NextResponse.redirect(new URL('/dashboard', request.url))
-    }
-
-    return NextResponse.next()
+    // Retourne la réponse de i18nRouter pour gérer les routes internationales
+    return i18nRouter(request, i18nConfig);
 }
 
-// See "Matching Paths" below to learn more
+// Configuration pour matcher les chemins spécifiés, en excluant la route de login
 export const config = {
-  matcher: ['/dashboard', '/dashboard/:path*','/'],
-}
+    matcher: '/((?!api|static|.*\\..*|_next).*)'
+};

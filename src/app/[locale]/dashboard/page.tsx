@@ -18,10 +18,17 @@ import { cn } from "@/lib/utils";
 import Image from "next/image";
 import TableInvoices from "@/components/tableInvoices";
 
-type Props = {};
+import { useTranslation } from "react-i18next";
 
-export default function Page({}: Props) {
+type Props = {
+  params: {
+    locale: string;
+  };
+};
+
+export default function Page({ params: { locale } }: Props) {
   const router = useRouter();
+  const { t } = useTranslation("dashboard");
 
   const [data, setData] = React.useState<Dashboard>({
     numberOfUnpaidInvoices: 0,
@@ -108,7 +115,9 @@ export default function Page({}: Props) {
       <div className="flex flex-col w-full gap-6">
         <div className="flex w-full justify-between ">
           <h1 className="text-s font-light">
-            <span className={cn("text-xl", "text-primary")}>Hi!</span>{" "}
+            <span className={cn("text-xl", "text-primary")}>
+              {t("welcome")}{" "}
+            </span>{" "}
             {data?.numberOfLatePaymentInvoices > 0
               ? "You have " +
                 data?.numberOfLatePaymentInvoices +
