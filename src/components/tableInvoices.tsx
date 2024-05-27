@@ -46,7 +46,9 @@ export default function TableInvoices({ invoices, search }: Props) {
         {invoices?.length === 0 ? (
           <TableRow>
             <TableCell colSpan={8} className="text-center">
-              {search ? "No invoices found" : "No invoices"}
+              {search
+                ? t("invoices:invoice_table_no_invoices")
+                : t("invoices:invoice_table_no_invoices_description")}
             </TableCell>
           </TableRow>
         ) : (

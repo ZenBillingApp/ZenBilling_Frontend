@@ -8,5 +8,7 @@
     "invoice_table_header_status": "Statut",
     "invoice_table_header_first_name": "Prénom",
     "invoice_table_header_last_name": "Nom",
-    "invoice_table_header_items": "Articles"
+    "invoice_table_header_items": "Articles",
+    "invoice_table_no_invoices": "Aucune facture trouver",
+    "invoice_table_no_invoices_description": "Il n'y a pas de factures pour le moment. Veuillez vérifier plus tard."
 }

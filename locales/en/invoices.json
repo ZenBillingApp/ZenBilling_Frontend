@@ -8,8 +8,7 @@
     "invoice_table_header_status": "Status",
     "invoice_table_header_first_name": "First Name",
     "invoice_table_header_last_name": "Last Name",
-    "invoice_table_header_items": "Items"
-
-
-    
+    "invoice_table_header_items": "Items",
+    "invoice_table_no_invoices": "No invoices found",
+    "invoice_table_no_invoices_description": "There are no invoices to display"
 }
