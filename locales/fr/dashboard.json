@@ -1,3 +1,11 @@
 {
-    "welcome": "Welcome to the world of Node.js!"
+    "welcome": "Bonjour!",
+    "dashboard": "Tableau de bord",
+    "dashboard_late_invoice": "Factures en retard",
+    "dashboard_pending_invoice": "Factures en attente",
+    "dashboard_invoice_late_message_one": "Vous avez {{count}} facture en retard",
+    "dashboard_invoice_late_message_other": "Vous avez {{count}} factures en retard",
+    "dashboard_no_invoice_late_message": "Vous n'avez pas de factures en retard",
+    "dashboard_section_customers": "Nombre de clients",
+    "dashboard_section_invoice_month": "Factures ce mois-ci"
 }

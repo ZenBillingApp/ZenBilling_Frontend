@@ -1,0 +1,15 @@
+{
+    "invoice_view_all": "View All Invoices",
+    "invoice_table_title": "Invoices",
+    "invoice_table_header_invoice_number": "Invoice Number",
+    "invoice_table_header_invoice_date": "Invoice Date",
+    "invoice_table_header_due_date": "Due Date",
+    "invoice_table_header_amount": "Amount",
+    "invoice_table_header_status": "Status",
+    "invoice_table_header_first_name": "First Name",
+    "invoice_table_header_last_name": "Last Name",
+    "invoice_table_header_items": "Items"
+
+
+    
+}

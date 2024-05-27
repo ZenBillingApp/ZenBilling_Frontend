@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 
 const inter = Inter({ subsets: ["latin"] });
 
-const i18nNamespaces = ["common", "dashboard"];
+const i18nNamespaces = ["common", "dashboard", "invoices"];
 
 export const metadata: Metadata = {
   title: "ZenBiling",

@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 
 import { Invoice } from "@/types/Invoice";
 
+import { useTranslation } from "react-i18next";
+
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -21,6 +23,7 @@ type Props = {
 };
 
 export default function TableInvoices({ invoices, search }: Props) {
+  const { t } = useTranslation();
   const router = useRouter();
   const handleSelectInvoice = (invoiceId: number) => {
     router.push(`/dashboard/invoices/${invoiceId}`);
@@ -28,14 +31,16 @@ export default function TableInvoices({ invoices, search }: Props) {
   return (
     <Table>
       <TableHeader>
-        <TableHead>InvoiceId</TableHead>
-        <TableHead>firstname</TableHead>
-        <TableHead>lastname</TableHead>
-        <TableHead>Status</TableHead>
-        <TableHead>Items</TableHead>
-        <TableHead>Amount</TableHead>
-        <TableHead>Invoice date</TableHead>
-        <TableHead>Due date</TableHead>
+        <TableHead>
+          {t("invoices:invoice_table_header_invoice_number")}
+        </TableHead>
+        <TableHead>{t("invoices:invoice_table_header_first_name")}</TableHead>
+        <TableHead>{t("invoices:invoice_table_header_last_name")}</TableHead>
+        <TableHead>{t("invoices:invoice_table_header_status")}</TableHead>
+        <TableHead>{t("invoices:invoice_table_header_items")}</TableHead>
+        <TableHead>{t("invoices:invoice_table_header_amount")}</TableHead>
+        <TableHead>{t("invoices:invoice_table_header_invoice_date")}</TableHead>
+        <TableHead>{t("invoices:invoice_table_header_due_date")}</TableHead>
       </TableHeader>
       <TableBody>
         {invoices?.length === 0 ? (

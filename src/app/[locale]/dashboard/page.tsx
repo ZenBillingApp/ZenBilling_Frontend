@@ -28,7 +28,7 @@ type Props = {
 
 export default function Page({ params: { locale } }: Props) {
   const router = useRouter();
-  const { t } = useTranslation("dashboard");
+  const { t } = useTranslation();
 
   const [data, setData] = React.useState<Dashboard>({
     numberOfUnpaidInvoices: 0,
@@ -116,19 +116,15 @@ export default function Page({ params: { locale } }: Props) {
         <div className="flex w-full justify-between ">
           <h1 className="text-s font-light">
             <span className={cn("text-xl", "text-primary")}>
-              {t("welcome")}{" "}
+              {t("dashboard:welcome")}
             </span>{" "}
-            {data?.numberOfLatePaymentInvoices > 0
-              ? "You have " +
-                data?.numberOfLatePaymentInvoices +
-                " late payment invoices"
-              : "You have no late payment invoices"}
+            {t("dashboard:dashboard_invoice_late_message", {
+              count: data?.numberOfLatePaymentInvoices || 0,
+            })}
           </h1>
           <ModeToggle />
         </div>
-        <h1 className="text-2xl font-semibold">
-          {data?.user?.first_name}&apos;s Dashboard
-        </h1>
+        <h1 className="text-2xl font-semibold">{t("dashboard:dashboard")}</h1>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <Card className="flex items-center w-full p-4 gap-6">
@@ -144,7 +140,7 @@ export default function Page({ params: { locale } }: Props) {
           </div>
           <div className="flex flex-col w-full">
             <CardTitle className="text-xl font-semibold">
-              Pending invoice
+              {t("dashboard:dashboard_pending_invoice")}
             </CardTitle>
             <h1 className="text-4xl font-light">
               {data?.numberOfUnpaidInvoices || 0}
@@ -160,7 +156,9 @@ export default function Page({ params: { locale } }: Props) {
             <PiUsersThree className={cn("text-primary-foreground")} size={32} />
           </div>
           <div className="flex flex-col w-full">
-            <CardTitle className="text-xl font-semibold">Customers</CardTitle>
+            <CardTitle className="text-xl font-semibold">
+              {t("dashboard:dashboard_section_customers")}
+            </CardTitle>
             <h1 className="text-4xl font-light">
               {data?.numberOfClients || 0}
             </h1>
@@ -179,7 +177,7 @@ export default function Page({ params: { locale } }: Props) {
           </div>
           <div className="flex flex-col w-full">
             <CardTitle className="text-xl font-semibold">
-              Invoice this month
+              {t("dashboard:dashboard_section_invoice_month")}
             </CardTitle>
             <h1 className="text-4xl font-light">
               {data?.numberOfInvoicesThisMonth || 0}
@@ -196,7 +194,7 @@ export default function Page({ params: { locale } }: Props) {
             }}
             className="w-full "
           >
-            View all invoices
+            {t("invoices:invoice_view_all")}
           </Button>
         </Card>
       </div>
