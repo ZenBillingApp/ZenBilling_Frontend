@@ -111,6 +111,41 @@ export default function Page({}: Props) {
     }
   }
 
+  const handleDownload = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/invoices/${id}/pdf`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${getCookie("token")}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to download invoice");
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${invoice?.invoice_id}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    } catch (error) {
+      console.error(error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to download invoice",
+      });
+    }
+  };
+
   const handleChangeStatus = async (status: string) => {
     try {
       const response = await fetch(
@@ -252,7 +287,11 @@ export default function Page({}: Props) {
     <div className="flex flex-col flex-1 gap-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">Invoices / {id}</h1>
-        <Button variant={"outline"} className="flex items-center gap-2">
+        <Button
+          variant={"outline"}
+          className="flex items-center gap-2"
+          onClick={handleDownload}
+        >
           <Download size={16} />
           Download
         </Button>
