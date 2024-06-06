@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { Customer } from "@/types/Customer";
 
 import { Button } from "@/components/ui/button";
@@ -18,8 +19,20 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { ChevronDownIcon, Delete, Edit } from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { ChevronDownIcon, Trash, Edit } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
+import { cn } from "@/lib/utils";
+
+import { useToast } from "@/components/ui/use-toast";
+import { ToastAction } from "@/components/ui/toast";
 
 import { getCookie } from "cookies-next";
 
@@ -28,11 +41,14 @@ type Props = {};
 type Item = {
   description: string;
   quantity: number;
-  unitPrice: number;
-  vatRate: number;
+  unit_price: number;
+  vat_rate: number;
 };
 
 export default function Page({}: Props) {
+  const router = useRouter();
+  const { toast } = useToast();
+
   const [open, setOpen] = useState<boolean>(false);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [search, setSearch] = useState<string>("");
@@ -43,6 +59,56 @@ export default function Page({}: Props) {
     null
   );
   const [items, setItems] = useState<Item[]>([]);
+  const [date, setDate] = useState<Date>(new Date());
+
+  const handleCreateInvoice = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/invoices`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${getCookie("token")}`,
+          },
+          body: JSON.stringify({
+            due_date: new Date(),
+            client_id: selectedCustomer?.client_id,
+            items,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to create invoice");
+      }
+
+      const data = await response.json();
+
+      toast({
+        title: "Success",
+        description: "Invoice created successfully",
+      });
+      router.push("/dashboard/invoices/" + data.invoice_id);
+    } catch (error) {
+      console.error(error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to create invoice",
+        action: (
+          <ToastAction
+            altText="Retry"
+            onClick={() => {
+              handleCreateInvoice();
+            }}
+          >
+            Retry
+          </ToastAction>
+        ),
+      });
+    }
+  };
 
   const fetchCustomers = useCallback(async () => {
     try {
@@ -67,7 +133,6 @@ export default function Page({}: Props) {
 
       const data = await response.json();
       setCustomers(data || []);
-      console.log(data);
     } catch (error) {
       console.error(error);
       setError(true);
@@ -87,13 +152,41 @@ export default function Page({}: Props) {
   const addItem = () => {
     setItems([
       ...items,
-      { description: "", quantity: 1, unitPrice: 0, vatRate: 0 },
+      { description: "", quantity: 1, unit_price: 0, vat_rate: 0 },
     ]);
   };
 
   const handleDeleteItem = (index: number) => {
     const newItems = items.filter((_, i) => i !== index);
     setItems(newItems);
+  };
+
+  const handleChangeItem = (index: number, field: string, value: string) => {
+    const newItems = [...items];
+    newItems[index] = { ...newItems[index], [field]: parseFloat(value) || 0 };
+    setItems(newItems);
+  };
+
+  const calculateSubtotal = () => {
+    return items
+      .reduce((total, item) => total + item.quantity * item.unit_price, 0)
+      .toFixed(2);
+  };
+
+  const calculateTax = () => {
+    return items
+      .reduce(
+        (total, item) =>
+          total + (item.quantity * item.unit_price * item.vat_rate) / 100,
+        0
+      )
+      .toFixed(2);
+  };
+
+  const calculateTotal = () => {
+    return (
+      parseFloat(calculateSubtotal()) + parseFloat(calculateTax())
+    ).toFixed(2);
   };
 
   return (
@@ -104,28 +197,6 @@ export default function Page({}: Props) {
       <div className="flex flex-col gap-6">
         <div className="flex gap-2">
           <div className="flex flex-col items-start w-96 gap-2">
-            <Label>Invoice date</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="w-full flex items-center justify-between"
-                >
-                  {"Select a date"}
-                  <ChevronDownIcon size={16} className="ml-2 opacity-50" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
-                <Calendar
-                  mode="single"
-                  selected={new Date()}
-                  onSelect={() => {}}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
-          <div className="flex flex-col items-start w-96 gap-2">
             <Label>Due date</Label>
             <Popover>
               <PopoverTrigger asChild>
@@ -133,7 +204,7 @@ export default function Page({}: Props) {
                   variant="outline"
                   className="w-full flex items-center justify-between"
                 >
-                  {"Select a date"}
+                  {date.toLocaleDateString() ?? "Select a date"}
                   <ChevronDownIcon size={16} className="ml-2 opacity-50" />
                 </Button>
               </PopoverTrigger>
@@ -141,7 +212,7 @@ export default function Page({}: Props) {
                 <Calendar
                   mode="single"
                   selected={new Date()}
-                  onSelect={() => {}}
+                  onSelect={(date) => setDate(date ?? new Date())}
                   initialFocus
                 />
               </PopoverContent>
@@ -195,57 +266,99 @@ export default function Page({}: Props) {
             </SheetContent>
           </Sheet>
         </div>
-        <div className="flex flex-col items-start w-full gap-2">
-          <Label>Items</Label>
-          <div className="flex flex-col w-full gap-2">
-            {items.map((item, index) => (
-              <div className="flex w-full gap-2" key={index}>
-                <Input
-                  placeholder="Description"
-                  className="flex flex-1"
-                  value={item.description}
-                  onChange={(e) => {}}
-                />
-                <Input
-                  placeholder="Quantity"
-                  className="w-24"
-                  type="number"
-                  value={item.quantity}
-                  onChange={(e) => {}}
-                />
-                <Input
-                  placeholder="Unit price"
-                  className="w-24"
-                  type="number"
-                  value={item.unitPrice}
-                  onChange={(e) => {}}
-                />
-                <Input
-                  placeholder="VAT rate"
-                  className="w-24"
-                  type="number"
-                  value={item.vatRate}
-                  onChange={(e) => {}}
-                />
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-500">
-                    {(
-                      item.quantity *
-                      item.unitPrice *
-                      (1 + item.vatRate / 100)
-                    ).toFixed(2)}
-                    $
-                  </span>
+        <div className="flex flex-col items-start w-full gap-2 mb-4">
+          <Table>
+            <TableHeader className={cn("bg-secondary")}>
+              <TableRow>
+                <TableHead>Description</TableHead>
+                <TableHead>Quantity</TableHead>
+                <TableHead>Unit price</TableHead>
+                <TableHead>VAT rate</TableHead>
+                <TableHead>Total</TableHead>
+                <TableHead></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {items.map((item, index) => (
+                <TableRow key={index} className="h-12">
+                  <TableCell className="w-3/6">
+                    <Input
+                      value={item.description}
+                      placeholder="Description"
+                      onChange={(e) => {
+                        const newItems = [...items];
+                        newItems[index].description = e.target.value;
+                        setItems(newItems);
+                      }}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Input
+                      type="number"
+                      value={item.quantity}
+                      onChange={(e) =>
+                        handleChangeItem(index, "quantity", e.target.value)
+                      }
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Input
+                      type="number"
+                      value={item.unit_price}
+                      onChange={(e) =>
+                        handleChangeItem(index, "unit_price", e.target.value)
+                      }
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Input
+                      type="number"
+                      value={item.vat_rate}
+                      onChange={(e) =>
+                        handleChangeItem(index, "vat_rate", e.target.value)
+                      }
+                    />
+                  </TableCell>
+                  <TableCell>
+                    ${(item.quantity * item.unit_price).toFixed(2)}
+                  </TableCell>
+                  <TableCell>
+                    <Trash
+                      size={24}
+                      color="#009933"
+                      className="cursor-pointer"
+                      onClick={() => handleDeleteItem(index)}
+                    />
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          <Button onClick={addItem}>Add item</Button>
+          <div className={cn("flex flex-col items-end w-full gap-2 ")}>
+            <div className={cn("flex justify-end w-full")}>
+              <div
+                className={cn(
+                  "flex flex-col items-end w-96 gap-2 bg-secondary p-4 rounded-lg"
+                )}
+              >
+                <div className="flex justify-between w-full">
+                  <span>Subtotal:</span>
+                  <span>${calculateSubtotal()}</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Delete size={16} onClick={() => handleDeleteItem(index)} />
-                  <Edit size={16} />
+                <div className="flex justify-between w-full">
+                  <span>Tax:</span>
+                  <span>${calculateTax()}</span>
                 </div>
+                <div className="flex justify-between w-full">
+                  <span>Total:</span>
+                  <span className="font-bold">${calculateTotal()}</span>
+                </div>
+                <Button className="w-full" onClick={handleCreateInvoice}>
+                  Create invoice
+                </Button>
               </div>
-            ))}
-            <Button variant="secondary" onClick={addItem}>
-              Add item
-            </Button>
+            </div>
           </div>
         </div>
       </div>
