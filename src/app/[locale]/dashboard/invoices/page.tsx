@@ -11,6 +11,16 @@ import { Input } from "@/components/ui/input";
 import { ClipLoader } from "react-spinners";
 import { getCookie } from "cookies-next";
 
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+
 import { PiPlus } from "react-icons/pi";
 
 type Props = {};
@@ -23,6 +33,12 @@ export default function Page({}: Props) {
   const [filter, setFilter] = React.useState<string>("all");
   const [loading, setLoading] = React.useState<boolean>(true);
   const [error, setError] = React.useState<boolean>(false);
+  const [page, setPage] = React.useState<number>(1);
+  const [totalPages, setTotalPages] = React.useState<number>(1);
+
+  const handleChangePage = (page: number) => {
+    setPage(page);
+  };
 
   const fetchInvoices = React.useCallback(async () => {
     try {
@@ -32,7 +48,7 @@ export default function Page({}: Props) {
         process.env.NEXT_PUBLIC_API_URL +
           "/api/invoices?" +
           `${filter === "all" ? "" : `status=${filter}&`}` +
-          `${search ? `search=${search}` : ""}`,
+          `${search ? `search=${search}` : ""} ${page ? `&page=${page}` : ""}`,
         {
           method: "GET",
           headers: {
@@ -47,6 +63,7 @@ export default function Page({}: Props) {
 
       const data = await response.json();
       setInvoices(data.invoices.rows);
+      setTotalPages(data.totalPages);
       console.log(data);
     } catch (error) {
       console.error(error);
@@ -54,7 +71,7 @@ export default function Page({}: Props) {
     } finally {
       setLoading(false);
     }
-  }, [filter, search]);
+  }, [filter, page, search]);
 
   React.useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
@@ -136,6 +153,23 @@ export default function Page({}: Props) {
       ) : (
         <TableInvoices invoices={invoices} search={search} />
       )}
+      <Pagination>
+        <PaginationContent>
+          <PaginationPrevious isActive={false}>Previous</PaginationPrevious>
+          {[...Array(totalPages)].map((_, index) => (
+            <PaginationItem key={index}>
+              <PaginationLink
+                isActive={index + 1 === page}
+                onClick={() => handleChangePage(index + 1)}
+              >
+                {index + 1}
+              </PaginationLink>
+            </PaginationItem>
+          ))}
+
+          <PaginationNext>Next</PaginationNext>
+        </PaginationContent>
+      </Pagination>
     </div>
   );
 }

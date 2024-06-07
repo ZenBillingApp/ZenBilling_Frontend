@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { ThemeProvider } from "next-themes";
-import { Toaster } from "@/components/ui/toaster";
 
 import initTranslations from "../i18n";
+
 import TranslationsProvider from "@/components/TranslationsProvider";
+import { Toaster } from "@/components/ui/toaster";
+
+import { cn } from "@/lib/utils";
 
 import "../globals.css";
-import { cn } from "@/lib/utils";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -30,7 +32,7 @@ export default async function RootLayout({
   children,
   params: { locale },
 }: RootLayoutProps) {
-  const { t, resources } = await initTranslations(locale, i18nNamespaces);
+  const { resources } = await initTranslations(locale, i18nNamespaces);
 
   return (
     <>
