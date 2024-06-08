@@ -1,3 +1,4 @@
+import { Item } from "./Item";
 export interface Invoice {
     invoice_id: number;
     invoice_date: Date;
@@ -24,15 +25,7 @@ export interface Invoice {
         city: string;
         postal_code: string;
     };
-    items: Array<{
-        description: string;
-        item_id: number;
-        total_price: number;
-        quantity: number;
-        unit_price: number;
-        vat_rate: number;
-        vat_amount: number;
-    }>;
+    items: Item[];
     status: string;
     total_amount: number;
     due_date: string;

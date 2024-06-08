@@ -3,7 +3,7 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { AiFillAliwangwang } from "react-icons/ai";
+import { HiBuildingStorefront } from "react-icons/hi2";
 
 import { Button } from "./ui/button";
 
@@ -18,8 +18,8 @@ export default function Sidebar({ items }: Props) {
     console.log(page);
     return (
         <div className="flex h-full w-[16rem] items-center flex-col gap-6 border">
-            <div className="flex w-full justify-start items-center p-4 gap-1">
-                <AiFillAliwangwang size={32} />
+            <div className="flex w-full justify-start items-center p-6 gap-2">
+                <HiBuildingStorefront size={24} />
                 <h1 className="text-xl font-bold">
                     <span className={cn("text-xl", "text-primary")}>Z</span>
                     ENBILLING
