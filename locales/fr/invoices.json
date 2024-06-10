@@ -1,14 +1,14 @@
 {
-    "invoice_view_all": "Voir Toutes les Factures",
-    "invoice_table_title": "Factures",
-    "invoice_table_header_invoice_number": "Numéro de Facture",
-    "invoice_table_header_invoice_date": "Date de Facture",
-    "invoice_table_header_due_date": "Date d'Échéance",
-    "invoice_table_header_amount": "Montant",
-    "invoice_table_header_status": "Statut",
-    "invoice_table_header_first_name": "Prénom",
-    "invoice_table_header_last_name": "Nom",
-    "invoice_table_header_items": "Articles",
-    "invoice_table_no_invoices": "Aucune facture trouver",
-    "invoice_table_no_invoices_description": "Il n'y a pas de factures pour le moment. Veuillez vérifier plus tard."
+    "invoice_view_all": "View All Invoices",
+    "invoice_table_title": "Invoices",
+    "invoice_table_header_invoice_number": "Invoice Number",
+    "invoice_table_header_invoice_date": "Invoice Date",
+    "invoice_table_header_due_date": "Due Date",
+    "invoice_table_header_amount": "Amount",
+    "invoice_table_header_status": "Status",
+    "invoice_table_header_first_name": "First Name",
+    "invoice_table_header_last_name": "Last Name",
+    "invoice_table_header_items": "Items",
+    "invoice_table_no_invoices": "No invoices found",
+    "invoice_table_no_invoices_description": "There are no invoices to display"
 }

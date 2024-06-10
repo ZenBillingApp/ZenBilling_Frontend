@@ -86,61 +86,77 @@ export default function Sidebar({ items }: Props) {
                         </li>
                     ))}
                 </ul>
-                <DropdownMenu>
-                    <DropdownMenuTrigger className="flex w-full gap-2 p-2">
+                {user ? (
+                    <DropdownMenu>
+                        <DropdownMenuTrigger className="flex w-full gap-2 p-2">
+                            <Button
+                                variant="ghost"
+                                className="flex w-full gap-2  p-2"
+                            >
+                                <div className="flex rounded-full w-8 h-8 bg-primary justify-center items-center">
+                                    <span className="text-white">
+                                        {user?.first_name?.charAt(0)}
+                                        {user?.last_name?.charAt(0)}
+                                    </span>
+                                </div>
+                                <div className="flex flex-col">
+                                    <span className="text-sm">
+                                        {user?.first_name} {user?.last_name}
+                                    </span>
+                                    <span className="text-xs text-gray-500">
+                                        {user?.company?.name}
+                                    </span>
+                                </div>
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                            <DropdownMenuLabel className="flex w-full gap-2 p-2 items-center">
+                                <div className="flex rounded-full w-8 h-8 bg-primary justify-center items-center">
+                                    <span className="text-white">
+                                        {user?.first_name?.charAt(0)}
+                                        {user?.last_name?.charAt(0)}
+                                    </span>
+                                </div>
+                                <div className="flex flex-col">
+                                    <span className="text-sm">
+                                        {user?.first_name} {user?.last_name}
+                                    </span>
+                                    <span className="text-xs text-gray-500">
+                                        {user?.company?.name}
+                                    </span>
+                                </div>
+                            </DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                                onClick={() =>
+                                    router.push("/dashboard/profile")
+                                }
+                            >
+                                Profile
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                                onClick={() => {
+                                    deleteCookie("token");
+                                    router.replace("/login");
+                                }}
+                            >
+                                Sign out
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                ) : (
+                    <div className="flex flex-col w-full p-2 gap-2">
                         <Button
-                            variant="ghost"
-                            className="flex w-full gap-2  p-2"
-                        >
-                            <div className="flex rounded-full w-8 h-8 bg-primary justify-center items-center">
-                                <span className="text-white">
-                                    {user?.first_name?.charAt(0)}
-                                    {user?.last_name?.charAt(0)}
-                                </span>
-                            </div>
-                            <div className="flex flex-col">
-                                <span className="text-sm">
-                                    {user?.first_name} {user?.last_name}
-                                </span>
-                                <span className="text-xs text-gray-500">
-                                    {user?.company?.name}
-                                </span>
-                            </div>
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                        <DropdownMenuLabel className="flex w-full gap-2 p-2 items-center">
-                            <div className="flex rounded-full w-8 h-8 bg-primary justify-center items-center">
-                                <span className="text-white">
-                                    {user?.first_name?.charAt(0)}
-                                    {user?.last_name?.charAt(0)}
-                                </span>
-                            </div>
-                            <div className="flex flex-col">
-                                <span className="text-sm">
-                                    {user?.first_name} {user?.last_name}
-                                </span>
-                                <span className="text-xs text-gray-500">
-                                    {user?.company?.name}
-                                </span>
-                            </div>
-                        </DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                            onClick={() => router.push("/dashboard/profile")}
-                        >
-                            Profile
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
+                            variant={"ghost"}
                             onClick={() => {
                                 deleteCookie("token");
                                 router.replace("/login");
                             }}
                         >
-                            Sign out
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                            Sign Out
+                        </Button>
+                    </div>
+                )}
             </div>
         </div>
     );

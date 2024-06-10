@@ -108,7 +108,7 @@ const EditUserDialog = ({
                     Modify
                 </Button>
             </DialogTrigger>
-            <DialogContent className="overflow-auto">
+            <DialogContent className="overflow-auto h-[80vh]">
                 <DialogHeader>
                     <DialogTitle>Modify my profile</DialogTitle>
                 </DialogHeader>
@@ -344,7 +344,14 @@ export default function Page({}: Props) {
             ) : (
                 <>
                     <div className="flex items-center justify-between">
-                        <h1 className="text-3xl font-semibold">My profile</h1>
+                        <div className="flex flex-col items-start gap-2">
+                            <h1 className="text-3xl font-semibold">
+                                My profile
+                            </h1>
+                            <p className=" text-gray-500">
+                                Manage your profile
+                            </p>
+                        </div>
                         <div className="flex items-center gap-2">
                             <EditUserDialog
                                 user={user}
@@ -354,12 +361,25 @@ export default function Page({}: Props) {
                         </div>
                     </div>
                     <div className="flex  w-full gap-6">
-                        <div className="flex w-1/2 flex-col justify-center p-4 gap-6">
-                            <Card className="flex flex-col justify-center p-4 gap-6">
-                                <h2 className="text-xl font-semibold">
-                                    Contact information :
-                                </h2>
-                                <div className="flex flex-col gap-2">
+                        <div className="flex w-full flex-col justify-center p-4 gap-6">
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>Personal information</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <div>
+                                        <span className="font-semibold">
+                                            First name :{" "}
+                                        </span>{" "}
+                                        {user?.first_name}
+                                    </div>
+                                    <div>
+                                        <span className="font-semibold">
+                                            Last name :{" "}
+                                        </span>{" "}
+                                        {user?.last_name}
+                                    </div>
+
                                     <div>
                                         <span className="font-semibold">
                                             Email :{" "}
@@ -372,13 +392,13 @@ export default function Page({}: Props) {
                                         </span>{" "}
                                         {user?.phone}
                                     </div>
-                                </div>
+                                </CardContent>
                             </Card>
-                            <Card className="flex  flex-col p-4 gap-6">
-                                <h2 className="text-xl font-semibold">
-                                    Address :
-                                </h2>
-                                <div className="flex flex-col gap-2">
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>Address</CardTitle>
+                                </CardHeader>
+                                <CardContent>
                                     <div>
                                         <span className="font-semibold">
                                             Street address:
@@ -409,7 +429,7 @@ export default function Page({}: Props) {
                                         </span>{" "}
                                         {user?.country}
                                     </div>
-                                </div>
+                                </CardContent>
                             </Card>
                         </div>
                     </div>

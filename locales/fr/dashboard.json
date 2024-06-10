@@ -1,11 +1,11 @@
 {
-    "welcome": "Bonjour!",
-    "dashboard": "Tableau de bord",
-    "dashboard_late_invoice": "Factures en retard",
-    "dashboard_pending_invoice": "Factures en attente",
-    "dashboard_invoice_late_message_one": "Vous avez {{count}} facture en retard",
-    "dashboard_invoice_late_message_other": "Vous avez {{count}} factures en retard",
-    "dashboard_no_invoice_late_message": "Vous n'avez pas de factures en retard",
-    "dashboard_section_customers": "Nombre de clients",
-    "dashboard_section_invoice_month": "Factures ce mois-ci"
+    "welcome": "Hello!",
+    "dashboard": "Dashboard",
+    "dashboard_late_invoice": "Late Invoices",
+    "dashboard_pending_invoice": "Pending Invoices",
+    "dashboard_invoice_late_message_one": "You have {{count}} late invoice",
+    "dashboard_invoice_late_message_other": "You have {{count}} late invoices",
+    "dashboard_no_invoice_late_message": "You have no late invoices",
+    "dashboard_section_customers": "Customers",
+    "dashboard_section_invoice_month": "Invoices this Month"
 }

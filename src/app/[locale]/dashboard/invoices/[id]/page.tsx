@@ -39,6 +39,16 @@ import {
     SheetTitle,
     SheetTrigger,
 } from "@/components/ui/sheet";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+    DialogClose,
+} from "@/components/ui/dialog";
 
 import { Calendar } from "@/components/ui/calendar";
 import { useToast } from "@/components/ui/use-toast";
@@ -53,6 +63,87 @@ import { ChevronDownIcon } from "lucide-react";
 import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
 
 type Props = {};
+
+const AlertDeleteInvoice = ({}) => {
+    const [open, setOpen] = React.useState<boolean>(false);
+    const { id } = useParams();
+    const router = useRouter();
+
+    const { toast } = useToast();
+
+    const [loading, setLoading] = React.useState<boolean>(false);
+
+    const onDelete = async () => {
+        try {
+            const response = await fetch(
+                `${process.env.NEXT_PUBLIC_API_URL}/api/invoices/${id}`,
+                {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${getCookie("token")}`,
+                    },
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error("Failed to delete invoice");
+            }
+
+            router.push("/dashboard/invoices");
+            toast({
+                title: "Success",
+                description: "Invoice deleted successfully",
+            });
+        } catch (error) {
+            console.error(error);
+            toast({
+                variant: "destructive",
+                title: "Error",
+                description: "Failed to delete invoice",
+                action: (
+                    <ToastAction altText="Retry" onClick={onDelete}>
+                        Retry
+                    </ToastAction>
+                ),
+            });
+        }
+    };
+
+    return (
+        <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger>
+                <Button
+                    variant={"destructive"}
+                    className="flex items-center gap-2"
+                >
+                    <MdDeleteOutline size={20} />
+                    Delete
+                </Button>
+            </DialogTrigger>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Delete Invoice</DialogTitle>
+                </DialogHeader>
+                <DialogDescription>
+                    <p>Are you sure you want to delete this invoice?</p>
+                </DialogDescription>
+                <DialogFooter>
+                    <Button
+                        disabled={loading}
+                        variant={"destructive"}
+                        onClick={onDelete}
+                    >
+                        {loading ? "Deleting..." : "Yes"}
+                    </Button>
+                    <DialogClose asChild>
+                        <Button variant="outline">No</Button>
+                    </DialogClose>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
+};
 
 export default function Page({}: Props) {
     const { id } = useParams();
@@ -337,43 +428,6 @@ export default function Page({}: Props) {
     //     }
     // };
 
-    const handleDeleteInvoice = async () => {
-        try {
-            const response = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/api/invoices/${id}`,
-                {
-                    method: "DELETE",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${getCookie("token")}`,
-                    },
-                }
-            );
-
-            if (!response.ok) {
-                throw new Error("Failed to delete invoice");
-            }
-
-            router.push("/dashboard/invoices");
-            toast({
-                title: "Success",
-                description: "Invoice deleted successfully",
-            });
-        } catch (error) {
-            console.error(error);
-            toast({
-                variant: "destructive",
-                title: "Error",
-                description: "Failed to delete invoice",
-                action: (
-                    <ToastAction altText="Retry" onClick={handleDeleteInvoice}>
-                        Retry
-                    </ToastAction>
-                ),
-            });
-        }
-    };
-
     const handleSelectDueDate = async (date: Date) => {
         try {
             const response = await fetch(
@@ -505,14 +559,7 @@ export default function Page({}: Props) {
                         Download
                     </Button>
 
-                    <Button
-                        variant="destructive"
-                        className="flex items-center gap-2"
-                        onClick={handleDeleteInvoice}
-                    >
-                        <MdDeleteOutline size={16} />
-                        Delete
-                    </Button>
+                    <AlertDeleteInvoice />
                 </div>
             </div>
             <Card className="flex flex-col justify-between gap-6 p-6 md:flex-row">
@@ -649,8 +696,15 @@ export default function Page({}: Props) {
                                 </SheetDescription>
                             </SheetHeader>
                             <div className="flex flex-col gap-2 mt-6">
-                                {customerLoading && <p>Loading...</p>}
+                                {customerLoading && (
+                                    <div className="flex justify-center items-center">
+                                        <ClipLoader color="#009933" size={20} />
+                                    </div>
+                                )}
                                 {error && <p>Failed to fetch customers</p>}
+                                {customers.length === 0 && !customerLoading && (
+                                    <p>No customers found</p>
+                                )}
                                 {customers.map((customer) => (
                                     <Button
                                         variant="secondary"
@@ -702,7 +756,7 @@ export default function Page({}: Props) {
                                     <TableHead>Description</TableHead>
                                     <TableHead>Quantity</TableHead>
                                     <TableHead>Unit Price</TableHead>
-                                    <TableHead>VAT Rate</TableHead>
+                                    <TableHead>VAT Rate (in %)</TableHead>
                                     <TableHead></TableHead>
                                 </TableRow>
                             </TableHeader>
@@ -797,7 +851,7 @@ export default function Page({}: Props) {
                                     <TableHead>Description</TableHead>
                                     <TableHead>Quantity</TableHead>
                                     <TableHead>Unit Price</TableHead>
-                                    <TableHead>VAT Rate</TableHead>
+                                    <TableHead>VAT Rate (in %)</TableHead>
                                     <TableHead>VAT Amount</TableHead>
                                     <TableHead>
                                         Total Price (VAT incl.)

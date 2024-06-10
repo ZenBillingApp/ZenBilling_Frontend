@@ -27,7 +27,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { ChevronDownIcon, Trash, Edit } from "lucide-react";
+import { ChevronDownIcon, Trash, Edit, Plus } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 
@@ -35,6 +35,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 
 import { getCookie } from "cookies-next";
+import { ClipLoader } from "react-spinners";
 
 type Props = {};
 
@@ -249,7 +250,7 @@ export default function Page({}: Props) {
                         <SheetContent className="p-10">
                             <SheetHeader>
                                 <SheetTitle>Select a customer</SheetTitle>
-                                <SheetDescription>
+                                <SheetDescription className="flex  gap-2">
                                     <Input
                                         placeholder="Search customers"
                                         value={search}
@@ -257,11 +258,30 @@ export default function Page({}: Props) {
                                             setSearch(e.target.value)
                                         }
                                     />
+                                    <Button
+                                        onClick={() =>
+                                            router.push(
+                                                "/dashboard/customers?add=true"
+                                            )
+                                        }
+                                    >
+                                        <Plus size={16} />
+                                    </Button>
                                 </SheetDescription>
                             </SheetHeader>
                             <div className="flex flex-col gap-2 mt-6">
-                                {loading && <p>Loading...</p>}
+                                {loading && (
+                                    <div className="flex w-full align-center justify-center">
+                                        <ClipLoader color="#009933" size={20} />
+                                    </div>
+                                )}
+
                                 {error && <p>Failed to fetch customers</p>}
+                                {customers.length === 0 && !loading && (
+                                    <p className="text-gray-500">
+                                        No customers found
+                                    </p>
+                                )}
                                 {customers.map((customer) => (
                                     <Button
                                         variant="secondary"

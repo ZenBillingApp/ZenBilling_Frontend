@@ -178,7 +178,7 @@ const EditCustomerDialog = ({
                     Modify
                 </Button>
             </DialogTrigger>
-            <DialogContent className="overflow-auto">
+            <DialogContent className="overflow-auto h-[80vh]">
                 <DialogHeader>
                     <DialogTitle>Modify customer information</DialogTitle>
                 </DialogHeader>
@@ -572,8 +572,8 @@ export default function Page({}: Props) {
                                                 No invoices found
                                             </AlertTitle>
                                             <AlertDescription>
-                                                There are no invoices for this
-                                                customer
+                                                There are no invoices paid by
+                                                this customer.
                                             </AlertDescription>
                                         </Alert>
                                     ) : (
@@ -599,7 +599,18 @@ export default function Page({}: Props) {
                             </Card>
                         </div>
                     </div>
-                    <TableInvoices invoices={customer?.invoices} search={""} />
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Invoices</CardTitle>
+                            <CardDescription>
+                                Invoices paid by this customer
+                            </CardDescription>
+                        </CardHeader>
+                        <TableInvoices
+                            invoices={customer?.invoices}
+                            search={""}
+                        />
+                    </Card>
                 </>
             )}
         </div>

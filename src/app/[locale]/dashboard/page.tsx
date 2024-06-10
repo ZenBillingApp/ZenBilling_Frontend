@@ -6,7 +6,13 @@ import { Dashboard } from "@/types/Dashboard";
 
 import { ModeToggle } from "@/components/ui/toggle-theme";
 import { Button } from "@/components/ui/button";
-import { Card, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+    Card,
+    CardContent,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card";
 
 import { ClipLoader } from "react-spinners";
 import { getCookie } from "cookies-next";
@@ -190,15 +196,17 @@ export default function Page({ params: { locale } }: Props) {
                     </div>
                 </Card>
             </div>
-            <div className="flex w-full h-full  gap-6 ">
-                <Card className="flex flex-col justify-between w-full h-full  p-4 ">
+            <div className="flex w-full  gap-6 ">
+                <Card className="flex flex-col  w-full   p-4 ">
                     <CardHeader>
                         <CardTitle>Latest Invoices</CardTitle>
                     </CardHeader>
-                    <TableInvoices
-                        invoices={data?.latestInvoices || []}
-                        search=""
-                    />
+                    <CardContent className="flex  w-full h-full ">
+                        <TableInvoices
+                            invoices={data?.latestInvoices || []}
+                            search=""
+                        />
+                    </CardContent>
                     <CardFooter>
                         <Button
                             onClick={() => {
