@@ -39,7 +39,7 @@ export default function Component() {
       );
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error);
+        throw new Error(error.message);
       }
       const data = await response.json();
       setCookie("token", data.token, {

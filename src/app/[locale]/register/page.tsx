@@ -92,7 +92,7 @@ export default function SignupPage() {
       );
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error);
+        throw new Error(error.message);
       }
       const data = await response.json();
 
