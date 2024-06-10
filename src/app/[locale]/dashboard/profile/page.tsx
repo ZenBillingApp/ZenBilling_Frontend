@@ -1,8 +1,8 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 
-import { Company } from "@/types/Company";
+import { User } from "@/types/User";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,51 +31,62 @@ import { AlertTriangle } from "lucide-react";
 import { ClipLoader } from "react-spinners";
 import { getCookie } from "cookies-next";
 
+import {
+    BarChart,
+    Bar,
+    XAxis,
+    YAxis,
+    Tooltip,
+    ResponsiveContainer,
+} from "recharts";
+
 import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
+import { cn } from "@/lib/utils";
+import TableInvoices from "@/components/tableInvoices";
 
 type Props = {};
 
-const EditCompanyDialog = ({
-    company,
+const EditUserDialog = ({
+    user,
     onClose,
     onSave,
 }: {
-    company: Company | null;
+    user: User | null;
     onClose: () => void;
-    onSave: (updatedCompany: Company) => void;
+    onSave: (updateduser: User) => void;
 }) => {
-    const [editCompany, setEditCompany] = useState<Company | null>(null);
-    const [loading, setLoading] = useState<boolean>(false);
-    const [open, setOpen] = useState<boolean>(false);
-    const [error, setError] = useState<boolean>(false);
+    const [editUser, setEditUser] = React.useState<User | null>(null);
+    const [loading, setLoading] = React.useState<boolean>(false);
+    const [open, setOpen] = React.useState<boolean>(false);
+    const [error, setError] = React.useState<boolean>(false);
 
-    useEffect(() => {
+    React.useEffect(() => {
         setError(false);
-        setEditCompany(company);
-    }, [open, company]);
+        setEditUser(user);
+    }, [open, user]);
 
     const handleSave = async () => {
         try {
-            if (editCompany) {
+            if (editUser) {
                 setLoading(true);
                 setError(false);
                 const response = await fetch(
-                    process.env.NEXT_PUBLIC_API_URL + `/api/company`,
+                    process.env.NEXT_PUBLIC_API_URL + `/api/auth/profile`,
                     {
                         method: "PUT",
                         headers: {
                             "Content-Type": "application/json",
                             Authorization: `Bearer ${getCookie("token")}`,
                         },
-                        body: JSON.stringify(editCompany),
+                        body: JSON.stringify(editUser),
                     }
                 );
                 if (!response.ok) {
-                    throw new Error("Failed to update company");
+                    throw new Error("Failed to update user");
                 }
 
-                const updatedCompany = await response.json();
-                onSave(updatedCompany);
+                const updatedUser = await response.json();
+                onSave(updatedUser);
                 setOpen(false);
             }
         } catch (error) {
@@ -99,56 +110,58 @@ const EditCompanyDialog = ({
             </DialogTrigger>
             <DialogContent className="overflow-auto">
                 <DialogHeader>
-                    <DialogTitle>Modify Company Profile</DialogTitle>
+                    <DialogTitle>Modify my profile</DialogTitle>
                 </DialogHeader>
                 <DialogDescription>
-                    <p>Change your company information</p>
+                    <p>change your information</p>
                 </DialogDescription>
                 {error && (
                     <Alert variant="destructive">
                         <AlertTriangle className="w-5 h-5" />
-                        <AlertTitle>Failed to update company</AlertTitle>
+                        <AlertTitle>Failed to update user</AlertTitle>
                         <AlertDescription>
                             Please check your information and try again.
                         </AlertDescription>
                     </Alert>
                 )}
-                <div className="flex flex-col w-full gap-2">
-                    <Label>Company Name</Label>
-                    <Input
-                        value={editCompany?.name || ""}
-                        onChange={(e) =>
-                            setEditCompany(
-                                (prev) =>
-                                    prev && {
-                                        ...prev,
-                                        name: e.target.value,
-                                    }
-                            )
-                        }
-                    />
+                <div className="flex gap-2">
+                    <div className="flex flex-col w-1/2 gap-2">
+                        <Label>First name</Label>
+                        <Input
+                            value={editUser?.first_name || ""}
+                            onChange={(e) =>
+                                setEditUser(
+                                    (prev) =>
+                                        prev && {
+                                            ...prev,
+                                            first_name: e.target.value,
+                                        }
+                                )
+                            }
+                        />
+                    </div>
+                    <div className="flex flex-col w-1/2 gap-2">
+                        <Label>Last name</Label>
+                        <Input
+                            value={editUser?.last_name || ""}
+                            onChange={(e) =>
+                                setEditUser(
+                                    (prev) =>
+                                        prev && {
+                                            ...prev,
+                                            last_name: e.target.value,
+                                        }
+                                )
+                            }
+                        />
+                    </div>
                 </div>
                 <div className="flex flex-col w-full gap-2">
-                    <Label>Industry</Label>
+                    <Label>Street address</Label>
                     <Input
-                        value={editCompany?.industry || ""}
+                        value={editUser?.street_address || ""}
                         onChange={(e) =>
-                            setEditCompany(
-                                (prev) =>
-                                    prev && {
-                                        ...prev,
-                                        industry: e.target.value,
-                                    }
-                            )
-                        }
-                    />
-                </div>
-                <div className="flex flex-col w-full gap-2">
-                    <Label>Street Address</Label>
-                    <Input
-                        value={editCompany?.street_address || ""}
-                        onChange={(e) =>
-                            setEditCompany(
+                            setEditUser(
                                 (prev) =>
                                     prev && {
                                         ...prev,
@@ -162,9 +175,9 @@ const EditCompanyDialog = ({
                     <div className="flex flex-col w-1/2 gap-2">
                         <Label>City</Label>
                         <Input
-                            value={editCompany?.city || ""}
+                            value={editUser?.city || ""}
                             onChange={(e) =>
-                                setEditCompany(
+                                setEditUser(
                                     (prev) =>
                                         prev && {
                                             ...prev,
@@ -177,9 +190,9 @@ const EditCompanyDialog = ({
                     <div className="flex flex-col w-1/2 gap-2">
                         <Label>State</Label>
                         <Input
-                            value={editCompany?.state || ""}
+                            value={editUser?.state || ""}
                             onChange={(e) =>
-                                setEditCompany(
+                                setEditUser(
                                     (prev) =>
                                         prev && {
                                             ...prev,
@@ -192,11 +205,11 @@ const EditCompanyDialog = ({
                 </div>
                 <div className="flex gap-2">
                     <div className="flex flex-col w-1/2 gap-2">
-                        <Label>Postal Code</Label>
+                        <Label>Postal code</Label>
                         <Input
-                            value={editCompany?.postal_code || ""}
+                            value={editUser?.postal_code || ""}
                             onChange={(e) =>
-                                setEditCompany(
+                                setEditUser(
                                     (prev) =>
                                         prev && {
                                             ...prev,
@@ -209,9 +222,9 @@ const EditCompanyDialog = ({
                     <div className="flex flex-col w-1/2 gap-2">
                         <Label>Country</Label>
                         <Input
-                            value={editCompany?.country || ""}
+                            value={editUser?.country || ""}
                             onChange={(e) =>
-                                setEditCompany(
+                                setEditUser(
                                     (prev) =>
                                         prev && {
                                             ...prev,
@@ -225,9 +238,9 @@ const EditCompanyDialog = ({
                 <div className="flex flex-col w-full gap-2">
                     <Label>Email</Label>
                     <Input
-                        value={editCompany?.email || ""}
+                        value={editUser?.email || ""}
                         onChange={(e) =>
-                            setEditCompany(
+                            setEditUser(
                                 (prev) =>
                                     prev && {
                                         ...prev,
@@ -240,9 +253,9 @@ const EditCompanyDialog = ({
                 <div className="flex flex-col w-full gap-2">
                     <Label>Phone</Label>
                     <Input
-                        value={editCompany?.phone || ""}
+                        value={editUser?.phone || ""}
                         onChange={(e) =>
-                            setEditCompany(
+                            setEditUser(
                                 (prev) =>
                                     prev && {
                                         ...prev,
@@ -252,35 +265,19 @@ const EditCompanyDialog = ({
                         }
                     />
                 </div>
-                <div className="flex flex-col w-full gap-2">
-                    <Label>VAT Number</Label>
-                    <Input
-                        value={editCompany?.vat_number || ""}
-                        onChange={(e) =>
-                            setEditCompany(
-                                (prev) =>
-                                    prev && {
-                                        ...prev,
-                                        vat_number: e.target.value,
-                                    }
-                            )
-                        }
-                    />
-                </div>
 
                 <DialogFooter>
                     <Button
                         disabled={
-                            !editCompany?.name ||
-                            !editCompany?.industry ||
-                            !editCompany?.email ||
-                            !editCompany?.phone ||
-                            !editCompany?.street_address ||
-                            !editCompany?.city ||
-                            !editCompany?.state ||
-                            !editCompany?.postal_code ||
-                            !editCompany?.country ||
-                            !editCompany?.vat_number ||
+                            !editUser?.first_name ||
+                            !editUser?.last_name ||
+                            !editUser?.email ||
+                            !editUser?.phone ||
+                            !editUser?.street_address ||
+                            !editUser?.city ||
+                            !editUser?.state ||
+                            !editUser?.postal_code ||
+                            !editUser?.country ||
                             loading
                         }
                         onClick={handleSave}
@@ -299,18 +296,18 @@ const EditCompanyDialog = ({
     );
 };
 
-export default function MyCompanyPage({}: Props) {
+export default function Page({}: Props) {
     const { id } = useParams();
     const router = useRouter();
 
-    const [company, setCompany] = useState<Company | null>(null);
-    const [loading, setLoading] = useState<boolean>(true);
+    const [user, setUser] = React.useState<User | null>(null);
+    const [loading, setLoading] = React.useState<boolean>(true);
 
-    useEffect(() => {
-        const fetchCompany = async () => {
+    React.useEffect(() => {
+        const fetchUser = async () => {
             try {
                 const response = await fetch(
-                    process.env.NEXT_PUBLIC_API_URL + `/api/company`,
+                    process.env.NEXT_PUBLIC_API_URL + `/api/auth/profile`,
                     {
                         method: "GET",
                         headers: {
@@ -320,26 +317,26 @@ export default function MyCompanyPage({}: Props) {
                     }
                 );
                 if (!response.ok) {
-                    throw new Error("Failed to fetch company");
+                    throw new Error("Failed to fetch user");
                 }
 
                 const data = await response.json();
-                setCompany(data);
+                setUser(data);
             } catch (error) {
                 console.error(error);
             } finally {
                 setLoading(false);
             }
         };
-        fetchCompany();
+        fetchUser();
     }, [id]);
 
-    const handleUpdateCompany = (updatedCompany: Company) => {
-        setCompany(updatedCompany);
+    const handleUpdateuser = (updatedUser: User) => {
+        setUser(updatedUser);
     };
 
     return (
-        <div className="flex flex-col w-full gap-4 p-6">
+        <div className="flex flex-col w-full gap-6 p-6">
             {loading ? (
                 <div className="flex w-full h-screen items-center justify-center">
                     <ClipLoader color="#009933" loading={loading} size={50} />
@@ -347,19 +344,12 @@ export default function MyCompanyPage({}: Props) {
             ) : (
                 <>
                     <div className="flex items-center justify-between">
-                        <div className="flex flex-col items-center gap-2">
-                            <h1 className="text-3xl font-semibold">
-                                My Company
-                            </h1>
-                            <h2 className="text-lg font-semibold text-gray-500">
-                                {company?.name}
-                            </h2>
-                        </div>
+                        <h1 className="text-3xl font-semibold">My profile</h1>
                         <div className="flex items-center gap-2">
-                            <EditCompanyDialog
-                                company={company}
+                            <EditUserDialog
+                                user={user}
                                 onClose={() => {}}
-                                onSave={handleUpdateCompany}
+                                onSave={handleUpdateuser}
                             />
                         </div>
                     </div>
@@ -367,70 +357,57 @@ export default function MyCompanyPage({}: Props) {
                         <div className="flex w-1/2 flex-col justify-center p-4 gap-6">
                             <Card className="flex flex-col justify-center p-4 gap-6">
                                 <h2 className="text-xl font-semibold">
-                                    Contact Information:
+                                    Contact information :
                                 </h2>
                                 <div className="flex flex-col gap-2">
                                     <div>
                                         <span className="font-semibold">
-                                            Email:{" "}
+                                            Email :{" "}
                                         </span>{" "}
-                                        {company?.email}
+                                        {user?.email}
                                     </div>
                                     <div>
                                         <span className="font-semibold">
-                                            Phone:{" "}
+                                            Phone :{" "}
                                         </span>{" "}
-                                        {company?.phone}
+                                        {user?.phone}
                                     </div>
                                 </div>
                             </Card>
                             <Card className="flex  flex-col p-4 gap-6">
                                 <h2 className="text-xl font-semibold">
-                                    Address:
+                                    Address :
                                 </h2>
                                 <div className="flex flex-col gap-2">
                                     <div>
                                         <span className="font-semibold">
-                                            Street Address:
+                                            Street address:
                                         </span>{" "}
-                                        {company?.street_address}
+                                        {user?.street_address}
                                     </div>
                                     <div>
                                         <span className="font-semibold">
                                             City:
                                         </span>{" "}
-                                        {company?.city}
+                                        {user?.city}
                                     </div>
                                     <div>
                                         <span className="font-semibold">
                                             State:
                                         </span>{" "}
-                                        {company?.state}
+                                        {user?.state}
                                     </div>
                                     <div>
                                         <span className="font-semibold">
-                                            Postal Code:
+                                            Postal code:
                                         </span>{" "}
-                                        {company?.postal_code}
+                                        {user?.postal_code}
                                     </div>
                                     <div>
                                         <span className="font-semibold">
                                             Country:
                                         </span>{" "}
-                                        {company?.country}
-                                    </div>
-                                </div>
-                            </Card>
-                            <Card className="flex  flex-col p-4 gap-6">
-                                <h2 className="text-xl font-semibold">
-                                    VAT Number:
-                                </h2>
-                                <div className="flex flex-col gap-2">
-                                    <div>
-                                        <span className="font-semibold">
-                                            VAT Number:
-                                        </span>{" "}
-                                        {company?.vat_number}
+                                        {user?.country}
                                     </div>
                                 </div>
                             </Card>
