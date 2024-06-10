@@ -37,7 +37,13 @@ export default async function RootLayout({
   return (
     <>
       <html lang="en" suppressHydrationWarning>
-        <body className={cn("h-full", "debug-screens", inter.className)}>
+        <body
+          className={cn(
+            "h-full",
+            process.env.NODE_ENV === "production" ? null : "debug-screens",
+            inter.className
+          )}
+        >
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
