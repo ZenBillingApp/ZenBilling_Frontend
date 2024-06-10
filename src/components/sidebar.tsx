@@ -118,12 +118,13 @@ export default function Sidebar({ items }: Props) {
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem
+                className=" cursor-pointer"
                 onClick={() => router.push("/dashboard/profile")}
               >
                 Profile
               </DropdownMenuItem>
               <DropdownMenuItem
-                className="bg-red-200 hover:bg-red-300 text-red-500"
+                className=" hover:bg-red-300 text-red-500 cursor-pointer"
                 onClick={() => {
                   deleteCookie("token");
                   router.replace("/login");
