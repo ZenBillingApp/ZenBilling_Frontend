@@ -123,14 +123,13 @@ export default function Sidebar({ items }: Props) {
                 Profile
               </DropdownMenuItem>
               <DropdownMenuItem
+                className="bg-red-200 hover:bg-red-300 text-red-500"
                 onClick={() => {
                   deleteCookie("token");
                   router.replace("/login");
                 }}
               >
-                <Button variant="destructive" className="w-full">
-                  Sign Out
-                </Button>
+                <span className="text-red-500">Sign Out</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
