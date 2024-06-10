@@ -9,6 +9,11 @@ export async function middleware(request: NextRequest) {
     // Utilisation de getCookie avec l'argument { req: request } pour récupérer le cookie côté serveur
     const token = getCookie("token", { req: request });
 
+    if (request.nextUrl.pathname === "/") {
+        return NextResponse.redirect(new URL("/dashboard", request.url));
+    }
+    
+
     if (token && request.nextUrl.pathname.includes("/login")) {
         return NextResponse.redirect(new URL("/dashboard", request.url));
     }
