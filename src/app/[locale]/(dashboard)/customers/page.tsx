@@ -30,6 +30,7 @@ import { ClipLoader } from "react-spinners";
 import { getCookie } from "cookies-next";
 
 import { PiPlus } from "react-icons/pi";
+import { ContentLayout } from "@/components/admin-panel/content-layout";
 
 type Props = {};
 
@@ -302,7 +303,7 @@ export default function Page({}: Props) {
     }, [fetchCustomers]);
 
     const handleSelectCustomer = (customerId: number) => {
-        router.push(`/dashboard/customers/${customerId}`);
+        router.push(`/customers/${customerId}`);
     };
 
     if (error) {
@@ -324,76 +325,94 @@ export default function Page({}: Props) {
     }
 
     return (
-        <div className="flex flex-col w-full h-full gap-6 p-6">
-            <div className="flex flex-col gap-10">
-                <div className="flex items-center justify-between">
-                    <h1 className="text-2xl font-semibold">Customers</h1>
-                    <AddCustomerDialog
-                        onSave={(updatedCustomer) =>
-                            setCustomers((prev) => [...prev, updatedCustomer])
-                        }
-                    />
-                </div>
-                <div className="flex flex-col w-full gap-6">
-                    <div className="flex flex-col gap-6 xl:flex-row xl:justify-between">
-                        <div className="flex w-full py-2 gap-6 xl:w-2/6">
-                            <Input
-                                placeholder="Search customers by name, email, phone"
-                                value={search}
-                                onChange={(e) => setSearch(e.target.value)}
-                            />
+        <ContentLayout title="Customers">
+            <div className="flex flex-col w-full h-full gap-6">
+                <div className="flex flex-col gap-10">
+                    <div className="flex items-center justify-between">
+                        <h1 className="text-2xl font-semibold">Customers</h1>
+                        <AddCustomerDialog
+                            onSave={(updatedCustomer) =>
+                                setCustomers((prev) => [
+                                    ...prev,
+                                    updatedCustomer,
+                                ])
+                            }
+                        />
+                    </div>
+                    <div className="flex flex-col w-full gap-6">
+                        <div className="flex flex-col gap-6 xl:flex-row xl:justify-between">
+                            <div className="flex w-full py-2 gap-6 xl:w-2/6">
+                                <Input
+                                    placeholder="Search customers by name, email, phone"
+                                    value={search}
+                                    onChange={(e) => setSearch(e.target.value)}
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            {loading ? (
-                <div className="flex justify-center items-center w-full h-full ">
-                    <ClipLoader color="#009933" size={50} />
-                </div>
-            ) : (
-                <Table>
-                    <TableHeader>
-                        <TableHead>CliendId</TableHead>
-                        <TableHead>Firstname</TableHead>
-                        <TableHead>Lastname</TableHead>
-                        <TableHead>Email</TableHead>
-                        <TableHead>Phone</TableHead>
-                        <TableHead>Country</TableHead>
-                        <TableHead>Nb Invoices</TableHead>
-                    </TableHeader>
-                    <TableBody>
-                        {customers?.length === 0 ? (
-                            <TableRow>
-                                <TableCell colSpan={8} className="text-center">
-                                    {search
-                                        ? "No customers found"
-                                        : "No customers"}
-                                </TableCell>
-                            </TableRow>
-                        ) : (
-                            customers?.map((customer) => (
-                                <TableRow
-                                    key={customer.client_id}
-                                    onClick={() =>
-                                        handleSelectCustomer(customer.client_id)
-                                    }
-                                    className="cursor-pointer"
-                                >
-                                    <TableCell>{customer.client_id}</TableCell>
-                                    <TableCell>{customer.first_name}</TableCell>
-                                    <TableCell>{customer.last_name}</TableCell>
-                                    <TableCell>{customer.email}</TableCell>
-                                    <TableCell>{customer.phone}</TableCell>
-                                    <TableCell>{customer.country}</TableCell>
-                                    <TableCell>
-                                        {customer.invoice_count}
+                {loading ? (
+                    <div className="flex justify-center items-center w-full h-full ">
+                        <ClipLoader color="#009933" size={50} />
+                    </div>
+                ) : (
+                    <Table>
+                        <TableHeader>
+                            <TableHead>CliendId</TableHead>
+                            <TableHead>Firstname</TableHead>
+                            <TableHead>Lastname</TableHead>
+                            <TableHead>Email</TableHead>
+                            <TableHead>Phone</TableHead>
+                            <TableHead>Country</TableHead>
+                            <TableHead>Nb Invoices</TableHead>
+                        </TableHeader>
+                        <TableBody>
+                            {customers?.length === 0 ? (
+                                <TableRow>
+                                    <TableCell
+                                        colSpan={8}
+                                        className="text-center"
+                                    >
+                                        {search
+                                            ? "No customers found"
+                                            : "No customers"}
                                     </TableCell>
                                 </TableRow>
-                            ))
-                        )}
-                    </TableBody>
-                </Table>
-            )}
-        </div>
+                            ) : (
+                                customers?.map((customer) => (
+                                    <TableRow
+                                        key={customer.client_id}
+                                        onClick={() =>
+                                            handleSelectCustomer(
+                                                customer.client_id
+                                            )
+                                        }
+                                        className="cursor-pointer"
+                                    >
+                                        <TableCell>
+                                            {customer.client_id}
+                                        </TableCell>
+                                        <TableCell>
+                                            {customer.first_name}
+                                        </TableCell>
+                                        <TableCell>
+                                            {customer.last_name}
+                                        </TableCell>
+                                        <TableCell>{customer.email}</TableCell>
+                                        <TableCell>{customer.phone}</TableCell>
+                                        <TableCell>
+                                            {customer.country}
+                                        </TableCell>
+                                        <TableCell>
+                                            {customer.invoice_count}
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            )}
+                        </TableBody>
+                    </Table>
+                )}
+            </div>
+        </ContentLayout>
     );
 }

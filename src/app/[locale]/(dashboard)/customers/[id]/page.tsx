@@ -43,6 +43,7 @@ import {
 import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
 import { cn } from "@/lib/utils";
 import TableInvoices from "@/components/tableInvoices";
+import { ContentLayout } from "@/components/admin-panel/content-layout";
 
 type Props = {};
 
@@ -475,144 +476,150 @@ export default function Page({}: Props) {
     };
 
     return (
-        <div className="flex flex-col w-full gap-6 p-6">
-            {loading ? (
-                <div className="flex w-full h-screen items-center justify-center">
-                    <ClipLoader color="#009933" loading={loading} size={50} />
-                </div>
-            ) : (
-                <>
-                    <div className="flex items-center justify-between">
-                        <h1 className="text-3xl font-semibold">
-                            {customer
-                                ? `${customer.first_name} ${customer.last_name}`
-                                : ""}
-                        </h1>
-                        <div className="flex items-center gap-2">
-                            <EditCustomerDialog
-                                customer={customer}
-                                onClose={() => {}}
-                                onSave={handleUpdateCustomer}
-                            />
-                            <AlertDeleteCustomer />
-                        </div>
-                    </div>
-                    <div className="flex  w-full gap-6">
-                        <div className="flex w-1/2 flex-col  p-4 gap-6">
-                            <Card className="flex flex-col justify-center p-4 gap-6">
-                                <h2 className="text-xl font-semibold">
-                                    Contact information :
-                                </h2>
-                                <div className="flex flex-col gap-2">
-                                    <div>
-                                        <span className="font-semibold">
-                                            Email :{" "}
-                                        </span>{" "}
-                                        {customer?.email}
-                                    </div>
-                                    <div>
-                                        <span className="font-semibold">
-                                            Phone :{" "}
-                                        </span>{" "}
-                                        {customer?.phone}
-                                    </div>
-                                </div>
-                            </Card>
-                            <Card className="flex  flex-col p-4 gap-6">
-                                <h2 className="text-xl font-semibold">
-                                    Address :
-                                </h2>
-                                <div className="flex flex-col gap-2">
-                                    <div>
-                                        <span className="font-semibold">
-                                            Street address:
-                                        </span>{" "}
-                                        {customer?.street_address}
-                                    </div>
-                                    <div>
-                                        <span className="font-semibold">
-                                            City:
-                                        </span>{" "}
-                                        {customer?.city}
-                                    </div>
-                                    <div>
-                                        <span className="font-semibold">
-                                            State:
-                                        </span>{" "}
-                                        {customer?.state}
-                                    </div>
-                                    <div>
-                                        <span className="font-semibold">
-                                            Postal code:
-                                        </span>{" "}
-                                        {customer?.postal_code}
-                                    </div>
-                                    <div>
-                                        <span className="font-semibold">
-                                            Country:
-                                        </span>{" "}
-                                        {customer?.country}
-                                    </div>
-                                </div>
-                            </Card>
-                        </div>
-                        <div className="flex w-1/2 flex-col p-4 gap-6">
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Invoices</CardTitle>
-                                    <CardDescription>
-                                        Monthly revenue
-                                    </CardDescription>
-                                </CardHeader>
-                                <CardContent>
-                                    {monthlyInvoice.length === 0 ? (
-                                        <Alert>
-                                            <AlertTriangle className="w-5 h-5" />
-                                            <AlertTitle>
-                                                No invoices found
-                                            </AlertTitle>
-                                            <AlertDescription>
-                                                There are no invoices paid by
-                                                this customer.
-                                            </AlertDescription>
-                                        </Alert>
-                                    ) : (
-                                        <ResponsiveContainer
-                                            width="100%"
-                                            height={300}
-                                        >
-                                            <BarChart data={monthlyInvoice}>
-                                                <XAxis
-                                                    dataKey="month"
-                                                    name="Month"
-                                                />
-                                                <YAxis name="Amount" />
-                                                <Tooltip />
-                                                <Bar
-                                                    dataKey="amount"
-                                                    fill="#009933"
-                                                />
-                                            </BarChart>
-                                        </ResponsiveContainer>
-                                    )}
-                                </CardContent>
-                            </Card>
-                        </div>
-                    </div>
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Invoices</CardTitle>
-                            <CardDescription>
-                                Invoices paid by this customer
-                            </CardDescription>
-                        </CardHeader>
-                        <TableInvoices
-                            invoices={customer?.invoices}
-                            search={""}
+        <ContentLayout title="Customer details">
+            <div className="flex flex-col w-full gap-6">
+                {loading ? (
+                    <div className="flex w-full h-screen items-center justify-center">
+                        <ClipLoader
+                            color="#009933"
+                            loading={loading}
+                            size={50}
                         />
-                    </Card>
-                </>
-            )}
-        </div>
+                    </div>
+                ) : (
+                    <>
+                        <div className="flex items-center justify-between">
+                            <h1 className="text-3xl font-semibold">
+                                {customer
+                                    ? `${customer.first_name} ${customer.last_name}`
+                                    : ""}
+                            </h1>
+                            <div className="flex items-center gap-2">
+                                <EditCustomerDialog
+                                    customer={customer}
+                                    onClose={() => {}}
+                                    onSave={handleUpdateCustomer}
+                                />
+                                <AlertDeleteCustomer />
+                            </div>
+                        </div>
+                        <div className="flex  w-full gap-6">
+                            <div className="flex w-1/2 flex-col  p-4 gap-6">
+                                <Card className="flex flex-col justify-center p-4 gap-6">
+                                    <h2 className="text-xl font-semibold">
+                                        Contact information :
+                                    </h2>
+                                    <div className="flex flex-col gap-2">
+                                        <div>
+                                            <span className="font-semibold">
+                                                Email :{" "}
+                                            </span>{" "}
+                                            {customer?.email}
+                                        </div>
+                                        <div>
+                                            <span className="font-semibold">
+                                                Phone :{" "}
+                                            </span>{" "}
+                                            {customer?.phone}
+                                        </div>
+                                    </div>
+                                </Card>
+                                <Card className="flex  flex-col p-4 gap-6">
+                                    <h2 className="text-xl font-semibold">
+                                        Address :
+                                    </h2>
+                                    <div className="flex flex-col gap-2">
+                                        <div>
+                                            <span className="font-semibold">
+                                                Street address:
+                                            </span>{" "}
+                                            {customer?.street_address}
+                                        </div>
+                                        <div>
+                                            <span className="font-semibold">
+                                                City:
+                                            </span>{" "}
+                                            {customer?.city}
+                                        </div>
+                                        <div>
+                                            <span className="font-semibold">
+                                                State:
+                                            </span>{" "}
+                                            {customer?.state}
+                                        </div>
+                                        <div>
+                                            <span className="font-semibold">
+                                                Postal code:
+                                            </span>{" "}
+                                            {customer?.postal_code}
+                                        </div>
+                                        <div>
+                                            <span className="font-semibold">
+                                                Country:
+                                            </span>{" "}
+                                            {customer?.country}
+                                        </div>
+                                    </div>
+                                </Card>
+                            </div>
+                            <div className="flex w-1/2 flex-col p-4 gap-6">
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle>Invoices</CardTitle>
+                                        <CardDescription>
+                                            Monthly revenue
+                                        </CardDescription>
+                                    </CardHeader>
+                                    <CardContent>
+                                        {monthlyInvoice.length === 0 ? (
+                                            <Alert>
+                                                <AlertTriangle className="w-5 h-5" />
+                                                <AlertTitle>
+                                                    No invoices found
+                                                </AlertTitle>
+                                                <AlertDescription>
+                                                    There are no invoices paid
+                                                    by this customer.
+                                                </AlertDescription>
+                                            </Alert>
+                                        ) : (
+                                            <ResponsiveContainer
+                                                width="100%"
+                                                height={300}
+                                            >
+                                                <BarChart data={monthlyInvoice}>
+                                                    <XAxis
+                                                        dataKey="month"
+                                                        name="Month"
+                                                    />
+                                                    <YAxis name="Amount" />
+                                                    <Tooltip />
+                                                    <Bar
+                                                        dataKey="amount"
+                                                        fill="#009933"
+                                                    />
+                                                </BarChart>
+                                            </ResponsiveContainer>
+                                        )}
+                                    </CardContent>
+                                </Card>
+                            </div>
+                        </div>
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Invoices</CardTitle>
+                                <CardDescription>
+                                    Invoices paid by this customer
+                                </CardDescription>
+                            </CardHeader>
+                            <TableInvoices
+                                invoices={customer?.invoices}
+                                search={""}
+                            />
+                        </Card>
+                    </>
+                )}
+            </div>
+        </ContentLayout>
     );
 }

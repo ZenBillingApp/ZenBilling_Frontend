@@ -1,13 +1,11 @@
 import {
-    Tag,
     Users,
     Settings,
-    Bookmark,
-    SquarePen,
     User2Icon,
     LayoutGrid,
     LucideIcon,
     FolderArchive,
+    Home,
 } from "lucide-react";
 
 type Submenu = {
@@ -44,7 +42,7 @@ export function getMenuList(pathname: string): Group[] {
             ],
         },
         {
-            groupLabel: "Contents",
+            groupLabel: "Management",
             menus: [
                 {
                     href: "",
@@ -53,29 +51,22 @@ export function getMenuList(pathname: string): Group[] {
                     icon: FolderArchive,
                     submenus: [
                         {
-                            href: "/dashboard/invoices",
+                            href: "/invoices",
                             label: "All Invoices",
-                            active: pathname === "/dashboard/invoices",
+                            active: pathname === "/invoices",
                         },
                         {
-                            href: "/dashboard/invoices/create",
+                            href: "/invoices/create",
                             label: "New Invoice",
-                            active: pathname === "/dashboard/invoices/create",
+                            active: pathname === "/invoices/create",
                         },
                     ],
                 },
                 {
-                    href: "/dashboard/customers",
+                    href: "/customers",
                     label: "Customers",
                     active: pathname.includes("/customers"),
-                    icon: User2Icon,
-                    submenus: [],
-                },
-                {
-                    href: "/tags",
-                    label: "Tags",
-                    active: pathname.includes("/tags"),
-                    icon: Tag,
+                    icon: Users,
                     submenus: [],
                 },
             ],
@@ -84,17 +75,17 @@ export function getMenuList(pathname: string): Group[] {
             groupLabel: "Settings",
             menus: [
                 {
-                    href: "/users",
-                    label: "Users",
-                    active: pathname.includes("/users"),
-                    icon: Users,
+                    href: "/profile",
+                    label: "Profile",
+                    active: pathname.includes("/profile"),
+                    icon: User2Icon,
                     submenus: [],
                 },
                 {
-                    href: "/account",
-                    label: "Account",
-                    active: pathname.includes("/account"),
-                    icon: Settings,
+                    href: "/my-company",
+                    label: "My Company",
+                    active: pathname.includes("/my-company"),
+                    icon: Home,
                     submenus: [],
                 },
             ],

@@ -26,7 +26,7 @@ export default function TableInvoices({ invoices, search }: Props) {
     const { t } = useTranslation();
     const router = useRouter();
     const handleSelectInvoice = (invoiceId: number) => {
-        router.push(`/dashboard/invoices/${invoiceId}`);
+        router.push(`/invoices/${invoiceId}`);
     };
     return (
         <Table>

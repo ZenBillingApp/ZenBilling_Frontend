@@ -43,6 +43,7 @@ import {
 import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
 import { cn } from "@/lib/utils";
 import TableInvoices from "@/components/tableInvoices";
+import { ContentLayout } from "@/components/admin-panel/content-layout";
 
 type Props = {};
 
@@ -336,105 +337,113 @@ export default function Page({}: Props) {
     };
 
     return (
-        <div className="flex flex-col w-full gap-6 p-6">
-            {loading ? (
-                <div className="flex w-full h-screen items-center justify-center">
-                    <ClipLoader color="#009933" loading={loading} size={50} />
-                </div>
-            ) : (
-                <>
-                    <div className="flex items-center justify-between">
-                        <div className="flex flex-col items-start gap-2">
-                            <h1 className="text-3xl font-semibold">
-                                My profile
-                            </h1>
-                            <p className=" text-gray-500">
-                                Manage your profile
-                            </p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <EditUserDialog
-                                user={user}
-                                onClose={() => {}}
-                                onSave={handleUpdateuser}
-                            />
-                        </div>
+        <ContentLayout title="My profile">
+            <div className="flex flex-col w-full gap-6">
+                {loading ? (
+                    <div className="flex w-full h-screen items-center justify-center">
+                        <ClipLoader
+                            color="#009933"
+                            loading={loading}
+                            size={50}
+                        />
                     </div>
-                    <div className="flex  w-full gap-6">
-                        <div className="flex w-full flex-col justify-center p-4 gap-6">
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Personal information</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <div>
-                                        <span className="font-semibold">
-                                            First name :{" "}
-                                        </span>{" "}
-                                        {user?.first_name}
-                                    </div>
-                                    <div>
-                                        <span className="font-semibold">
-                                            Last name :{" "}
-                                        </span>{" "}
-                                        {user?.last_name}
-                                    </div>
+                ) : (
+                    <>
+                        <div className="flex items-center justify-between">
+                            <div className="flex flex-col items-start gap-2">
+                                <h1 className="text-3xl font-semibold">
+                                    My profile
+                                </h1>
+                                <p className=" text-gray-500">
+                                    Manage your profile
+                                </p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <EditUserDialog
+                                    user={user}
+                                    onClose={() => {}}
+                                    onSave={handleUpdateuser}
+                                />
+                            </div>
+                        </div>
+                        <div className="flex  w-full gap-6">
+                            <div className="flex w-full flex-col justify-center p-4 gap-6">
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle>
+                                            Personal information
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div>
+                                            <span className="font-semibold">
+                                                First name :{" "}
+                                            </span>{" "}
+                                            {user?.first_name}
+                                        </div>
+                                        <div>
+                                            <span className="font-semibold">
+                                                Last name :{" "}
+                                            </span>{" "}
+                                            {user?.last_name}
+                                        </div>
 
-                                    <div>
-                                        <span className="font-semibold">
-                                            Email :{" "}
-                                        </span>{" "}
-                                        {user?.email}
-                                    </div>
-                                    <div>
-                                        <span className="font-semibold">
-                                            Phone :{" "}
-                                        </span>{" "}
-                                        {user?.phone}
-                                    </div>
-                                </CardContent>
-                            </Card>
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Address</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <div>
-                                        <span className="font-semibold">
-                                            Street address:
-                                        </span>{" "}
-                                        {user?.street_address}
-                                    </div>
-                                    <div>
-                                        <span className="font-semibold">
-                                            City:
-                                        </span>{" "}
-                                        {user?.city}
-                                    </div>
-                                    <div>
-                                        <span className="font-semibold">
-                                            State:
-                                        </span>{" "}
-                                        {user?.state}
-                                    </div>
-                                    <div>
-                                        <span className="font-semibold">
-                                            Postal code:
-                                        </span>{" "}
-                                        {user?.postal_code}
-                                    </div>
-                                    <div>
-                                        <span className="font-semibold">
-                                            Country:
-                                        </span>{" "}
-                                        {user?.country}
-                                    </div>
-                                </CardContent>
-                            </Card>
+                                        <div>
+                                            <span className="font-semibold">
+                                                Email :{" "}
+                                            </span>{" "}
+                                            {user?.email}
+                                        </div>
+                                        <div>
+                                            <span className="font-semibold">
+                                                Phone :{" "}
+                                            </span>{" "}
+                                            {user?.phone}
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle>Address</CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div>
+                                            <span className="font-semibold">
+                                                Street address:
+                                            </span>{" "}
+                                            {user?.street_address}
+                                        </div>
+                                        <div>
+                                            <span className="font-semibold">
+                                                City:
+                                            </span>{" "}
+                                            {user?.city}
+                                        </div>
+                                        <div>
+                                            <span className="font-semibold">
+                                                State:
+                                            </span>{" "}
+                                            {user?.state}
+                                        </div>
+                                        <div>
+                                            <span className="font-semibold">
+                                                Postal code:
+                                            </span>{" "}
+                                            {user?.postal_code}
+                                        </div>
+                                        <div>
+                                            <span className="font-semibold">
+                                                Country:
+                                            </span>{" "}
+                                            {user?.country}
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </div>
                         </div>
-                    </div>
-                </>
-            )}
-        </div>
+                    </>
+                )}
+            </div>
+        </ContentLayout>
     );
 }
