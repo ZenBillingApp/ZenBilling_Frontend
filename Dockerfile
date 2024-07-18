@@ -1,5 +1,6 @@
 # Choisir une image de base
-FROM node:latest
+FROM node:18-alpine
+
 
 # Définir le répertoire de travail
 WORKDIR /app
