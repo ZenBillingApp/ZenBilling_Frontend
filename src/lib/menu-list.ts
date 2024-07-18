@@ -4,8 +4,10 @@ import {
     Settings,
     Bookmark,
     SquarePen,
+    User2Icon,
     LayoutGrid,
     LucideIcon,
+    FolderArchive,
 } from "lucide-react";
 
 type Submenu = {
@@ -48,7 +50,7 @@ export function getMenuList(pathname: string): Group[] {
                     href: "",
                     label: "Invoices",
                     active: pathname.includes("/invoices"),
-                    icon: SquarePen,
+                    icon: FolderArchive,
                     submenus: [
                         {
                             href: "/dashboard/invoices",
@@ -63,10 +65,10 @@ export function getMenuList(pathname: string): Group[] {
                     ],
                 },
                 {
-                    href: "/categories",
-                    label: "Categories",
-                    active: pathname.includes("/categories"),
-                    icon: Bookmark,
+                    href: "/dashboard/customers",
+                    label: "Customers",
+                    active: pathname.includes("/customers"),
+                    icon: User2Icon,
                     submenus: [],
                 },
                 {
