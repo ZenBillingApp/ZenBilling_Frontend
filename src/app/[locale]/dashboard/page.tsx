@@ -55,9 +55,8 @@ export default function Page({ params: { locale } }: Props) {
         setError(false);
         try {
             const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-            const apiKey = process.env.NEXT_PUBLIC_API_KEY;
 
-            if (!apiUrl || !apiKey) {
+            if (!apiUrl) {
                 throw new Error(
                     "API URL or API Key is not defined in environment variables"
                 );

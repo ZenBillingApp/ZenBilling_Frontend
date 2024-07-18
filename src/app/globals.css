@@ -7,6 +7,19 @@ html {
   height: 100%;
 }
 
+@font-face {
+  font-family: 'Space Grotesk';
+  src: url('/fonts/SpaceGrotesk-Bold.ttf') format('truetype'),
+       url('/fonts/SpaceGrotesk-SemiBold.ttf') format('truetype'),
+       url('/fonts/SpaceGrotesk-Regular.ttf') format('truetype'),
+       url('/fonts/SpaceGrotesk-Medium.ttf') format('truetype'),
+       url('/fonts/SpaceGrotesk-Light.ttf') format('truetype');
+  font-weight: 300 700;
+  font-style: normal;
+}
+
+
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -54,6 +67,18 @@ html {
     --ring: 142.4 71.8% 29.2%;
   }
 }
+
+body {
+  @apply bg-background text-foreground;
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6, p, span, a, li, blockquote {
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+
+
 
 @layer base {
   * {
