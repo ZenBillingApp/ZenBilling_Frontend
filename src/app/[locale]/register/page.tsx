@@ -3,6 +3,8 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
+import { ArrowRightIcon } from "lucide-react";
+
 import { User } from "@/types/User";
 
 import { useToast } from "@/components/ui/use-toast";
@@ -10,20 +12,13 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { PhoneInput } from "@/components/ui/phone-input";
-import {
-    CardContent,
-    Card,
-    CardHeader,
-    CardTitle,
-    CardDescription,
-} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertTriangle } from "lucide-react";
 import { setCookie } from "cookies-next";
+import SearchAddress from "@/components/ui/search-address";
 
 import { cn } from "@/lib/utils";
-import SearchAddress from "@/components/ui/search-address";
 
 export default function SignupPage() {
     const router = useRouter();
@@ -131,18 +126,20 @@ export default function SignupPage() {
         <div className="flex w-full justify-center p-6 sm:px-6 lg:px-8">
             <div className="w-full max-w-4xl space-y-2">
                 <div className="text-center">
-                    <h2 className="text-3xl font-bold ">
-                        Sign up for an account
+                    <h2 className="text-3xl font-bo ld ">
+                        <span className="text-primary">C</span>
+                        reate your account 🚀
                     </h2>
-                    <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
                         Already have an account?
-                        <Link
-                            href="/login"
-                            className={cn("text-primary", "hover:underline")}
+                        <Button
+                            variant="linkHover2"
+                            onClick={() => router.push("/login")}
+                            className={cn("text-primary", "p-2")}
                         >
                             {" "}
                             Sign in
-                        </Link>
+                        </Button>
                     </p>
                 </div>
 
@@ -162,7 +159,8 @@ export default function SignupPage() {
                         <div className="w-full space-y-4">
                             <div>
                                 <h1 className="text-2xl">
-                                    Personal Information
+                                    <span className="text-primary">P</span>
+                                    ersonal Information
                                 </h1>
                                 <p className="text-sm text-gray-600 dark:text-gray-400">
                                     Enter your personal information
@@ -221,6 +219,7 @@ export default function SignupPage() {
                                             id="password"
                                             placeholder="Password"
                                             value={user.password}
+                                            autoComplete="new-password"
                                             onChange={(e) =>
                                                 setUser((prevUser) => ({
                                                     ...prevUser,
@@ -238,6 +237,7 @@ export default function SignupPage() {
                                             id="password"
                                             placeholder="Confirm Password"
                                             value={confirmPassword}
+                                            autoComplete="new-password"
                                             onChange={(e) =>
                                                 setConfirmPassword(
                                                     e.target.value
@@ -251,6 +251,7 @@ export default function SignupPage() {
                                     <PhoneInput
                                         required
                                         value={user.phone}
+                                        defaultCountry="FR"
                                         onChange={(phone) =>
                                             setUser((prevUser) => ({
                                                 ...prevUser,
@@ -298,7 +299,8 @@ export default function SignupPage() {
                         <div className="w-full  space-y-4">
                             <div>
                                 <h1 className="text-2xl">
-                                    Company Information
+                                    <span className="text-primary">C</span>
+                                    ompany Information
                                 </h1>
                                 <p className="text-sm text-gray-600 dark:text-gray-400">
                                     Enter your company information
@@ -393,6 +395,7 @@ export default function SignupPage() {
                                         placeholder="Phone"
                                         type="text"
                                         value={user.company.phone}
+                                        defaultCountry="FR"
                                         onChange={(phone) =>
                                             setUser((prevUser) => ({
                                                 ...prevUser,
@@ -421,7 +424,14 @@ export default function SignupPage() {
                             </div>
                         </div>
                     </div>
-                    <Button className="w-full" type="submit" disabled={loading}>
+                    <Button
+                        variant="expandIcon"
+                        Icon={ArrowRightIcon}
+                        iconPlacement="right"
+                        type="submit"
+                        disabled={loading}
+                        className="w-full"
+                    >
                         {loading ? "Signing up..." : "Sign up"}
                     </Button>
                 </form>

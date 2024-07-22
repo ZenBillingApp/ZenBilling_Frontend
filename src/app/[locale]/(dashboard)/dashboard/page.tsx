@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation";
 
 import { Dashboard } from "@/types/Dashboard";
 
-import { ModeToggle } from "@/components/ui/toggle-theme";
 import { Button } from "@/components/ui/button";
 import {
     Card,

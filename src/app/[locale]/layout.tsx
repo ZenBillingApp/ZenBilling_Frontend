@@ -43,7 +43,7 @@ export default async function RootLayout({
     const { resources } = await initTranslations(locale, i18nNamespaces);
 
     return (
-        <html lang="en" suppressHydrationWarning>
+        <html lang={locale} suppressHydrationWarning>
             <body
                 className={cn(
                     "font-SpaceGrotesk",

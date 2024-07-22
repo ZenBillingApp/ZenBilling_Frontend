@@ -3,6 +3,8 @@ import React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
+import { ArrowRightIcon } from "lucide-react";
+
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 
@@ -12,6 +14,7 @@ import { AlertTriangle } from "lucide-react";
 import { setCookie } from "cookies-next";
 
 import { cn } from "@/lib/utils";
+import { PasswordInput } from "@/components/ui/password-input";
 
 export default function Component() {
     const router = useRouter();
@@ -62,16 +65,19 @@ export default function Component() {
         <div className="flex h-full w-full items-center justify-center px-4 sm:px-6 lg:px-8">
             <div className="w-full max-w-md space-y-2">
                 <div className="text-center">
-                    <h2 className="text-3xl font-bold ">Welcome back 🎉</h2>
-                    <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                    <h2 className="text-3xl font-bold ">
+                        <span className="text-primary">W</span>
+                        elcome back 🎉
+                    </h2>
+                    <p className=" text-sm text-gray-600 dark:text-gray-400">
                         New here?{" "}
-                        <Link
-                            href="/register"
-                            className={cn("text-primary", "hover:underline")}
+                        <Button
+                            variant="linkHover2"
+                            onClick={() => router.push("/register")}
+                            className={cn("text-primary", "p-0 ")}
                         >
-                            {" "}
                             Create an account
-                        </Link>
+                        </Button>
                     </p>
                 </div>
                 <form onSubmit={handleSubmit} className="space-y-4">
@@ -99,9 +105,8 @@ export default function Component() {
                         <div className="flex items-center justify-between">
                             <Label htmlFor="password">Password</Label>
                         </div>
-                        <Input
+                        <PasswordInput
                             id="password"
-                            type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                         />
@@ -117,7 +122,14 @@ export default function Component() {
               >
                 Forgot password?
               </Link> */}
-                    <Button className="w-full" type="submit" disabled={loading}>
+                    <Button
+                        variant="expandIcon"
+                        Icon={ArrowRightIcon}
+                        iconPlacement="right"
+                        type="submit"
+                        disabled={loading}
+                        className="w-full"
+                    >
                         {loading ? "Signing in..." : "Sign in"}
                     </Button>
                 </form>
