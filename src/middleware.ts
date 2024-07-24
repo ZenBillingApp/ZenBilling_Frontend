@@ -4,30 +4,68 @@ import { getCookie } from "cookies-next";
 import { i18nRouter } from "next-i18n-router";
 import i18nConfig from "../i18nConfig";
 
-// Cette fonction peut être marquée `async` si l'utilisation de `await` est nécessaire à l'intérieur
+const PUBLIC_FILE = /\.(.*)$/;
+
 export async function middleware(request: NextRequest) {
-    // Utilisation de getCookie avec l'argument { req: request } pour récupérer le cookie côté serveur
     const token = getCookie("token", { req: request });
 
-    if (request.nextUrl.pathname === "/") {
-        return NextResponse.redirect(new URL("/dashboard", request.url));
+    // Extraction de la locale depuis l'URL
+    const pathnameParts = request.nextUrl.pathname.split("/");
+    const locale = i18nConfig.locales.includes(pathnameParts[1])
+        ? pathnameParts[1]
+        : i18nConfig.defaultLocale;
+
+    // List of protected routes
+    const protectedRoutes = [
+        "dashboard",
+        "invoices",
+        "customers",
+        "my-company",
+        "profile",
+    ];
+
+    // Check if the current path is a protected route
+    const isProtectedRoute = protectedRoutes.some((route) =>
+        request.nextUrl.pathname.includes(route)
+    );
+
+    if (
+        request.nextUrl.pathname.startsWith("/_next") ||
+        request.nextUrl.pathname.includes("/api/") ||
+        PUBLIC_FILE.test(request.nextUrl.pathname)
+    ) {
+        return NextResponse.next();
     }
-    
+
+    if (request.nextUrl.locale === "default") {
+        const locale = request.cookies.get("NEXT_LOCALE")?.value || "en";
+        return NextResponse.redirect(
+            new URL(
+                `/${locale}${request.nextUrl.pathname}${request.nextUrl.search}`,
+                request.url
+            )
+        );
+    }
+
+    if (request.nextUrl.pathname === `/${locale}`) {
+        return NextResponse.redirect(
+            new URL(`/${locale}/dashboard`, request.url)
+        );
+    }
 
     if (token && request.nextUrl.pathname.includes("/login")) {
-        return NextResponse.redirect(new URL("/dashboard", request.url));
+        return NextResponse.redirect(
+            new URL(`/${locale}/dashboard`, request.url)
+        );
     }
 
-    // Si le token n'existe pas et que l'utilisateur n'est pas déjà sur la page de login
-    if (!token && request.nextUrl.pathname.includes("/dashboard")) {
-        return NextResponse.redirect(new URL("/login", request.url));
+    if (!token && isProtectedRoute) {
+        return NextResponse.redirect(new URL(`/${locale}/login`, request.url));
     }
 
-    // Retourne la réponse de i18nRouter pour gérer les routes internationales
     return i18nRouter(request, i18nConfig);
 }
 
-// Configuration pour matcher les chemins spécifiés, en excluant la route de login
 export const config = {
     matcher: "/((?!api|static|.*\\..*|_next).*)",
 };

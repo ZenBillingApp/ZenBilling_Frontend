@@ -48,6 +48,8 @@ export default function Component() {
             setCookie("token", data.token, {
                 maxAge: 3600,
                 path: "/",
+                secure: process.env.NODE_ENV === "production",
+                sameSite: "strict",
             });
             router.push("/dashboard");
         } catch (error) {
