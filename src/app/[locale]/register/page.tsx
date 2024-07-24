@@ -229,12 +229,12 @@ export default function SignupPage() {
                                         />
                                     </div>
                                     <div className="w-full space-y-2">
-                                        <Label htmlFor="password">
+                                        <Label htmlFor="confirmPassword">
                                             Confirm Password
                                         </Label>
                                         <PasswordInput
                                             required
-                                            id="password"
+                                            id="confirmPassword"
                                             placeholder="Confirm Password"
                                             value={confirmPassword}
                                             autoComplete="new-password"

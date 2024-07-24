@@ -14,7 +14,7 @@ export default function Layout({ children }: Props) {
                 <div className="flex items-center justify-center flex-1 w-full z-10">
                     {children}
                 </div>
-                <BackgroundBeams />
+                {/* <BackgroundBeams /> */}
             </div>
         </div>
     );
