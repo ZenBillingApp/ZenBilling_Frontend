@@ -113,7 +113,11 @@ export default function Page({}: Props) {
                 <div className="flex flex-col gap-10">
                     <div className="flex items-center justify-between">
                         <h1 className="text-2xl font-semibold">Invoices</h1>
-                        <Button onClick={() => router.push("/invoices/create")}>
+                        <Button
+                            onClick={() =>
+                                router.push("/dashboard/invoices/create")
+                            }
+                        >
                             <PiPlus className="mr-2" size={20} />
                             New Invoice
                         </Button>

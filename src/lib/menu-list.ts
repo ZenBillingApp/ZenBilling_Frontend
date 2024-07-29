@@ -33,9 +33,9 @@ export function getMenuList(pathname: string): Group[] {
             groupLabel: "",
             menus: [
                 {
-                    href: "/dashboard",
+                    href: "/dashboard/home",
                     label: "Dashboard",
-                    active: pathname.includes("/dashboard"),
+                    active: pathname.includes("/home"),
                     icon: LayoutGrid,
                     submenus: [],
                 },
@@ -51,21 +51,21 @@ export function getMenuList(pathname: string): Group[] {
                     icon: FolderArchive,
                     submenus: [
                         {
-                            href: "/invoices",
+                            href: "/dashboard/invoices",
                             label: "All Invoices",
-                            active: pathname === "/invoices",
+                            active: pathname === "/dashboard/invoices",
                         },
                         {
-                            href: "/invoices/create",
+                            href: "/dashboard/invoices/create",
                             label: "New Invoice",
-                            active: pathname === "/invoices/create",
+                            active: pathname === "/dashboard/invoices/create",
                         },
                     ],
                 },
                 {
-                    href: "/customers",
+                    href: "/dashboard/customers",
                     label: "Customers",
-                    active: pathname.includes("/customers"),
+                    active: pathname.includes("/dashboard/customers"),
                     icon: Users,
                     submenus: [],
                 },
@@ -75,14 +75,14 @@ export function getMenuList(pathname: string): Group[] {
             groupLabel: "Settings",
             menus: [
                 {
-                    href: "/profile",
+                    href: "/dashboard/profile",
                     label: "Profile",
                     active: pathname.includes("/profile"),
                     icon: User2Icon,
                     submenus: [],
                 },
                 {
-                    href: "/my-company",
+                    href: "/dashboard/my-company",
                     label: "My Company",
                     active: pathname.includes("/my-company"),
                     icon: Home,

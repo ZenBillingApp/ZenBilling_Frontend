@@ -110,7 +110,7 @@ export default function SignupPage() {
                 maxAge: 3600,
                 path: "/",
             });
-            router.push("/dashboard");
+            router.push("/dashboard/home");
         } catch (error) {
             console.error(error);
             if (error instanceof Error) {

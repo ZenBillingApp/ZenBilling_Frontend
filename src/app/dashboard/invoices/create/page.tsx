@@ -91,7 +91,7 @@ export default function Page({}: Props) {
                 title: "Success",
                 description: "Invoice created successfully",
             });
-            router.push("/invoices/" + data.invoice_id);
+            router.push("/dashboard/invoices/" + data.invoice_id);
         } catch (error) {
             console.error(error);
             toast({
@@ -265,7 +265,7 @@ export default function Page({}: Props) {
                                         <Button
                                             onClick={() =>
                                                 router.push(
-                                                    "/customers?add=true"
+                                                    "/dashboard/customers?add=true"
                                                 )
                                             }
                                         >

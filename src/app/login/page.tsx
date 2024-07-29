@@ -51,7 +51,7 @@ export default function Component() {
                 secure: process.env.NODE_ENV === "production",
                 sameSite: "strict",
             });
-            router.push("/dashboard");
+            router.push("/dashboard/home");
         } catch (error) {
             console.error(error);
             if (error instanceof Error) {

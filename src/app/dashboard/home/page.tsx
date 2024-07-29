@@ -24,7 +24,7 @@ import { cn } from "@/lib/utils";
 import Image from "next/image";
 import TableInvoices from "@/components/tableInvoices";
 
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 
 type Props = {
     params: {
@@ -34,7 +34,7 @@ type Props = {
 
 export default function Page({ params: { locale } }: Props) {
     const router = useRouter();
-    const { t } = useTranslation();
+    const t = useTranslations();
 
     const [data, setData] = React.useState<Dashboard>({
         numberOfUnpaidInvoices: 0,
@@ -122,15 +122,15 @@ export default function Page({ params: { locale } }: Props) {
                     <div className="flex w-full justify-between ">
                         <h1 className="text-s font-light">
                             <span className={cn("text-xl", "text-primary")}>
-                                {t("dashboard:welcome")}
+                                {t("dashboard.welcome")}
                             </span>{" "}
-                            {t("dashboard:dashboard_invoice_late_message", {
+                            {t("dashboard.dashboard_invoice_late_message", {
                                 count: data?.numberOfLatePaymentInvoices || 0,
                             })}
                         </h1>
                     </div>
                     <h1 className="text-2xl font-semibold">
-                        {t("dashboard:dashboard")}
+                        {t("dashboard.dashboard")}
                     </h1>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -147,7 +147,7 @@ export default function Page({ params: { locale } }: Props) {
                         </div>
                         <div className="flex flex-col w-full">
                             <CardTitle className="text-xl font-semibold">
-                                {t("dashboard:dashboard_pending_invoice")}
+                                {t("dashboard.dashboard_pending_invoice")}
                             </CardTitle>
                             <h1 className="text-4xl font-light">
                                 {data?.numberOfUnpaidInvoices || 0}
@@ -167,7 +167,7 @@ export default function Page({ params: { locale } }: Props) {
                         </div>
                         <div className="flex flex-col w-full">
                             <CardTitle className="text-xl font-semibold">
-                                {t("dashboard:dashboard_section_customers")}
+                                {t("dashboard.dashboard_section_customers")}
                             </CardTitle>
                             <h1 className="text-4xl font-light">
                                 {data?.numberOfClients || 0}
@@ -187,7 +187,7 @@ export default function Page({ params: { locale } }: Props) {
                         </div>
                         <div className="flex flex-col w-full">
                             <CardTitle className="text-xl font-semibold">
-                                {t("dashboard:dashboard_section_invoice_month")}
+                                {t("dashboard.dashboard_section_invoice_month")}
                             </CardTitle>
                             <h1 className="text-4xl font-light">
                                 {data?.numberOfInvoicesThisMonth || 0}
@@ -213,7 +213,7 @@ export default function Page({ params: { locale } }: Props) {
                                 }}
                                 className="w-full "
                             >
-                                {t("invoices:invoice_view_all")}
+                                {t("invoices.invoice_view_all")}
                             </Button>
                         </CardFooter>
                     </Card>

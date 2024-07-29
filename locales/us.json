@@ -1,0 +1,27 @@
+{
+    "dashboard": {
+        "welcome": "Hello!",
+        "dashboard": "Dashboard",
+        "dashboard_late_invoice": "Late Invoices",
+        "dashboard_pending_invoice": "Pending Invoices",
+        "dashboard_invoice_late_message": "You have {count, plural, =0 {no late invoices} =1 {# late invoice} other {# late invoices}}",
+        "dashboard_section_customers": "Customers",
+        "dashboard_section_invoice_month": "Invoices this Month"
+    },
+    "invoices":{
+        "invoice_view_all": "View All Invoices",
+        "invoice_table_title": "Invoices",
+        "invoice_table_header_invoice_number": "Invoice Number",
+        "invoice_table_header_invoice_date": "Invoice Date",
+        "invoice_table_header_due_date": "Due Date",
+        "invoice_table_header_amount": "Amount",
+        "invoice_table_header_status": "Status",
+        "invoice_table_header_first_name": "First Name",
+        "invoice_table_header_last_name": "Last Name",
+        "invoice_table_header_items": "Items",
+        "invoice_table_no_invoices": "No invoices found",
+        "invoice_table_no_invoices_description": "There are no invoices to display"
+    }
+    
+   
+}

@@ -4,14 +4,14 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 
-import initTranslations from "../i18n";
-
-import TranslationsProvider from "@/components/TranslationsProvider";
 import { Toaster } from "@/components/ui/toaster";
+
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getMessages } from "next-intl/server";
 
 import { cn } from "@/lib/utils";
 
-import "../globals.css";
+import "./globals.css";
 
 // Initialize the Inter font
 const inter = Inter({ subsets: ["latin"] });
@@ -29,19 +29,15 @@ export const metadata: Metadata = {
 // Define the props for the RootLayout component
 type RootLayoutProps = {
     children: React.ReactNode;
-    params: {
-        locale: string;
-    };
 };
 
 // The main RootLayout component
-export default async function RootLayout({
-    children,
-    params: { locale },
-}: RootLayoutProps) {
-    // Initialize translations for the given locale
-    const { resources } = await initTranslations(locale, i18nNamespaces);
+export default async function RootLayout({ children }: RootLayoutProps) {
+    const locale = await getLocale();
 
+    // Providing all messages to the client
+    // side is the easiest way to get started
+    const messages = await getMessages();
     return (
         <html lang={locale} suppressHydrationWarning>
             <body
@@ -59,14 +55,10 @@ export default async function RootLayout({
                     enableSystem
                     disableTransitionOnChange
                 >
-                    <TranslationsProvider
-                        namespaces={i18nNamespaces}
-                        locale={locale}
-                        resources={resources}
-                    >
+                    <NextIntlClientProvider messages={messages}>
                         {children}
-                        <Toaster />
-                    </TranslationsProvider>
+                    </NextIntlClientProvider>
+                    <Toaster />
                 </ThemeProvider>
             </body>
         </html>

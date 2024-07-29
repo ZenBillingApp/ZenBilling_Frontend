@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 
 import { Invoice } from "@/types/Invoice";
 
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -23,37 +23,37 @@ type Props = {
 };
 
 export default function TableInvoices({ invoices, search }: Props) {
-    const { t } = useTranslation();
+    const t = useTranslations();
     const router = useRouter();
     const handleSelectInvoice = (invoiceId: number) => {
-        router.push(`/invoices/${invoiceId}`);
+        router.push(`/dashboard/invoices/${invoiceId}`);
     };
     return (
         <Table>
             <TableHeader>
                 <TableHead>
-                    {t("invoices:invoice_table_header_invoice_number")}
+                    {t("invoices.invoice_table_header_invoice_number")}
                 </TableHead>
                 <TableHead>
-                    {t("invoices:invoice_table_header_first_name")}
+                    {t("invoices.invoice_table_header_first_name")}
                 </TableHead>
                 <TableHead>
-                    {t("invoices:invoice_table_header_last_name")}
+                    {t("invoices.invoice_table_header_last_name")}
                 </TableHead>
                 <TableHead>
-                    {t("invoices:invoice_table_header_status")}
+                    {t("invoices.invoice_table_header_status")}
                 </TableHead>
                 <TableHead>
-                    {t("invoices:invoice_table_header_items")}
+                    {t("invoices.invoice_table_header_items")}
                 </TableHead>
                 <TableHead>
-                    {t("invoices:invoice_table_header_amount")}
+                    {t("invoices.invoice_table_header_amount")}
                 </TableHead>
                 <TableHead>
-                    {t("invoices:invoice_table_header_invoice_date")}
+                    {t("invoices.invoice_table_header_invoice_date")}
                 </TableHead>
                 <TableHead>
-                    {t("invoices:invoice_table_header_due_date")}
+                    {t("invoices.invoice_table_header_due_date")}
                 </TableHead>
             </TableHeader>
             <TableBody>
@@ -61,9 +61,9 @@ export default function TableInvoices({ invoices, search }: Props) {
                     <TableRow>
                         <TableCell colSpan={8} className="text-center">
                             {search
-                                ? t("invoices:invoice_table_no_invoices")
+                                ? t("invoices.invoice_table_no_invoices")
                                 : t(
-                                      "invoices:invoice_table_no_invoices_description"
+                                      "invoices.invoice_table_no_invoices_description"
                                   )}
                         </TableCell>
                     </TableRow>
