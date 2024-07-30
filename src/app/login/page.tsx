@@ -46,10 +46,8 @@ export default function Login() {
             const data = await response.json();
             setCookie("token", data.token, {
                 maxAge: 3600,
-                path: "/",
-                secure: process.env.NODE_ENV === "production",
-                sameSite: "strict",
             });
+
             router.push("/dashboard/home");
         } catch (error) {
             console.error(error);
