@@ -209,7 +209,7 @@ export default function Page({ params: { locale } }: Props) {
                         <CardFooter>
                             <Button
                                 onClick={() => {
-                                    router.push("/invoices");
+                                    router.push("/dashboard/invoices");
                                 }}
                                 className="w-full "
                             >

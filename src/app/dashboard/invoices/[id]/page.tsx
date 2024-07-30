@@ -91,7 +91,7 @@ const AlertDeleteInvoice = ({}) => {
                 throw new Error("Failed to delete invoice");
             }
 
-            router.push("/invoices");
+            router.push("/dashboard/invoices");
             toast({
                 title: "Success",
                 description: "Invoice deleted successfully",

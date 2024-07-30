@@ -1,7 +1,8 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 
 import { ArrowRightIcon } from "lucide-react";
 
@@ -16,16 +17,18 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertTriangle } from "lucide-react";
 import { setCookie } from "cookies-next";
-import SearchAddress from "@/components/ui/search-address";
+// Importation dynamique de SearchAddress pour s'assurer qu'il ne se charge que côté client
+const SearchAddress = dynamic(() => import("@/components/ui/search-address"), {
+    ssr: false,
+});
 
 import { cn } from "@/lib/utils";
 
 export default function SignupPage() {
     const router = useRouter();
+    const [confirmPassword, setConfirmPassword] = React.useState<string>("");
 
-    const [confirmPassword, setConfirmPassword] = useState<string>("");
-
-    const [user, setUser] = useState<User>({
+    const [user, setUser] = React.useState<User>({
         first_name: "",
         last_name: "",
         email: "",
@@ -51,9 +54,9 @@ export default function SignupPage() {
         is_freelancer: false,
     });
 
-    const [loading, setLoading] = useState<boolean>(false);
-    const [error, setError] = useState<boolean>(false);
-    const [errorMessage, setErrorMessage] = useState<string>("");
+    const [loading, setLoading] = React.useState<boolean>(false);
+    const [error, setError] = React.useState<boolean>(false);
+    const [errorMessage, setErrorMessage] = React.useState<string>("");
 
     const { toast } = useToast();
 

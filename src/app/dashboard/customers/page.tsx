@@ -303,7 +303,7 @@ export default function Page({}: Props) {
     }, [fetchCustomers]);
 
     const handleSelectCustomer = (customerId: number) => {
-        router.push(`/customers/${customerId}`);
+        router.push(`/dashboard/customers/${customerId}`);
     };
 
     if (error) {

@@ -1,6 +1,5 @@
 "use client";
 import React from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { ArrowRightIcon } from "lucide-react";
@@ -16,7 +15,7 @@ import { setCookie } from "cookies-next";
 import { cn } from "@/lib/utils";
 import { PasswordInput } from "@/components/ui/password-input";
 
-export default function Component() {
+export default function Login() {
     const router = useRouter();
 
     const [email, setEmail] = React.useState<string>("");
