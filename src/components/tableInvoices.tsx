@@ -35,30 +35,32 @@ export default function TableInvoices({ invoices, search }: Props) {
     return (
         <Table>
             <TableHeader>
-                <TableHead>
-                    {t("invoices.invoice_table_header_invoice_number")}
-                </TableHead>
-                <TableHead>
-                    {t("invoices.invoice_table_header_first_name")}
-                </TableHead>
-                <TableHead>
-                    {t("invoices.invoice_table_header_last_name")}
-                </TableHead>
-                <TableHead>
-                    {t("invoices.invoice_table_header_status")}
-                </TableHead>
-                <TableHead>
-                    {t("invoices.invoice_table_header_items")}
-                </TableHead>
-                <TableHead>
-                    {t("invoices.invoice_table_header_amount")}
-                </TableHead>
-                <TableHead>
-                    {t("invoices.invoice_table_header_invoice_date")}
-                </TableHead>
-                <TableHead>
-                    {t("invoices.invoice_table_header_due_date")}
-                </TableHead>
+                <TableRow>
+                    <TableHead className="min-w-[120px]">
+                        {t("invoices.invoice_table_header_invoice_number")}
+                    </TableHead>
+                    <TableHead className="min-w-[120px]">
+                        {t("invoices.invoice_table_header_first_name")}
+                    </TableHead>
+                    <TableHead className="min-w-[120px]">
+                        {t("invoices.invoice_table_header_last_name")}
+                    </TableHead>
+                    <TableHead className="min-w-[120px]">
+                        {t("invoices.invoice_table_header_status")}
+                    </TableHead>
+                    <TableHead className="min-w-[120px]">
+                        {t("invoices.invoice_table_header_items")}
+                    </TableHead>
+                    <TableHead className="min-w-[120px]">
+                        {t("invoices.invoice_table_header_amount")}
+                    </TableHead>
+                    <TableHead className="min-w-[150px]">
+                        {t("invoices.invoice_table_header_invoice_date")}
+                    </TableHead>
+                    <TableHead className="min-w-[150px]">
+                        {t("invoices.invoice_table_header_due_date")}
+                    </TableHead>
+                </TableRow>
             </TableHeader>
             <TableBody>
                 {invoices?.length === 0 ? (
@@ -80,14 +82,16 @@ export default function TableInvoices({ invoices, search }: Props) {
                             }
                             className="cursor-pointer"
                         >
-                            <TableCell>{invoice.invoice_id || "N/A"}</TableCell>
-                            <TableCell>
+                            <TableCell className="min-w-[120px]">
+                                {invoice.invoice_id || "N/A"}
+                            </TableCell>
+                            <TableCell className="min-w-[120px]">
                                 {invoice.client.first_name || "N/A"}
                             </TableCell>
-                            <TableCell>
+                            <TableCell className="min-w-[120px]">
                                 {invoice.client.last_name || "N/A"}
                             </TableCell>
-                            <TableCell>
+                            <TableCell className="min-w-[120px]">
                                 <Badge
                                     className={cn(
                                         invoice.status === "paid"
@@ -102,17 +106,18 @@ export default function TableInvoices({ invoices, search }: Props) {
                                     ) || "N/A"}
                                 </Badge>
                             </TableCell>
-                            <TableCell>{invoice?.items?.length || 0}</TableCell>
-
-                            <TableCell>
+                            <TableCell className="min-w-[120px]">
+                                {invoice?.items?.length || 0}
+                            </TableCell>
+                            <TableCell className="min-w-[120px]">
                                 {formatAmount(invoice.total_amount, {
                                     currency: "EUR",
                                 })}
                             </TableCell>
-                            <TableCell>
+                            <TableCell className="min-w-[150px]">
                                 {formatDate(invoice.invoice_date) || "N/A"}
                             </TableCell>
-                            <TableCell>
+                            <TableCell className="min-w-[150px]">
                                 {formatDate(invoice.due_date) || "N/A"}
                             </TableCell>
                         </TableRow>

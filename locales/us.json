@@ -1,26 +1,28 @@
 {
     "dashboard": {
-        "welcome": "Welcome!",
+        "welcome": "Hello!",
         "dashboard": "Dashboard",
-        "dashboard_late_invoice": "Late Invoices",
+        "dashboard_late_invoice": "Overdue Invoices",
         "dashboard_pending_invoice": "Pending Invoices",
-        "dashboard_invoice_late_message": "You have {count, plural, =0 {no late invoices} =1 {# late invoice} other {# late invoices}}",
+        "dashboard_invoice_late_message": "You have {count, plural, =0 {no overdue invoices} =1 {# overdue invoice} other {# overdue invoices}}",
         "dashboard_section_customers": "Customers",
         "dashboard_section_invoice_month": "Invoices this month"
     },
     "invoices": {
-        "invoice_view_all": "View All Invoices",
+        "invoice_view_all": "View all invoices",
         "latest_invoices": "Latest Invoices",
         "create_invoice": "New Invoice",
         "invoices": "Invoices",
         "invoice": "Invoice",
         "all_invoices": "All Invoices",
+        "invoice_due_date": "Due Date",
+        "invoice_billTo": "Bill To",
         "invoice_table_header_invoice_number": "Invoice Number",
         "invoice_table_filter_all": "All",
         "invoice_table_filter_paid": "Paid",
         "invoice_table_filter_pending": "Pending",
         "invoice_table_filter_cancelled": "Cancelled",
-        "invoice_table_search_placeholder": "Search invoice by name, first name, or invoice ID",
+        "invoice_table_search_placeholder": "Search for an invoice by name, first name, or invoice ID",
         "invoice_table_header_invoice_date": "Invoice Date",
         "invoice_table_header_due_date": "Due Date",
         "invoice_table_header_amount": "Amount",
@@ -32,12 +34,39 @@
         "invoice_table_no_invoices_description": "There are no invoices to display",
         "invoice_table_status_paid": "Paid",
         "invoice_table_status_pending": "Pending",
-        "invoice_table_status_cancelled": "Cancelled"
+        "invoice_table_status_cancelled": "Cancelled",
+        "invoice_placeholder_select_customer": "Select a customer",
+        "invoice_subtotal": "Subtotal",
+        "invoice_vat": "VAT (%)",
+        "invoice_total": "Total",
+        "invoice_create": "Create Invoice"
+    },
+    "items": {
+        "items": "Items",
+        "item": "Item",
+        "all_items": "All Items",
+        "item_table_header_description": "Description",
+        "item_table_header_quantity": "Quantity",
+        "item_table_header_vat_rate": "VAT (%)",
+        "item_table_header_unit_price": "Unit Price",
+        "item_table_header_total": "Total",
+        "item_table_no_items": "No items found",
+        "item_table_no_items_description": "There are no items to display",
+        "item_create": "Create Item",
+        "item_table_placeholder_description": "Item Description",
+        "item_table_add_item": "Add Item"
     },
     "customers": {
         "customers": "Customers",
         "customer": "Customer",
-        "all_customers": "All Customers"
+        "all_customers": "All Customers",
+        "customer_select": "Select a customer",
+        "customer_create": "Create Customer",
+        "customer_placeholder_search": "Search for a customer",
+        "customer_create_success": "Customer created successfully",
+        "customer_create_error": "Error creating customer",
+        "customer_no_results": "No results found",
+        "customer_failed_search": "Failed to search customer"
     },
     "settings": {
         "settings": "Settings"
@@ -51,7 +80,7 @@
         "company_name": "Company Name",
         "company_address": "Company Address",
         "company_city": "Company City",
-        "company_zip": "Company Zip Code",
+        "company_zip": "Company ZIP Code",
         "company_country": "Company Country",
         "company_phone": "Company Phone",
         "company_email": "Company Email",
@@ -80,7 +109,7 @@
         "common_error": "Error",
         "common_error_description": "An error occurred",
         "common_error_description_message": "An error occurred while loading the page",
-        "common_error_fetch": "Loading Error",
-        "common_error_fetch_message": "An error occurred while loading data"
+        "common_error_fetch": "Loading error",
+        "common_error_fetch_message": "An error occurred while loading the data"
     }
 }

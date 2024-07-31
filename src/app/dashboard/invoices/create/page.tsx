@@ -2,6 +2,8 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Customer } from "@/types/Customer";
+import { useTranslations } from "next-intl";
+import useFormattedAmount from "@/hooks/useFormattedAmount";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -50,6 +52,8 @@ type Item = {
 export default function Page({}: Props) {
     const router = useRouter();
     const { toast } = useToast();
+    const t = useTranslations();
+    const { formatAmount } = useFormattedAmount();
 
     const [open, setOpen] = useState<boolean>(false);
     const [customers, setCustomers] = useState<Customer[]>([]);
@@ -196,15 +200,17 @@ export default function Page({}: Props) {
     };
 
     return (
-        <ContentLayout title="Create Invoice">
+        <ContentLayout title={t("invoices.create_invoice")}>
             <div className="flex flex-col w-full h-full gap-6">
                 <div className="flex items-center justify-between">
-                    <h1 className="text-2xl font-semibold">Create Invoice</h1>
+                    <h1 className="text-2xl font-semibold">
+                        {t("invoices.create_invoice")}
+                    </h1>
                 </div>
                 <div className="flex flex-col gap-6">
                     <div className="flex gap-2">
                         <div className="flex flex-col items-start w-96 gap-2">
-                            <Label>Due date</Label>
+                            <Label>{t("invoices.invoice_due_date")}</Label>
                             <Popover>
                                 <PopoverTrigger asChild>
                                     <Button
@@ -233,13 +239,15 @@ export default function Page({}: Props) {
                         </div>
                     </div>
                     <div className="flex flex-col items-start w-96 gap-2">
-                        <Label>Bill to</Label>
+                        <Label>{t("invoices.invoice_billTo")} </Label>
                         <Sheet open={open} onOpenChange={setOpen}>
                             <SheetTrigger asChild>
                                 <div className="flex flex-col items-start w-96 gap-2">
                                     <Input
                                         className="w-full cursor-pointer"
-                                        placeholder="Select a customer"
+                                        placeholder={t(
+                                            "invoices.invoice_placeholder_select_customer"
+                                        )}
                                         value={
                                             selectedCustomer
                                                 ? `${selectedCustomer.first_name} ${selectedCustomer.last_name}`
@@ -253,10 +261,14 @@ export default function Page({}: Props) {
                             </SheetTrigger>
                             <SheetContent className="p-10">
                                 <SheetHeader>
-                                    <SheetTitle>Select a customer</SheetTitle>
+                                    <SheetTitle>
+                                        {t("customers.customer_select")}
+                                    </SheetTitle>
                                     <SheetDescription className="flex  gap-2">
                                         <Input
-                                            placeholder="Search customers"
+                                            placeholder={t(
+                                                "customers.customer_placeholder_search"
+                                            )}
                                             value={search}
                                             onChange={(e) =>
                                                 setSearch(e.target.value)
@@ -283,10 +295,16 @@ export default function Page({}: Props) {
                                         </div>
                                     )}
 
-                                    {error && <p>Failed to fetch customers</p>}
+                                    {error && (
+                                        <p>
+                                            {t(
+                                                "customers.customer_failed_search"
+                                            )}
+                                        </p>
+                                    )}
                                     {customers.length === 0 && !loading && (
                                         <p className="text-gray-500">
-                                            No customers found
+                                            {t("customers.customer_no_results")}
                                         </p>
                                     )}
                                     {customers.map((customer) => (
@@ -306,25 +324,41 @@ export default function Page({}: Props) {
                             </SheetContent>
                         </Sheet>
                     </div>
-                    <div className="flex flex-col items-start w-full gap-2 mb-4">
+                    <div className="flex flex-col items-start w-full gap-4 mb-4">
                         <Table>
                             <TableHeader className={cn("bg-secondary")}>
                                 <TableRow>
-                                    <TableHead>Description</TableHead>
-                                    <TableHead>Quantity</TableHead>
-                                    <TableHead>Unit price</TableHead>
-                                    <TableHead>VAT rate</TableHead>
-                                    <TableHead>Total</TableHead>
+                                    <TableHead className="min-w-96">
+                                        {t(
+                                            "items.item_table_header_description"
+                                        )}
+                                    </TableHead>
+                                    <TableHead className="min-w-32">
+                                        {t("items.item_table_header_quantity")}
+                                    </TableHead>
+                                    <TableHead className="min-w-32">
+                                        {t(
+                                            "items.item_table_header_unit_price"
+                                        )}
+                                    </TableHead>
+                                    <TableHead className="min-w-32">
+                                        {t("items.item_table_header_vat_rate")}
+                                    </TableHead>
+                                    <TableHead className="min-w-32">
+                                        {t("items.item_table_header_total")}
+                                    </TableHead>
                                     <TableHead></TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {items.map((item, index) => (
                                     <TableRow key={index} className="h-12">
-                                        <TableCell className="w-3/6">
+                                        <TableCell>
                                             <Input
                                                 value={item.description}
-                                                placeholder="Description"
+                                                placeholder={t(
+                                                    "items.item_table_placeholder_description"
+                                                )}
                                                 onChange={(e) => {
                                                     const newItems = [...items];
                                                     newItems[
@@ -350,7 +384,7 @@ export default function Page({}: Props) {
                                         </TableCell>
                                         <TableCell>
                                             <Input
-                                                type="number"
+                                                type="price"
                                                 value={item.unit_price}
                                                 onChange={(e) =>
                                                     handleChangeItem(
@@ -375,10 +409,12 @@ export default function Page({}: Props) {
                                             />
                                         </TableCell>
                                         <TableCell>
-                                            $
-                                            {(
-                                                item.quantity * item.unit_price
-                                            ).toFixed(2)}
+                                            {formatAmount(
+                                                item.quantity * item.unit_price,
+                                                {
+                                                    currency: "EUR",
+                                                }
+                                            )}
                                         </TableCell>
                                         <TableCell>
                                             <Trash
@@ -394,7 +430,9 @@ export default function Page({}: Props) {
                                 ))}
                             </TableBody>
                         </Table>
-                        <Button onClick={addItem}>Add item</Button>
+                        <Button onClick={addItem}>
+                            {t("items.item_table_add_item")}
+                        </Button>
                         <div
                             className={cn(
                                 "flex flex-col items-end w-full gap-2 "
@@ -407,17 +445,42 @@ export default function Page({}: Props) {
                                     )}
                                 >
                                     <div className="flex justify-between w-full">
-                                        <span>Subtotal:</span>
-                                        <span>${calculateSubtotal()}</span>
+                                        <span>
+                                            {t("invoices.invoice_subtotal")}:
+                                        </span>
+                                        <span>
+                                            {formatAmount(
+                                                parseFloat(calculateSubtotal()),
+                                                {
+                                                    currency: "EUR",
+                                                }
+                                            )}
+                                        </span>
                                     </div>
                                     <div className="flex justify-between w-full">
-                                        <span>Tax:</span>
-                                        <span>${calculateTax()}</span>
+                                        <span>
+                                            {t("invoices.invoice_vat")}:
+                                        </span>
+                                        <span>
+                                            {formatAmount(
+                                                parseFloat(calculateTax()),
+                                                {
+                                                    currency: "EUR",
+                                                }
+                                            )}
+                                        </span>
                                     </div>
                                     <div className="flex justify-between w-full">
-                                        <span>Total:</span>
+                                        <span>
+                                            {t("invoices.invoice_total")}:
+                                        </span>
                                         <span className="font-bold">
-                                            ${calculateTotal()}
+                                            {formatAmount(
+                                                parseFloat(calculateTotal()),
+                                                {
+                                                    currency: "EUR",
+                                                }
+                                            )}
                                         </span>
                                     </div>
                                     <Button
@@ -428,7 +491,7 @@ export default function Page({}: Props) {
                                             items.length === 0
                                         }
                                     >
-                                        Create invoice
+                                        {t("invoices.invoice_create")}
                                     </Button>
                                 </div>
                             </div>

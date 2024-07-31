@@ -196,7 +196,7 @@ export default function Page({}: Props) {
                     </div>
                 ) : (
                     <>
-                        <div className="flex flex-col gap-6">
+                        <div className="flex flex-col gap-6 w-full">
                             <TableInvoices
                                 invoices={invoices}
                                 search={search}

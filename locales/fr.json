@@ -15,11 +15,13 @@
         "invoices": "Factures",
         "invoice": "Facture",
         "all_invoices": "Toutes les factures",
+        "invoice_due_date": "Date d'échéance",
+        "invoice_billTo": "Facturer à",
         "invoice_table_header_invoice_number": "Numéro de facture",
         "invoice_table_filter_all": "Tout",
-        "invoice_table_filter_paid": "Payée",
+        "invoice_table_filter_paid": "Payées",
         "invoice_table_filter_pending": "En attente",
-        "invoice_table_filter_cancelled": "Annulée",
+        "invoice_table_filter_cancelled": "Annulées",
         "invoice_table_search_placeholder": "Rechercher une facture par nom, prénom ou ID de la facture",
         "invoice_table_header_invoice_date": "Date de facture",
         "invoice_table_header_due_date": "Date d'échéance",
@@ -32,12 +34,49 @@
         "invoice_table_no_invoices_description": "Il n'y a aucune facture à afficher",
         "invoice_table_status_paid": "Payée",
         "invoice_table_status_pending": "En attente",
-        "invoice_table_status_cancelled": "Annulée"
+        "invoice_table_status_cancelled": "Annulée",
+        "invoice_placeholder_select_customer": "Sélectionner un client",
+        "invoice_subtotal": "Sous-total",
+        "invoice_vat": "TVA",
+        "invoice_total": "Total",
+        "invoice_create": "Créer une facture",
+        "invoice_delete": "Supprimer la facture",
+        "invoice_delete_confirm": "Êtes-vous sûr de vouloir supprimer cette facture ?",
+        "invoice_details": "Détails de la facture",
+        "invoice_id": "ID de la facture",
+        "invoice_date": "Date de la facture",
+        "invoice_myCompany": "Mon entreprise",
+        
+        "invoice_status": "Statut de la facture"
+
+    },
+    "items": {
+        "items": "Articles",
+        "item": "Article",
+        "all_items": "Tous les articles",
+        "item_table_header_description": "Description",
+        "item_table_header_quantity": "Quantité",
+        "item_table_header_vat_rate": "TVA (%)",
+        "item_table_header_total_vat": "Total TVA",
+        "item_table_header_unit_price": "Prix unitaire",
+        "item_table_header_total": "Total",
+        "item_table_no_items": "Aucun article trouvé",
+        "item_table_no_items_description": "Il n'y a aucun article à afficher",
+        "item_create": "Créer un article",
+        "item_table_placeholder_description": "Description de l'article",
+        "item_table_add_item": "Ajouter un article"
     },
     "customers": {
         "customers": "Clients",
         "customer": "Client",
-        "all_customers": "Tous les clients"
+        "all_customers": "Tous les clients",
+        "customer_select": "Sélectionner un client",
+        "customer_create": "Créer un client",
+        "customer_placeholder_search": "Rechercher un client",
+        "customer_create_success": "Client créé avec succès",
+        "customer_create_error": "Erreur lors de la création du client",
+        "customer_no_results": "Aucun résultat trouvé",
+        "customer_failed_search": "Échec de la recherche du client"
     },
     "settings": {
         "settings": "Paramètres"
@@ -78,9 +117,13 @@
         "common_previous": "Précédent",
         "common_loading": "Chargement...",
         "common_error": "Erreur",
+        "common_download_pdf": "Télécharger PDF",
         "common_error_description": "Une erreur s'est produite",
         "common_error_description_message": "Une erreur s'est produite lors du chargement de la page",
         "common_error_fetch": "Erreur de chargement",
-        "common_error_fetch_message": "Une erreur s'est produite lors du chargement des données"
+        "common_error_fetch_message": "Une erreur s'est produite lors du chargement des données",
+        "common_email": "Email",
+        "common_phone": "Téléphone",
+        "common_vat_number": "Numéro de TVA"
     }
 }

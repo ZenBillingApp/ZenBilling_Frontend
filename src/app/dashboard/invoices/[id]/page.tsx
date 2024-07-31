@@ -1,6 +1,9 @@
 "use client";
 import React, { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+
+import useFormattedAmount from "@/hooks/useFormattedAmount";
 
 import { Invoice } from "@/types/Invoice";
 import { Customer } from "@/types/Customer";
@@ -70,12 +73,13 @@ const AlertDeleteInvoice = ({}) => {
     const [open, setOpen] = React.useState<boolean>(false);
     const { id } = useParams();
     const router = useRouter();
+    const t = useTranslations();
 
     const { toast } = useToast();
 
     const [loading, setLoading] = React.useState<boolean>(false);
 
-    const onDelete = async () => {
+    const OnDelete = async () => {
         try {
             const response = await fetch(
                 `${process.env.NEXT_PUBLIC_API_URL}/api/invoices/${id}`,
@@ -104,7 +108,7 @@ const AlertDeleteInvoice = ({}) => {
                 title: "Error",
                 description: "Failed to delete invoice",
                 action: (
-                    <ToastAction altText="Retry" onClick={onDelete}>
+                    <ToastAction altText="Retry" onClick={OnDelete}>
                         Retry
                     </ToastAction>
                 ),
@@ -120,26 +124,33 @@ const AlertDeleteInvoice = ({}) => {
                     className="flex items-center gap-2"
                 >
                     <MdDeleteOutline size={20} />
-                    Delete
+                    {t("common.common_delete")}
                 </Button>
             </CredenzaTrigger>
             <CredenzaContent>
                 <CredenzaHeader>
-                    <CredenzaTitle>Delete Invoice</CredenzaTitle>
+                    <CredenzaTitle>
+                        {t("invoices.invoice_delete")}
+                    </CredenzaTitle>
+                    <CredenzaDescription>
+                        <p>{t("invoices.invoice_delete_confirm")}</p>
+                    </CredenzaDescription>
                 </CredenzaHeader>
-                <CredenzaDescription>
-                    <p>Are you sure you want to delete this invoice?</p>
-                </CredenzaDescription>
+
                 <CredenzaFooter>
                     <Button
                         disabled={loading}
                         variant={"destructive"}
-                        onClick={onDelete}
+                        onClick={OnDelete}
                     >
-                        {loading ? "Deleting..." : "Yes"}
+                        {loading
+                            ? t("common.common_loading")
+                            : t("common.common_delete")}
                     </Button>
                     <CredenzaClose asChild>
-                        <Button variant="outline">No</Button>
+                        <Button variant="outline">
+                            {t("common.common_cancel")}
+                        </Button>
                     </CredenzaClose>
                 </CredenzaFooter>
             </CredenzaContent>
@@ -151,6 +162,9 @@ export default function Page({}: Props) {
     const { id } = useParams();
     const router = useRouter();
     const { toast } = useToast();
+    const t = useTranslations();
+
+    const { formatAmount } = useFormattedAmount();
 
     const [invoice, setInvoice] = useState<Invoice | null>(null);
     const [loading, setLoading] = useState(true);
@@ -429,7 +443,6 @@ export default function Page({}: Props) {
         );
         const isoDate = localDate.toISOString().split("T")[0]; // Garde seulement la partie date sans l'heure
 
-        console.log(isoDate); // Vérifiez que la date est bien convertie en ISO
         try {
             const response = await fetch(
                 `${process.env.NEXT_PUBLIC_API_URL}/api/invoices/${id}`,
@@ -543,10 +556,13 @@ export default function Page({}: Props) {
     };
 
     return (
-        <ContentLayout title="Invoices details">
+        <ContentLayout title={t("invoices.invoice_details")}>
             <div className="flex flex-col flex-1 gap-6">
-                <div className="flex items-center justify-between">
-                    <h1 className="text-2xl font-semibold">Invoices / {id}</h1>
+                <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+                    <h1 className="text-2xl font-semibold">
+                        {" "}
+                        {t("invoices.invoice") + " / " + id}
+                    </h1>
                     <div className="flex gap-4">
                         <Button
                             variant="outline"
@@ -554,17 +570,17 @@ export default function Page({}: Props) {
                             onClick={handleDownload}
                         >
                             <Download size={16} />
-                            Download
+                            {t("common.common_download_pdf")}
                         </Button>
 
                         <AlertDeleteInvoice />
                     </div>
                 </div>
-                <Card className="flex flex-col justify-between gap-6 p-6 md:flex-row">
+                <Card className="flex flex-col justify-between p-6 md:flex-row gap-4">
                     <div className="flex flex-col w-full gap-4 md:w-1/2">
                         <div className="flex items-center justify-between">
                             <h2 className="text-sm font-semibold">
-                                Invoice ID
+                                {t("invoices.invoice_id")}
                             </h2>
                             <p className="flex text-sm text-right">
                                 {invoice?.invoice_id}
@@ -572,7 +588,7 @@ export default function Page({}: Props) {
                         </div>
                         <div className="flex items-center justify-between">
                             <h2 className="text-sm font-semibold">
-                                Invoice Date
+                                {t("invoices.invoice_date")}
                             </h2>
                             <p className="flex text-sm text-right">
                                 {formattedDate}
@@ -580,7 +596,9 @@ export default function Page({}: Props) {
                         </div>
 
                         <div className="flex items-center justify-between">
-                            <h2 className="text-sm font-semibold">Status</h2>
+                            <h2 className="text-sm font-semibold">
+                                {t("invoices.invoice_status")}
+                            </h2>
                             <div className="flex">
                                 <Select
                                     defaultValue={invoice?.status}
@@ -593,17 +611,23 @@ export default function Page({}: Props) {
                                     <SelectContent>
                                         <SelectItem value="paid">
                                             <Badge className="bg-green-500 text-white">
-                                                paid
+                                                {t(
+                                                    "invoices.invoice_table_filter_paid"
+                                                )}
                                             </Badge>
                                         </SelectItem>
                                         <SelectItem value="pending">
                                             <Badge className="bg-yellow-500 text-white hover:bg-yellow-600">
-                                                pending
+                                                {t(
+                                                    "invoices.invoice_table_filter_pending"
+                                                )}
                                             </Badge>
                                         </SelectItem>
                                         <SelectItem value="cancelled">
                                             <Badge className="bg-red-500 text-white hover:bg-red-600">
-                                                cancelled
+                                                {t(
+                                                    "invoices.invoice_table_filter_cancelled"
+                                                )}
                                             </Badge>
                                         </SelectItem>
                                     </SelectContent>
@@ -613,7 +637,9 @@ export default function Page({}: Props) {
                     </div>
                     <div className="flex flex-col w-full gap-4 md:w-1/2">
                         <div className="flex items-center justify-between">
-                            <h2 className="text-sm font-semibold">Due</h2>
+                            <h2 className="text-sm font-semibold">
+                                {t("invoices.invoice_due_date")}
+                            </h2>
                             <Popover>
                                 <PopoverTrigger asChild>
                                     <Button
@@ -632,7 +658,11 @@ export default function Page({}: Props) {
                                 <PopoverContent className="w-auto p-0">
                                     <Calendar
                                         mode="single"
-                                        selected={invoice?.due_date}
+                                        selected={
+                                            invoice?.due_date
+                                                ? new Date(invoice.due_date)
+                                                : new Date()
+                                        }
                                         onSelect={(date) => {
                                             handleSelectDueDate(date as Date);
                                         }}
@@ -645,7 +675,9 @@ export default function Page({}: Props) {
                 </Card>
                 <div className="flex flex-col gap-6 md:flex-row">
                     <Card className="flex flex-col w-full gap-2 p-6">
-                        <h2 className="text-lg font-semibold">My Company :</h2>
+                        <h2 className="text-lg font-semibold">
+                            {t("invoices.invoice_myCompany")}
+                        </h2>
                         <div className="flex flex-col pl-2">
                             <h2 className="text-sm font-semibold">
                                 {invoice?.company?.name}
@@ -662,16 +694,20 @@ export default function Page({}: Props) {
                                 {invoice?.company?.country}
                             </p>
                             <p className="text-sm">
-                                <span className="font-semibold">Email:</span>{" "}
+                                <span className="font-semibold">
+                                    {t("common.common_email")} :
+                                </span>{" "}
                                 {invoice?.company?.email}
                             </p>
                             <p className="text-sm">
-                                <span className="font-semibold">Phone:</span>{" "}
+                                <span className="font-semibold">
+                                    {t("common.common_phone")} :
+                                </span>{" "}
                                 {invoice?.company?.phone}
                             </p>
                             <p className="text-sm">
                                 <span className="font-semibold">
-                                    VAT Number:
+                                    {t("common.common_vat_number")} :
                                 </span>{" "}
                                 {invoice?.company?.vat_number}
                             </p>
@@ -689,12 +725,14 @@ export default function Page({}: Props) {
                                 <SheetHeader>
                                     <SheetTitle>
                                         <h1 className="text-2xl font-semibold">
-                                            Select a customer
+                                            {t("customers.customer_select")}
                                         </h1>
                                     </SheetTitle>
                                     <SheetDescription>
                                         <Input
-                                            placeholder="Search customers"
+                                            placeholder={t(
+                                                "customers.customer_placeholder_search"
+                                            )}
                                             value={search}
                                             onChange={(e) =>
                                                 setSearch(e.target.value)
@@ -711,10 +749,20 @@ export default function Page({}: Props) {
                                             />
                                         </div>
                                     )}
-                                    {error && <p>Failed to fetch customers</p>}
+                                    {error && (
+                                        <p>
+                                            {t(
+                                                "customers.customer_failed_search"
+                                            )}
+                                        </p>
+                                    )}
                                     {customers.length === 0 &&
                                         !customerLoading && (
-                                            <p>No customers found</p>
+                                            <p>
+                                                {t(
+                                                    "customers.customer_no_results"
+                                                )}
+                                            </p>
                                         )}
                                     {customers.map((customer) => (
                                         <Button
@@ -733,7 +781,9 @@ export default function Page({}: Props) {
                                 </div>
                             </SheetContent>
                         </Sheet>
-                        <h2 className="text-lg font-semibold">Bill To :</h2>
+                        <h2 className="text-lg font-semibold">
+                            {t("invoices.invoice_billTo")} :
+                        </h2>
                         <div className="flex flex-col pl-2">
                             <h2 className="text-sm font-semibold">
                                 {invoice?.client?.first_name}{" "}
@@ -751,27 +801,50 @@ export default function Page({}: Props) {
                                 {invoice?.client?.country}
                             </p>
                             <p className="text-sm">
-                                <span className="font-semibold">Email:</span>{" "}
+                                <span className="font-semibold">
+                                    {t("common.common_email")} :
+                                </span>{" "}
                                 {invoice?.client?.email}
                             </p>
                             <p className="text-sm">
-                                <span className="font-semibold">Phone:</span>{" "}
+                                <span className="font-semibold">
+                                    {t("common.common_phone")} :
+                                </span>{" "}
                                 {invoice?.client?.phone}
                             </p>
                         </div>
                     </Card>
                 </div>
-                <div className="relative">
+                <div className="flex flex-col items-start w-full gap-4 mb-4">
                     {editOpen ? (
                         <>
                             <Table>
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead>Description</TableHead>
-                                        <TableHead>Quantity</TableHead>
-                                        <TableHead>Unit Price</TableHead>
-                                        <TableHead>VAT Rate (in %)</TableHead>
-                                        <TableHead></TableHead>
+                                        <TableHead className="min-w-96">
+                                            {t(
+                                                "items.item_table_header_description"
+                                            )}
+                                        </TableHead>
+                                        <TableHead className="min-w-32">
+                                            {t(
+                                                "items.item_table_header_quantity"
+                                            )}
+                                        </TableHead>
+                                        <TableHead className="min-w-32">
+                                            {t(
+                                                "items.item_table_header_unit_price"
+                                            )}
+                                        </TableHead>
+                                        <TableHead className="min-w-32">
+                                            {t(
+                                                "items.item_table_header_vat_rate"
+                                            )}
+                                        </TableHead>
+
+                                        <TableHead className="min-w-32">
+                                            {t("items.item_table_header_total")}
+                                        </TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -830,6 +903,14 @@ export default function Page({}: Props) {
                                                 />
                                             </TableCell>
                                             <TableCell>
+                                                $
+                                                {item.unit_price *
+                                                    item.quantity +
+                                                    (item.vat_rate / 100) *
+                                                        item.unit_price *
+                                                        item.quantity}
+                                            </TableCell>
+                                            <TableCell>
                                                 <Button
                                                     variant="destructive"
                                                     onClick={() =>
@@ -862,16 +943,36 @@ export default function Page({}: Props) {
                         </>
                     ) : (
                         <>
-                            <Table>
-                                <TableHeader className="bg-secondary">
+                            <Table className="relative">
+                                <TableHeader className="bg-secondary  ">
                                     <TableRow>
-                                        <TableHead>Description</TableHead>
-                                        <TableHead>Quantity</TableHead>
-                                        <TableHead>Unit Price</TableHead>
-                                        <TableHead>VAT Rate (in %)</TableHead>
-                                        <TableHead>VAT Amount</TableHead>
-                                        <TableHead>
-                                            Total Price (VAT incl.)
+                                        <TableHead className="min-w-96">
+                                            {t(
+                                                "items.item_table_header_description"
+                                            )}
+                                        </TableHead>
+                                        <TableHead className="min-w-32">
+                                            {t(
+                                                "items.item_table_header_quantity"
+                                            )}
+                                        </TableHead>
+                                        <TableHead className="min-w-32">
+                                            {t(
+                                                "items.item_table_header_unit_price"
+                                            )}
+                                        </TableHead>
+                                        <TableHead className="min-w-32">
+                                            {t(
+                                                "items.item_table_header_vat_rate"
+                                            )}
+                                        </TableHead>
+                                        <TableHead className="min-w-32">
+                                            {t(
+                                                "items.item_table_header_total_vat"
+                                            )}
+                                        </TableHead>
+                                        <TableHead className="min-w-32">
+                                            {t("items.item_table_header_total")}
                                         </TableHead>
                                     </TableRow>
                                 </TableHeader>
@@ -885,31 +986,39 @@ export default function Page({}: Props) {
                                                 {item.quantity}
                                             </TableCell>
                                             <TableCell>
-                                                ${item.unit_price}
+                                                {formatAmount(item.unit_price, {
+                                                    currency: "EUR",
+                                                }) || 0}
                                             </TableCell>
                                             <TableCell>
                                                 {item.vat_rate}
                                             </TableCell>
                                             <TableCell>
-                                                ${item.vat_amount}
+                                                {formatAmount(item.vat_amount, {
+                                                    currency: "EUR",
+                                                }) || 0}
                                             </TableCell>
                                             <TableCell>
-                                                $
-                                                {item.unit_price *
-                                                    item.quantity +
-                                                    (item.vat_rate / 100) *
-                                                        item.unit_price *
-                                                        item.quantity}
+                                                {formatAmount(
+                                                    item.unit_price *
+                                                        item.quantity +
+                                                        (item.vat_rate / 100) *
+                                                            item.unit_price *
+                                                            item.quantity,
+                                                    {
+                                                        currency: "EUR",
+                                                    }
+                                                ) || 0}
                                             </TableCell>
                                         </TableRow>
                                     ))}
                                 </TableBody>
+                                <Edit
+                                    size={20}
+                                    className="absolute top-2 right-2 cursor-pointer"
+                                    onClick={() => setEditOpen(true)}
+                                />
                             </Table>
-                            <Edit
-                                size={20}
-                                className="absolute top-[0.75rem] right-4 cursor-pointer"
-                                onClick={() => setEditOpen(true)}
-                            />
                         </>
                     )}
                 </div>
@@ -918,29 +1027,35 @@ export default function Page({}: Props) {
                     <div className="w-full md:w-1/4">
                         <div className="flex justify-between">
                             <h2 className="text-sm font-semibold">
-                                Total Amount (VAT excl.)
+                                {t("invoices.invoice_subtotal")} :
                             </h2>
                             <p className="flex w-24 text-sm items-start text-right">
-                                ${totalAmountWithoutVAT.toFixed(2)}
+                                {formatAmount(totalAmountWithoutVAT, {
+                                    currency: "EUR",
+                                }) || 0}
                             </p>
                         </div>
                         <div className="flex justify-between">
                             <h2 className="text-sm font-semibold">
-                                VAT Amount
+                                {t("invoices.invoice_vat")} :
                             </h2>
                             <p className="flex w-24 text-sm items-start text-right">
-                                $
-                                {(totalAmount - totalAmountWithoutVAT).toFixed(
-                                    2
-                                )}
+                                {formatAmount(
+                                    totalAmount - totalAmountWithoutVAT,
+                                    {
+                                        currency: "EUR",
+                                    }
+                                ) || 0}
                             </p>
                         </div>
                         <div className="flex justify-between">
                             <h2 className="text-sm font-semibold">
-                                Total Amount (VAT incl.)
+                                {t("invoices.invoice_total")} :
                             </h2>
                             <p className="flex w-24 text-sm items-start text-right">
-                                ${totalAmount.toFixed(2)}
+                                {formatAmount(totalAmount, {
+                                    currency: "EUR",
+                                }) || 0}
                             </p>
                         </div>
                     </div>
