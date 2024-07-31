@@ -56,7 +56,9 @@ export default async function RootLayout({ children }: RootLayoutProps) {
                     disableTransitionOnChange
                 >
                     <NextIntlClientProvider messages={messages}>
-                        {children}
+                        <div vaul-drawer-wrapper="" className="bg-background">
+                            {children}
+                        </div>
                     </NextIntlClientProvider>
                     <Toaster />
                 </ThemeProvider>

@@ -16,15 +16,16 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import {
-    Dialog,
-    DialogTrigger,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogDescription,
-    DialogFooter,
-    DialogClose,
-} from "@/components/ui/dialog";
+    Credenza,
+    CredenzaBody,
+    CredenzaClose,
+    CredenzaContent,
+    CredenzaDescription,
+    CredenzaFooter,
+    CredenzaHeader,
+    CredenzaTitle,
+    CredenzaTrigger,
+} from "@/components/ui/credenza";
 import { Label } from "@/components/ui/label";
 import { ClipLoader } from "react-spinners";
 import { getCookie } from "cookies-next";
@@ -78,8 +79,8 @@ const AddCustomerDialog = ({
     };
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger>
+        <Credenza open={open} onOpenChange={setOpen}>
+            <CredenzaTrigger>
                 <Button
                     className="flex items-center gap-2"
                     onClick={() => setOpen(true)}
@@ -87,14 +88,14 @@ const AddCustomerDialog = ({
                     <PiPlus size={20} />
                     Add customer
                 </Button>
-            </DialogTrigger>
-            <DialogContent className="overflow-auto h-[80vh]">
-                <DialogHeader>
-                    <DialogTitle>Add customer</DialogTitle>
-                </DialogHeader>
-                <DialogDescription>
+            </CredenzaTrigger>
+            <CredenzaContent className="overflow-auto h-[80vh]">
+                <CredenzaHeader>
+                    <CredenzaTitle>Add customer</CredenzaTitle>
+                </CredenzaHeader>
+                <CredenzaDescription>
                     <p>Fill the form below to add a new customer</p>
-                </DialogDescription>
+                </CredenzaDescription>
                 <form
                     className="flex flex-col w-full gap-6"
                     onSubmit={handleAdd}
@@ -225,7 +226,7 @@ const AddCustomerDialog = ({
                             }
                         />
                     </div>
-                    <DialogFooter>
+                    <CredenzaFooter>
                         <Button
                             type="submit"
                             disabled={
@@ -243,15 +244,15 @@ const AddCustomerDialog = ({
                         >
                             {loading ? "Adding..." : "Add"}
                         </Button>
-                        <DialogClose asChild>
+                        <CredenzaClose asChild>
                             <Button variant="outline" disabled={loading}>
                                 Cancel
                             </Button>
-                        </DialogClose>
-                    </DialogFooter>
+                        </CredenzaClose>
+                    </CredenzaFooter>
                 </form>
-            </DialogContent>
-        </Dialog>
+            </CredenzaContent>
+        </Credenza>
     );
 };
 

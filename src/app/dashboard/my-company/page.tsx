@@ -15,15 +15,16 @@ import {
 } from "@/components/ui/card";
 
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-    DialogClose,
-} from "@/components/ui/dialog";
+    Credenza,
+    CredenzaBody,
+    CredenzaClose,
+    CredenzaContent,
+    CredenzaDescription,
+    CredenzaFooter,
+    CredenzaHeader,
+    CredenzaTitle,
+    CredenzaTrigger,
+} from "@/components/ui/credenza";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertTriangle } from "lucide-react";
@@ -88,8 +89,8 @@ const EditCompanyDialog = ({
     };
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger>
+        <Credenza open={open} onOpenChange={setOpen}>
+            <CredenzaTrigger>
                 <Button
                     className="flex items-center gap-2"
                     onClick={() => setOpen(true)}
@@ -97,14 +98,14 @@ const EditCompanyDialog = ({
                     <MdOutlineEdit size={20} />
                     Modify
                 </Button>
-            </DialogTrigger>
-            <DialogContent className="h-[80vh] overflow-auto">
-                <DialogHeader>
-                    <DialogTitle>Modify Company Profile</DialogTitle>
-                </DialogHeader>
-                <DialogDescription>
+            </CredenzaTrigger>
+            <CredenzaContent className="h-[80vh] overflow-auto">
+                <CredenzaHeader>
+                    <CredenzaTitle>Modify Company Profile</CredenzaTitle>
+                </CredenzaHeader>
+                <CredenzaDescription>
                     <p>Change your company information</p>
-                </DialogDescription>
+                </CredenzaDescription>
                 {error && (
                     <Alert variant="destructive">
                         <AlertTriangle className="w-5 h-5" />
@@ -269,7 +270,7 @@ const EditCompanyDialog = ({
                     />
                 </div>
 
-                <DialogFooter>
+                <CredenzaFooter>
                     <Button
                         disabled={
                             !editCompany?.name ||
@@ -289,14 +290,14 @@ const EditCompanyDialog = ({
                         {loading ? "Saving..." : "Save"}
                     </Button>
 
-                    <DialogClose asChild>
+                    <CredenzaClose asChild>
                         <Button variant="outline" onClick={onClose}>
                             Cancel
                         </Button>
-                    </DialogClose>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
+                    </CredenzaClose>
+                </CredenzaFooter>
+            </CredenzaContent>
+        </Credenza>
     );
 };
 

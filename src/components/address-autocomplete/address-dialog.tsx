@@ -2,13 +2,16 @@
 
 import { Button } from "@/components/ui/button";
 import {
-    Dialog,
-    DialogContent,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog";
+    Credenza,
+    CredenzaBody,
+    CredenzaClose,
+    CredenzaContent,
+    CredenzaDescription,
+    CredenzaFooter,
+    CredenzaHeader,
+    CredenzaTitle,
+    CredenzaTrigger,
+} from "@/components/ui/credenza";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type React from "react";
@@ -242,12 +245,12 @@ export default function AddressDialog(
     }, [address, open]);
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>{children}</DialogTrigger>
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>{dialogTitle}</DialogTitle>
-                </DialogHeader>
+        <Credenza open={open} onOpenChange={setOpen}>
+            <CredenzaTrigger asChild>{children}</CredenzaTrigger>
+            <CredenzaContent>
+                <CredenzaHeader>
+                    <CredenzaTitle>{dialogTitle}</CredenzaTitle>
+                </CredenzaHeader>
 
                 {isLoading ? (
                     <div className="h-52 flex items-center justify-center">
@@ -377,7 +380,7 @@ export default function AddressDialog(
                             </div>
                         </div>
 
-                        <DialogFooter>
+                        <CredenzaFooter>
                             <Button
                                 type="reset"
                                 onClick={() => setOpen(false)}
@@ -386,10 +389,10 @@ export default function AddressDialog(
                                 Cancel
                             </Button>
                             <Button type="submit">Save</Button>
-                        </DialogFooter>
+                        </CredenzaFooter>
                     </form>
                 )}
-            </DialogContent>
-        </Dialog>
+            </CredenzaContent>
+        </Credenza>
     );
 }

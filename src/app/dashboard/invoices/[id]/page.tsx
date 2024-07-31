@@ -40,15 +40,16 @@ import {
     SheetTrigger,
 } from "@/components/ui/sheet";
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-    DialogClose,
-} from "@/components/ui/dialog";
+    Credenza,
+    CredenzaBody,
+    CredenzaClose,
+    CredenzaContent,
+    CredenzaDescription,
+    CredenzaFooter,
+    CredenzaHeader,
+    CredenzaTitle,
+    CredenzaTrigger,
+} from "@/components/ui/credenza";
 
 import { Calendar } from "@/components/ui/calendar";
 import { useToast } from "@/components/ui/use-toast";
@@ -112,8 +113,8 @@ const AlertDeleteInvoice = ({}) => {
     };
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger>
+        <Credenza open={open} onOpenChange={setOpen}>
+            <CredenzaTrigger>
                 <Button
                     variant={"destructive"}
                     className="flex items-center gap-2"
@@ -121,15 +122,15 @@ const AlertDeleteInvoice = ({}) => {
                     <MdDeleteOutline size={20} />
                     Delete
                 </Button>
-            </DialogTrigger>
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>Delete Invoice</DialogTitle>
-                </DialogHeader>
-                <DialogDescription>
+            </CredenzaTrigger>
+            <CredenzaContent>
+                <CredenzaHeader>
+                    <CredenzaTitle>Delete Invoice</CredenzaTitle>
+                </CredenzaHeader>
+                <CredenzaDescription>
                     <p>Are you sure you want to delete this invoice?</p>
-                </DialogDescription>
-                <DialogFooter>
+                </CredenzaDescription>
+                <CredenzaFooter>
                     <Button
                         disabled={loading}
                         variant={"destructive"}
@@ -137,12 +138,12 @@ const AlertDeleteInvoice = ({}) => {
                     >
                         {loading ? "Deleting..." : "Yes"}
                     </Button>
-                    <DialogClose asChild>
+                    <CredenzaClose asChild>
                         <Button variant="outline">No</Button>
-                    </DialogClose>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
+                    </CredenzaClose>
+                </CredenzaFooter>
+            </CredenzaContent>
+        </Credenza>
     );
 };
 

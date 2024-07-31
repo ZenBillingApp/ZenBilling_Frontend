@@ -15,15 +15,16 @@ import {
 } from "@/components/ui/card";
 
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-    DialogClose,
-} from "@/components/ui/dialog";
+    Credenza,
+    CredenzaBody,
+    CredenzaClose,
+    CredenzaContent,
+    CredenzaDescription,
+    CredenzaFooter,
+    CredenzaHeader,
+    CredenzaTitle,
+    CredenzaTrigger,
+} from "@/components/ui/credenza";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertTriangle } from "lucide-react";
@@ -99,8 +100,8 @@ const EditUserDialog = ({
     };
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger>
+        <Credenza open={open} onOpenChange={setOpen}>
+            <CredenzaTrigger>
                 <Button
                     className="flex items-center gap-2"
                     onClick={() => setOpen(true)}
@@ -108,14 +109,14 @@ const EditUserDialog = ({
                     <MdOutlineEdit size={20} />
                     Modify
                 </Button>
-            </DialogTrigger>
-            <DialogContent className="overflow-auto h-[80vh]">
-                <DialogHeader>
-                    <DialogTitle>Modify my profile</DialogTitle>
-                </DialogHeader>
-                <DialogDescription>
+            </CredenzaTrigger>
+            <CredenzaContent className="overflow-auto h-[80vh]">
+                <CredenzaHeader>
+                    <CredenzaTitle>Modify my profile</CredenzaTitle>
+                </CredenzaHeader>
+                <CredenzaDescription>
                     <p>change your information</p>
-                </DialogDescription>
+                </CredenzaDescription>
                 {error && (
                     <Alert variant="destructive">
                         <AlertTriangle className="w-5 h-5" />
@@ -267,7 +268,7 @@ const EditUserDialog = ({
                     />
                 </div>
 
-                <DialogFooter>
+                <CredenzaFooter>
                     <Button
                         disabled={
                             !editUser?.first_name ||
@@ -286,14 +287,14 @@ const EditUserDialog = ({
                         {loading ? "Saving..." : "Save"}
                     </Button>
 
-                    <DialogClose asChild>
+                    <CredenzaClose asChild>
                         <Button variant="outline" onClick={onClose}>
                             Cancel
                         </Button>
-                    </DialogClose>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
+                    </CredenzaClose>
+                </CredenzaFooter>
+            </CredenzaContent>
+        </Credenza>
     );
 };
 
