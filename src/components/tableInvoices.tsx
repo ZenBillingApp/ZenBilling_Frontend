@@ -16,6 +16,8 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
+import useFormattedAmount from "@/hooks/useFormattedAmount";
+import useFormattedDate from "@/hooks/useFormattedDate";
 
 type Props = {
     invoices: Invoice[] | undefined;
@@ -25,6 +27,8 @@ type Props = {
 export default function TableInvoices({ invoices, search }: Props) {
     const t = useTranslations();
     const router = useRouter();
+    const { formatAmount } = useFormattedAmount();
+    const { formatDate } = useFormattedDate();
     const handleSelectInvoice = (invoiceId: number) => {
         router.push(`/dashboard/invoices/${invoiceId}`);
     };
@@ -93,22 +97,23 @@ export default function TableInvoices({ invoices, search }: Props) {
                                             : "bg-red-500 text-white hover:bg-red-600"
                                     )}
                                 >
-                                    {invoice.status || "N/A"}
+                                    {t(
+                                        `invoices.invoice_table_status_${invoice.status}`
+                                    ) || "N/A"}
                                 </Badge>
                             </TableCell>
-
                             <TableCell>{invoice?.items?.length || 0}</TableCell>
 
-                            <TableCell>${invoice.total_amount || 0}</TableCell>
                             <TableCell>
-                                {new Date(
-                                    invoice.invoice_date
-                                ).toLocaleDateString() || "N/A"}
+                                {formatAmount(invoice.total_amount, {
+                                    currency: "EUR",
+                                })}
                             </TableCell>
                             <TableCell>
-                                {new Date(
-                                    invoice.due_date
-                                ).toLocaleDateString() || "N/A"}
+                                {formatDate(invoice.invoice_date) || "N/A"}
+                            </TableCell>
+                            <TableCell>
+                                {formatDate(invoice.due_date) || "N/A"}
                             </TableCell>
                         </TableRow>
                     ))

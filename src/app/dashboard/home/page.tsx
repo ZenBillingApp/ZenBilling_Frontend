@@ -116,7 +116,7 @@ export default function Page({ params: { locale } }: Props) {
     }
 
     return (
-        <ContentLayout title="Dashboard">
+        <ContentLayout title={t("dashboard.dashboard")}>
             <div className={cn("flex flex-col w-full h-full gap-6")}>
                 <div className="flex flex-col w-full gap-6">
                     <div className="flex w-full justify-between ">
@@ -198,7 +198,9 @@ export default function Page({ params: { locale } }: Props) {
                 <div className="flex w-full  gap-6 ">
                     <Card className="flex flex-col  w-full   p-4 ">
                         <CardHeader>
-                            <CardTitle>Latest Invoices</CardTitle>
+                            <CardTitle>
+                                {t("invoices.latest_invoices")}
+                            </CardTitle>
                         </CardHeader>
                         <CardContent className="flex  w-full h-full ">
                             <TableInvoices

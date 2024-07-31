@@ -8,6 +8,8 @@ import {
     Home,
 } from "lucide-react";
 
+import { useTranslations } from "next-intl";
+
 type Submenu = {
     href: string;
     label: string;
@@ -27,14 +29,15 @@ type Group = {
     menus: Menu[];
 };
 
-export function getMenuList(pathname: string): Group[] {
+export function GetMenuList(pathname: string): Group[] {
+    const t = useTranslations();
     return [
         {
             groupLabel: "",
             menus: [
                 {
                     href: "/dashboard/home",
-                    label: "Dashboard",
+                    label: t("dashboard.dashboard"),
                     active: pathname.includes("/home"),
                     icon: LayoutGrid,
                     submenus: [],
@@ -46,25 +49,25 @@ export function getMenuList(pathname: string): Group[] {
             menus: [
                 {
                     href: "",
-                    label: "Invoices",
+                    label: t("invoices.invoices"),
                     active: pathname.includes("/invoices"),
                     icon: FolderArchive,
                     submenus: [
                         {
                             href: "/dashboard/invoices",
-                            label: "All Invoices",
+                            label: t("invoices.all_invoices"),
                             active: pathname === "/dashboard/invoices",
                         },
                         {
                             href: "/dashboard/invoices/create",
-                            label: "New Invoice",
+                            label: t("invoices.create_invoice"),
                             active: pathname === "/dashboard/invoices/create",
                         },
                     ],
                 },
                 {
                     href: "/dashboard/customers",
-                    label: "Customers",
+                    label: t("customers.customers"),
                     active: pathname.includes("/dashboard/customers"),
                     icon: Users,
                     submenus: [],
@@ -72,18 +75,18 @@ export function getMenuList(pathname: string): Group[] {
             ],
         },
         {
-            groupLabel: "Settings",
+            groupLabel: t("settings.settings"),
             menus: [
                 {
                     href: "/dashboard/profile",
-                    label: "Profile",
+                    label: t("profile.profile"),
                     active: pathname.includes("/profile"),
                     icon: User2Icon,
                     submenus: [],
                 },
                 {
                     href: "/dashboard/my-company",
-                    label: "My Company",
+                    label: t("company.company"),
                     active: pathname.includes("/my-company"),
                     icon: Home,
                     submenus: [],

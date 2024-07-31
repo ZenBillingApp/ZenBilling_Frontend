@@ -28,7 +28,7 @@ export interface Invoice {
     items: Item[];
     status: string;
     total_amount: number;
-    due_date: string;
+    due_date: Date;
     payments: {
         payment_method: "cash" | "credit_card" | "bank_transfer";
         amount: number;

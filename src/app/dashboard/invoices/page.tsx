@@ -2,6 +2,7 @@
 import React from "react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 import { Invoice } from "@/types/Invoice";
 
@@ -29,6 +30,7 @@ type Props = {};
 export default function Page({}: Props) {
     const router = useRouter();
     const searchParams = useSearchParams();
+    const t = useTranslations();
 
     const [invoices, setInvoices] = React.useState<Invoice[]>([]);
     const [search, setSearch] = React.useState<string>("");
@@ -100,26 +102,31 @@ export default function Page({}: Props) {
                     alt="Error"
                 />
                 <h1 className="text-2xl font-semibold">
-                    An error occurred while fetching data
+                    {t("common.common_error_fetch")}
                 </h1>
+                <p className="text-gray-500">
+                    {t("common.common_error_fetch_message")}
+                </p>
                 <Button onClick={fetchInvoices}>Retry</Button>
             </div>
         );
     }
 
     return (
-        <ContentLayout title="Invoices">
+        <ContentLayout title={t("invoices.invoices")}>
             <div className="flex flex-col w-full gap-6">
                 <div className="flex flex-col gap-10">
-                    <div className="flex items-center justify-between">
-                        <h1 className="text-2xl font-semibold">Invoices</h1>
+                    <div className="flex flex-col xl:flex-row xl:justify-between xl:items-center gap-6">
+                        <h1 className="text-2xl font-semibold">
+                            {t("invoices.invoices")}
+                        </h1>
                         <Button
                             onClick={() =>
                                 router.push("/dashboard/invoices/create")
                             }
                         >
                             <PiPlus className="mr-2" size={20} />
-                            New Invoice
+                            {t("invoices.create_invoice")}
                         </Button>
                     </div>
                     <div className="flex flex-col w-full gap-6">
@@ -131,7 +138,7 @@ export default function Page({}: Props) {
                                     }
                                     onClick={() => handleChangeFilter("all")}
                                 >
-                                    All
+                                    {t("invoices.invoice_table_filter_all")}
                                 </Button>
                                 <Button
                                     variant={
@@ -141,7 +148,7 @@ export default function Page({}: Props) {
                                     }
                                     onClick={() => handleChangeFilter("paid")}
                                 >
-                                    Paid
+                                    {t("invoices.invoice_table_filter_paid")}
                                 </Button>
                                 <Button
                                     variant={
@@ -153,7 +160,7 @@ export default function Page({}: Props) {
                                         handleChangeFilter("pending")
                                     }
                                 >
-                                    Pending
+                                    {t("invoices.invoice_table_filter_pending")}
                                 </Button>
                                 <Button
                                     variant={
@@ -165,13 +172,17 @@ export default function Page({}: Props) {
                                         handleChangeFilter("cancelled")
                                     }
                                 >
-                                    Cancelled
+                                    {t(
+                                        "invoices.invoice_table_filter_cancelled"
+                                    )}
                                 </Button>
                             </div>
 
                             <div className="flex w-full py-2 gap-6 xl:w-2/6">
                                 <Input
-                                    placeholder="Search invoices by client name or invoice id"
+                                    placeholder={t(
+                                        "invoices.invoice_table_search_placeholder"
+                                    )}
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
                                 />
@@ -195,16 +206,15 @@ export default function Page({}: Props) {
                             <Pagination>
                                 <PaginationContent>
                                     <PaginationPrevious
-                                        isActive={false}
+                                        title={t("common.common_previous")}
+                                        isActive={page > 1}
                                         className="cursor-pointer"
                                         onClick={() => {
                                             if (page > 1) {
                                                 handleChangePage(page - 1);
                                             }
                                         }}
-                                    >
-                                        Previous
-                                    </PaginationPrevious>
+                                    />
                                     {[...Array(totalPages)].map((_, index) => (
                                         <PaginationItem
                                             key={index}
@@ -222,15 +232,14 @@ export default function Page({}: Props) {
                                     ))}
 
                                     <PaginationNext
+                                        title={t("common.common_next")}
                                         className="cursor-pointer"
                                         onClick={() => {
                                             if (page < totalPages) {
                                                 handleChangePage(page + 1);
                                             }
                                         }}
-                                    >
-                                        Next
-                                    </PaginationNext>
+                                    />
                                 </PaginationContent>
                             </Pagination>
                         )}

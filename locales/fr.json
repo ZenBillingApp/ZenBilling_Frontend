@@ -1,27 +1,86 @@
 {
     "dashboard": {
-        "welcome": "Bonjour!",
-        "dashboard": "Dashboard",
-        "dashboard_late_invoice": "Late Invoices",
-        "dashboard_pending_invoice": "Pending Invoices",
-        "dashboard_invoice_late_message": "You have {count, plural, =0 {no late invoices} =1 {# late invoice} other {# late invoices}}",
-        "dashboard_section_customers": "Customers",
-        "dashboard_section_invoice_month": "Invoices this Month"
+        "welcome": "Bonjour !",
+        "dashboard": "Tableau de bord",
+        "dashboard_late_invoice": "Factures en retard",
+        "dashboard_pending_invoice": "Factures en attente",
+        "dashboard_invoice_late_message": "Vous avez {count, plural, =0 {aucune facture en retard} =1 {# facture en retard} other {# factures en retard}}",
+        "dashboard_section_customers": "Clients",
+        "dashboard_section_invoice_month": "Factures ce mois-ci"
     },
-    "invoices":{
-        "invoice_view_all": "View All Invoices",
-        "invoice_table_title": "Invoices",
-        "invoice_table_header_invoice_number": "Invoice Number",
-        "invoice_table_header_invoice_date": "Invoice Date",
-        "invoice_table_header_due_date": "Due Date",
-        "invoice_table_header_amount": "Amount",
-        "invoice_table_header_status": "Status",
-        "invoice_table_header_first_name": "First Name",
-        "invoice_table_header_last_name": "Last Name",
-        "invoice_table_header_items": "Items",
-        "invoice_table_no_invoices": "No invoices found",
-        "invoice_table_no_invoices_description": "There are no invoices to display"
+    "invoices": {
+        "invoice_view_all": "Voir toutes les factures",
+        "latest_invoices": "Dernières factures",
+        "create_invoice": "Nouvelle facture",
+        "invoices": "Factures",
+        "invoice": "Facture",
+        "all_invoices": "Toutes les factures",
+        "invoice_table_header_invoice_number": "Numéro de facture",
+        "invoice_table_filter_all": "Tout",
+        "invoice_table_filter_paid": "Payée",
+        "invoice_table_filter_pending": "En attente",
+        "invoice_table_filter_cancelled": "Annulée",
+        "invoice_table_search_placeholder": "Rechercher une facture par nom, prénom ou ID de la facture",
+        "invoice_table_header_invoice_date": "Date de facture",
+        "invoice_table_header_due_date": "Date d'échéance",
+        "invoice_table_header_amount": "Montant",
+        "invoice_table_header_status": "Statut",
+        "invoice_table_header_first_name": "Prénom",
+        "invoice_table_header_last_name": "Nom",
+        "invoice_table_header_items": "Articles",
+        "invoice_table_no_invoices": "Aucune facture trouvée",
+        "invoice_table_no_invoices_description": "Il n'y a aucune facture à afficher",
+        "invoice_table_status_paid": "Payée",
+        "invoice_table_status_pending": "En attente",
+        "invoice_table_status_cancelled": "Annulée"
+    },
+    "customers": {
+        "customers": "Clients",
+        "customer": "Client",
+        "all_customers": "Tous les clients"
+    },
+    "settings": {
+        "settings": "Paramètres"
+    },
+    "profile": {
+        "profile": "Profil",
+        "logout": "Déconnexion"
+    },
+    "company": {
+        "company": "Entreprise",
+        "company_name": "Nom de l'entreprise",
+        "company_address": "Adresse de l'entreprise",
+        "company_city": "Ville de l'entreprise",
+        "company_zip": "Code postal de l'entreprise",
+        "company_country": "Pays de l'entreprise",
+        "company_phone": "Téléphone de l'entreprise",
+        "company_email": "Email de l'entreprise",
+        "company_website": "Site web de l'entreprise",
+        "company_logo": "Logo de l'entreprise",
+        "company_update": "Mettre à jour l'entreprise",
+        "company_update_success": "Entreprise mise à jour avec succès",
+        "company_update_error": "Erreur lors de la mise à jour de l'entreprise"
+    },
+    "common": {
+        "common_search": "Rechercher",
+        "common_search_placeholder": "Rechercher...",
+        "common_view": "Voir",
+        "common_edit": "Modifier",
+        "common_delete": "Supprimer",
+        "common_cancel": "Annuler",
+        "common_save": "Enregistrer",
+        "common_close": "Fermer",
+        "common_yes": "Oui",
+        "common_no": "Non",
+        "common_confirm": "Confirmer",
+        "common_confirm_ok": "OK",
+        "common_next": "Suivant",
+        "common_previous": "Précédent",
+        "common_loading": "Chargement...",
+        "common_error": "Erreur",
+        "common_error_description": "Une erreur s'est produite",
+        "common_error_description_message": "Une erreur s'est produite lors du chargement de la page",
+        "common_error_fetch": "Erreur de chargement",
+        "common_error_fetch_message": "Une erreur s'est produite lors du chargement des données"
     }
-    
-   
 }

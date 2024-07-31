@@ -1,17 +1,26 @@
 {
     "dashboard": {
-        "welcome": "Hello!",
+        "welcome": "Welcome!",
         "dashboard": "Dashboard",
         "dashboard_late_invoice": "Late Invoices",
         "dashboard_pending_invoice": "Pending Invoices",
         "dashboard_invoice_late_message": "You have {count, plural, =0 {no late invoices} =1 {# late invoice} other {# late invoices}}",
         "dashboard_section_customers": "Customers",
-        "dashboard_section_invoice_month": "Invoices this Month"
+        "dashboard_section_invoice_month": "Invoices this month"
     },
-    "invoices":{
+    "invoices": {
         "invoice_view_all": "View All Invoices",
-        "invoice_table_title": "Invoices",
+        "latest_invoices": "Latest Invoices",
+        "create_invoice": "New Invoice",
+        "invoices": "Invoices",
+        "invoice": "Invoice",
+        "all_invoices": "All Invoices",
         "invoice_table_header_invoice_number": "Invoice Number",
+        "invoice_table_filter_all": "All",
+        "invoice_table_filter_paid": "Paid",
+        "invoice_table_filter_pending": "Pending",
+        "invoice_table_filter_cancelled": "Cancelled",
+        "invoice_table_search_placeholder": "Search invoice by name, first name, or invoice ID",
         "invoice_table_header_invoice_date": "Invoice Date",
         "invoice_table_header_due_date": "Due Date",
         "invoice_table_header_amount": "Amount",
@@ -20,8 +29,58 @@
         "invoice_table_header_last_name": "Last Name",
         "invoice_table_header_items": "Items",
         "invoice_table_no_invoices": "No invoices found",
-        "invoice_table_no_invoices_description": "There are no invoices to display"
+        "invoice_table_no_invoices_description": "There are no invoices to display",
+        "invoice_table_status_paid": "Paid",
+        "invoice_table_status_pending": "Pending",
+        "invoice_table_status_cancelled": "Cancelled"
+    },
+    "customers": {
+        "customers": "Customers",
+        "customer": "Customer",
+        "all_customers": "All Customers"
+    },
+    "settings": {
+        "settings": "Settings"
+    },
+    "profile": {
+        "profile": "Profile",
+        "logout": "Logout"
+    },
+    "company": {
+        "company": "Company",
+        "company_name": "Company Name",
+        "company_address": "Company Address",
+        "company_city": "Company City",
+        "company_zip": "Company Zip Code",
+        "company_country": "Company Country",
+        "company_phone": "Company Phone",
+        "company_email": "Company Email",
+        "company_website": "Company Website",
+        "company_logo": "Company Logo",
+        "company_update": "Update Company",
+        "company_update_success": "Company updated successfully",
+        "company_update_error": "Error updating company"
+    },
+    "common": {
+        "common_search": "Search",
+        "common_search_placeholder": "Search...",
+        "common_view": "View",
+        "common_edit": "Edit",
+        "common_delete": "Delete",
+        "common_cancel": "Cancel",
+        "common_save": "Save",
+        "common_close": "Close",
+        "common_yes": "Yes",
+        "common_no": "No",
+        "common_confirm": "Confirm",
+        "common_confirm_ok": "OK",
+        "common_next": "Next",
+        "common_previous": "Previous",
+        "common_loading": "Loading...",
+        "common_error": "Error",
+        "common_error_description": "An error occurred",
+        "common_error_description_message": "An error occurred while loading the page",
+        "common_error_fetch": "Loading Error",
+        "common_error_fetch_message": "An error occurred while loading data"
     }
-    
-   
 }

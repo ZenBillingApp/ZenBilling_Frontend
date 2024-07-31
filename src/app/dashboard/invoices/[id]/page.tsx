@@ -287,14 +287,6 @@ export default function Page({}: Props) {
         invoice?.due_date ?? ""
     ).toLocaleDateString();
 
-    const formatDate = (date: Date | string): string => {
-        const d = new Date(date);
-        const year = d.getFullYear();
-        const month = String(d.getMonth() + 1).padStart(2, "0");
-        const day = String(d.getDate()).padStart(2, "0");
-        return `${year}-${month}-${day}`;
-    };
-
     let totalAmountWithoutVAT = 0;
     let totalAmount = 0;
 
@@ -431,6 +423,13 @@ export default function Page({}: Props) {
     // };
 
     const handleSelectDueDate = async (date: Date) => {
+        // Ajuster manuellement le décalage de fuseau horaire
+        const localDate = new Date(
+            date.getTime() - date.getTimezoneOffset() * 60000
+        );
+        const isoDate = localDate.toISOString().split("T")[0]; // Garde seulement la partie date sans l'heure
+
+        console.log(isoDate); // Vérifiez que la date est bien convertie en ISO
         try {
             const response = await fetch(
                 `${process.env.NEXT_PUBLIC_API_URL}/api/invoices/${id}`,
@@ -440,7 +439,7 @@ export default function Page({}: Props) {
                         "Content-Type": "application/json",
                         Authorization: `Bearer ${getCookie("token")}`,
                     },
-                    body: JSON.stringify({ due_date: formatDate(date) }),
+                    body: JSON.stringify({ due_date: isoDate }),
                 }
             );
 
@@ -452,11 +451,7 @@ export default function Page({}: Props) {
                 title: "Success",
                 description: "Due date updated successfully",
             });
-            setInvoice((prev) =>
-                prev
-                    ? { ...prev, due_date: date.toISOString() }
-                    : (prev as unknown as Invoice)
-            );
+            setInvoice((prev) => (prev ? { ...prev, due_date: date } : prev));
         } catch (error) {
             console.error(error);
             toast({
@@ -637,12 +632,10 @@ export default function Page({}: Props) {
                                 <PopoverContent className="w-auto p-0">
                                     <Calendar
                                         mode="single"
-                                        selected={
-                                            new Date(invoice?.due_date ?? "")
-                                        }
-                                        onSelect={(date) =>
-                                            handleSelectDueDate(date as Date)
-                                        }
+                                        selected={invoice?.due_date}
+                                        onSelect={(date) => {
+                                            handleSelectDueDate(date as Date);
+                                        }}
                                         initialFocus
                                     />
                                 </PopoverContent>

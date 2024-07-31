@@ -469,7 +469,7 @@ export default function Page({}: Props) {
                     </div>
                 ) : (
                     <>
-                        <div className="flex items-center justify-between">
+                        <div className="flex flex-col w-full items-center justify-between sm:flex-row sm:items-center sm:justify-between gap-6">
                             <h1 className="text-3xl font-semibold">
                                 {customer
                                     ? `${customer.first_name} ${customer.last_name}`
