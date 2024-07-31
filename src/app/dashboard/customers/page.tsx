@@ -94,15 +94,16 @@ const AddCustomerDialog = ({
                     Add customer
                 </Button>
             </CredenzaTrigger>
-            <CredenzaContent className="w-full p-4">
+            <CredenzaContent>
                 <CredenzaHeader>
                     <CredenzaTitle>Add customer</CredenzaTitle>
+                    <CredenzaDescription>
+                        <p>Fill the form below to add a new customer</p>
+                    </CredenzaDescription>
                 </CredenzaHeader>
-                <CredenzaDescription>
-                    <p>Fill the form below to add a new customer</p>
-                </CredenzaDescription>
+
                 <form
-                    className="flex flex-col w-full gap-6"
+                    className="flex flex-col w-full gap-6 p-3"
                     onSubmit={handleAdd}
                 >
                     <div className="flex flex-col gap-2 sm:flex-row">
@@ -141,8 +142,8 @@ const AddCustomerDialog = ({
                                     ...newCustomer,
                                     street_address:
                                         location?.raw.address.house_number +
-                                        " " +
-                                        location?.raw.address.road,
+                                            " " +
+                                            location?.raw.address.road || "",
                                     city:
                                         location?.raw.address.town ||
                                         location?.raw.address.municipality ||
@@ -188,31 +189,31 @@ const AddCustomerDialog = ({
                             }
                         />
                     </div>
-                    <CredenzaFooter>
-                        <Button
-                            type="submit"
-                            disabled={
-                                !newCustomer.first_name ||
-                                !newCustomer.last_name ||
-                                !newCustomer.street_address ||
-                                !newCustomer.city ||
-                                !newCustomer.state ||
-                                !newCustomer.postal_code ||
-                                !newCustomer.country ||
-                                !newCustomer.email ||
-                                !newCustomer.phone ||
-                                loading
-                            }
-                        >
-                            {loading ? "Adding..." : "Add"}
-                        </Button>
-                        <CredenzaClose asChild>
-                            <Button variant="outline" disabled={loading}>
-                                Cancel
-                            </Button>
-                        </CredenzaClose>
-                    </CredenzaFooter>
                 </form>
+                <CredenzaFooter>
+                    <Button
+                        type="submit"
+                        disabled={
+                            !newCustomer.first_name ||
+                            !newCustomer.last_name ||
+                            !newCustomer.street_address ||
+                            !newCustomer.city ||
+                            !newCustomer.state ||
+                            !newCustomer.postal_code ||
+                            !newCustomer.country ||
+                            !newCustomer.email ||
+                            !newCustomer.phone ||
+                            loading
+                        }
+                    >
+                        {loading ? "Adding..." : "Add"}
+                    </Button>
+                    <CredenzaClose asChild>
+                        <Button variant="outline" disabled={loading}>
+                            Cancel
+                        </Button>
+                    </CredenzaClose>
+                </CredenzaFooter>
             </CredenzaContent>
         </Credenza>
     );

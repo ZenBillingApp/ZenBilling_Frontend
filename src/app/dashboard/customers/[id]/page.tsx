@@ -1,7 +1,7 @@
 "use client";
 import React, { use, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-
+import dynamic from "next/dynamic";
 import { Customer } from "@/types/Customer";
 
 import { Button } from "@/components/ui/button";
@@ -45,6 +45,11 @@ import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
 import { cn } from "@/lib/utils";
 import TableInvoices from "@/components/tableInvoices";
 import { ContentLayout } from "@/components/admin-panel/content-layout";
+import { PhoneInput } from "@/components/ui/phone-input";
+
+const SearchAddress = dynamic(() => import("@/components/ui/search-address"), {
+    ssr: false,
+});
 
 type Props = {};
 
@@ -94,10 +99,11 @@ const AlertDeleteCustomer = ({}) => {
             <CredenzaContent>
                 <CredenzaHeader>
                     <CredenzaTitle>Delete customer</CredenzaTitle>
+                    <CredenzaDescription>
+                        <p>Are you sure you want to delete this customer?</p>
+                    </CredenzaDescription>
                 </CredenzaHeader>
-                <CredenzaDescription>
-                    <p>Are you sure you want to delete this customer?</p>
-                </CredenzaDescription>
+
                 <CredenzaFooter>
                     <Button
                         disabled={loading}
@@ -180,13 +186,14 @@ const EditCustomerDialog = ({
                     Modify
                 </Button>
             </CredenzaTrigger>
-            <CredenzaContent className="overflow-auto h-[80vh]">
+            <CredenzaContent>
                 <CredenzaHeader>
                     <CredenzaTitle>Modify customer information</CredenzaTitle>
+                    <CredenzaDescription>
+                        <p>change the customer information here</p>
+                    </CredenzaDescription>
                 </CredenzaHeader>
-                <CredenzaDescription>
-                    <p>change the customer information here</p>
-                </CredenzaDescription>
+
                 {error && (
                     <Alert variant="destructive">
                         <AlertTriangle className="w-5 h-5" />
@@ -196,147 +203,120 @@ const EditCustomerDialog = ({
                         </AlertDescription>
                     </Alert>
                 )}
-                <div className="flex gap-2">
-                    <div className="flex flex-col w-1/2 gap-2">
-                        <Label>First name</Label>
+                <form className="flex flex-col w-full gap-2 p-4">
+                    <div className="flex flex-col w-full gap-2 sm:flex-row">
+                        <div className="flex flex-col w-full gap-2 sm:w-1/2">
+                            <Label>First name</Label>
+                            <Input
+                                value={editCustomer?.first_name || ""}
+                                onChange={(e) =>
+                                    setEditCustomer(
+                                        (prev) =>
+                                            prev && {
+                                                ...prev,
+                                                first_name: e.target.value,
+                                            }
+                                    )
+                                }
+                            />
+                        </div>
+                        <div className="flex flex-col w-full gap-2 sm:w-1/2">
+                            <Label>Last name</Label>
+                            <Input
+                                value={editCustomer?.last_name || ""}
+                                onChange={(e) =>
+                                    setEditCustomer(
+                                        (prev) =>
+                                            prev && {
+                                                ...prev,
+                                                last_name: e.target.value,
+                                            }
+                                    )
+                                }
+                            />
+                        </div>
+                    </div>
+                    <div className="flex flex-col w-full gap-2">
+                        <Label>Street address</Label>
+                        <SearchAddress
+                            location={
+                                editCustomer?.street_address +
+                                    " " +
+                                    editCustomer?.city +
+                                    " " +
+                                    editCustomer?.state +
+                                    " " +
+                                    editCustomer?.postal_code +
+                                    " " +
+                                    editCustomer?.country || ""
+                            }
+                            onSelectLocation={(location) => {
+                                setEditCustomer(
+                                    (prev) =>
+                                        prev && {
+                                            ...prev,
+                                            street_address:
+                                                location?.raw.address
+                                                    .house_number +
+                                                    " " +
+                                                    location?.raw.address
+                                                        .road || "",
+                                            city:
+                                                location?.raw.address.town ||
+                                                location?.raw.address
+                                                    .municipality ||
+                                                "",
+                                            state:
+                                                location?.raw.address.state ||
+                                                "",
+                                            postal_code:
+                                                location?.raw.address
+                                                    .postcode || "",
+                                            country:
+                                                location?.raw.address.country ||
+                                                "",
+                                        }
+                                );
+                            }}
+                        />
+                    </div>
+                    <div className="flex flex-col w-full gap-2">
+                        <Label>Email</Label>
                         <Input
-                            value={editCustomer?.first_name || ""}
+                            value={editCustomer?.email || ""}
                             onChange={(e) =>
                                 setEditCustomer(
                                     (prev) =>
                                         prev && {
                                             ...prev,
-                                            first_name: e.target.value,
+                                            email: e.target.value,
                                         }
                                 )
                             }
                         />
                     </div>
-                    <div className="flex flex-col w-1/2 gap-2">
-                        <Label>Last name</Label>
-                        <Input
-                            value={editCustomer?.last_name || ""}
-                            onChange={(e) =>
+                    <div className="flex flex-col w-full gap-2">
+                        <Label>Phone</Label>
+                        <PhoneInput
+                            required
+                            id="company.phone"
+                            name="company.phone"
+                            placeholder="Phone"
+                            type="text"
+                            value={editCustomer?.phone || ""}
+                            defaultCountry="FR"
+                            onChange={(phone) =>
                                 setEditCustomer(
                                     (prev) =>
                                         prev && {
                                             ...prev,
-                                            last_name: e.target.value,
+                                            phone,
                                         }
                                 )
                             }
                         />
                     </div>
-                </div>
-                <div className="flex flex-col w-full gap-2">
-                    <Label>Street address</Label>
-                    <Input
-                        value={editCustomer?.street_address || ""}
-                        onChange={(e) =>
-                            setEditCustomer(
-                                (prev) =>
-                                    prev && {
-                                        ...prev,
-                                        street_address: e.target.value,
-                                    }
-                            )
-                        }
-                    />
-                </div>
-                <div className="flex gap-2">
-                    <div className="flex flex-col w-1/2 gap-2">
-                        <Label>City</Label>
-                        <Input
-                            value={editCustomer?.city || ""}
-                            onChange={(e) =>
-                                setEditCustomer(
-                                    (prev) =>
-                                        prev && {
-                                            ...prev,
-                                            city: e.target.value,
-                                        }
-                                )
-                            }
-                        />
-                    </div>
-                    <div className="flex flex-col w-1/2 gap-2">
-                        <Label>State</Label>
-                        <Input
-                            value={editCustomer?.state || ""}
-                            onChange={(e) =>
-                                setEditCustomer(
-                                    (prev) =>
-                                        prev && {
-                                            ...prev,
-                                            state: e.target.value,
-                                        }
-                                )
-                            }
-                        />
-                    </div>
-                </div>
-                <div className="flex gap-2">
-                    <div className="flex flex-col w-1/2 gap-2">
-                        <Label>Postal code</Label>
-                        <Input
-                            value={editCustomer?.postal_code || ""}
-                            onChange={(e) =>
-                                setEditCustomer(
-                                    (prev) =>
-                                        prev && {
-                                            ...prev,
-                                            postal_code: e.target.value,
-                                        }
-                                )
-                            }
-                        />
-                    </div>
-                    <div className="flex flex-col w-1/2 gap-2">
-                        <Label>Country</Label>
-                        <Input
-                            value={editCustomer?.country || ""}
-                            onChange={(e) =>
-                                setEditCustomer(
-                                    (prev) =>
-                                        prev && {
-                                            ...prev,
-                                            country: e.target.value,
-                                        }
-                                )
-                            }
-                        />
-                    </div>
-                </div>
-                <div className="flex flex-col w-full gap-2">
-                    <Label>Email</Label>
-                    <Input
-                        value={editCustomer?.email || ""}
-                        onChange={(e) =>
-                            setEditCustomer(
-                                (prev) =>
-                                    prev && {
-                                        ...prev,
-                                        email: e.target.value,
-                                    }
-                            )
-                        }
-                    />
-                </div>
-                <div className="flex flex-col w-full gap-2">
-                    <Label>Phone</Label>
-                    <Input
-                        value={editCustomer?.phone || ""}
-                        onChange={(e) =>
-                            setEditCustomer(
-                                (prev) =>
-                                    prev && {
-                                        ...prev,
-                                        phone: e.target.value,
-                                    }
-                            )
-                        }
-                    />
-                </div>
+                </form>
 
                 <CredenzaFooter>
                     <Button
@@ -504,67 +484,75 @@ export default function Page({}: Props) {
                                 <AlertDeleteCustomer />
                             </div>
                         </div>
-                        <div className="flex  w-full gap-6">
-                            <div className="flex w-1/2 flex-col  p-4 gap-6">
-                                <Card className="flex flex-col justify-center p-4 gap-6">
-                                    <h2 className="text-xl font-semibold">
-                                        Contact information :
-                                    </h2>
-                                    <div className="flex flex-col gap-2">
-                                        <div>
+                        <div className="flex flex-col w-full  sm:flex-row gap-6">
+                            <div className="flex w-full sm:w-1/2 flex-col gap-6">
+                                <Card className="flex flex-col justify-center  ">
+                                    <CardHeader>
+                                        <CardTitle>
+                                            Contact information
+                                        </CardTitle>
+                                        <CardDescription>
+                                            Basic customer information
+                                        </CardDescription>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div className="flex gap-2">
                                             <span className="font-semibold">
                                                 Email :{" "}
                                             </span>{" "}
                                             {customer?.email}
                                         </div>
-                                        <div>
+                                        <div className="flex gap-2">
                                             <span className="font-semibold">
                                                 Phone :{" "}
                                             </span>{" "}
                                             {customer?.phone}
                                         </div>
-                                    </div>
+                                    </CardContent>
                                 </Card>
-                                <Card className="flex  flex-col p-4 gap-6">
-                                    <h2 className="text-xl font-semibold">
-                                        Address :
-                                    </h2>
-                                    <div className="flex flex-col gap-2">
-                                        <div>
+                                <Card className="flex flex-col ">
+                                    <CardHeader>
+                                        <CardTitle>Address</CardTitle>
+                                        <CardDescription>
+                                            Customer address
+                                        </CardDescription>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div className="flex gap-2 break-word">
                                             <span className="font-semibold">
                                                 Street address:
                                             </span>{" "}
                                             {customer?.street_address}
                                         </div>
-                                        <div>
+                                        <div className="flex gap-2">
                                             <span className="font-semibold">
                                                 City:
                                             </span>{" "}
                                             {customer?.city}
                                         </div>
-                                        <div>
+                                        <div className="flex gap-2">
                                             <span className="font-semibold">
                                                 State:
                                             </span>{" "}
                                             {customer?.state}
                                         </div>
-                                        <div>
+                                        <div className="flex gap-2">
                                             <span className="font-semibold">
                                                 Postal code:
                                             </span>{" "}
                                             {customer?.postal_code}
                                         </div>
-                                        <div>
+                                        <div className="flex gap-2">
                                             <span className="font-semibold">
                                                 Country:
                                             </span>{" "}
                                             {customer?.country}
                                         </div>
-                                    </div>
+                                    </CardContent>
                                 </Card>
                             </div>
-                            <div className="flex w-1/2 flex-col p-4 gap-6">
-                                <Card>
+                            <div className="flex w-full sm:w-1/2">
+                                <Card className="w-full">
                                     <CardHeader>
                                         <CardTitle>Invoices</CardTitle>
                                         <CardDescription>

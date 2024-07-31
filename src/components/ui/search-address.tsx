@@ -24,11 +24,15 @@ import { useSearchAddress } from "@/hooks/use-search-address";
 
 interface SearchAddressProps {
     onSelectLocation: (item: SearchResult<RawResult> | null) => void;
+    location?: string;
 }
 
-const SearchAddress: React.FC<SearchAddressProps> = ({ onSelectLocation }) => {
+const SearchAddress: React.FC<SearchAddressProps> = ({
+    onSelectLocation,
+    location,
+}) => {
     const [open, setOpen] = React.useState(false);
-    const [value, setValue] = React.useState("");
+    const [value, setValue] = React.useState(location || "");
 
     const {
         query,
@@ -38,6 +42,12 @@ const SearchAddress: React.FC<SearchAddressProps> = ({ onSelectLocation }) => {
         selectedItem,
         setSelectedItem,
     } = useSearchAddress();
+
+    React.useEffect(() => {
+        if (location) {
+            handleSearch(location);
+        }
+    }, [location]);
 
     return (
         <Popover open={open} onOpenChange={setOpen}>
@@ -51,7 +61,7 @@ const SearchAddress: React.FC<SearchAddressProps> = ({ onSelectLocation }) => {
                     <p className="truncate">
                         {selectedItem
                             ? `${selectedItem.label}`
-                            : "Sélectionnez un lieu..."}
+                            : value || "Sélectionnez un lieu..."}
                     </p>
 
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -61,7 +71,11 @@ const SearchAddress: React.FC<SearchAddressProps> = ({ onSelectLocation }) => {
                 <Command>
                     <CommandInput
                         placeholder="Rechercher un lieu..."
-                        onValueChange={(value: string) => handleSearch(value)}
+                        value={value}
+                        onValueChange={(value: string) => {
+                            setValue(value);
+                            handleSearch(value);
+                        }}
                         className="w-full"
                     />
                     <CommandList>
