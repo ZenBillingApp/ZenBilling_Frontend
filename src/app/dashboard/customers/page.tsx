@@ -2,6 +2,7 @@
 import React from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
+import dynamic from "next/dynamic";
 
 import { Customer } from "@/types/Customer";
 
@@ -32,6 +33,10 @@ import { getCookie } from "cookies-next";
 
 import { PiPlus } from "react-icons/pi";
 import { ContentLayout } from "@/components/admin-panel/content-layout";
+const SearchAddress = dynamic(() => import("@/components/ui/search-address"), {
+    ssr: false,
+});
+import { PhoneInput } from "@/components/ui/phone-input";
 
 type Props = {};
 
@@ -89,7 +94,7 @@ const AddCustomerDialog = ({
                     Add customer
                 </Button>
             </CredenzaTrigger>
-            <CredenzaContent className="overflow-auto h-[80vh]">
+            <CredenzaContent className="w-full p-4">
                 <CredenzaHeader>
                     <CredenzaTitle>Add customer</CredenzaTitle>
                 </CredenzaHeader>
@@ -100,8 +105,8 @@ const AddCustomerDialog = ({
                     className="flex flex-col w-full gap-6"
                     onSubmit={handleAdd}
                 >
-                    <div className="flex gap-2">
-                        <div className="flex flex-col w-1/2 gap-2">
+                    <div className="flex flex-col gap-2 sm:flex-row">
+                        <div className="flex flex-col w-full gap-2 sm:w-1/2">
                             <Label htmlFor="first_name">First name</Label>
                             <Input
                                 id="first_name"
@@ -114,7 +119,7 @@ const AddCustomerDialog = ({
                                 }
                             />
                         </div>
-                        <div className="flex flex-col w-1/2 gap-2">
+                        <div className="flex flex-col w-full gap-2 sm:w-1/2">
                             <Label htmlFor="last_name">Last name</Label>
                             <Input
                                 id="last_name"
@@ -130,73 +135,26 @@ const AddCustomerDialog = ({
                     </div>
                     <div className="flex flex-col w-full gap-2">
                         <Label htmlFor="street_address">Street address</Label>
-                        <Input
-                            id="street_address"
-                            value={newCustomer.street_address}
-                            onChange={(e) =>
+                        <SearchAddress
+                            onSelectLocation={(location) => {
                                 setNewCustomer({
                                     ...newCustomer,
-                                    street_address: e.target.value,
-                                })
-                            }
+                                    street_address:
+                                        location?.raw.address.house_number +
+                                        " " +
+                                        location?.raw.address.road,
+                                    city:
+                                        location?.raw.address.town ||
+                                        location?.raw.address.municipality ||
+                                        "",
+                                    state: location?.raw.address.state || "",
+                                    postal_code:
+                                        location?.raw.address.postcode || "",
+                                    country:
+                                        location?.raw.address.country || "",
+                                });
+                            }}
                         />
-                    </div>
-                    <div className="flex gap-2">
-                        <div className="flex flex-col w-1/2 gap-2">
-                            <Label htmlFor="city">City</Label>
-                            <Input
-                                id="city"
-                                value={newCustomer.city}
-                                onChange={(e) =>
-                                    setNewCustomer({
-                                        ...newCustomer,
-                                        city: e.target.value,
-                                    })
-                                }
-                            />
-                        </div>
-                        <div className="flex flex-col w-1/2 gap-2">
-                            <Label htmlFor="state">State</Label>
-                            <Input
-                                id="state"
-                                value={newCustomer.state}
-                                onChange={(e) =>
-                                    setNewCustomer({
-                                        ...newCustomer,
-                                        state: e.target.value,
-                                    })
-                                }
-                            />
-                        </div>
-                    </div>
-                    <div className="flex gap-2">
-                        <div className="flex flex-col w-1/2 gap-2">
-                            <Label htmlFor="postal_code">Postal code</Label>
-                            <Input
-                                id="postal_code"
-                                type="number"
-                                value={newCustomer.postal_code}
-                                onChange={(e) =>
-                                    setNewCustomer({
-                                        ...newCustomer,
-                                        postal_code: e.target.value,
-                                    })
-                                }
-                            />
-                        </div>
-                        <div className="flex flex-col w-1/2 gap-2">
-                            <Label htmlFor="country">Country</Label>
-                            <Input
-                                id="country"
-                                value={newCustomer.country}
-                                onChange={(e) =>
-                                    setNewCustomer({
-                                        ...newCustomer,
-                                        country: e.target.value,
-                                    })
-                                }
-                            />
-                        </div>
                     </div>
                     <div className="flex flex-col w-full gap-2">
                         <Label htmlFor="email">Email</Label>
@@ -214,14 +172,18 @@ const AddCustomerDialog = ({
                     </div>
                     <div className="flex flex-col w-full gap-2">
                         <Label htmlFor="phone">Phone</Label>
-                        <Input
-                            id="phone"
-                            type="tel"
+                        <PhoneInput
+                            required
+                            id="company.phone"
+                            name="company.phone"
+                            placeholder="Phone"
+                            type="text"
                             value={newCustomer.phone}
-                            onChange={(e) =>
+                            defaultCountry="FR"
+                            onChange={(phone) =>
                                 setNewCustomer({
                                     ...newCustomer,
-                                    phone: e.target.value,
+                                    phone,
                                 })
                             }
                         />
