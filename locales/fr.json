@@ -18,7 +18,7 @@
         "invoice_due_date": "Date d'échéance",
         "invoice_billTo": "Facturer à",
         "invoice_table_header_invoice_number": "Numéro de facture",
-        "invoice_table_filter_all": "Tout",
+        "invoice_table_filter_all": "Toutes",
         "invoice_table_filter_paid": "Payées",
         "invoice_table_filter_pending": "En attente",
         "invoice_table_filter_cancelled": "Annulées",
@@ -46,9 +46,7 @@
         "invoice_id": "ID de la facture",
         "invoice_date": "Date de la facture",
         "invoice_myCompany": "Mon entreprise",
-        
         "invoice_status": "Statut de la facture"
-
     },
     "items": {
         "items": "Articles",
