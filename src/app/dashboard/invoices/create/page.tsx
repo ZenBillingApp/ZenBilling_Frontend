@@ -338,7 +338,7 @@ export default function Page({}: Props) {
                                     </TableHead>
                                     <TableHead className="min-w-32">
                                         {t(
-                                            "items.item_table_header_unit_price"
+                                            "items.item_table_header_unit_price_no_vat"
                                         )}
                                     </TableHead>
                                     <TableHead className="min-w-32">
@@ -384,7 +384,7 @@ export default function Page({}: Props) {
                                         </TableCell>
                                         <TableCell>
                                             <Input
-                                                type="price"
+                                                type="currency"
                                                 value={item.unit_price}
                                                 onChange={(e) =>
                                                     handleChangeItem(

@@ -92,30 +92,33 @@ export default function Page({}: Props) {
     };
 
     if (error) {
-        console.error("Error fetching data");
         return (
-            <div className="flex flex-col w-full h-full justify-center items-center gap-6">
-                <Image
-                    src={"/assets/illustrations/illu_error.svg"}
-                    width={200}
-                    height={200}
-                    alt="Error"
-                />
-                <h1 className="text-2xl font-semibold">
-                    {t("common.common_error_fetch")}
-                </h1>
-                <p className="text-gray-500">
-                    {t("common.common_error_fetch_message")}
-                </p>
-                <Button onClick={fetchInvoices}>Retry</Button>
-            </div>
+            <ContentLayout title={t("invoices.invoices")}>
+                <div className="flex flex-col w-full justify-center items-center gap-4">
+                    <Image
+                        src={"/assets/illustrations/illu_error.svg"}
+                        width={200}
+                        height={200}
+                        alt="Error"
+                    />
+                    <h1 className="text-2xl font-semibold">
+                        {t("common.common_error_fetch")}
+                    </h1>
+                    <p className="text-gray-500">
+                        {t("common.common_error_fetch_message")}
+                    </p>
+                    <Button onClick={fetchInvoices}>
+                        {t("common.common_retry")}
+                    </Button>
+                </div>
+            </ContentLayout>
         );
     }
 
     return (
         <ContentLayout title={t("invoices.invoices")}>
-            <div className="flex flex-col w-full gap-6">
-                <div className="flex flex-col gap-10">
+            <div className="flex flex-col w-full gap-4">
+                <div className="flex flex-col gap-6">
                     <div className="flex flex-col xl:flex-row xl:justify-between xl:items-center gap-6">
                         <h1 className="text-2xl font-semibold">
                             {t("invoices.invoices")}
@@ -131,10 +134,12 @@ export default function Page({}: Props) {
                     </div>
                     <div className="flex flex-col w-full gap-6">
                         <div className="flex flex-col gap-6 xl:flex-row xl:justify-between">
-                            <div className="flex w-1/2 gap-2">
+                            <div className="grid grid-cols-2 items-center gap-4 sm:grid-cols-4">
                                 <Button
                                     variant={
-                                        filter === "all" ? "default" : "outline"
+                                        filter === "all"
+                                            ? "default"
+                                            : "secondary"
                                     }
                                     onClick={() => handleChangeFilter("all")}
                                 >
@@ -144,7 +149,7 @@ export default function Page({}: Props) {
                                     variant={
                                         filter === "paid"
                                             ? "default"
-                                            : "outline"
+                                            : "secondary"
                                     }
                                     onClick={() => handleChangeFilter("paid")}
                                 >
@@ -154,7 +159,7 @@ export default function Page({}: Props) {
                                     variant={
                                         filter === "pending"
                                             ? "default"
-                                            : "outline"
+                                            : "secondary"
                                     }
                                     onClick={() =>
                                         handleChangeFilter("pending")
@@ -166,7 +171,7 @@ export default function Page({}: Props) {
                                     variant={
                                         filter === "cancelled"
                                             ? "default"
-                                            : "outline"
+                                            : "secondary"
                                     }
                                     onClick={() =>
                                         handleChangeFilter("cancelled")
@@ -191,18 +196,18 @@ export default function Page({}: Props) {
                     </div>
                 </div>
                 {loading ? (
-                    <div className="flex justify-center items-center w-full h-full ">
+                    <div className="flex justify-center items-center w-full h-96">
                         <ClipLoader color="#009933" size={50} />
                     </div>
                 ) : (
                     <>
-                        <div className="flex flex-col gap-6 w-full">
+                        <div className="flex flex-col gap-6">
                             <TableInvoices
                                 invoices={invoices}
                                 search={search}
                             />
                         </div>
-                        {invoices.length !== 0 && (
+                        {totalPages > 1 && (
                             <Pagination>
                                 <PaginationContent>
                                     <PaginationPrevious

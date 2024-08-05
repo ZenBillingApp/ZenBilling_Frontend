@@ -57,6 +57,7 @@
         "item_table_header_vat_rate": "TVA (%)",
         "item_table_header_total_vat": "Total TVA",
         "item_table_header_unit_price": "Prix unitaire",
+        "item_table_header_unit_price_no_vat": "Prix unitaire (HT)",
         "item_table_header_total": "Total",
         "item_table_no_items": "Aucun article trouvé",
         "item_table_no_items_description": "Il n'y a aucun article à afficher",
@@ -122,6 +123,7 @@
         "common_error_fetch_message": "Une erreur s'est produite lors du chargement des données",
         "common_email": "Email",
         "common_phone": "Téléphone",
-        "common_vat_number": "Numéro de TVA"
+        "common_vat_number": "Numéro de TVA",
+        "common_retry": "Réessayer"
     }
 }
