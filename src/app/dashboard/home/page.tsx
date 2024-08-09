@@ -25,6 +25,7 @@ import Image from "next/image";
 import TableInvoices from "@/components/tableInvoices";
 
 import { useTranslations } from "next-intl";
+import DashboardShorcut from "@/components/dashboard-shorcut";
 
 type Props = {
     params: {
@@ -91,27 +92,31 @@ export default function Page({ params: { locale } }: Props) {
 
     if (loading) {
         return (
-            <div className="flex flex-col w-full h-full justify-center items-center gap-6">
-                <ClipLoader color="#009933" size={50} />
-            </div>
+            <ContentLayout title={t("dashboard.dashboard")}>
+                <div className="flex w-full h-full justify-center items-center">
+                    <ClipLoader color="#009933" size={50} />
+                </div>
+            </ContentLayout>
         );
     }
 
     if (error) {
         console.error("Error fetching data");
         return (
-            <div className="flex flex-col w-full h-full justify-center items-center gap-6">
-                <Image
-                    src={"/assets/illustrations/illu_error.svg"}
-                    width={200}
-                    height={200}
-                    alt="Error"
-                />
-                <h1 className="text-2xl font-semibold">
-                    An error occurred while fetching data
-                </h1>
-                <Button onClick={fetchData}>Retry</Button>
-            </div>
+            <ContentLayout title={t("dashboard.dashboard")}>
+                <div className="flex flex-col w-full h-full justify-center items-center gap-6">
+                    <Image
+                        src={"/assets/illustrations/illu_error.svg"}
+                        width={200}
+                        height={200}
+                        alt="Error"
+                    />
+                    <h1 className="text-2xl font-semibold">
+                        An error occurred while fetching data
+                    </h1>
+                    <Button onClick={fetchData}>Retry</Button>
+                </div>
+            </ContentLayout>
         );
     }
 
@@ -134,66 +139,21 @@ export default function Page({ params: { locale } }: Props) {
                     </h1>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <Card className="flex items-center w-full p-4 gap-6">
-                        <div
-                            className={cn(
-                                "flex items-center justify-center p-2 rounded-full bg-primary"
-                            )}
-                        >
-                            <LiaFileInvoiceDollarSolid
-                                className={cn("text-primary-foreground")}
-                                size={32}
-                            />
-                        </div>
-                        <div className="flex flex-col w-full">
-                            <CardTitle className="text-xl font-semibold">
-                                {t("dashboard.dashboard_pending_invoice")}
-                            </CardTitle>
-                            <h1 className="text-4xl font-light">
-                                {data?.numberOfUnpaidInvoices || 0}
-                            </h1>
-                        </div>
-                    </Card>
-                    <Card className="flex items-center w-full p-4 gap-6">
-                        <div
-                            className={cn(
-                                "flex items-center justify-center p-2 rounded-full bg-primary"
-                            )}
-                        >
-                            <PiUsersThree
-                                className={cn("text-primary-foreground")}
-                                size={32}
-                            />
-                        </div>
-                        <div className="flex flex-col w-full">
-                            <CardTitle className="text-xl font-semibold">
-                                {t("dashboard.dashboard_section_customers")}
-                            </CardTitle>
-                            <h1 className="text-4xl font-light">
-                                {data?.numberOfClients || 0}
-                            </h1>
-                        </div>
-                    </Card>
-                    <Card className="flex items-center w-full p-4 gap-6">
-                        <div
-                            className={cn(
-                                "flex items-center justify-center p-2 rounded-full bg-primary"
-                            )}
-                        >
-                            <LiaFileInvoiceDollarSolid
-                                className={cn("text-primary-foreground")}
-                                size={32}
-                            />
-                        </div>
-                        <div className="flex flex-col w-full">
-                            <CardTitle className="text-xl font-semibold">
-                                {t("dashboard.dashboard_section_invoice_month")}
-                            </CardTitle>
-                            <h1 className="text-4xl font-light">
-                                {data?.numberOfInvoicesThisMonth || 0}
-                            </h1>
-                        </div>
-                    </Card>
+                    <DashboardShorcut
+                        icon={<LiaFileInvoiceDollarSolid size={32} />}
+                        title={t("dashboard.dashboard_pending_invoice")}
+                        value={data?.numberOfUnpaidInvoices || 0}
+                    />
+                    <DashboardShorcut
+                        icon={<PiUsersThree size={32} />}
+                        title={t("dashboard.dashboard_section_customers")}
+                        value={data?.numberOfClients || 0}
+                    />
+                    <DashboardShorcut
+                        icon={<PiUsersThree size={32} />}
+                        title={t("dashboard.dashboard_section_invoice_month")}
+                        value={data?.numberOfInvoicesThisMonth || 0}
+                    />
                 </div>
                 <div className="flex w-full  gap-6 ">
                     <Card className="flex flex-col  w-full   p-4 ">
