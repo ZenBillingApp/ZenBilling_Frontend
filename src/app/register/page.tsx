@@ -1,8 +1,8 @@
 "use client";
 import React from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
+import { useTranslations } from "next-intl";
 
 import { ArrowRightIcon } from "lucide-react";
 
@@ -27,6 +27,7 @@ import { cn } from "@/lib/utils";
 export default function SignupPage() {
     const router = useRouter();
     const [confirmPassword, setConfirmPassword] = React.useState<string>("");
+    const t = useTranslations();
 
     const [user, setUser] = React.useState<User>({
         first_name: "",
@@ -130,18 +131,20 @@ export default function SignupPage() {
             <div className="w-full max-w-4xl space-y-2">
                 <div className="text-center">
                     <h2 className="text-3xl font-bo ld ">
-                        <span className="text-primary">C</span>
-                        reate your account 🚀
+                        {t.rich("register.register_title", {
+                            b: (chunks) => (
+                                <span className="text-primary">{chunks}</span>
+                            ),
+                        })}
                     </h2>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                        Already have an account?
+                        {t("register.register_already_account")} &nbsp;
                         <Button
                             variant="linkHover2"
                             onClick={() => router.push("/login")}
-                            className={cn("text-primary", "p-2")}
+                            className={cn("text-primary", "p-0")}
                         >
-                            {" "}
-                            Sign in
+                            {t("register.register_login")}
                         </Button>
                     </p>
                 </div>
@@ -150,10 +153,12 @@ export default function SignupPage() {
                     {error && (
                         <Alert variant="destructive">
                             <AlertTriangle className="w-5 h-5" />
-                            <AlertTitle>Failed to sign up</AlertTitle>
+                            <AlertTitle>
+                                {t("register.register_error")}
+                            </AlertTitle>
                             <AlertDescription>
                                 {errorMessage ||
-                                    "Please check your information and try again."}
+                                    t("register.register_error_message")}
                             </AlertDescription>
                         </Alert>
                     )}
@@ -162,24 +167,33 @@ export default function SignupPage() {
                         <div className="w-full space-y-4">
                             <div>
                                 <h1 className="text-2xl">
-                                    <span className="text-primary">P</span>
-                                    ersonal Information
+                                    {t.rich("register.register_personal_info", {
+                                        b: (chunks) => (
+                                            <span className="text-primary">
+                                                {chunks}
+                                            </span>
+                                        ),
+                                    })}
                                 </h1>
                                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                                    Enter your personal information
+                                    {t(
+                                        "register.register_personal_info_message"
+                                    )}
                                 </p>
                             </div>
                             <div className="space-y-4">
                                 <div className="flex flex-col w-full space-y-2 lg:flex-row lg:space-x-4 lg:space-y-0">
                                     <div className="w-full space-y-2">
                                         <Label htmlFor="first_name">
-                                            First Name
+                                            {t("register.first_name")}
                                         </Label>
                                         <Input
                                             required
                                             id="first_name"
                                             name="first_name"
-                                            placeholder="First Name"
+                                            placeholder={t(
+                                                "register.first_name_placeholder"
+                                            )}
                                             type="text"
                                             value={user.first_name}
                                             onChange={handleChange}
@@ -187,13 +201,15 @@ export default function SignupPage() {
                                     </div>
                                     <div className="w-full space-y-2">
                                         <Label htmlFor="last_name">
-                                            Last Name
+                                            {t("register.last_name")}
                                         </Label>
                                         <Input
                                             required
                                             id="last_name"
                                             name="last_name"
-                                            placeholder="Last Name"
+                                            placeholder={t(
+                                                "register.last_name_placeholder"
+                                            )}
                                             type="text"
                                             value={user.last_name}
                                             onChange={handleChange}
@@ -201,7 +217,9 @@ export default function SignupPage() {
                                     </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="email">Email</Label>
+                                    <Label htmlFor="email">
+                                        {t("register.email")}
+                                    </Label>
                                     <Input
                                         required
                                         id="email"
@@ -215,12 +233,12 @@ export default function SignupPage() {
                                 <div className="flex flex-col w-full space-y-2 lg:flex-row lg:space-x-4 lg:space-y-0">
                                     <div className="w-full space-y-2">
                                         <Label htmlFor="password">
-                                            Password
+                                            {t("register.password")}
                                         </Label>
                                         <PasswordInput
                                             required
                                             id="password"
-                                            placeholder="Password"
+                                            placeholder="********"
                                             value={user.password}
                                             autoComplete="new-password"
                                             onChange={(e) =>
@@ -233,12 +251,12 @@ export default function SignupPage() {
                                     </div>
                                     <div className="w-full space-y-2">
                                         <Label htmlFor="confirmPassword">
-                                            Confirm Password
+                                            {t("register.confirm_password")}
                                         </Label>
                                         <PasswordInput
                                             required
                                             id="confirmPassword"
-                                            placeholder="Confirm Password"
+                                            placeholder="********"
                                             value={confirmPassword}
                                             autoComplete="new-password"
                                             onChange={(e) =>
@@ -250,7 +268,9 @@ export default function SignupPage() {
                                     </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="phone">Phone</Label>
+                                    <Label htmlFor="phone">
+                                        {t("register.phone")}
+                                    </Label>
                                     <PhoneInput
                                         required
                                         value={user.phone}
@@ -265,7 +285,7 @@ export default function SignupPage() {
                                 </div>
                                 <div className="space-y-2">
                                     <Label htmlFor="street_address">
-                                        Street Address
+                                        {t("register.address")}
                                     </Label>
                                     <SearchAddress
                                         onSelectLocation={(location) => {
@@ -302,23 +322,32 @@ export default function SignupPage() {
                         <div className="w-full  space-y-4">
                             <div>
                                 <h1 className="text-2xl">
-                                    <span className="text-primary">C</span>
-                                    ompany Information
+                                    {t.rich("register.register_company_info", {
+                                        b: (chunks) => (
+                                            <span className="text-primary">
+                                                {chunks}
+                                            </span>
+                                        ),
+                                    })}
                                 </h1>
                                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                                    Enter your company information
+                                    {t(
+                                        "register.register_company_info_message"
+                                    )}
                                 </p>
                             </div>
                             <div className="space-y-4">
                                 <div className="space-y-2">
                                     <Label htmlFor="company.name">
-                                        Company Name
+                                        {t("register.company_name")}
                                     </Label>
                                     <Input
                                         required
                                         id="company.name"
                                         name="company.name"
-                                        placeholder="Company Name"
+                                        placeholder={t(
+                                            "register.company_name_placeholder"
+                                        )}
                                         type="text"
                                         value={user.company.name}
                                         onChange={handleChange}
@@ -326,13 +355,15 @@ export default function SignupPage() {
                                 </div>
                                 <div className="space-y-2">
                                     <Label htmlFor="company.industry">
-                                        Industry
+                                        {t("register.company_industry")}
                                     </Label>
                                     <Input
                                         required
                                         id="company.industry"
                                         name="company.industry"
-                                        placeholder="Industry"
+                                        placeholder={t(
+                                            "register.company_industry_placeholder"
+                                        )}
                                         type="text"
                                         value={user.company.industry}
                                         onChange={handleChange}
@@ -340,7 +371,7 @@ export default function SignupPage() {
                                 </div>
                                 <div className="space-y-2">
                                     <Label htmlFor="company.street_address">
-                                        Street Address
+                                        {t("register.company_address")}
                                     </Label>
                                     <SearchAddress
                                         onSelectLocation={(location) => {
@@ -378,24 +409,30 @@ export default function SignupPage() {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="company.email">Email</Label>
+                                    <Label htmlFor="company.email">
+                                        {t("register.company_email")}
+                                    </Label>
                                     <Input
                                         required
                                         id="company.email"
                                         name="company.email"
-                                        placeholder="Email"
+                                        placeholder="example@company.com"
                                         type="email"
                                         value={user.company.email}
                                         onChange={handleChange}
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="company.phone">Phone</Label>
+                                    <Label htmlFor="company.phone">
+                                        {t("register.company_phone")}
+                                    </Label>
                                     <PhoneInput
                                         required
                                         id="company.phone"
                                         name="company.phone"
-                                        placeholder="Phone"
+                                        placeholder={t(
+                                            "register.company_phone_placeholder"
+                                        )}
                                         type="text"
                                         value={user.company.phone}
                                         defaultCountry="FR"
@@ -412,13 +449,15 @@ export default function SignupPage() {
                                 </div>
                                 <div className="space-y-2">
                                     <Label htmlFor="company.vat_number">
-                                        VAT Number
+                                        {t("register.company_vat_number")}
                                     </Label>
                                     <Input
                                         required
                                         id="company.vat_number"
                                         name="company.vat_number"
-                                        placeholder="VAT Number"
+                                        placeholder={t(
+                                            "register.company_vat_number_placeholder"
+                                        )}
                                         type="text"
                                         value={user.company.vat_number}
                                         onChange={handleChange}
@@ -435,7 +474,9 @@ export default function SignupPage() {
                         disabled={loading}
                         className="w-full"
                     >
-                        {loading ? "Signing up..." : "Sign up"}
+                        {loading
+                            ? t("register.register_button_loading")
+                            : t("register.register_button")}
                     </Button>
                 </form>
             </div>

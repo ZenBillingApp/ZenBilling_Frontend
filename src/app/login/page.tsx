@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 import { ArrowRightIcon } from "lucide-react";
 
@@ -17,6 +18,7 @@ import { PasswordInput } from "@/components/ui/password-input";
 
 export default function Login() {
     const router = useRouter();
+    const t = useTranslations();
 
     const [email, setEmail] = React.useState<string>("");
     const [password, setPassword] = React.useState<string>("");
@@ -65,17 +67,20 @@ export default function Login() {
             <div className="w-full max-w-md space-y-2">
                 <div className="text-center">
                     <h2 className="text-3xl font-bold ">
-                        <span className="text-primary">W</span>
-                        elcome back 🎉
+                        {t.rich("login.login_title", {
+                            b: (chunks) => (
+                                <span className="text-primary">{chunks}</span>
+                            ),
+                        })}
                     </h2>
                     <p className=" text-sm text-gray-600 dark:text-gray-400">
-                        New here?{" "}
+                        {t("login.login_new_here")} &nbsp;
                         <Button
                             variant="linkHover2"
                             onClick={() => router.push("/register")}
                             className={cn("text-primary", "p-0 ")}
                         >
-                            Create an account
+                            {t("login.login_create_account")}
                         </Button>
                     </p>
                 </div>
@@ -83,15 +88,15 @@ export default function Login() {
                     {error && (
                         <Alert variant="destructive">
                             <AlertTriangle className="w-5 h-5" />
-                            <AlertTitle>Failed to sign in</AlertTitle>
+                            <AlertTitle>{t("login.login_error")}</AlertTitle>
                             <AlertDescription>
                                 {errorMessage ||
-                                    "Please check your email and password and try again."}
+                                    t("login.login_error_check_credentials")}
                             </AlertDescription>
                         </Alert>
                     )}
                     <div className="space-y-2">
-                        <Label htmlFor="email">Email</Label>
+                        <Label htmlFor="email">{t("login.email")}</Label>
                         <Input
                             id="email"
                             placeholder="name@example.com"
@@ -102,10 +107,13 @@ export default function Login() {
                     </div>
                     <div className="space-y-2">
                         <div className="flex items-center justify-between">
-                            <Label htmlFor="password">Password</Label>
+                            <Label htmlFor="password">
+                                {t("login.password")}
+                            </Label>
                         </div>
                         <PasswordInput
                             id="password"
+                            placeholder="********"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                         />
@@ -129,7 +137,9 @@ export default function Login() {
                         disabled={loading}
                         className="w-full"
                     >
-                        {loading ? "Signing in..." : "Sign in"}
+                        {loading
+                            ? t("login.login_button_loading")
+                            : t("login.login_button")}
                     </Button>
                 </form>
             </div>
