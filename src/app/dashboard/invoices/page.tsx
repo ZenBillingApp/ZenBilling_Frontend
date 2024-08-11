@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import Image from "next/image";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 
 import { Invoice } from "@/types/Invoice";
@@ -9,32 +9,22 @@ import { Invoice } from "@/types/Invoice";
 import TableInvoices from "@/components/tableInvoices";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ClipLoader } from "react-spinners";
-import { getCookie } from "cookies-next";
-
-import {
-    Pagination,
-    PaginationContent,
-    PaginationEllipsis,
-    PaginationItem,
-    PaginationLink,
-    PaginationNext,
-    PaginationPrevious,
-} from "@/components/ui/pagination";
+import PaginationList from "@/components/pagination-list";
+import { ContentLayout } from "@/components/admin-panel/content-layout";
 
 import { PiPlus } from "react-icons/pi";
-import { ContentLayout } from "@/components/admin-panel/content-layout";
+import { ClipLoader } from "react-spinners";
+import { getCookie } from "cookies-next";
 
 type Props = {};
 
 export default function Page({}: Props) {
     const router = useRouter();
-    const searchParams = useSearchParams();
     const t = useTranslations();
 
     const [invoices, setInvoices] = React.useState<Invoice[]>([]);
     const [search, setSearch] = React.useState<string>("");
-    const [filter, setFilter] = React.useState<string>("all");
+    const [selectedFilter, setSelectedFilter] = React.useState<string>("all");
     const [loading, setLoading] = React.useState<boolean>(true);
     const [error, setError] = React.useState<boolean>(false);
     const [page, setPage] = React.useState<number>(1);
@@ -44,6 +34,15 @@ export default function Page({}: Props) {
         setPage(page);
     };
 
+    const BtnFilter = ({ filter, text }: { filter: string; text: string }) => (
+        <Button
+            variant={selectedFilter === filter ? "default" : "secondary"}
+            onClick={() => setSelectedFilter(filter)}
+        >
+            {text}
+        </Button>
+    );
+
     const fetchInvoices = React.useCallback(async () => {
         try {
             setLoading(true);
@@ -51,7 +50,11 @@ export default function Page({}: Props) {
             const response = await fetch(
                 process.env.NEXT_PUBLIC_API_URL +
                     "/api/invoices?" +
-                    `${filter === "all" ? "" : `status=${filter}&`}` +
+                    `${
+                        selectedFilter === "all"
+                            ? ""
+                            : `status=${selectedFilter}&`
+                    }` +
                     `${search ? `search=${search}` : ""}${
                         page ? `&page=${page}` : ""
                     }`,
@@ -77,7 +80,7 @@ export default function Page({}: Props) {
         } finally {
             setLoading(false);
         }
-    }, [filter, page, search]);
+    }, [selectedFilter, page, search]);
 
     React.useEffect(() => {
         const delayDebounceFn = setTimeout(() => {
@@ -86,10 +89,6 @@ export default function Page({}: Props) {
 
         return () => clearTimeout(delayDebounceFn);
     }, [fetchInvoices]);
-
-    const handleChangeFilter = (filter: string) => {
-        setFilter(filter);
-    };
 
     if (error) {
         return (
@@ -117,7 +116,7 @@ export default function Page({}: Props) {
 
     return (
         <ContentLayout title={t("invoices.invoices")}>
-            <div className="flex flex-col w-full gap-4">
+            <div className="flex flex-col w-full h-full gap-4">
                 <div className="flex flex-col gap-6">
                     <div className="flex flex-col xl:flex-row xl:justify-between xl:items-center gap-6">
                         <h1 className="text-2xl font-semibold">
@@ -135,52 +134,31 @@ export default function Page({}: Props) {
                     <div className="flex flex-col w-full gap-6">
                         <div className="flex flex-col gap-6 xl:flex-row xl:justify-between">
                             <div className="grid grid-cols-2 items-center gap-4 sm:grid-cols-4">
-                                <Button
-                                    variant={
-                                        filter === "all"
-                                            ? "default"
-                                            : "secondary"
-                                    }
-                                    onClick={() => handleChangeFilter("all")}
-                                >
-                                    {t("invoices.invoice_table_filter_all")}
-                                </Button>
-                                <Button
-                                    variant={
-                                        filter === "paid"
-                                            ? "default"
-                                            : "secondary"
-                                    }
-                                    onClick={() => handleChangeFilter("paid")}
-                                >
-                                    {t("invoices.invoice_table_filter_paid")}
-                                </Button>
-                                <Button
-                                    variant={
-                                        filter === "pending"
-                                            ? "default"
-                                            : "secondary"
-                                    }
-                                    onClick={() =>
-                                        handleChangeFilter("pending")
-                                    }
-                                >
-                                    {t("invoices.invoice_table_filter_pending")}
-                                </Button>
-                                <Button
-                                    variant={
-                                        filter === "cancelled"
-                                            ? "default"
-                                            : "secondary"
-                                    }
-                                    onClick={() =>
-                                        handleChangeFilter("cancelled")
-                                    }
-                                >
-                                    {t(
+                                <BtnFilter
+                                    filter="all"
+                                    text={t(
+                                        "invoices.invoice_table_filter_all"
+                                    )}
+                                />
+
+                                <BtnFilter
+                                    filter="paid"
+                                    text={t(
+                                        "invoices.invoice_table_filter_paid"
+                                    )}
+                                />
+                                <BtnFilter
+                                    filter="pending"
+                                    text={t(
+                                        "invoices.invoice_table_filter_pending"
+                                    )}
+                                />
+                                <BtnFilter
+                                    filter="cancelled"
+                                    text={t(
                                         "invoices.invoice_table_filter_cancelled"
                                     )}
-                                </Button>
+                                />
                             </div>
 
                             <div className="flex w-full py-2 gap-6 xl:w-2/6">
@@ -196,7 +174,7 @@ export default function Page({}: Props) {
                     </div>
                 </div>
                 {loading ? (
-                    <div className="flex justify-center items-center w-full h-96">
+                    <div className="flex justify-center items-center w-full h-full">
                         <ClipLoader color="#009933" size={50} />
                     </div>
                 ) : (
@@ -208,45 +186,11 @@ export default function Page({}: Props) {
                             />
                         </div>
                         {totalPages > 1 && (
-                            <Pagination>
-                                <PaginationContent>
-                                    <PaginationPrevious
-                                        title={t("common.common_previous")}
-                                        isActive={page > 1}
-                                        className="cursor-pointer"
-                                        onClick={() => {
-                                            if (page > 1) {
-                                                handleChangePage(page - 1);
-                                            }
-                                        }}
-                                    />
-                                    {[...Array(totalPages)].map((_, index) => (
-                                        <PaginationItem
-                                            key={index}
-                                            className="cursor-pointer"
-                                        >
-                                            <PaginationLink
-                                                isActive={index + 1 === page}
-                                                onClick={() =>
-                                                    handleChangePage(index + 1)
-                                                }
-                                            >
-                                                {index + 1}
-                                            </PaginationLink>
-                                        </PaginationItem>
-                                    ))}
-
-                                    <PaginationNext
-                                        title={t("common.common_next")}
-                                        className="cursor-pointer"
-                                        onClick={() => {
-                                            if (page < totalPages) {
-                                                handleChangePage(page + 1);
-                                            }
-                                        }}
-                                    />
-                                </PaginationContent>
-                            </Pagination>
+                            <PaginationList
+                                currentPage={page}
+                                totalPages={totalPages}
+                                handleChangePage={handleChangePage}
+                            />
                         )}
                     </>
                 )}
