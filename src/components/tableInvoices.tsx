@@ -115,10 +115,12 @@ export default function TableInvoices({ invoices, search }: Props) {
                                 })}
                             </TableCell>
                             <TableCell className="min-w-[150px]">
-                                {formatDate(invoice.invoice_date) || "N/A"}
+                                {formatDate(new Date(invoice.invoice_date)) ||
+                                    "N/A"}
                             </TableCell>
                             <TableCell className="min-w-[150px]">
-                                {formatDate(invoice.due_date) || "N/A"}
+                                {formatDate(new Date(invoice.due_date)) ||
+                                    "N/A"}
                             </TableCell>
                         </TableRow>
                     ))

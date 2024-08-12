@@ -4,14 +4,15 @@ import { useParams, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 
 import useFormattedAmount from "@/hooks/useFormattedAmount";
+import useFormattedDate from "@/hooks/useFormattedDate";
 
 import { Invoice } from "@/types/Invoice";
 import { Customer } from "@/types/Customer";
 import { Item } from "@/types/Item";
 
+import SelectStatusInvoice from "@/components/selectStatusInvoice";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Download, Edit, Plus, Save } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import {
@@ -23,18 +24,6 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover";
-import {
     Sheet,
     SheetContent,
     SheetDescription,
@@ -42,121 +31,20 @@ import {
     SheetTitle,
     SheetTrigger,
 } from "@/components/ui/sheet";
-import {
-    Credenza,
-    CredenzaBody,
-    CredenzaClose,
-    CredenzaContent,
-    CredenzaDescription,
-    CredenzaFooter,
-    CredenzaHeader,
-    CredenzaTitle,
-    CredenzaTrigger,
-} from "@/components/ui/credenza";
 
-import { Calendar } from "@/components/ui/calendar";
 import { useToast } from "@/components/ui/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 
 import { ClipLoader } from "react-spinners";
-import { cn } from "@/lib/utils";
 import { getCookie } from "cookies-next";
-import { Badge } from "@/components/ui/badge";
 
 import { ChevronDownIcon } from "lucide-react";
 import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
 import { ContentLayout } from "@/components/admin-panel/content-layout";
+import AlertDialog from "@/components/alert-dialog";
+import DatePicker from "@/components/datePicker";
 
 type Props = {};
-
-const AlertDeleteInvoice = ({}) => {
-    const [open, setOpen] = React.useState<boolean>(false);
-    const { id } = useParams();
-    const router = useRouter();
-    const t = useTranslations();
-
-    const { toast } = useToast();
-
-    const [loading, setLoading] = React.useState<boolean>(false);
-
-    const OnDelete = async () => {
-        try {
-            const response = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/api/invoices/${id}`,
-                {
-                    method: "DELETE",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${getCookie("token")}`,
-                    },
-                }
-            );
-
-            if (!response.ok) {
-                throw new Error("Failed to delete invoice");
-            }
-
-            router.push("/dashboard/invoices");
-            toast({
-                title: "Success",
-                description: "Invoice deleted successfully",
-            });
-        } catch (error) {
-            console.error(error);
-            toast({
-                variant: "destructive",
-                title: "Error",
-                description: "Failed to delete invoice",
-                action: (
-                    <ToastAction altText="Retry" onClick={OnDelete}>
-                        Retry
-                    </ToastAction>
-                ),
-            });
-        }
-    };
-
-    return (
-        <Credenza open={open} onOpenChange={setOpen}>
-            <CredenzaTrigger>
-                <Button
-                    variant={"destructive"}
-                    className="flex items-center gap-2"
-                >
-                    <MdDeleteOutline size={20} />
-                    {t("common.common_delete")}
-                </Button>
-            </CredenzaTrigger>
-            <CredenzaContent>
-                <CredenzaHeader>
-                    <CredenzaTitle>
-                        {t("invoices.invoice_delete")}
-                    </CredenzaTitle>
-                    <CredenzaDescription>
-                        <p>{t("invoices.invoice_delete_confirm")}</p>
-                    </CredenzaDescription>
-                </CredenzaHeader>
-
-                <CredenzaFooter>
-                    <Button
-                        disabled={loading}
-                        variant={"destructive"}
-                        onClick={OnDelete}
-                    >
-                        {loading
-                            ? t("common.common_loading")
-                            : t("common.common_delete")}
-                    </Button>
-                    <CredenzaClose asChild>
-                        <Button variant="outline">
-                            {t("common.common_cancel")}
-                        </Button>
-                    </CredenzaClose>
-                </CredenzaFooter>
-            </CredenzaContent>
-        </Credenza>
-    );
-};
 
 export default function Page({}: Props) {
     const { id } = useParams();
@@ -165,6 +53,7 @@ export default function Page({}: Props) {
     const t = useTranslations();
 
     const { formatAmount } = useFormattedAmount();
+    const { formatDate } = useFormattedDate();
 
     const [invoice, setInvoice] = useState<Invoice | null>(null);
     const [loading, setLoading] = useState(true);
@@ -293,13 +182,6 @@ export default function Page({}: Props) {
             </div>
         );
     }
-
-    const formattedDate = new Date(
-        invoice?.invoice_date ?? ""
-    ).toLocaleDateString();
-    const formattedDueDate = new Date(
-        invoice?.due_date ?? ""
-    ).toLocaleDateString();
 
     let totalAmountWithoutVAT = 0;
     let totalAmount = 0;
@@ -464,7 +346,10 @@ export default function Page({}: Props) {
                 title: "Success",
                 description: "Due date updated successfully",
             });
-            setInvoice((prev) => (prev ? { ...prev, due_date: date } : prev));
+            console.log(response);
+            setInvoice((prev) =>
+                prev ? { ...prev, due_date: isoDate as unknown as Date } : prev
+            );
         } catch (error) {
             console.error(error);
             toast({
@@ -555,6 +440,43 @@ export default function Page({}: Props) {
         }
     };
 
+    const HandleOnDelete = async () => {
+        try {
+            const response = await fetch(
+                `${process.env.NEXT_PUBLIC_API_URL}/api/invoices/${id}`,
+                {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${getCookie("token")}`,
+                    },
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error("Failed to delete invoice");
+            }
+
+            router.push("/dashboard/invoices");
+            toast({
+                title: "Success",
+                description: "Invoice deleted successfully",
+            });
+        } catch (error) {
+            console.error(error);
+            toast({
+                variant: "destructive",
+                title: "Error",
+                description: "Failed to delete invoice",
+                action: (
+                    <ToastAction altText="Retry" onClick={HandleOnDelete}>
+                        Retry
+                    </ToastAction>
+                ),
+            });
+        }
+    };
+
     return (
         <ContentLayout title={t("invoices.invoice_details")}>
             <div className="flex flex-col flex-1 gap-6">
@@ -573,7 +495,21 @@ export default function Page({}: Props) {
                             {t("common.common_download_pdf")}
                         </Button>
 
-                        <AlertDeleteInvoice />
+                        <AlertDialog
+                            trigger={
+                                <Button
+                                    variant="destructive"
+                                    className="flex items-center gap-2"
+                                >
+                                    <MdDeleteOutline size={20} />
+                                    {t("common.common_delete")}
+                                </Button>
+                            }
+                            title={t("invoices.invoice_delete")}
+                            description={t("invoices.invoice_delete_confirm")}
+                            confirmText={t("common.common_delete")}
+                            handleOnConfirm={HandleOnDelete}
+                        />
                     </div>
                 </div>
                 <Card className="flex flex-col justify-between p-6 md:flex-row gap-4">
@@ -591,7 +527,9 @@ export default function Page({}: Props) {
                                 {t("invoices.invoice_date")}
                             </h2>
                             <p className="flex text-sm text-right">
-                                {formattedDate}
+                                {invoice?.invoice_date
+                                    ? formatDate(new Date(invoice.invoice_date))
+                                    : ""}
                             </p>
                         </div>
 
@@ -600,38 +538,10 @@ export default function Page({}: Props) {
                                 {t("invoices.invoice_status")}
                             </h2>
                             <div className="flex">
-                                <Select
-                                    defaultValue={invoice?.status}
-                                    value={invoice?.status}
-                                    onValueChange={handleChangeStatus}
-                                >
-                                    <SelectTrigger className="border-0 p-0 h-fit gap-2 bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0">
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="paid">
-                                            <Badge className="bg-green-500 text-white">
-                                                {t(
-                                                    "invoices.invoice_table_filter_paid"
-                                                )}
-                                            </Badge>
-                                        </SelectItem>
-                                        <SelectItem value="pending">
-                                            <Badge className="bg-yellow-500 text-white hover:bg-yellow-600">
-                                                {t(
-                                                    "invoices.invoice_table_filter_pending"
-                                                )}
-                                            </Badge>
-                                        </SelectItem>
-                                        <SelectItem value="cancelled">
-                                            <Badge className="bg-red-500 text-white hover:bg-red-600">
-                                                {t(
-                                                    "invoices.invoice_table_filter_cancelled"
-                                                )}
-                                            </Badge>
-                                        </SelectItem>
-                                    </SelectContent>
-                                </Select>
+                                <SelectStatusInvoice
+                                    invoice={invoice}
+                                    handleChangeStatus={handleChangeStatus}
+                                />
                             </div>
                         </div>
                     </div>
@@ -640,36 +550,25 @@ export default function Page({}: Props) {
                             <h2 className="text-sm font-semibold">
                                 {t("invoices.invoice_due_date")}
                             </h2>
-                            <Popover>
-                                <PopoverTrigger asChild>
+                            <DatePicker
+                                trigger={
                                     <Button
                                         variant="ghost"
                                         className="p-0 h-fit justify-start text-left font-normal hover:bg-transparent"
                                     >
-                                        {invoice?.due_date
-                                            ? formattedDueDate
-                                            : "Select a date"}
+                                        {formatDate(
+                                            new Date(invoice?.due_date as Date)
+                                        ) || "Select Due Date"}
                                         <ChevronDownIcon
                                             size={16}
                                             className="ml-2 opacity-50"
                                         />
                                     </Button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-auto p-0">
-                                    <Calendar
-                                        mode="single"
-                                        selected={
-                                            invoice?.due_date
-                                                ? new Date(invoice.due_date)
-                                                : new Date()
-                                        }
-                                        onSelect={(date) => {
-                                            handleSelectDueDate(date as Date);
-                                        }}
-                                        initialFocus
-                                    />
-                                </PopoverContent>
-                            </Popover>
+                                }
+                                value={invoice?.due_date}
+                                placeholder="Select Due Date"
+                                onChange={handleSelectDueDate}
+                            />
                         </div>
                     </div>
                 </Card>

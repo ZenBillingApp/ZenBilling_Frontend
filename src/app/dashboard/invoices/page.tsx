@@ -1,8 +1,9 @@
 "use client";
 import React from "react";
-import Image from "next/image";
+
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { getCookie } from "cookies-next";
 
 import { Invoice } from "@/types/Invoice";
 
@@ -11,10 +12,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import PaginationList from "@/components/pagination-list";
 import { ContentLayout } from "@/components/admin-panel/content-layout";
+import BtnFilter from "@/components/btn-filter";
 
 import { PiPlus } from "react-icons/pi";
 import { ClipLoader } from "react-spinners";
-import { getCookie } from "cookies-next";
+import ErrorScreen from "@/components/error-screen";
 
 type Props = {};
 
@@ -33,15 +35,6 @@ export default function Page({}: Props) {
     const handleChangePage = (page: number) => {
         setPage(page);
     };
-
-    const BtnFilter = ({ filter, text }: { filter: string; text: string }) => (
-        <Button
-            variant={selectedFilter === filter ? "default" : "secondary"}
-            onClick={() => setSelectedFilter(filter)}
-        >
-            {text}
-        </Button>
-    );
 
     const fetchInvoices = React.useCallback(async () => {
         try {
@@ -93,23 +86,7 @@ export default function Page({}: Props) {
     if (error) {
         return (
             <ContentLayout title={t("invoices.invoices")}>
-                <div className="flex flex-col w-full justify-center items-center gap-4">
-                    <Image
-                        src={"/assets/illustrations/illu_error.svg"}
-                        width={200}
-                        height={200}
-                        alt="Error"
-                    />
-                    <h1 className="text-2xl font-semibold">
-                        {t("common.common_error_fetch")}
-                    </h1>
-                    <p className="text-gray-500">
-                        {t("common.common_error_fetch_message")}
-                    </p>
-                    <Button onClick={fetchInvoices}>
-                        {t("common.common_retry")}
-                    </Button>
-                </div>
+                <ErrorScreen handleRetry={fetchInvoices} />
             </ContentLayout>
         );
     }
@@ -139,6 +116,8 @@ export default function Page({}: Props) {
                                     text={t(
                                         "invoices.invoice_table_filter_all"
                                     )}
+                                    selectedFilter={selectedFilter}
+                                    setSelectedFilter={setSelectedFilter}
                                 />
 
                                 <BtnFilter
@@ -146,18 +125,24 @@ export default function Page({}: Props) {
                                     text={t(
                                         "invoices.invoice_table_filter_paid"
                                     )}
+                                    selectedFilter={selectedFilter}
+                                    setSelectedFilter={setSelectedFilter}
                                 />
                                 <BtnFilter
                                     filter="pending"
                                     text={t(
                                         "invoices.invoice_table_filter_pending"
                                     )}
+                                    selectedFilter={selectedFilter}
+                                    setSelectedFilter={setSelectedFilter}
                                 />
                                 <BtnFilter
                                     filter="cancelled"
                                     text={t(
                                         "invoices.invoice_table_filter_cancelled"
                                     )}
+                                    selectedFilter={selectedFilter}
+                                    setSelectedFilter={setSelectedFilter}
                                 />
                             </div>
 
