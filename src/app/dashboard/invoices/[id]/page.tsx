@@ -43,6 +43,7 @@ import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
 import { ContentLayout } from "@/components/admin-panel/content-layout";
 import AlertDialog from "@/components/alert-dialog";
 import DatePicker from "@/components/datePicker";
+import SheetCustomers from "@/components/sheet-customers";
 
 type Props = {};
 
@@ -67,37 +68,6 @@ export default function Page({}: Props) {
     const [error, setError] = useState(false);
     const [customers, setCustomers] = useState<Customer[]>([]);
     const [items, setItems] = useState<Item[]>([]);
-
-    const fetchCustomers = useCallback(async () => {
-        try {
-            setCustomerLoading(true);
-            setError(false);
-            const response = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/api/customers?${
-                    search ? `search=${search}` : ""
-                }`,
-                {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${getCookie("token")}`,
-                    },
-                }
-            );
-
-            if (!response.ok) {
-                throw new Error("Failed to fetch customers");
-            }
-
-            const data = await response.json();
-            setCustomers(data || []);
-        } catch (error) {
-            console.error(error);
-            setError(true);
-        } finally {
-            setCustomerLoading(false);
-        }
-    }, [search]);
 
     const handleChangeCustomer = async (customer: Customer) => {
         try {
@@ -139,11 +109,6 @@ export default function Page({}: Props) {
             });
         }
     };
-
-    useEffect(() => {
-        const delayDebounceFn = setTimeout(fetchCustomers, 300);
-        return () => clearTimeout(delayDebounceFn);
-    }, [fetchCustomers]);
 
     useEffect(() => {
         const fetchInvoiceDetails = async () => {
@@ -613,73 +578,15 @@ export default function Page({}: Props) {
                         </div>
                     </Card>
                     <Card className="relative flex flex-col w-full gap-2 p-6">
-                        <Sheet open={open} onOpenChange={setOpen}>
-                            <SheetTrigger asChild>
+                        <SheetCustomers
+                            trigger={
                                 <MdOutlineEdit
-                                    size={24}
+                                    size={20}
                                     className="absolute top-2 right-2 cursor-pointer"
                                 />
-                            </SheetTrigger>
-                            <SheetContent className="p-10">
-                                <SheetHeader>
-                                    <SheetTitle>
-                                        <h1 className="text-2xl font-semibold">
-                                            {t("customers.customer_select")}
-                                        </h1>
-                                    </SheetTitle>
-                                    <SheetDescription>
-                                        <Input
-                                            placeholder={t(
-                                                "customers.customer_placeholder_search"
-                                            )}
-                                            value={search}
-                                            onChange={(e) =>
-                                                setSearch(e.target.value)
-                                            }
-                                        />
-                                    </SheetDescription>
-                                </SheetHeader>
-                                <div className="flex flex-col gap-2 mt-6">
-                                    {customerLoading && (
-                                        <div className="flex justify-center items-center">
-                                            <ClipLoader
-                                                color="#009933"
-                                                size={20}
-                                            />
-                                        </div>
-                                    )}
-                                    {error && (
-                                        <p>
-                                            {t(
-                                                "customers.customer_failed_search"
-                                            )}
-                                        </p>
-                                    )}
-                                    {customers.length === 0 &&
-                                        !customerLoading && (
-                                            <p>
-                                                {t(
-                                                    "customers.customer_no_results"
-                                                )}
-                                            </p>
-                                        )}
-                                    {customers.map((customer) => (
-                                        <Button
-                                            variant="secondary"
-                                            key={customer.client_id}
-                                            onClick={() => {
-                                                setSelectedCustomer(customer);
-                                                setOpen(false);
-                                                handleChangeCustomer(customer);
-                                            }}
-                                        >
-                                            {customer.first_name}{" "}
-                                            {customer.last_name}
-                                        </Button>
-                                    ))}
-                                </div>
-                            </SheetContent>
-                        </Sheet>
+                            }
+                            handleSelectCustomer={handleChangeCustomer}
+                        />
                         <h2 className="text-lg font-semibold">
                             {t("invoices.invoice_billTo")} :
                         </h2>
