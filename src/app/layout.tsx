@@ -40,6 +40,20 @@ export default async function RootLayout({ children }: RootLayoutProps) {
     const messages = await getMessages();
     return (
         <html lang={locale} suppressHydrationWarning>
+            <meta
+                name="viewport"
+                content="width=device-width, initial-scale=1.0"
+            />
+            <meta
+                name="keywords"
+                content="ZenBilling, billing, invoices, management"
+            />
+            <meta name="application-name" content="ZenBilling" />
+            <meta charSet="utf-8" />
+            <meta name="author" content="ZenBilling" />
+            <link rel="icon" href="/favicon.ico" />
+            <link rel="apple-touch-icon" href="/favicon.ico" />
+
             <body
                 className={cn(
                     "font-SpaceGrotesk",
