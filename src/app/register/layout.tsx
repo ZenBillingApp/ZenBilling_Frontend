@@ -1,6 +1,5 @@
 import React from "react";
 import Header from "@/components/header";
-import { BackgroundBeams } from "@/components/background-beams";
 
 type Props = {
     children: React.ReactNode;
