@@ -59,7 +59,7 @@ export default function EditTableItems({ items, handleOnSaveItems }: Props) {
 
     return (
         <>
-            <Table>
+            <Table className="w-full">
                 <TableHeader>
                     <TableRow>
                         <TableHead className="min-w-96">

@@ -46,7 +46,8 @@
         "invoice_id": "ID de la facture",
         "invoice_date": "Date de la facture",
         "invoice_myCompany": "Mon entreprise",
-        "invoice_status": "Statut de la facture"
+        "invoice_status": "Statut de la facture",
+        "invoice_summary": "Résumé de la facture"
     },
     "items": {
         "items": "Articles",

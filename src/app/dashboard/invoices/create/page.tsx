@@ -1,53 +1,32 @@
 "use client";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Customer } from "@/types/Customer";
 import { useTranslations } from "next-intl";
+import { getCookie } from "cookies-next";
+
 import useFormattedAmount from "@/hooks/useFormattedAmount";
+
+import { Item } from "@/types/Item";
+import { Customer } from "@/types/Customer";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-    Sheet,
-    SheetContent,
-    SheetDescription,
-    SheetHeader,
-    SheetTitle,
-    SheetTrigger,
-} from "@/components/ui/sheet";
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover";
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table";
-import { ChevronDownIcon, Trash, Edit, Plus } from "lucide-react";
-import { Calendar } from "@/components/ui/calendar";
-import { cn } from "@/lib/utils";
-
+import { ContentLayout } from "@/components/admin-panel/content-layout";
+import DatePicker from "@/components/datePicker";
+import SheetCustomers from "@/components/sheet-customers";
+import EditTableItems from "@/components/edit-table-items";
+import TableItems from "@/components/table-items";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 
-import { getCookie } from "cookies-next";
-import { ClipLoader } from "react-spinners";
-import { ContentLayout } from "@/components/admin-panel/content-layout";
+import { ChevronDownIcon, Plus } from "lucide-react";
+import { MdClose, MdOutlineEdit } from "react-icons/md";
+
+import { cn } from "@/lib/utils";
 
 type Props = {};
-
-type Item = {
-    description: string;
-    quantity: number;
-    unit_price: number;
-    vat_rate: number;
-};
 
 export default function Page({}: Props) {
     const router = useRouter();
@@ -55,15 +34,10 @@ export default function Page({}: Props) {
     const t = useTranslations();
     const { formatAmount } = useFormattedAmount();
 
-    const [open, setOpen] = useState<boolean>(false);
-    const [customers, setCustomers] = useState<Customer[]>([]);
-    const [search, setSearch] = useState<string>("");
-    const [filter, setFilter] = useState<string>("all");
-    const [loading, setLoading] = useState<boolean>(true);
-    const [error, setError] = useState<boolean>(false);
     const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
         null
     );
+    const [editItems, setEditItems] = useState<boolean>(false);
     const [items, setItems] = useState<Item[]>([]);
     const [date, setDate] = useState<Date>(new Date());
 
@@ -116,66 +90,6 @@ export default function Page({}: Props) {
         }
     };
 
-    const fetchCustomers = useCallback(async () => {
-        try {
-            setLoading(true);
-            setError(false);
-            const response = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/api/customers?${
-                    filter === "all" ? "" : `status=${filter}&`
-                }${search ? `search=${search}` : ""}`,
-                {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${getCookie("token")}`,
-                    },
-                }
-            );
-
-            if (!response.ok) {
-                throw new Error("Failed to fetch customers");
-            }
-
-            const data = await response.json();
-            setCustomers(data || []);
-        } catch (error) {
-            console.error(error);
-            setError(true);
-        } finally {
-            setLoading(false);
-        }
-    }, [filter, search]);
-
-    useEffect(() => {
-        const delayDebounceFn = setTimeout(() => {
-            fetchCustomers();
-        }, 300);
-
-        return () => clearTimeout(delayDebounceFn);
-    }, [fetchCustomers]);
-
-    const addItem = () => {
-        setItems([
-            ...items,
-            { description: "", quantity: 1, unit_price: 0, vat_rate: 0 },
-        ]);
-    };
-
-    const handleDeleteItem = (index: number) => {
-        const newItems = items.filter((_, i) => i !== index);
-        setItems(newItems);
-    };
-
-    const handleChangeItem = (index: number, field: string, value: string) => {
-        const newItems = [...items];
-        newItems[index] = {
-            ...newItems[index],
-            [field]: parseFloat(value) || 0,
-        };
-        setItems(newItems);
-    };
-
     const calculateSubtotal = () => {
         return items
             .reduce((total, item) => total + item.quantity * item.unit_price, 0)
@@ -211,8 +125,8 @@ export default function Page({}: Props) {
                     <div className="flex gap-2">
                         <div className="flex flex-col items-start w-96 gap-2">
                             <Label>{t("invoices.invoice_due_date")}</Label>
-                            <Popover>
-                                <PopoverTrigger asChild>
+                            <DatePicker
+                                trigger={
                                     <Button
                                         variant="outline"
                                         className="w-full flex items-center justify-between"
@@ -224,231 +138,82 @@ export default function Page({}: Props) {
                                             className="ml-2 opacity-50"
                                         />
                                     </Button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-auto p-0">
-                                    <Calendar
-                                        mode="single"
-                                        selected={date}
-                                        onSelect={(date) =>
-                                            setDate(date ?? new Date())
-                                        }
-                                        initialFocus
-                                    />
-                                </PopoverContent>
-                            </Popover>
+                                }
+                                value={date}
+                                onChange={(date) => setDate(date)}
+                            />
                         </div>
                     </div>
                     <div className="flex flex-col items-start w-96 gap-2">
                         <Label>{t("invoices.invoice_billTo")} </Label>
-                        <Sheet open={open} onOpenChange={setOpen}>
-                            <SheetTrigger asChild>
-                                <div className="flex flex-col items-start w-96 gap-2">
-                                    <Input
-                                        className="w-full cursor-pointer"
-                                        placeholder={t(
-                                            "invoices.invoice_placeholder_select_customer"
-                                        )}
-                                        value={
-                                            selectedCustomer
-                                                ? `${selectedCustomer.first_name} ${selectedCustomer.last_name}`
-                                                : ""
-                                        }
-                                        onChange={(e) =>
-                                            setSearch(e.target.value)
-                                        }
-                                    />
-                                </div>
-                            </SheetTrigger>
-                            <SheetContent className="p-10">
-                                <SheetHeader>
-                                    <SheetTitle>
-                                        {t("customers.customer_select")}
-                                    </SheetTitle>
-                                    <SheetDescription className="flex  gap-2">
-                                        <Input
-                                            placeholder={t(
-                                                "customers.customer_placeholder_search"
-                                            )}
-                                            value={search}
-                                            onChange={(e) =>
-                                                setSearch(e.target.value)
-                                            }
-                                        />
-                                        <Button
-                                            onClick={() =>
-                                                router.push(
-                                                    "/dashboard/customers?add=true"
-                                                )
-                                            }
-                                        >
-                                            <Plus size={16} />
-                                        </Button>
-                                    </SheetDescription>
-                                </SheetHeader>
-                                <div className="flex flex-col gap-2 mt-6">
-                                    {loading && (
-                                        <div className="flex w-full align-center justify-center">
-                                            <ClipLoader
-                                                color="#009933"
-                                                size={20}
-                                            />
-                                        </div>
+                        <SheetCustomers
+                            trigger={
+                                <Input
+                                    className="w-full cursor-pointer"
+                                    placeholder={t(
+                                        "invoices.invoice_placeholder_select_customer"
                                     )}
-
-                                    {error && (
-                                        <p>
-                                            {t(
-                                                "customers.customer_failed_search"
-                                            )}
-                                        </p>
-                                    )}
-                                    {customers.length === 0 && !loading && (
-                                        <p className="text-gray-500">
-                                            {t("customers.customer_no_results")}
-                                        </p>
-                                    )}
-                                    {customers.map((customer) => (
-                                        <Button
-                                            variant="secondary"
-                                            key={customer.client_id}
-                                            onClick={() => {
-                                                setSelectedCustomer(customer);
-                                                setOpen(false);
-                                            }}
-                                        >
-                                            {customer.first_name}{" "}
-                                            {customer.last_name}
-                                        </Button>
-                                    ))}
-                                </div>
-                            </SheetContent>
-                        </Sheet>
+                                    value={
+                                        selectedCustomer
+                                            ? `${selectedCustomer.first_name} ${selectedCustomer.last_name}`
+                                            : ""
+                                    }
+                                />
+                            }
+                            handleSelectCustomer={(customer) => {
+                                setSelectedCustomer(customer);
+                            }}
+                        />
                     </div>
                     <div className="flex flex-col items-start w-full gap-4 mb-4">
-                        <Table>
-                            <TableHeader className={cn("bg-secondary")}>
-                                <TableRow>
-                                    <TableHead className="min-w-96">
-                                        {t(
-                                            "items.item_table_header_description"
-                                        )}
-                                    </TableHead>
-                                    <TableHead className="min-w-32">
-                                        {t("items.item_table_header_quantity")}
-                                    </TableHead>
-                                    <TableHead className="min-w-32">
-                                        {t(
-                                            "items.item_table_header_unit_price_no_vat"
-                                        )}
-                                    </TableHead>
-                                    <TableHead className="min-w-32">
-                                        {t("items.item_table_header_vat_rate")}
-                                    </TableHead>
-                                    <TableHead className="min-w-32">
-                                        {t("items.item_table_header_total")}
-                                    </TableHead>
-                                    <TableHead></TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {items.map((item, index) => (
-                                    <TableRow key={index} className="h-12">
-                                        <TableCell>
-                                            <Input
-                                                value={item.description}
-                                                placeholder={t(
-                                                    "items.item_table_placeholder_description"
-                                                )}
-                                                onChange={(e) => {
-                                                    const newItems = [...items];
-                                                    newItems[
-                                                        index
-                                                    ].description =
-                                                        e.target.value;
-                                                    setItems(newItems);
-                                                }}
-                                            />
-                                        </TableCell>
-                                        <TableCell>
-                                            <Input
-                                                type="number"
-                                                value={item.quantity}
-                                                onChange={(e) =>
-                                                    handleChangeItem(
-                                                        index,
-                                                        "quantity",
-                                                        e.target.value
-                                                    )
-                                                }
-                                            />
-                                        </TableCell>
-                                        <TableCell>
-                                            <Input
-                                                type="currency"
-                                                value={item.unit_price}
-                                                onChange={(e) =>
-                                                    handleChangeItem(
-                                                        index,
-                                                        "unit_price",
-                                                        e.target.value
-                                                    )
-                                                }
-                                            />
-                                        </TableCell>
-                                        <TableCell>
-                                            <Input
-                                                type="number"
-                                                value={item.vat_rate}
-                                                onChange={(e) =>
-                                                    handleChangeItem(
-                                                        index,
-                                                        "vat_rate",
-                                                        e.target.value
-                                                    )
-                                                }
-                                            />
-                                        </TableCell>
-                                        <TableCell>
-                                            {formatAmount(
-                                                item.quantity * item.unit_price,
-                                                {
-                                                    currency: "EUR",
-                                                }
-                                            )}
-                                        </TableCell>
-                                        <TableCell>
-                                            <Trash
-                                                size={24}
-                                                color="#009933"
-                                                className="cursor-pointer"
-                                                onClick={() =>
-                                                    handleDeleteItem(index)
-                                                }
-                                            />
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                        <Button onClick={addItem}>
-                            {t("items.item_table_add_item")}
-                        </Button>
-                        <div
-                            className={cn(
-                                "flex flex-col items-end w-full gap-2 "
-                            )}
-                        >
-                            <div className={cn("flex justify-end w-full")}>
-                                <div
-                                    className={cn(
-                                        "flex flex-col items-end w-96 gap-2 bg-secondary p-4 rounded-lg"
-                                    )}
-                                >
+                        <Card className="relative w-full">
+                            <CardHeader>
+                                <CardTitle>{t("items.items")}</CardTitle>
+                                {editItems ? (
+                                    <MdClose
+                                        size={20}
+                                        className="absolute top-2 right-2 cursor-pointer"
+                                        onClick={() =>
+                                            setEditItems((prev) => !prev)
+                                        }
+                                    />
+                                ) : (
+                                    <MdOutlineEdit
+                                        size={20}
+                                        className="absolute top-2 right-2 cursor-pointer"
+                                        onClick={() =>
+                                            setEditItems((prev) => !prev)
+                                        }
+                                    />
+                                )}
+                            </CardHeader>
+                            <CardContent>
+                                {editItems ? (
+                                    <EditTableItems
+                                        items={items}
+                                        handleOnSaveItems={(items) => {
+                                            setItems(items);
+                                            setEditItems(false);
+                                        }}
+                                    />
+                                ) : (
+                                    <TableItems items={items} />
+                                )}
+                            </CardContent>
+                        </Card>
+                        <div className={cn("flex flex-col items-end w-full")}>
+                            <Card className="w-full md:w-1/2 xl:w-1/3">
+                                <CardHeader>
+                                    <CardTitle>
+                                        {t("invoices.invoice_summary")}
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className="flex flex-col gap-2">
                                     <div className="flex justify-between w-full">
-                                        <span>
+                                        <span className="font-light text-sm ">
                                             {t("invoices.invoice_subtotal")}:
                                         </span>
-                                        <span>
+                                        <span className="font-semibold">
                                             {formatAmount(
                                                 parseFloat(calculateSubtotal()),
                                                 {
@@ -458,10 +223,10 @@ export default function Page({}: Props) {
                                         </span>
                                     </div>
                                     <div className="flex justify-between w-full">
-                                        <span>
+                                        <span className="font-light text-sm ">
                                             {t("invoices.invoice_vat")}:
                                         </span>
-                                        <span>
+                                        <span className="font-semibold">
                                             {formatAmount(
                                                 parseFloat(calculateTax()),
                                                 {
@@ -471,10 +236,10 @@ export default function Page({}: Props) {
                                         </span>
                                     </div>
                                     <div className="flex justify-between w-full">
-                                        <span>
+                                        <span className="font-light text-sm ">
                                             {t("invoices.invoice_total")}:
                                         </span>
-                                        <span className="font-bold">
+                                        <span className="font-semibold">
                                             {formatAmount(
                                                 parseFloat(calculateTotal()),
                                                 {
@@ -483,18 +248,20 @@ export default function Page({}: Props) {
                                             )}
                                         </span>
                                     </div>
+
                                     <Button
-                                        className="w-full"
+                                        className="w-full mt-4"
                                         onClick={handleCreateInvoice}
                                         disabled={
                                             !selectedCustomer ||
                                             items.length === 0
                                         }
                                     >
+                                        <Plus size={20} className="mr-2" />
                                         {t("invoices.invoice_create")}
                                     </Button>
-                                </div>
-                            </div>
+                                </CardContent>
+                            </Card>
                         </div>
                     </div>
                 </div>
