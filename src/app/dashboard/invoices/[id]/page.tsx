@@ -1,10 +1,12 @@
 "use client";
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { getCookie } from "cookies-next";
 
 import useFormattedAmount from "@/hooks/useFormattedAmount";
 import useFormattedDate from "@/hooks/useFormattedDate";
+import useFetch from "@/hooks/useFetch";
 
 import { Invoice } from "@/types/Invoice";
 import { Customer } from "@/types/Customer";
@@ -12,38 +14,20 @@ import { Item } from "@/types/Item";
 
 import SelectStatusInvoice from "@/components/selectStatusInvoice";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Download, Edit, Plus, Save } from "lucide-react";
-import { Card } from "@/components/ui/card";
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table";
-import {
-    Sheet,
-    SheetContent,
-    SheetDescription,
-    SheetHeader,
-    SheetTitle,
-    SheetTrigger,
-} from "@/components/ui/sheet";
-
+import { Download } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { ToastAction } from "@/components/ui/toast";
-
-import { ClipLoader } from "react-spinners";
-import { getCookie } from "cookies-next";
-
-import { ChevronDownIcon } from "lucide-react";
-import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
 import { ContentLayout } from "@/components/admin-panel/content-layout";
 import AlertDialog from "@/components/alert-dialog";
 import DatePicker from "@/components/datePicker";
 import SheetCustomers from "@/components/sheet-customers";
+import TableItems from "@/components/table-items";
+import EditTableItems from "@/components/edit-table-items";
+
+import { ClipLoader } from "react-spinners";
+import { ChevronDownIcon } from "lucide-react";
+import { MdOutlineEdit, MdDeleteOutline, MdClose } from "react-icons/md";
 
 type Props = {};
 
@@ -58,16 +42,7 @@ export default function Page({}: Props) {
 
     const [invoice, setInvoice] = useState<Invoice | null>(null);
     const [loading, setLoading] = useState(true);
-    const [customerLoading, setCustomerLoading] = useState(true);
-    const [open, setOpen] = useState(false);
     const [editOpen, setEditOpen] = useState(false);
-    const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
-        null
-    );
-    const [search, setSearch] = useState("");
-    const [error, setError] = useState(false);
-    const [customers, setCustomers] = useState<Customer[]>([]);
-    const [items, setItems] = useState<Item[]>([]);
 
     const handleChangeCustomer = async (customer: Customer) => {
         try {
@@ -129,14 +104,12 @@ export default function Page({}: Props) {
 
                 const data = await response.json();
                 setInvoice(data);
-                setItems(data.items);
             } catch (error) {
                 console.error(error);
             } finally {
                 setLoading(false);
             }
         };
-
         fetchInvoiceDetails();
     }, [id]);
 
@@ -236,53 +209,6 @@ export default function Page({}: Props) {
         }
     };
 
-    // const handleChangePaymentMethod = async (payment_method: string) => {
-    //     try {
-    //         const response = await fetch(
-    //             `${process.env.NEXT_PUBLIC_API_URL}/api/payments/${id}`,
-    //             {
-    //                 method: "PUT",
-    //                 headers: {
-    //                     "Content-Type": "application/json",
-    //                     Authorization: `Bearer ${getCookie("token")}`,
-    //                 },
-    //                 body: JSON.stringify({ payment_method }),
-    //             }
-    //         );
-
-    //         if (!response.ok) {
-    //             throw new Error("Failed to update payment method");
-    //         }
-
-    //         toast({
-    //             title: "Success",
-    //             description: "Payment method updated successfully",
-    //         });
-    //         setInvoice((prev) =>
-    //             prev
-    //                 ? { ...prev, payments: { payment_method } }
-    //                 : (prev as Invoice | null)
-    //         );
-    //     } catch (error) {
-    //         console.error(error);
-    //         toast({
-    //             variant: "destructive",
-    //             title: "Error",
-    //             description: "Failed to update payment method",
-    //             action: (
-    //                 <ToastAction
-    //                     altText="Retry"
-    //                     onClick={() =>
-    //                         handleChangePaymentMethod(payment_method)
-    //                     }
-    //                 >
-    //                     Retry
-    //                 </ToastAction>
-    //             ),
-    //         });
-    //     }
-    // };
-
     const handleSelectDueDate = async (date: Date) => {
         // Ajuster manuellement le décalage de fuseau horaire
         const localDate = new Date(
@@ -333,34 +259,7 @@ export default function Page({}: Props) {
         }
     };
 
-    const handleChangeItem = (index: number, key: string, value: string) => {
-        const newItems = items.map((item, i) =>
-            i === index ? { ...item, [key]: value } : item
-        );
-        setItems(newItems);
-    };
-
-    const handleDeleteItem = (index: number) => {
-        const newItems = items.filter((_, i) => i !== index);
-        setItems(newItems);
-    };
-
-    const addItem = () => {
-        setItems((prev) => [
-            ...prev,
-            {
-                description: "",
-                item_id: items.length + 1,
-                total_price: 0,
-                quantity: 0,
-                unit_price: 0,
-                vat_rate: 0,
-                vat_amount: 0,
-            },
-        ]);
-    };
-
-    const handleSaveItems = async () => {
+    const handleSaveItems = async (items: Item[]) => {
         try {
             const response = await fetch(
                 `${process.env.NEXT_PUBLIC_API_URL}/api/invoices/${id}`,
@@ -397,7 +296,10 @@ export default function Page({}: Props) {
                 title: "Error",
                 description: "Failed to update items",
                 action: (
-                    <ToastAction altText="Retry" onClick={handleSaveItems}>
+                    <ToastAction
+                        altText="Retry"
+                        onClick={() => handleSaveItems(items)}
+                    >
                         Retry
                     </ToastAction>
                 ),
@@ -531,7 +433,6 @@ export default function Page({}: Props) {
                                     </Button>
                                 }
                                 value={invoice?.due_date}
-                                placeholder="Select Due Date"
                                 onChange={handleSelectDueDate}
                             />
                         </div>
@@ -621,213 +522,34 @@ export default function Page({}: Props) {
                         </div>
                     </Card>
                 </div>
-                <div className="flex flex-col items-start w-full gap-4 mb-4">
-                    {editOpen ? (
-                        <>
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead className="min-w-96">
-                                            {t(
-                                                "items.item_table_header_description"
-                                            )}
-                                        </TableHead>
-                                        <TableHead className="min-w-32">
-                                            {t(
-                                                "items.item_table_header_quantity"
-                                            )}
-                                        </TableHead>
-                                        <TableHead className="min-w-32">
-                                            {t(
-                                                "items.item_table_header_unit_price"
-                                            )}
-                                        </TableHead>
-                                        <TableHead className="min-w-32">
-                                            {t(
-                                                "items.item_table_header_vat_rate"
-                                            )}
-                                        </TableHead>
-
-                                        <TableHead className="min-w-32">
-                                            {t("items.item_table_header_total")}
-                                        </TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {items.map((item, index) => (
-                                        <TableRow key={index}>
-                                            <TableCell>
-                                                <Input
-                                                    value={item.description}
-                                                    placeholder="Description"
-                                                    onChange={(e) =>
-                                                        handleChangeItem(
-                                                            index,
-                                                            "description",
-                                                            e.target.value
-                                                        )
-                                                    }
-                                                />
-                                            </TableCell>
-                                            <TableCell>
-                                                <Input
-                                                    type="number"
-                                                    value={item.quantity}
-                                                    onChange={(e) =>
-                                                        handleChangeItem(
-                                                            index,
-                                                            "quantity",
-                                                            e.target.value
-                                                        )
-                                                    }
-                                                />
-                                            </TableCell>
-                                            <TableCell>
-                                                <Input
-                                                    type="number"
-                                                    value={item.unit_price}
-                                                    onChange={(e) =>
-                                                        handleChangeItem(
-                                                            index,
-                                                            "unit_price",
-                                                            e.target.value
-                                                        )
-                                                    }
-                                                />
-                                            </TableCell>
-                                            <TableCell>
-                                                <Input
-                                                    type="number"
-                                                    value={item.vat_rate}
-                                                    onChange={(e) =>
-                                                        handleChangeItem(
-                                                            index,
-                                                            "vat_rate",
-                                                            e.target.value
-                                                        )
-                                                    }
-                                                />
-                                            </TableCell>
-                                            <TableCell>
-                                                $
-                                                {item.unit_price *
-                                                    item.quantity +
-                                                    (item.vat_rate / 100) *
-                                                        item.unit_price *
-                                                        item.quantity}
-                                            </TableCell>
-                                            <TableCell>
-                                                <Button
-                                                    variant="destructive"
-                                                    onClick={() =>
-                                                        handleDeleteItem(index)
-                                                    }
-                                                >
-                                                    Delete
-                                                </Button>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                            <div className="flex gap-4 mt-4 justify-end">
-                                <Button
-                                    className="flex gap-1"
-                                    onClick={addItem}
-                                >
-                                    <Plus size={20} />
-                                    Add Item
-                                </Button>
-                                <Button
-                                    className="flex gap-1"
-                                    onClick={handleSaveItems}
-                                >
-                                    <Save size={20} />
-                                    Save Items
-                                </Button>
-                            </div>
-                        </>
-                    ) : (
-                        <>
-                            <Table className="relative">
-                                <TableHeader className="bg-secondary  ">
-                                    <TableRow>
-                                        <TableHead className="min-w-96">
-                                            {t(
-                                                "items.item_table_header_description"
-                                            )}
-                                        </TableHead>
-                                        <TableHead className="min-w-32">
-                                            {t(
-                                                "items.item_table_header_quantity"
-                                            )}
-                                        </TableHead>
-                                        <TableHead className="min-w-32">
-                                            {t(
-                                                "items.item_table_header_unit_price"
-                                            )}
-                                        </TableHead>
-                                        <TableHead className="min-w-32">
-                                            {t(
-                                                "items.item_table_header_vat_rate"
-                                            )}
-                                        </TableHead>
-                                        <TableHead className="min-w-32">
-                                            {t(
-                                                "items.item_table_header_total_vat"
-                                            )}
-                                        </TableHead>
-                                        <TableHead className="min-w-32">
-                                            {t("items.item_table_header_total")}
-                                        </TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {invoice?.items?.map((item, index) => (
-                                        <TableRow key={item.item_id}>
-                                            <TableCell>
-                                                {item.description}
-                                            </TableCell>
-                                            <TableCell>
-                                                {item.quantity}
-                                            </TableCell>
-                                            <TableCell>
-                                                {formatAmount(item.unit_price, {
-                                                    currency: "EUR",
-                                                }) || 0}
-                                            </TableCell>
-                                            <TableCell>
-                                                {item.vat_rate}
-                                            </TableCell>
-                                            <TableCell>
-                                                {formatAmount(item.vat_amount, {
-                                                    currency: "EUR",
-                                                }) || 0}
-                                            </TableCell>
-                                            <TableCell>
-                                                {formatAmount(
-                                                    item.unit_price *
-                                                        item.quantity +
-                                                        (item.vat_rate / 100) *
-                                                            item.unit_price *
-                                                            item.quantity,
-                                                    {
-                                                        currency: "EUR",
-                                                    }
-                                                ) || 0}
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                                <Edit
-                                    size={20}
-                                    className="absolute top-2 right-2 cursor-pointer"
-                                    onClick={() => setEditOpen(true)}
-                                />
-                            </Table>
-                        </>
-                    )}
-                </div>
+                <Card className="relative">
+                    <CardHeader>
+                        <CardTitle>{t("items.items")}</CardTitle>
+                        {editOpen ? (
+                            <MdClose
+                                size={20}
+                                className="absolute top-2 right-2 cursor-pointer"
+                                onClick={() => setEditOpen((prev) => !prev)}
+                            />
+                        ) : (
+                            <MdOutlineEdit
+                                size={20}
+                                className="absolute top-2 right-2 cursor-pointer"
+                                onClick={() => setEditOpen((prev) => !prev)}
+                            />
+                        )}
+                    </CardHeader>
+                    <CardContent>
+                        {editOpen ? (
+                            <EditTableItems
+                                items={invoice?.items || []}
+                                handleOnSaveItems={handleSaveItems}
+                            />
+                        ) : (
+                            <TableItems items={invoice?.items || []} />
+                        )}
+                    </CardContent>
+                </Card>
 
                 <div className="flex justify-end p-4">
                     <div className="w-full md:w-1/4">
@@ -838,7 +560,7 @@ export default function Page({}: Props) {
                             <p className="flex w-24 text-sm items-start text-right">
                                 {formatAmount(totalAmountWithoutVAT, {
                                     currency: "EUR",
-                                }) || 0}
+                                })}
                             </p>
                         </div>
                         <div className="flex justify-between">
@@ -851,7 +573,7 @@ export default function Page({}: Props) {
                                     {
                                         currency: "EUR",
                                     }
-                                ) || 0}
+                                )}
                             </p>
                         </div>
                         <div className="flex justify-between">
@@ -861,7 +583,7 @@ export default function Page({}: Props) {
                             <p className="flex w-24 text-sm items-start text-right">
                                 {formatAmount(totalAmount, {
                                     currency: "EUR",
-                                }) || 0}
+                                })}
                             </p>
                         </div>
                     </div>
