@@ -38,11 +38,12 @@ export default async function RootLayout({ children }: RootLayoutProps) {
     // Providing all messages to the client
     // side is the easiest way to get started
     const messages = await getMessages();
+
     return (
         <html lang={locale} suppressHydrationWarning>
             <meta
                 name="viewport"
-                content="width=device-width, initial-scale=1.0"
+                content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1, user-scalable=no"
             />
             <meta
                 name="keywords"
@@ -56,7 +57,6 @@ export default async function RootLayout({ children }: RootLayoutProps) {
 
             <body
                 className={cn(
-                    "font-SpaceGrotesk",
                     process.env.NODE_ENV === "production"
                         ? null
                         : "debug-screens",
