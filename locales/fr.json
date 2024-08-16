@@ -75,7 +75,38 @@
         "customer_create_success": "Client créé avec succès",
         "customer_create_error": "Erreur lors de la création du client",
         "customer_no_results": "Aucun résultat trouvé",
-        "customer_failed_search": "Échec de la recherche du client"
+        "customer_failed_search": "Échec de la recherche du client",
+        "customer_add": "Ajouter un client",
+        "customer_update": "Mettre à jour le client",
+        "customer_update_success": "Client mis à jour avec succès",
+        "customer_update_error": "Erreur lors de la mise à jour du client",
+        "customer_delete": "Supprimer le client",
+        "customer_delete_confirm": "Êtes-vous sûr de vouloir supprimer ce client ?",
+        "customer_delete_success": "Client supprimé avec succès",
+        "customer_delete_error": "Erreur lors de la suppression du client",
+        "customer_details": "Détails du client",
+        "customer_first_name": "Prénom",
+        "customer_first_name_placeholder": "Prénom",
+        "customer_last_name": "Nom",
+        "customer_last_name_placeholder": "Nom",
+        "customer_address": "Adresse",
+        "customer_address_placeholder": "Adresse",
+        "customer_email": "Email",
+        "customer_email_placeholder": "Email",
+        "customer_phone": "Téléphone",
+        "customer_phone_placeholder": "Téléphone",
+        "customer_add_description": "Complétez les informations du client",
+        "customer_add_loading": "Ajout du client...",
+        "customer_table_header_id": "ID",
+        "customer_table_header_first_name": "Prénom",
+        "customer_table_header_last_name": "Nom",
+        "customer_table_header_email": "Email",
+        "customer_table_header_phone": "Téléphone",
+        "customer_table_header_country": "Pays",
+        "customer_table_header_invoice_count": "Nombre de factures",
+        "customer_table_no_customers": "Aucun client trouvé",
+        "customer_table_no_customers_description": "Il n'y a aucun client à afficher",
+        "customer_table_search_placeholder": "Rechercher un client par nom, prénom ou email"
     },
     "settings": {
         "settings": "Paramètres"
@@ -175,6 +206,11 @@
         "common_email": "Email",
         "common_phone": "Téléphone",
         "common_vat_number": "Numéro de TVA",
-        "common_retry": "Réessayer"
+        "common_retry": "Réessayer",
+        "common_search_address": "Rechercher une adresse...",
+        "common_search_address_placeholder": "Sélectionner une adresse...",
+        "common_search_address_no_results": "Aucun résultat trouvé",
+        "common_search_address_failed": "Échec de la recherche de l'adresse",
+        "common_search_address_loading": "Recherche de l'adresse..."
     }
 }

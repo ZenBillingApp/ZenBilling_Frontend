@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { Check, ChevronsUpDown } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -33,6 +34,7 @@ const SearchAddress: React.FC<SearchAddressProps> = ({
 }) => {
     const [open, setOpen] = React.useState(false);
     const [value, setValue] = React.useState(location || "");
+    const t = useTranslations();
 
     const {
         query,
@@ -47,7 +49,7 @@ const SearchAddress: React.FC<SearchAddressProps> = ({
         if (location) {
             handleSearch(location);
         }
-    }, [location]);
+    }, [handleSearch, location]);
 
     return (
         <Popover open={open} onOpenChange={setOpen}>
@@ -61,7 +63,8 @@ const SearchAddress: React.FC<SearchAddressProps> = ({
                     <p className="truncate">
                         {selectedItem
                             ? `${selectedItem.label}`
-                            : value || "Sélectionnez un lieu..."}
+                            : value ||
+                              t("common.common_search_address_placeholder")}
                     </p>
 
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -70,7 +73,7 @@ const SearchAddress: React.FC<SearchAddressProps> = ({
             <PopoverContent className="w-80 p-0">
                 <Command>
                     <CommandInput
-                        placeholder="Rechercher un lieu..."
+                        placeholder={t("common.common_search_address")}
                         value={value}
                         onValueChange={(value: string) => {
                             setValue(value);
@@ -82,7 +85,7 @@ const SearchAddress: React.FC<SearchAddressProps> = ({
                         {loading ? (
                             <CommandLoading>
                                 <CommandEmpty>
-                                    Tapez pour rechercher
+                                    {t("common.common_search_address_loading")}
                                 </CommandEmpty>
                             </CommandLoading>
                         ) : Object.keys(results).length > 0 ? (
@@ -132,7 +135,9 @@ const SearchAddress: React.FC<SearchAddressProps> = ({
                                 </CommandGroup>
                             ))
                         ) : (
-                            <CommandEmpty>Aucun résultat trouvé.</CommandEmpty>
+                            <CommandEmpty>
+                                {t("common.common_search_address_no_results")}
+                            </CommandEmpty>
                         )}
                     </CommandList>
                 </Command>
