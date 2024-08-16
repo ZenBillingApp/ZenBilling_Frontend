@@ -42,10 +42,6 @@ export default async function RootLayout({ children }: RootLayoutProps) {
     return (
         <html lang={locale} suppressHydrationWarning>
             <meta
-                name="viewport"
-                content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1, user-scalable=no"
-            />
-            <meta
                 name="keywords"
                 content="ZenBilling, billing, invoices, management"
             />
