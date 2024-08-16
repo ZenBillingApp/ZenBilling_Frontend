@@ -213,40 +213,40 @@ export default function Page({}: Props) {
                                         <span className="font-light text-sm ">
                                             {t("invoices.invoice_subtotal")}:
                                         </span>
-                                        <span className="font-semibold">
+                                        <p className="flex  text-sm items-end text-right">
                                             {formatAmount(
                                                 parseFloat(calculateSubtotal()),
                                                 {
                                                     currency: "EUR",
                                                 }
                                             )}
-                                        </span>
+                                        </p>
                                     </div>
                                     <div className="flex justify-between w-full">
                                         <span className="font-light text-sm ">
                                             {t("invoices.invoice_vat")}:
                                         </span>
-                                        <span className="font-semibold">
+                                        <p className="flex  text-sm items-end text-right">
                                             {formatAmount(
                                                 parseFloat(calculateTax()),
                                                 {
                                                     currency: "EUR",
                                                 }
                                             )}
-                                        </span>
+                                        </p>
                                     </div>
                                     <div className="flex justify-between w-full">
                                         <span className="font-light text-sm ">
                                             {t("invoices.invoice_total")}:
                                         </span>
-                                        <span className="font-semibold">
+                                        <p className="flex  text-sm items-end text-right">
                                             {formatAmount(
                                                 parseFloat(calculateTotal()),
                                                 {
                                                     currency: "EUR",
                                                 }
                                             )}
-                                        </span>
+                                        </p>
                                     </div>
 
                                     <Button

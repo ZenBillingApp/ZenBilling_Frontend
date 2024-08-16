@@ -551,42 +551,49 @@ export default function Page({}: Props) {
                     </CardContent>
                 </Card>
 
-                <div className="flex justify-end p-4">
-                    <div className="w-full md:w-1/4">
-                        <div className="flex justify-between">
-                            <h2 className="text-sm font-semibold">
-                                {t("invoices.invoice_subtotal")} :
-                            </h2>
-                            <p className="flex w-24 text-sm items-start text-right">
-                                {formatAmount(totalAmountWithoutVAT, {
-                                    currency: "EUR",
-                                })}
-                            </p>
-                        </div>
-                        <div className="flex justify-between">
-                            <h2 className="text-sm font-semibold">
-                                {t("invoices.invoice_vat")} :
-                            </h2>
-                            <p className="flex w-24 text-sm items-start text-right">
-                                {formatAmount(
-                                    totalAmount - totalAmountWithoutVAT,
-                                    {
+                <div className={"flex flex-col items-end w-full"}>
+                    <Card className="w-full md:w-1/2 xl:w-1/3">
+                        <CardHeader>
+                            <CardTitle>
+                                {t("invoices.invoice_summary")}
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="flex flex-col gap-2">
+                            <div className="flex justify-between">
+                                <h2 className="text-sm font-semibold">
+                                    {t("invoices.invoice_subtotal")} :
+                                </h2>
+                                <p className="flex  text-sm items-end text-right">
+                                    {formatAmount(totalAmountWithoutVAT, {
                                         currency: "EUR",
-                                    }
-                                )}
-                            </p>
-                        </div>
-                        <div className="flex justify-between">
-                            <h2 className="text-sm font-semibold">
-                                {t("invoices.invoice_total")} :
-                            </h2>
-                            <p className="flex w-24 text-sm items-start text-right">
-                                {formatAmount(totalAmount, {
-                                    currency: "EUR",
-                                })}
-                            </p>
-                        </div>
-                    </div>
+                                    })}
+                                </p>
+                            </div>
+                            <div className="flex justify-between">
+                                <h2 className="text-sm font-semibold">
+                                    {t("invoices.invoice_vat")} :
+                                </h2>
+                                <p className="flex  text-sm items-end text-right">
+                                    {formatAmount(
+                                        totalAmount - totalAmountWithoutVAT,
+                                        {
+                                            currency: "EUR",
+                                        }
+                                    )}
+                                </p>
+                            </div>
+                            <div className="flex justify-between">
+                                <h2 className="text-sm font-semibold">
+                                    {t("invoices.invoice_total")} :
+                                </h2>
+                                <p className="flex  text-sm items-end text-right">
+                                    {formatAmount(totalAmount, {
+                                        currency: "EUR",
+                                    })}
+                                </p>
+                            </div>
+                        </CardContent>
+                    </Card>
                 </div>
             </div>
         </ContentLayout>
