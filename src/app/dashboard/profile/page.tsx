@@ -130,6 +130,7 @@ const EditUserDialog = ({
                     <div className="flex flex-col w-1/2 gap-2">
                         <Label>First name</Label>
                         <Input
+                            type="text"
                             value={editUser?.first_name || ""}
                             onChange={(e) =>
                                 setEditUser(
@@ -145,6 +146,7 @@ const EditUserDialog = ({
                     <div className="flex flex-col w-1/2 gap-2">
                         <Label>Last name</Label>
                         <Input
+                            type="text"
                             value={editUser?.last_name || ""}
                             onChange={(e) =>
                                 setEditUser(
@@ -161,6 +163,7 @@ const EditUserDialog = ({
                 <div className="flex flex-col w-full gap-2">
                     <Label>Street address</Label>
                     <Input
+                        type="text"
                         value={editUser?.street_address || ""}
                         onChange={(e) =>
                             setEditUser(
@@ -177,6 +180,7 @@ const EditUserDialog = ({
                     <div className="flex flex-col w-1/2 gap-2">
                         <Label>City</Label>
                         <Input
+                            type="text"
                             value={editUser?.city || ""}
                             onChange={(e) =>
                                 setEditUser(
@@ -192,6 +196,7 @@ const EditUserDialog = ({
                     <div className="flex flex-col w-1/2 gap-2">
                         <Label>State</Label>
                         <Input
+                            type="text"
                             value={editUser?.state || ""}
                             onChange={(e) =>
                                 setEditUser(
@@ -209,6 +214,7 @@ const EditUserDialog = ({
                     <div className="flex flex-col w-1/2 gap-2">
                         <Label>Postal code</Label>
                         <Input
+                            type="text"
                             value={editUser?.postal_code || ""}
                             onChange={(e) =>
                                 setEditUser(
@@ -224,6 +230,7 @@ const EditUserDialog = ({
                     <div className="flex flex-col w-1/2 gap-2">
                         <Label>Country</Label>
                         <Input
+                            type="text"
                             value={editUser?.country || ""}
                             onChange={(e) =>
                                 setEditUser(
@@ -240,6 +247,7 @@ const EditUserDialog = ({
                 <div className="flex flex-col w-full gap-2">
                     <Label>Email</Label>
                     <Input
+                        type="email"
                         value={editUser?.email || ""}
                         onChange={(e) =>
                             setEditUser(
@@ -255,6 +263,7 @@ const EditUserDialog = ({
                 <div className="flex flex-col w-full gap-2">
                     <Label>Phone</Label>
                     <Input
+                        type="tel"
                         value={editUser?.phone || ""}
                         onChange={(e) =>
                             setEditUser(

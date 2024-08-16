@@ -50,7 +50,6 @@ export default async function RootLayout({ children }: RootLayoutProps) {
             <meta name="author" content="ZenBilling" />
             <link rel="icon" href="/favicon.ico" />
             <link rel="apple-touch-icon" href="/favicon.ico" />
-
             <body
                 className={cn(
                     process.env.NODE_ENV === "production"

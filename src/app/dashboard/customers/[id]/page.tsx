@@ -208,6 +208,7 @@ const EditCustomerDialog = ({
                         <div className="flex flex-col w-full gap-2 sm:w-1/2">
                             <Label>First name</Label>
                             <Input
+                                type="text"
                                 value={editCustomer?.first_name || ""}
                                 onChange={(e) =>
                                     setEditCustomer(
@@ -223,6 +224,7 @@ const EditCustomerDialog = ({
                         <div className="flex flex-col w-full gap-2 sm:w-1/2">
                             <Label>Last name</Label>
                             <Input
+                                type="text"
                                 value={editCustomer?.last_name || ""}
                                 onChange={(e) =>
                                     setEditCustomer(
@@ -283,6 +285,7 @@ const EditCustomerDialog = ({
                     <div className="flex flex-col w-full gap-2">
                         <Label>Email</Label>
                         <Input
+                            type="email"
                             value={editCustomer?.email || ""}
                             onChange={(e) =>
                                 setEditCustomer(
@@ -302,7 +305,6 @@ const EditCustomerDialog = ({
                             id="company.phone"
                             name="company.phone"
                             placeholder="Phone"
-                            type="text"
                             value={editCustomer?.phone || ""}
                             defaultCountry="FR"
                             onChange={(phone) =>

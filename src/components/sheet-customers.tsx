@@ -61,6 +61,7 @@ export default function SheetCustomers({
                     <SheetDescription>
                         <div className="flex items-center gap-2">
                             <Input
+                                type="text"
                                 placeholder={t(
                                     "customers.customer_placeholder_search"
                                 )}

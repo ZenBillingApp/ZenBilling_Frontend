@@ -118,6 +118,7 @@ const EditCompanyDialog = ({
                 <div className="flex flex-col w-full gap-2">
                     <Label>Company Name</Label>
                     <Input
+                        type="text"
                         value={editCompany?.name || ""}
                         onChange={(e) =>
                             setEditCompany(
@@ -133,6 +134,7 @@ const EditCompanyDialog = ({
                 <div className="flex flex-col w-full gap-2">
                     <Label>Industry</Label>
                     <Input
+                        type="text"
                         value={editCompany?.industry || ""}
                         onChange={(e) =>
                             setEditCompany(
@@ -148,6 +150,7 @@ const EditCompanyDialog = ({
                 <div className="flex flex-col w-full gap-2">
                     <Label>Street Address</Label>
                     <Input
+                        type="text"
                         value={editCompany?.street_address || ""}
                         onChange={(e) =>
                             setEditCompany(
@@ -164,6 +167,7 @@ const EditCompanyDialog = ({
                     <div className="flex flex-col w-1/2 gap-2">
                         <Label>City</Label>
                         <Input
+                            type="text"
                             value={editCompany?.city || ""}
                             onChange={(e) =>
                                 setEditCompany(
@@ -179,6 +183,7 @@ const EditCompanyDialog = ({
                     <div className="flex flex-col w-1/2 gap-2">
                         <Label>State</Label>
                         <Input
+                            type="text"
                             value={editCompany?.state || ""}
                             onChange={(e) =>
                                 setEditCompany(
@@ -196,6 +201,7 @@ const EditCompanyDialog = ({
                     <div className="flex flex-col w-1/2 gap-2">
                         <Label>Postal Code</Label>
                         <Input
+                            type="text"
                             value={editCompany?.postal_code || ""}
                             onChange={(e) =>
                                 setEditCompany(
@@ -211,6 +217,7 @@ const EditCompanyDialog = ({
                     <div className="flex flex-col w-1/2 gap-2">
                         <Label>Country</Label>
                         <Input
+                            type="text"
                             value={editCompany?.country || ""}
                             onChange={(e) =>
                                 setEditCompany(
@@ -227,6 +234,7 @@ const EditCompanyDialog = ({
                 <div className="flex flex-col w-full gap-2">
                     <Label>Email</Label>
                     <Input
+                        type="email"
                         value={editCompany?.email || ""}
                         onChange={(e) =>
                             setEditCompany(
@@ -242,6 +250,7 @@ const EditCompanyDialog = ({
                 <div className="flex flex-col w-full gap-2">
                     <Label>Phone</Label>
                     <Input
+                        type="tel"
                         value={editCompany?.phone || ""}
                         onChange={(e) =>
                             setEditCompany(
@@ -257,6 +266,7 @@ const EditCompanyDialog = ({
                 <div className="flex flex-col w-full gap-2">
                     <Label>VAT Number</Label>
                     <Input
+                        type="text"
                         value={editCompany?.vat_number || ""}
                         onChange={(e) =>
                             setEditCompany(

@@ -148,6 +148,7 @@ export default function Page({}: Props) {
 
                             <div className="flex w-full py-2 gap-6 xl:w-2/6">
                                 <Input
+                                    type="text"
                                     placeholder={t(
                                         "invoices.invoice_table_search_placeholder"
                                     )}

@@ -149,6 +149,7 @@ export default function Page({}: Props) {
                         <SheetCustomers
                             trigger={
                                 <Input
+                                    type="text"
                                     className="w-full cursor-pointer"
                                     placeholder={t(
                                         "invoices.invoice_placeholder_select_customer"

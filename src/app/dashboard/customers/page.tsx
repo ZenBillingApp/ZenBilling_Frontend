@@ -178,7 +178,6 @@ const AddCustomerDialog = ({
                             id="company.phone"
                             name="company.phone"
                             placeholder="Phone"
-                            type="text"
                             value={newCustomer.phone}
                             defaultCountry="FR"
                             onChange={(phone) =>

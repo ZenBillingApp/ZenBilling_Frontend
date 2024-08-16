@@ -84,6 +84,7 @@ export default function EditTableItems({ items, handleOnSaveItems }: Props) {
                         <TableRow key={index}>
                             <TableCell>
                                 <Input
+                                    type="text"
                                     value={item.description}
                                     placeholder={t(
                                         "items.item_table_placeholder_description"
