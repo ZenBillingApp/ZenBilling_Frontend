@@ -144,7 +144,7 @@ export default function Page({}: Props) {
                             />
                         </div>
                     </div>
-                    <div className="flex flex-col items-start w-96 gap-2">
+                    <div className="flex flex-col items-start w-full gap-2 sm:w-96">
                         <Label>{t("invoices.invoice_billTo")} </Label>
                         <SheetCustomers
                             trigger={

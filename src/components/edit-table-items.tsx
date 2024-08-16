@@ -160,7 +160,7 @@ export default function EditTableItems({ items, handleOnSaveItems }: Props) {
                     ))}
                 </TableBody>
             </Table>
-            <div className="flex gap-4 mt-4 justify-end">
+            <div className="flex justify-end mt-4 flex-wrap gap-2">
                 <Button className="flex gap-1" onClick={addItem}>
                     <Plus size={20} />
                     {t("items.item_table_add_item")}
