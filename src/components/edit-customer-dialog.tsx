@@ -26,21 +26,37 @@ const SearchAddress = dynamic(() => import("@/components/ui/search-address"), {
 
 type Props = {
     trigger: React.ReactNode;
-    onAdd: (newCustomer: Customer) => Promise<void>;
+    onModify: (newCustomer: Customer) => void;
+    customer: Customer | null;
 };
 
-export default function AddCustomerDialog({ trigger, onAdd }: Props) {
+export default function EditCustomerDialog({
+    trigger,
+    onModify,
+    customer,
+}: Props) {
     const [open, setOpen] = React.useState<boolean>(false);
     const [newCustomer, setNewCustomer] = React.useState<Customer>(
-        {} as Customer
+        customer ||
+            ({
+                first_name: "",
+                last_name: "",
+                street_address: "",
+                city: "",
+                state: "",
+                postal_code: "",
+                country: "",
+                email: "",
+                phone: "",
+            } as Customer)
     );
     const [loading, setLoading] = React.useState<boolean>(false);
     const t = useTranslations();
 
-    const handleOnAdd = async () => {
+    const handleOnModify = async () => {
         try {
             setLoading(true);
-            await onAdd(newCustomer);
+            await onModify(newCustomer);
             setLoading(false);
             setOpen(false);
         } catch (error) {
@@ -109,6 +125,17 @@ export default function AddCustomerDialog({ trigger, onAdd }: Props) {
                                     {t("customers.customer_address")}
                                 </Label>
                                 <SearchAddress
+                                    location={
+                                        newCustomer.street_address +
+                                        " " +
+                                        newCustomer.city +
+                                        " " +
+                                        newCustomer.state +
+                                        " " +
+                                        newCustomer.postal_code +
+                                        " " +
+                                        newCustomer.country
+                                    }
                                     onSelectLocation={(location) => {
                                         setNewCustomer({
                                             ...newCustomer,
@@ -184,7 +211,7 @@ export default function AddCustomerDialog({ trigger, onAdd }: Props) {
                                 </Button>
                             </CredenzaClose>
                             <Button
-                                onClick={handleOnAdd}
+                                onClick={handleOnModify}
                                 disabled={
                                     !newCustomer.first_name ||
                                     !newCustomer.last_name ||
@@ -199,8 +226,8 @@ export default function AddCustomerDialog({ trigger, onAdd }: Props) {
                                 }
                             >
                                 {loading
-                                    ? t("customers.customer_add_loading")
-                                    : t("customers.customer_add")}
+                                    ? t("customers.customer_update_loading")
+                                    : t("customers.customer_update")}
                             </Button>
                         </CredenzaFooter>
                     </div>

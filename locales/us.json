@@ -1,9 +1,9 @@
 {
     "dashboard": {
-        "welcome": "Hello!",
+        "welcome": "Welcome!",
         "dashboard": "Dashboard",
-        "dashboard_late_invoice": "Late Invoices",
-        "dashboard_pending_invoice": "Pending Invoices",
+        "dashboard_late_invoice": "Late invoices",
+        "dashboard_pending_invoice": "Pending invoices",
         "dashboard_invoice_late_message": "You have {count, plural, =0 {no late invoices} =1 {# late invoice} other {# late invoices}}",
         "dashboard_section_customers": "Customers",
         "dashboard_section_invoice_month": "Invoices this month"
@@ -22,7 +22,7 @@
         "invoice_table_filter_paid": "Paid",
         "invoice_table_filter_pending": "Pending",
         "invoice_table_filter_cancelled": "Cancelled",
-        "invoice_table_search_placeholder": "Search an invoice by name, first name or invoice ID",
+        "invoice_table_search_placeholder": "Search for an invoice by first name, last name, or invoice ID",
         "invoice_table_header_invoice_date": "Invoice date",
         "invoice_table_header_due_date": "Due date",
         "invoice_table_header_amount": "Amount",
@@ -37,7 +37,7 @@
         "invoice_table_status_cancelled": "Cancelled",
         "invoice_placeholder_select_customer": "Select a customer",
         "invoice_subtotal": "Subtotal (excl. VAT)",
-        "invoice_vat": "VAT subtotal",
+        "invoice_vat": "Subtotal VAT",
         "invoice_total": "Total (incl. VAT)",
         "invoice_create": "Create an invoice",
         "invoice_delete": "Delete invoice",
@@ -71,13 +71,14 @@
         "all_customers": "All customers",
         "customer_select": "Select a customer",
         "customer_create": "Create a customer",
-        "customer_placeholder_search": "Search a customer",
+        "customer_placeholder_search": "Search for a customer",
         "customer_create_success": "Customer created successfully",
         "customer_create_error": "Error creating customer",
         "customer_no_results": "No results found",
         "customer_failed_search": "Customer search failed",
         "customer_add": "Add a customer",
         "customer_update": "Update customer",
+        "customer_update_loading": "Updating customer...",
         "customer_update_success": "Customer updated successfully",
         "customer_update_error": "Error updating customer",
         "customer_delete": "Delete customer",
@@ -95,7 +96,7 @@
         "customer_email_placeholder": "Email",
         "customer_phone": "Phone",
         "customer_phone_placeholder": "Phone",
-        "customer_add_description": "Complete customer information",
+        "customer_add_description": "Complete the customer information",
         "customer_add_loading": "Adding customer...",
         "customer_table_header_id": "ID",
         "customer_table_header_first_name": "First name",
@@ -106,7 +107,13 @@
         "customer_table_header_invoice_count": "Invoice count",
         "customer_table_no_customers": "No customers found",
         "customer_table_no_customers_description": "There are no customers to display",
-        "customer_table_search_placeholder": "Search a customer by name, first name or email"
+        "customer_table_search_placeholder": "Search for a customer by first name, last name, or email",
+        "customer_contact_info": "Contact information",
+        "customer_contact_info_description": "Customer contact information",
+        "customer_monthly_revenue": "Monthly revenue",
+        "customer_monthly_revenue_description": "Customer's monthly revenue",
+        "customer_invoices_description": "Customer invoices",
+        "customer_address_description": "Customer address information"
     },
     "settings": {
         "settings": "Settings"
@@ -120,7 +127,7 @@
         "company_name": "Company name",
         "company_address": "Company address",
         "company_city": "Company city",
-        "company_zip": "Company zip code",
+        "company_zip": "Company postal code",
         "company_country": "Company country",
         "company_phone": "Company phone",
         "company_email": "Company email",
@@ -132,7 +139,7 @@
     },
     "login": {
         "login": "Login",
-        "login_title": "<b>W</b>elcome back! 🎉",
+        "login_title": "<b>R</b>e Hello! 🎉",
         "login_new_here": "New here?",
         "email": "Email",
         "password": "Password",
@@ -181,7 +188,7 @@
         "company_phone_placeholder": "Company phone",
         "register_login": "Log in"
     },
-    "common": {
+    "common" :{
         "common_search": "Search",
         "common_search_placeholder": "Search...",
         "common_view": "View",
@@ -202,15 +209,26 @@
         "common_error_description": "An error occurred",
         "common_error_description_message": "An error occurred while loading the page",
         "common_error_fetch": "Loading error",
-        "common_error_fetch_message": "An error occurred while loading data",
+        "common_error_fetch_message": "An error occurred while loading the data",
         "common_email": "Email",
+        "common_address": "Address",
+        "common_first_name": "First name",
+        "common_last_name": "Last name",
+        "common_country": "Country",
+        "common_street": "Street",
+        "common_city": "City",
+        "common_state": "State/Region",
+        "common_zip": "Postal code",
+        "common_website": "Website",
+        "common_industry": "Industry",
+        "common_vat": "VAT",
         "common_phone": "Phone",
         "common_vat_number": "VAT number",
         "common_retry": "Retry",
-        "common_search_address": "Search an address...",
+        "common_search_address": "Search for an address...",
         "common_search_address_placeholder": "Select an address...",
         "common_search_address_no_results": "No results found",
         "common_search_address_failed": "Address search failed",
-        "common_search_address_loading": "Searching address..."
+        "common_search_address_loading": "Searching for the address..."
     }
 }

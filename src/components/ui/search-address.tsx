@@ -49,7 +49,7 @@ const SearchAddress: React.FC<SearchAddressProps> = ({
         if (location) {
             handleSearch(location);
         }
-    }, [handleSearch, location]);
+    }, [location]);
 
     return (
         <Popover open={open} onOpenChange={setOpen}>
@@ -76,6 +76,7 @@ const SearchAddress: React.FC<SearchAddressProps> = ({
                         placeholder={t("common.common_search_address")}
                         value={value}
                         onValueChange={(value: string) => {
+                            console.log(value);
                             setValue(value);
                             handleSearch(value);
                         }}
