@@ -113,8 +113,8 @@ export default function AddCustomerDialog({ trigger, onAdd }: Props) {
                                         setNewCustomer({
                                             ...newCustomer,
                                             street_address:
-                                                location?.raw.address
-                                                    .house_number +
+                                                (location?.raw.address
+                                                    ?.house_number || "") +
                                                     " " +
                                                     location?.raw.address
                                                         .road || "",

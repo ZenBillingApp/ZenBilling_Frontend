@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
+import { getCookie } from "cookies-next";
 
 import { Customer } from "@/types/Customer";
 
@@ -19,7 +19,8 @@ import { ClipLoader } from "react-spinners";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { ScrollArea } from "./ui/scroll-area";
-import { MdAdd, MdPlusOne } from "react-icons/md";
+import { MdAdd } from "react-icons/md";
+import AddCustomerDialog from "./add-customer-dialog";
 
 type Props = {
     trigger: React.ReactNode;
@@ -31,15 +32,15 @@ export default function SheetCustomers({
     trigger,
 }: Props) {
     const t = useTranslations();
-    const router = useRouter();
 
     const [open, setOpen] = React.useState(false);
     const [search, setSearch] = React.useState("");
+    const [customers, setCustomers] = React.useState<Customer[]>([]);
 
     const debouncedSearch = useDebounce(search, 300);
 
     const {
-        data: customers,
+        data: data,
         loading: loading,
         error: error,
     } = useFetch<Customer[]>(
@@ -47,6 +48,36 @@ export default function SheetCustomers({
             debouncedSearch ? `search=${debouncedSearch}` : ""
         }`
     );
+
+    React.useEffect(() => {
+        if (data) {
+            setCustomers(data);
+        }
+    }, [data]);
+
+    const onAdd = async (newCustomer: Customer) => {
+        try {
+            const response = await fetch(
+                process.env.NEXT_PUBLIC_API_URL + "/api/customers",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${getCookie("token")}`,
+                    },
+                    body: JSON.stringify(newCustomer),
+                }
+            );
+            if (!response.ok) {
+                throw new Error("Failed to add customer");
+            }
+
+            const data = await response.json();
+            setCustomers((prev) => [data, ...prev]);
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
     return (
         <Sheet open={open} onOpenChange={setOpen}>
@@ -68,14 +99,14 @@ export default function SheetCustomers({
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                             />
-                            <Button
-                                variant="default"
-                                onClick={() =>
-                                    router.push("/dashboard/customers?add=true")
+                            <AddCustomerDialog
+                                trigger={
+                                    <Button variant="default">
+                                        <MdAdd size={20} />
+                                    </Button>
                                 }
-                            >
-                                <MdAdd size={20} />
-                            </Button>
+                                onAdd={onAdd}
+                            />
                         </div>
                     </SheetDescription>
                 </SheetHeader>

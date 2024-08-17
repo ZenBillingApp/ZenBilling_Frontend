@@ -301,7 +301,7 @@ export default function Page({}: Props) {
                                             <span className="font-semibold">
                                                 {t("common.common_street")} :{" "}
                                             </span>{" "}
-                                            {customer?.street_address}
+                                            {customer?.street_address || "-"}
                                         </div>
                                         <div className="flex gap-2">
                                             <span className="font-semibold">
