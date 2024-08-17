@@ -1,11 +1,12 @@
 "use client";
-import React, { use, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
+import React from "react";
+import { useParams } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { getCookie } from "cookies-next";
 
 import { User } from "@/types/User";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
     Card,
     CardContent,
@@ -13,306 +14,54 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-
-import {
-    Credenza,
-    CredenzaBody,
-    CredenzaClose,
-    CredenzaContent,
-    CredenzaDescription,
-    CredenzaFooter,
-    CredenzaHeader,
-    CredenzaTitle,
-    CredenzaTrigger,
-} from "@/components/ui/credenza";
-import { Label } from "@/components/ui/label";
+import { ContentLayout } from "@/components/admin-panel/content-layout";
+import EditUserDialog from "@/components/edit-user-dialog";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertTriangle } from "lucide-react";
 
 import { ClipLoader } from "react-spinners";
-import { getCookie } from "cookies-next";
-
-import {
-    BarChart,
-    Bar,
-    XAxis,
-    YAxis,
-    Tooltip,
-    ResponsiveContainer,
-} from "recharts";
-
-import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
-import { cn } from "@/lib/utils";
-import TableInvoices from "@/components/tableInvoices";
-import { ContentLayout } from "@/components/admin-panel/content-layout";
+import { MdOutlineEdit } from "react-icons/md";
 
 type Props = {};
 
-const EditUserDialog = ({
-    user,
-    onClose,
-    onSave,
-}: {
-    user: User | null;
-    onClose: () => void;
-    onSave: (updateduser: User) => void;
-}) => {
-    const [editUser, setEditUser] = React.useState<User | null>(null);
-    const [loading, setLoading] = React.useState<boolean>(false);
-    const [open, setOpen] = React.useState<boolean>(false);
-    const [error, setError] = React.useState<boolean>(false);
+export default function Page({}: Props) {
+    const { id } = useParams();
+    const t = useTranslations();
 
-    React.useEffect(() => {
-        setError(false);
-        setEditUser(user);
-    }, [open, user]);
+    const [user, setUser] = React.useState<User>({} as User);
+    const [loading, setLoading] = React.useState<boolean>(true);
 
-    const handleSave = async () => {
+    const handleSave = async (newUser: User) => {
         try {
-            if (editUser) {
-                setLoading(true);
-                setError(false);
-                const response = await fetch(
-                    process.env.NEXT_PUBLIC_API_URL + `/api/auth/profile`,
-                    {
-                        method: "PUT",
-                        headers: {
-                            "Content-Type": "application/json",
-                            Authorization: `Bearer ${getCookie("token")}`,
-                        },
-                        body: JSON.stringify(editUser),
-                    }
-                );
-                if (!response.ok) {
-                    throw new Error("Failed to update user");
+            setLoading(true);
+            const response = await fetch(
+                process.env.NEXT_PUBLIC_API_URL + `/api/auth/profile`,
+                {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${getCookie("token")}`,
+                    },
+                    body: JSON.stringify(newUser),
                 }
-
-                const updatedUser = await response.json();
-                onSave(updatedUser);
-                setOpen(false);
+            );
+            if (!response.ok) {
+                throw new Error("Failed to update user");
             }
+
+            const updatedUser = await response.json();
+            setUser(updatedUser);
         } catch (error) {
             console.error(error);
-            setError(true);
+            <Alert variant="destructive">
+                <AlertTitle>Error</AlertTitle>
+                <AlertDescription>
+                    Failed to update user. Please try again.
+                </AlertDescription>
+            </Alert>;
         } finally {
             setLoading(false);
         }
     };
-
-    return (
-        <Credenza open={open} onOpenChange={setOpen}>
-            <CredenzaTrigger>
-                <Button
-                    className="flex items-center gap-2"
-                    onClick={() => setOpen(true)}
-                >
-                    <MdOutlineEdit size={20} />
-                    Modify
-                </Button>
-            </CredenzaTrigger>
-            <CredenzaContent className="overflow-auto h-[80vh]">
-                <CredenzaHeader>
-                    <CredenzaTitle>Modify my profile</CredenzaTitle>
-                </CredenzaHeader>
-                <CredenzaDescription>
-                    <p>change your information</p>
-                </CredenzaDescription>
-                {error && (
-                    <Alert variant="destructive">
-                        <AlertTriangle className="w-5 h-5" />
-                        <AlertTitle>Failed to update user</AlertTitle>
-                        <AlertDescription>
-                            Please check your information and try again.
-                        </AlertDescription>
-                    </Alert>
-                )}
-                <div className="flex gap-2">
-                    <div className="flex flex-col w-1/2 gap-2">
-                        <Label>First name</Label>
-                        <Input
-                            type="text"
-                            value={editUser?.first_name || ""}
-                            onChange={(e) =>
-                                setEditUser(
-                                    (prev) =>
-                                        prev && {
-                                            ...prev,
-                                            first_name: e.target.value,
-                                        }
-                                )
-                            }
-                        />
-                    </div>
-                    <div className="flex flex-col w-1/2 gap-2">
-                        <Label>Last name</Label>
-                        <Input
-                            type="text"
-                            value={editUser?.last_name || ""}
-                            onChange={(e) =>
-                                setEditUser(
-                                    (prev) =>
-                                        prev && {
-                                            ...prev,
-                                            last_name: e.target.value,
-                                        }
-                                )
-                            }
-                        />
-                    </div>
-                </div>
-                <div className="flex flex-col w-full gap-2">
-                    <Label>Street address</Label>
-                    <Input
-                        type="text"
-                        value={editUser?.street_address || ""}
-                        onChange={(e) =>
-                            setEditUser(
-                                (prev) =>
-                                    prev && {
-                                        ...prev,
-                                        street_address: e.target.value,
-                                    }
-                            )
-                        }
-                    />
-                </div>
-                <div className="flex gap-2">
-                    <div className="flex flex-col w-1/2 gap-2">
-                        <Label>City</Label>
-                        <Input
-                            type="text"
-                            value={editUser?.city || ""}
-                            onChange={(e) =>
-                                setEditUser(
-                                    (prev) =>
-                                        prev && {
-                                            ...prev,
-                                            city: e.target.value,
-                                        }
-                                )
-                            }
-                        />
-                    </div>
-                    <div className="flex flex-col w-1/2 gap-2">
-                        <Label>State</Label>
-                        <Input
-                            type="text"
-                            value={editUser?.state || ""}
-                            onChange={(e) =>
-                                setEditUser(
-                                    (prev) =>
-                                        prev && {
-                                            ...prev,
-                                            state: e.target.value,
-                                        }
-                                )
-                            }
-                        />
-                    </div>
-                </div>
-                <div className="flex gap-2">
-                    <div className="flex flex-col w-1/2 gap-2">
-                        <Label>Postal code</Label>
-                        <Input
-                            type="text"
-                            value={editUser?.postal_code || ""}
-                            onChange={(e) =>
-                                setEditUser(
-                                    (prev) =>
-                                        prev && {
-                                            ...prev,
-                                            postal_code: e.target.value,
-                                        }
-                                )
-                            }
-                        />
-                    </div>
-                    <div className="flex flex-col w-1/2 gap-2">
-                        <Label>Country</Label>
-                        <Input
-                            type="text"
-                            value={editUser?.country || ""}
-                            onChange={(e) =>
-                                setEditUser(
-                                    (prev) =>
-                                        prev && {
-                                            ...prev,
-                                            country: e.target.value,
-                                        }
-                                )
-                            }
-                        />
-                    </div>
-                </div>
-                <div className="flex flex-col w-full gap-2">
-                    <Label>Email</Label>
-                    <Input
-                        type="email"
-                        value={editUser?.email || ""}
-                        onChange={(e) =>
-                            setEditUser(
-                                (prev) =>
-                                    prev && {
-                                        ...prev,
-                                        email: e.target.value,
-                                    }
-                            )
-                        }
-                    />
-                </div>
-                <div className="flex flex-col w-full gap-2">
-                    <Label>Phone</Label>
-                    <Input
-                        type="tel"
-                        value={editUser?.phone || ""}
-                        onChange={(e) =>
-                            setEditUser(
-                                (prev) =>
-                                    prev && {
-                                        ...prev,
-                                        phone: e.target.value,
-                                    }
-                            )
-                        }
-                    />
-                </div>
-
-                <CredenzaFooter>
-                    <Button
-                        disabled={
-                            !editUser?.first_name ||
-                            !editUser?.last_name ||
-                            !editUser?.email ||
-                            !editUser?.phone ||
-                            !editUser?.street_address ||
-                            !editUser?.city ||
-                            !editUser?.state ||
-                            !editUser?.postal_code ||
-                            !editUser?.country ||
-                            loading
-                        }
-                        onClick={handleSave}
-                    >
-                        {loading ? "Saving..." : "Save"}
-                    </Button>
-
-                    <CredenzaClose asChild>
-                        <Button variant="outline" onClick={onClose}>
-                            Cancel
-                        </Button>
-                    </CredenzaClose>
-                </CredenzaFooter>
-            </CredenzaContent>
-        </Credenza>
-    );
-};
-
-export default function Page({}: Props) {
-    const { id } = useParams();
-    const router = useRouter();
-
-    const [user, setUser] = React.useState<User | null>(null);
-    const [loading, setLoading] = React.useState<boolean>(true);
 
     React.useEffect(() => {
         const fetchUser = async () => {
@@ -342,12 +91,8 @@ export default function Page({}: Props) {
         fetchUser();
     }, [id]);
 
-    const handleUpdateuser = (updatedUser: User) => {
-        setUser(updatedUser);
-    };
-
     return (
-        <ContentLayout title="My profile">
+        <ContentLayout title={t("profile.profile")}>
             <div className="flex flex-col w-full gap-6">
                 {loading ? (
                     <div className="flex w-full h-screen items-center justify-center">
@@ -362,17 +107,22 @@ export default function Page({}: Props) {
                         <div className="flex items-center justify-between">
                             <div className="flex flex-col items-start gap-2">
                                 <h1 className="text-3xl font-semibold">
-                                    My profile
+                                    {t("profile.profile_title")}
                                 </h1>
                                 <p className=" text-gray-500">
-                                    Manage your profile
+                                    {t("profile.profile_description")}
                                 </p>
                             </div>
                             <div className="flex items-center gap-2">
                                 <EditUserDialog
+                                    trigger={
+                                        <Button variant="default">
+                                            <MdOutlineEdit size={20} />
+                                            {t("profile.profile_edit")}
+                                        </Button>
+                                    }
                                     user={user}
-                                    onClose={() => {}}
-                                    onSave={handleUpdateuser}
+                                    onSave={handleSave}
                                 />
                             </div>
                         </div>
@@ -381,32 +131,43 @@ export default function Page({}: Props) {
                                 <Card>
                                     <CardHeader>
                                         <CardTitle>
-                                            Personal information
+                                            {t("profile.profile_information")}
                                         </CardTitle>
+                                        <CardDescription>
+                                            {t(
+                                                "profile.profile_information_description"
+                                            )}
+                                        </CardDescription>
                                     </CardHeader>
                                     <CardContent>
                                         <div>
                                             <span className="font-semibold">
-                                                First name :{" "}
+                                                {t(
+                                                    "profile.profile_first_name"
+                                                )}
+                                                {" : "}
                                             </span>{" "}
                                             {user?.first_name}
                                         </div>
                                         <div>
                                             <span className="font-semibold">
-                                                Last name :{" "}
+                                                {t("profile.profile_last_name")}
+                                                {" : "}
                                             </span>{" "}
                                             {user?.last_name}
                                         </div>
 
                                         <div>
                                             <span className="font-semibold">
-                                                Email :{" "}
+                                                {t("profile.profile_email")}
+                                                {" : "}
                                             </span>{" "}
                                             {user?.email}
                                         </div>
                                         <div>
                                             <span className="font-semibold">
-                                                Phone :{" "}
+                                                {t("profile.profile_phone")}
+                                                {" :"}
                                             </span>{" "}
                                             {user?.phone}
                                         </div>
@@ -414,36 +175,50 @@ export default function Page({}: Props) {
                                 </Card>
                                 <Card>
                                     <CardHeader>
-                                        <CardTitle>Address</CardTitle>
+                                        <CardTitle>
+                                            {t("profile.profile_address")}
+                                        </CardTitle>
+                                        <CardDescription>
+                                            {t(
+                                                "profile.profile_address_description"
+                                            )}
+                                        </CardDescription>
                                     </CardHeader>
                                     <CardContent>
                                         <div>
                                             <span className="font-semibold">
-                                                Street address:
+                                                {t(
+                                                    "profile.profile_street_address"
+                                                )}{" "}
+                                                {" : "}
                                             </span>{" "}
                                             {user?.street_address}
                                         </div>
                                         <div>
                                             <span className="font-semibold">
-                                                City:
+                                                {t("profile.profile_city")}{" "}
+                                                {" : "}
                                             </span>{" "}
                                             {user?.city}
                                         </div>
                                         <div>
                                             <span className="font-semibold">
-                                                State:
+                                                {t("profile.profile_state")}{" "}
+                                                {" : "}
                                             </span>{" "}
                                             {user?.state}
                                         </div>
                                         <div>
                                             <span className="font-semibold">
-                                                Postal code:
+                                                {t("profile.profile_zip")}{" "}
+                                                {" : "}
                                             </span>{" "}
                                             {user?.postal_code}
                                         </div>
                                         <div>
                                             <span className="font-semibold">
-                                                Country:
+                                                {t("profile.profile_country")}
+                                                {" : "}
                                             </span>{" "}
                                             {user?.country}
                                         </div>
