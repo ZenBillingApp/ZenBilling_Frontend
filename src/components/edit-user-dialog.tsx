@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useEffect } from "react";
 import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
+import { getCookie } from "cookies-next";
 
 import { User } from "@/types/User";
 
@@ -22,6 +23,9 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertTriangle } from "lucide-react";
 import { ScrollArea } from "./ui/scroll-area";
 import { PhoneInput } from "./ui/phone-input";
+import { ToastAction } from "@/components/ui/toast";
+import { useToast } from "@/components/ui/use-toast";
+import { se } from "date-fns/locale";
 const SearchAddress = dynamic(() => import("@/components/ui/search-address"), {
     ssr: false,
 });
@@ -34,11 +38,64 @@ type Props = {
 
 export default function EditUserDialog({ trigger, user, onSave }: Props) {
     const t = useTranslations();
+    const { toast } = useToast();
 
     const [open, setOpen] = React.useState(false);
     const [newUser, setNewUser] = React.useState<User>(user);
     const [loading, setLoading] = React.useState(false);
-    const [error, setError] = React.useState(false);
+    const [error, setError] = React.useState(null);
+
+    useEffect(() => {
+        if (open) {
+            setNewUser(user);
+            setError(null);
+        }
+    }, [open, user]);
+
+    const handleSave = async (newUser: User) => {
+        try {
+            setLoading(true);
+            setError(null);
+            const response = await fetch(
+                process.env.NEXT_PUBLIC_API_URL + `/api/auth/profile`,
+                {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${getCookie("token")}`,
+                    },
+                    body: JSON.stringify(newUser),
+                }
+            );
+            if (!response.ok) {
+                throw new Error(await response.text());
+            }
+
+            const updatedUser = await response.json();
+            onSave(updatedUser);
+        } catch (error: any) {
+            console.error(error);
+            setError(error.message);
+
+            toast({
+                variant: "destructive",
+                title: "Error",
+                description: error.message,
+                action: (
+                    <ToastAction
+                        altText="Retry"
+                        onClick={() => {
+                            handleSave(newUser);
+                        }}
+                    >
+                        Retry
+                    </ToastAction>
+                ),
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <Credenza open={open} onOpenChange={setOpen}>
@@ -62,10 +119,7 @@ export default function EditUserDialog({ trigger, user, onSave }: Props) {
                                     <AlertTitle>
                                         Failed to update user
                                     </AlertTitle>
-                                    <AlertDescription>
-                                        Please check your information and try
-                                        again.
-                                    </AlertDescription>
+                                    <AlertDescription>{error}</AlertDescription>
                                 </Alert>
                             )}
                             <div className="flex gap-2">
@@ -219,8 +273,7 @@ export default function EditUserDialog({ trigger, user, onSave }: Props) {
                                         loading
                                     }
                                     onClick={() => {
-                                        setLoading(true);
-                                        onSave(newUser);
+                                        handleSave(newUser);
                                     }}
                                 >
                                     {loading

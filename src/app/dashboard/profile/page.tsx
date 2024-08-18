@@ -16,7 +16,6 @@ import {
 } from "@/components/ui/card";
 import { ContentLayout } from "@/components/admin-panel/content-layout";
 import EditUserDialog from "@/components/edit-user-dialog";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 import { ClipLoader } from "react-spinners";
 import { MdOutlineEdit } from "react-icons/md";
@@ -29,39 +28,6 @@ export default function Page({}: Props) {
 
     const [user, setUser] = React.useState<User>({} as User);
     const [loading, setLoading] = React.useState<boolean>(true);
-
-    const handleSave = async (newUser: User) => {
-        try {
-            setLoading(true);
-            const response = await fetch(
-                process.env.NEXT_PUBLIC_API_URL + `/api/auth/profile`,
-                {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${getCookie("token")}`,
-                    },
-                    body: JSON.stringify(newUser),
-                }
-            );
-            if (!response.ok) {
-                throw new Error("Failed to update user");
-            }
-
-            const updatedUser = await response.json();
-            setUser(updatedUser);
-        } catch (error) {
-            console.error(error);
-            <Alert variant="destructive">
-                <AlertTitle>Error</AlertTitle>
-                <AlertDescription>
-                    Failed to update user. Please try again.
-                </AlertDescription>
-            </Alert>;
-        } finally {
-            setLoading(false);
-        }
-    };
 
     React.useEffect(() => {
         const fetchUser = async () => {
@@ -122,7 +88,7 @@ export default function Page({}: Props) {
                                         </Button>
                                     }
                                     user={user}
-                                    onSave={handleSave}
+                                    onSave={(user: User) => setUser(user)}
                                 />
                             </div>
                         </div>
