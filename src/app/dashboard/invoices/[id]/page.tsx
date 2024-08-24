@@ -54,7 +54,7 @@ export default function Page({}: Props) {
                         "Content-Type": "application/json",
                         Authorization: `Bearer ${getCookie("token")}`,
                     },
-                    body: JSON.stringify({ client_id: customer.client_id }),
+                    body: JSON.stringify({ Client_id: customer.client_id }),
                 }
             );
 
@@ -66,7 +66,7 @@ export default function Page({}: Props) {
                 title: "Success",
                 description: "Customer updated successfully",
             });
-            setInvoice((prev) => (prev ? { ...prev, client: customer } : prev));
+            setInvoice((prev) => (prev ? { ...prev, Client: customer } : prev));
         } catch (error) {
             console.error(error);
             toast({
@@ -124,8 +124,8 @@ export default function Page({}: Props) {
     let totalAmountWithoutVAT = 0;
     let totalAmount = 0;
 
-    if (invoice?.items) {
-        for (let item of invoice.items) {
+    if (invoice?.InvoiceItems) {
+        for (let item of invoice.InvoiceItems) {
             const itemTotal = item.unit_price * item.quantity;
             const itemVAT = (item.vat_rate / 100) * itemTotal;
             totalAmountWithoutVAT += itemTotal;
@@ -445,36 +445,36 @@ export default function Page({}: Props) {
                         </h2>
                         <div className="flex flex-col pl-2">
                             <h2 className="text-sm font-semibold">
-                                {invoice?.company?.name}
+                                {invoice?.Company?.name}
                             </h2>
                             <p className="text-sm">
-                                {invoice?.company?.street_address}
+                                {invoice?.Company?.street_address}
                             </p>
                             <p className="text-sm">
-                                {invoice?.company?.city},{" "}
-                                {invoice?.company?.state}{" "}
-                                {invoice?.company?.postal_code}
+                                {invoice?.Company?.city},{" "}
+                                {invoice?.Company?.state}{" "}
+                                {invoice?.Company?.postal_code}
                             </p>
                             <p className="text-sm">
-                                {invoice?.company?.country}
+                                {invoice?.Company?.country}
                             </p>
                             <p className="text-sm">
                                 <span className="font-semibold">
                                     {t("common.common_email")} :
                                 </span>{" "}
-                                {invoice?.company?.email}
+                                {invoice?.Company?.email}
                             </p>
                             <p className="text-sm">
                                 <span className="font-semibold">
                                     {t("common.common_phone")} :
                                 </span>{" "}
-                                {invoice?.company?.phone}
+                                {invoice?.Company?.phone}
                             </p>
                             <p className="text-sm">
                                 <span className="font-semibold">
                                     {t("common.common_vat_number")} :
                                 </span>{" "}
-                                {invoice?.company?.vat_number}
+                                {invoice?.Company?.vat_number}
                             </p>
                         </div>
                     </Card>
@@ -493,31 +493,31 @@ export default function Page({}: Props) {
                         </h2>
                         <div className="flex flex-col pl-2">
                             <h2 className="text-sm font-semibold">
-                                {invoice?.client?.first_name}{" "}
-                                {invoice?.client?.last_name}
+                                {invoice?.Client?.first_name}{" "}
+                                {invoice?.Client?.last_name}
                             </h2>
                             <p className="text-sm">
-                                {invoice?.client?.street_address}
+                                {invoice?.Client?.street_address}
                             </p>
                             <p className="text-sm">
-                                {invoice?.client?.city},{" "}
-                                {invoice?.client?.state}{" "}
-                                {invoice?.client?.postal_code}
+                                {invoice?.Client?.city},{" "}
+                                {invoice?.Client?.state}{" "}
+                                {invoice?.Client?.postal_code}
                             </p>
                             <p className="text-sm">
-                                {invoice?.client?.country}
+                                {invoice?.Client?.country}
                             </p>
                             <p className="text-sm">
                                 <span className="font-semibold">
                                     {t("common.common_email")} :
                                 </span>{" "}
-                                {invoice?.client?.email}
+                                {invoice?.Client?.email}
                             </p>
                             <p className="text-sm">
                                 <span className="font-semibold">
                                     {t("common.common_phone")} :
                                 </span>{" "}
-                                {invoice?.client?.phone}
+                                {invoice?.Client?.phone}
                             </p>
                         </div>
                     </Card>
@@ -542,11 +542,11 @@ export default function Page({}: Props) {
                     <CardContent>
                         {editOpen ? (
                             <EditTableItems
-                                items={invoice?.items || []}
+                                items={invoice?.InvoiceItems || []}
                                 handleOnSaveItems={handleSaveItems}
                             />
                         ) : (
-                            <TableItems items={invoice?.items || []} />
+                            <TableItems items={invoice?.InvoiceItems || []} />
                         )}
                     </CardContent>
                 </Card>

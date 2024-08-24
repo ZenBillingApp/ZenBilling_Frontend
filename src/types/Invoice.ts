@@ -2,7 +2,7 @@ import { Item } from "./Item";
 export interface Invoice {
     invoice_id: number;
     invoice_date: Date;
-    company: {
+    Company: {
         name: string;
         street_address: string;
         city: string;
@@ -13,7 +13,7 @@ export interface Invoice {
         email: string;
         vat_number: string;
     };
-    client: {
+    Client: {
         client_id: number;
         first_name: string;
         last_name: string;
@@ -25,11 +25,11 @@ export interface Invoice {
         city: string;
         postal_code: string;
     };
-    items: Item[];
+    InvoiceItems: Item[];
     status: string;
     total_amount: number;
     due_date: Date;
-    payments: {
+    Payments: {
         payment_method: "cash" | "credit_card" | "bank_transfer";
         amount: number;
         payment_date: Date;

@@ -86,10 +86,10 @@ export default function TableInvoices({ invoices, search }: Props) {
                                 {invoice.invoice_id || "N/A"}
                             </TableCell>
                             <TableCell className="min-w-[120px]">
-                                {invoice.client.first_name || "N/A"}
+                                {invoice.Client.first_name || "N/A"}
                             </TableCell>
                             <TableCell className="min-w-[120px]">
-                                {invoice.client.last_name || "N/A"}
+                                {invoice.Client.last_name || "N/A"}
                             </TableCell>
                             <TableCell className="min-w-[120px]">
                                 <Badge
@@ -107,7 +107,7 @@ export default function TableInvoices({ invoices, search }: Props) {
                                 </Badge>
                             </TableCell>
                             <TableCell className="min-w-[120px]">
-                                {invoice?.items?.length || 0}
+                                {invoice?.InvoiceItems?.length || 0}
                             </TableCell>
                             <TableCell className="min-w-[120px]">
                                 {formatAmount(invoice.total_amount, {
