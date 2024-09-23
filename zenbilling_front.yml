@@ -7,7 +7,7 @@ services:
         ports:
             - "3000:3000"
         environment:
-            - NEXT_PUBLIC_API_URL=http://212.132.111.107:8080
+            - NEXT_PUBLIC_API_URL=https://zenbillingapi.dynamicwebforge.fr
         networks:
             - app-network
 

@@ -12,7 +12,7 @@ RUN npm install --verbose
 # Copier le reste du code source de l'application
 COPY . .
 
-ENV NEXT_PUBLIC_API_URL=http://212.132.111.107:8080
+ENV NEXT_PUBLIC_API_URL=https://zenbillingapi.dynamicwebforge.fr
 
 # Construire l'application
 RUN npm run build
