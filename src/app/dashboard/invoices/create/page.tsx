@@ -42,6 +42,11 @@ export default function Page({}: Props) {
     const [date, setDate] = useState<Date>(new Date());
 
     const handleCreateInvoice = async () => {
+        const localDate = new Date(
+            date.getTime() - date.getTimezoneOffset() * 60000
+        );
+        const isoDate = localDate.toISOString().split("T")[0]; // Garde seulement la partie date sans l'heure
+
         try {
             const response = await fetch(
                 `${process.env.NEXT_PUBLIC_API_URL}/api/invoices`,
@@ -52,7 +57,7 @@ export default function Page({}: Props) {
                         Authorization: `Bearer ${getCookie("token")}`,
                     },
                     body: JSON.stringify({
-                        due_date: new Date(),
+                        due_date: isoDate,
                         client_id: selectedCustomer?.client_id,
                         items,
                     }),

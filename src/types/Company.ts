@@ -9,4 +9,5 @@ export interface Company {
     phone: string;
     email: string;
     vat_number: string;
+    siret_number: string;
 }

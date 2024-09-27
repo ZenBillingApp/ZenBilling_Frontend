@@ -51,6 +51,7 @@ export default function SignupPage() {
             email: "",
             phone: "",
             vat_number: "",
+            siret_number: "",
         },
         is_freelancer: false,
     });
@@ -460,6 +461,22 @@ export default function SignupPage() {
                                         )}
                                         type="text"
                                         value={user.company.vat_number}
+                                        onChange={handleChange}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="company.siret_number">
+                                        {t("register.company_siret_number")}
+                                    </Label>
+                                    <Input
+                                        required
+                                        id="company.siret_number"
+                                        name="company.siret_number"
+                                        placeholder={t(
+                                            "register.company_siret_number_placeholder"
+                                        )}
+                                        type="text"
+                                        value={user.company.siret_number}
                                         onChange={handleChange}
                                     />
                                 </div>
