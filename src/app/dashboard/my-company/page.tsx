@@ -264,20 +264,38 @@ const EditCompanyDialog = ({
                     />
                 </div>
                 <div className="flex flex-col w-full gap-2">
-                    <Label>VAT Number</Label>
-                    <Input
-                        type="text"
-                        value={editCompany?.vat_number || ""}
-                        onChange={(e) =>
-                            setEditCompany(
-                                (prev) =>
-                                    prev && {
-                                        ...prev,
-                                        vat_number: e.target.value,
-                                    }
-                            )
-                        }
-                    />
+                    <div className="flex flex-col gap-2">
+                        <Label>VAT Number</Label>
+                        <Input
+                            type="text"
+                            value={editCompany?.vat_number || ""}
+                            onChange={(e) =>
+                                setEditCompany(
+                                    (prev) =>
+                                        prev && {
+                                            ...prev,
+                                            vat_number: e.target.value,
+                                        }
+                                )
+                            }
+                        />
+                    </div>
+                    <div className="flex flex-col gap-2">
+                        <Label>SIRET Number</Label>
+                        <Input
+                            type="text"
+                            value={editCompany?.siret_number || ""}
+                            onChange={(e) =>
+                                setEditCompany(
+                                    (prev) =>
+                                        prev && {
+                                            ...prev,
+                                            siret_number: e.target.value,
+                                        }
+                                )
+                            }
+                        />
+                    </div>
                 </div>
 
                 <CredenzaFooter>
@@ -467,6 +485,12 @@ export default function MyCompanyPage({}: Props) {
                                                     VAT Number:
                                                 </span>{" "}
                                                 {company?.vat_number}
+                                            </div>
+                                            <div>
+                                                <span className="font-semibold">
+                                                    SIRET Number:
+                                                </span>{" "}
+                                                {company?.siret_number}
                                             </div>
                                         </div>
                                     </CardContent>
