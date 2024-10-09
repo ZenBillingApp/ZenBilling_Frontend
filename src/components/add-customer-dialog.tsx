@@ -84,7 +84,7 @@ export default function AddCustomerDialog({ trigger, onAdd }: Props) {
               {errorMessage && (
                 <Alert variant="destructive">
                   <AlertTriangle className="w-5 h-5" />
-                  <AlertTitle>Une erreur s'est produite</AlertTitle>
+                  <AlertTitle>Une erreur s&apos;est produite</AlertTitle>
                   <AlertDescription>
                     {errorMessage && errorMessage.length > 0 ? (
                       <ul>
