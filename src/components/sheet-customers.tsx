@@ -56,7 +56,7 @@ export default function SheetCustomers({
     }, [data]);
 
     const onAdd = async (newCustomer: Customer) => {
-        try {
+
             const response = await fetch(
                 process.env.NEXT_PUBLIC_API_URL + "/api/customers",
                 {
@@ -69,14 +69,18 @@ export default function SheetCustomers({
                 }
             );
             if (!response.ok) {
-                throw new Error("Failed to add customer");
-            }
+                const errorText = await response.json();
+                const errorMessages =  errorText.message || errorText?.errors
+                .map((error: any) => error.msg)
+                .join("\n");
+
+                  console.log(errorMessages);
+          
+                throw new Error(errorMessages || errorText.message || "Failed to add customer");
+              }
 
             const data = await response.json();
             setCustomers((prev) => [data, ...prev]);
-        } catch (error) {
-            console.error(error);
-        }
     };
 
     return (

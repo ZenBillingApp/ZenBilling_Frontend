@@ -19,152 +19,148 @@ import { PiPlus } from "react-icons/pi";
 type Props = {};
 
 export default function Page({}: Props) {
-    const router = useRouter();
-    const t = useTranslations();
+  const router = useRouter();
+  const t = useTranslations();
 
-    const [customers, setCustomers] = React.useState<Customer[]>([]);
-    const [search, setSearch] = React.useState<string>("");
-    const [loading, setLoading] = React.useState<boolean>(true);
-    const [error, setError] = React.useState<boolean>(false);
+  const [customers, setCustomers] = React.useState<Customer[]>([]);
+  const [search, setSearch] = React.useState<string>("");
+  const [loading, setLoading] = React.useState<boolean>(true);
+  const [error, setError] = React.useState<boolean>(false);
 
-    const onAdd = async (newCustomer: Customer) => {
-        try {
-            setLoading(true);
-            const response = await fetch(
-                process.env.NEXT_PUBLIC_API_URL + "/api/customers",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${getCookie("token")}`,
-                    },
-                    body: JSON.stringify(newCustomer),
-                }
-            );
-            if (!response.ok) {
-                throw new Error("Failed to add customer");
-            }
+  const onAdd = async (newCustomer: Customer) => {
+    const response = await fetch(
+      process.env.NEXT_PUBLIC_API_URL + "/api/customers",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${getCookie("token")}`,
+        },
+        body: JSON.stringify(newCustomer),
+      }
+    );
 
-            const data = await response.json();
-            console.log(data);
-            fetchCustomers();
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setLoading(false);
-        }
-    };
+    if (!response.ok) {
+      const errorText = await response.json();
+      const errorMessages =
+        errorText.message ||
+        errorText?.errors.map((error: any) => error.msg).join("\n");
 
-    const fetchCustomers = React.useCallback(async () => {
-        try {
-            setLoading(true);
-            setError(false);
-            const response = await fetch(
-                process.env.NEXT_PUBLIC_API_URL +
-                    "/api/customers?" +
-                    `${search ? `search=${search}` : ""}`,
-                {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${getCookie("token")}`,
-                    },
-                }
-            );
-            if (!response.ok) {
-                throw new Error("Failed to fetch invoices");
-            }
+      console.log(errorMessages);
 
-            const data = await response.json();
-            setCustomers(data);
-            console.log(data);
-        } catch (error) {
-            console.error(error);
-            setError(true);
-        } finally {
-            setLoading(false);
-        }
-    }, [search]);
-
-    React.useEffect(() => {
-        const delayDebounceFn = setTimeout(() => {
-            fetchCustomers();
-        }, 300);
-
-        return () => clearTimeout(delayDebounceFn);
-    }, [fetchCustomers]);
-
-    const handleSelectCustomer = (customerId: number) => {
-        router.push(`/dashboard/customers/${customerId}`);
-    };
-
-    if (error) {
-        console.error("Error fetching data");
-        return (
-            <div className="flex flex-col w-full h-full justify-center items-center gap-6">
-                <Image
-                    src={"/assets/illustrations/illu_error.svg"}
-                    width={200}
-                    height={200}
-                    alt="Error"
-                />
-                <h1 className="text-2xl font-semibold">
-                    {t("common.common_error_fetch_message")}
-                </h1>
-                <Button onClick={fetchCustomers}>
-                    {t("common.common_retry")}
-                </Button>
-            </div>
-        );
+      throw new Error(
+        errorMessages || errorText.message || "Failed to add customer"
+      );
     }
 
+    const data = await response.json();
+    console.log(data);
+    fetchCustomers();
+  };
+
+  const fetchCustomers = React.useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(false);
+      const response = await fetch(
+        process.env.NEXT_PUBLIC_API_URL +
+          "/api/customers?" +
+          `${search ? `search=${search}` : ""}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${getCookie("token")}`,
+          },
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch invoices");
+      }
+
+      const data = await response.json();
+      setCustomers(data);
+      console.log(data);
+    } catch (error) {
+      console.error(error);
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
+  }, [search]);
+
+  React.useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      fetchCustomers();
+    }, 300);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [fetchCustomers]);
+
+  const handleSelectCustomer = (customerId: number) => {
+    router.push(`/dashboard/customers/${customerId}`);
+  };
+
+  if (error) {
+    console.error("Error fetching data");
     return (
-        <ContentLayout title={t("customers.customers")}>
-            <div className="flex flex-col w-full h-full gap-6">
-                <div className="flex flex-col gap-10">
-                    <div className="flex items-center justify-between">
-                        <h1 className="text-2xl font-semibold">
-                            {t("customers.customers")}
-                        </h1>
-                        <AddCustomerDialog
-                            trigger={
-                                <Button
-                                    variant="default"
-                                    className="flex items-center gap-2"
-                                >
-                                    <PiPlus size={20} />
-                                    {t("customers.customer_add")}
-                                </Button>
-                            }
-                            onAdd={onAdd}
-                        />
-                    </div>
-                    <div className="flex flex-col w-full gap-6">
-                        <div className="flex flex-col gap-6 xl:flex-row xl:justify-between">
-                            <div className="flex w-full py-2 gap-6 xl:w-2/6">
-                                <Input
-                                    type="text"
-                                    placeholder={t(
-                                        "customers.customer_table_search_placeholder"
-                                    )}
-                                    value={search}
-                                    onChange={(e) => setSearch(e.target.value)}
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {loading ? (
-                    <div className="flex justify-center items-center w-full h-full ">
-                        <ClipLoader color="#009933" size={50} />
-                    </div>
-                ) : (
-                    <TableCustomers
-                        customers={customers}
-                        handleSelectCustomer={handleSelectCustomer}
-                    />
-                )}
-            </div>
-        </ContentLayout>
+      <div className="flex flex-col w-full h-full justify-center items-center gap-6">
+        <Image
+          src={"/assets/illustrations/illu_error.svg"}
+          width={200}
+          height={200}
+          alt="Error"
+        />
+        <h1 className="text-2xl font-semibold">
+          {t("common.common_error_fetch_message")}
+        </h1>
+        <Button onClick={fetchCustomers}>{t("common.common_retry")}</Button>
+      </div>
     );
+  }
+
+  return (
+    <ContentLayout title={t("customers.customers")}>
+      <div className="flex flex-col w-full h-full gap-6">
+        <div className="flex flex-col gap-10">
+          <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-semibold">
+              {t("customers.customers")}
+            </h1>
+            <AddCustomerDialog
+              trigger={
+                <Button variant="default" className="flex items-center gap-2">
+                  <PiPlus size={20} />
+                  {t("customers.customer_add")}
+                </Button>
+              }
+              onAdd={(newCustomer) => onAdd(newCustomer)}
+            />
+          </div>
+          <div className="flex flex-col w-full gap-6">
+            <div className="flex flex-col gap-6 xl:flex-row xl:justify-between">
+              <div className="flex w-full py-2 gap-6 xl:w-2/6">
+                <Input
+                  type="text"
+                  placeholder={t("customers.customer_table_search_placeholder")}
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        {loading ? (
+          <div className="flex justify-center items-center w-full h-full ">
+            <ClipLoader color="#009933" size={50} />
+          </div>
+        ) : (
+          <TableCustomers
+            customers={customers}
+            handleSelectCustomer={handleSelectCustomer}
+          />
+        )}
+      </div>
+    </ContentLayout>
+  );
 }

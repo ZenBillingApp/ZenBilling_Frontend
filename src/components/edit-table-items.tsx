@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useTranslations } from "next-intl";
 
 import { Item } from "@/types/Item";
@@ -56,6 +56,10 @@ export default function EditTableItems({ items, handleOnSaveItems }: Props) {
             },
         ]);
     };
+
+    useEffect(() => {
+        setNewItems(items);
+    }, [items]);
 
     return (
         <>

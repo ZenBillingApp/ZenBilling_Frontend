@@ -73,8 +73,15 @@ const EditCompanyDialog = ({
                     }
                 );
                 if (!response.ok) {
-                    throw new Error("Failed to update company");
-                }
+                    const errorText = await response.json();
+                    const errorMessages =  errorText.message || errorText?.errors
+                    .map((error: any) => error.msg)
+                    .join("\n");
+    
+                      console.log(errorMessages);
+              
+                    throw new Error(errorMessages || errorText.message || "Failed to add customer");
+                  }
 
                 const updatedCompany = await response.json();
                 onSave(updatedCompany);
