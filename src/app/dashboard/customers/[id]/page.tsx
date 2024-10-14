@@ -2,7 +2,6 @@
 import React from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { getCookie } from "cookies-next";
 
 import { Customer } from "@/types/Customer";
 
@@ -19,6 +18,7 @@ import TableInvoices from "@/components/tableInvoices";
 import { ContentLayout } from "@/components/admin-panel/content-layout";
 import AlertDialog from "@/components/alert-dialog";
 import EditCustomerDialog from "@/components/edit-customer-dialog";
+import { useToast } from "@/components/ui/use-toast";
 
 import {
   BarChart,
@@ -34,12 +34,14 @@ import { AlertTriangle } from "lucide-react";
 import { ClipLoader } from "react-spinners";
 
 import { cn } from "@/lib/utils";
+import api from "@/lib/axios";
 
 type Props = {};
 
 export default function Page({}: Props) {
   const { id } = useParams();
   const router = useRouter();
+  const { toast } = useToast();
 
   const t = useTranslations();
 
@@ -49,86 +51,40 @@ export default function Page({}: Props) {
     Array<{ month: string; amount: number }>
   >([]);
 
-  const onDelete = async () => {
+  const handleOnDelete = async () => {
     try {
       setLoading(true);
-      const response = await fetch(
-        process.env.NEXT_PUBLIC_API_URL + `/api/customers/${id}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${getCookie("token")}`,
-          },
-        }
-      );
-      if (!response.ok) {
-        throw new Error("Failed to delete customer");
-      }
-
-      router.push("/dashboard/customers");
+      await api.delete(`/customers/${id}`);
+      toast({
+        title: "Client supprimé",
+        description: "Le client a été supprimé avec succès",
+      });
     } catch (error) {
       console.error(error);
+      toast({
+        variant: "destructive",
+        title: "Une erreur s'est produite",
+        description: "Impossible de supprimer le client",
+      });
     } finally {
-      setLoading(false);
+      router.push("/dashboard/customers");
     }
-  };
-
-  const handleOnEdit = async (editCustomer: Customer) => {
-    const response = await fetch(
-      process.env.NEXT_PUBLIC_API_URL +
-        `/api/customers/${editCustomer.client_id}`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${getCookie("token")}`,
-        },
-        body: JSON.stringify(editCustomer),
-      }
-    );
-    if (!response.ok) {
-      const errorText = await response.json();
-      const errorMessages =
-        errorText.message ||
-        errorText?.errors.map((error: any) => error.msg).join("\n");
-
-      throw new Error(
-        errorMessages || errorText.message || "Failed to add customer"
-      );
-    }
-    const updatedCustomer = await response.json();
-    setCustomer(updatedCustomer);
   };
 
   React.useEffect(() => {
     const fetchMonthlyInvoice = async () => {
       try {
-        const response = await fetch(
-          process.env.NEXT_PUBLIC_API_URL +
-            `/api/customers/${id}/monthly-revenue`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${getCookie("token")}`,
-            },
-          }
-        );
-        if (!response.ok) {
-          throw new Error("Failed to fetch monthly invoice");
-        }
-
-        const data = await response.json();
-        const formattedData = Object.entries(data.monthlyRevenue).map(
-          ([month, amount]) => ({
-            month,
-            amount,
-          })
-        );
-        setMonthlyInvoice(formattedData as any);
+        const response = await api.get(`/customers/${id}/monthly-revenue`);
+        setMonthlyInvoice(response.data);
       } catch (error) {
         console.error(error);
+        toast({
+          variant: "destructive",
+          title: "Une erreur s'est produite",
+          description: "Impossible de charger les revenus mensuels",
+        });
+      } finally {
+        setLoading(false);
       }
     };
     fetchMonthlyInvoice();
@@ -137,61 +93,18 @@ export default function Page({}: Props) {
   React.useEffect(() => {
     const fetchCustomer = async () => {
       try {
-        const response = await fetch(
-          process.env.NEXT_PUBLIC_API_URL + `/api/customers/${id}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${getCookie("token")}`,
-            },
-          }
-        );
-        if (!response.ok) {
-          throw new Error("Failed to fetch customer");
-        }
-
-        const data = await response.json();
-        setCustomer(data);
+        const response = await api.get(`/customers/${id}`);
+        setCustomer(response.data);
       } catch (error) {
         console.error(error);
-      } finally {
-        setLoading(false);
+        toast({
+          variant: "destructive",
+          title: "Une erreur s'est produite",
+          description: "Impossible de charger les informations du client",
+        });
       }
     };
     fetchCustomer();
-  }, [id]);
-
-  React.useEffect(() => {
-    const fetchCustomerInvoices = async () => {
-      try {
-        const response = await fetch(
-          process.env.NEXT_PUBLIC_API_URL + `/api/customers/${id}/invoices`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${getCookie("token")}`,
-            },
-          }
-        );
-        if (!response.ok) {
-          throw new Error("Failed to fetch customer invoices");
-        }
-
-        const data = await response.json();
-        setCustomer(
-          (prev) =>
-            prev && {
-              ...prev,
-              invoices: data,
-            }
-        );
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    fetchCustomerInvoices();
   }, [id]);
 
   return (
@@ -222,7 +135,6 @@ export default function Page({}: Props) {
                     </Button>
                   }
                   customer={customer}
-                  onModify={handleOnEdit}
                 />
 
                 <AlertDialog
@@ -238,7 +150,7 @@ export default function Page({}: Props) {
                       {t("common.common_delete")}
                     </Button>
                   }
-                  handleOnConfirm={onDelete}
+                  handleOnConfirm={handleOnDelete}
                   title={t("customers.customer_delete")}
                   description={t("customers.customer_delete_confirm")}
                   confirmText={t("common.common_delete")}
@@ -336,7 +248,7 @@ export default function Page({}: Props) {
                     ) : (
                       <ResponsiveContainer width="100%" height={300}>
                         <BarChart data={monthlyInvoice}>
-                          <XAxis dataKey="month" name="Month" />
+                          <XAxis dataKey="month" />
                           <YAxis name="Amount" />
                           <Tooltip />
                           <Bar dataKey="amount" fill="#009933" />
@@ -355,7 +267,7 @@ export default function Page({}: Props) {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <TableInvoices invoices={customer?.invoices} search={""} />
+                <TableInvoices invoices={customer?.Invoices} search={""} />
               </CardContent>
             </Card>
           </>

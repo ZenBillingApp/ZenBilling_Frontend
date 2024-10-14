@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useTranslations } from "next-intl";
 
 import { Customer } from "@/types/Customer";
@@ -21,47 +21,45 @@ import {
 } from "@/components/ui/credenza";
 import { PhoneInput } from "@/components/ui/phone-input";
 import { ScrollArea } from "./ui/scroll-area";
-import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
-import { AlertTriangle } from "lucide-react";
+
+import api from "@/lib/axios";
 
 type Props = {
   trigger: React.ReactNode;
-  onAdd: (newCustomer: Customer) => Promise<void>;
 };
 
-export default function AddCustomerDialog({ trigger, onAdd }: Props) {
+export default function AddCustomerDialog({ trigger }: Props) {
+  const t = useTranslations();
+  const { toast } = useToast();
+
   const [open, setOpen] = React.useState<boolean>(false);
   const [newCustomer, setNewCustomer] = React.useState<Customer>(
     {} as Customer
   );
-  const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
   const [loading, setLoading] = React.useState<boolean>(false);
-  const t = useTranslations();
-
-  const { toast } = useToast();
 
   useEffect(() => {
     if (!open) {
       setNewCustomer({} as Customer);
-      setErrorMessage(null);
     }
   }, [open]);
 
   const handleOnAdd = async () => {
-    setLoading(true);
-    setErrorMessage(null);
     try {
-      await onAdd(newCustomer);
-      setNewCustomer({} as Customer);
+      setLoading(true);
+      await api.post("/customers", {
+        ...newCustomer,
+      });
+      toast({
+        title: "Client ajouté",
+        description: "Le client a été ajouté avec succès",
+      });
       setOpen(false);
     } catch (error) {
-      if (error instanceof Error) {
-        setErrorMessage(error.message);
-      }
       toast({
         variant: "destructive",
-        title: "Une erreur s'est produite",
-        description: "Une erreur s'est produite lors de l'ajout du client",
+        title: "Erreur",
+        description: "Une erreur s'est produite",
       });
     } finally {
       setLoading(false);
@@ -81,23 +79,6 @@ export default function AddCustomerDialog({ trigger, onAdd }: Props) {
               </CredenzaDescription>
             </CredenzaHeader>
             <CredenzaBody className="flex flex-col space-y-4">
-              {errorMessage && (
-                <Alert variant="destructive">
-                  <AlertTriangle className="w-5 h-5" />
-                  <AlertTitle>Une erreur s&apos;est produite</AlertTitle>
-                  <AlertDescription>
-                    {errorMessage && errorMessage.length > 0 ? (
-                      <ul>
-                        {errorMessage.split("\n").map((msg, index) => (
-                          <li key={index}>{msg}</li>
-                        ))}
-                      </ul>
-                    ) : (
-                      errorMessage
-                    )}
-                  </AlertDescription>
-                </Alert>
-              )}
               <div className="flex flex-col gap-2 sm:flex-row">
                 <div className="flex flex-col gap-2 sm:w-1/2">
                   <Label htmlFor="first_name">

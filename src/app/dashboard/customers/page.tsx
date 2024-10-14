@@ -1,9 +1,8 @@
 "use client";
 import React from "react";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { getCookie } from "cookies-next";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 
 import { Customer } from "@/types/Customer";
 
@@ -16,6 +15,8 @@ import TableCustomers from "@/components/table-customers";
 import { ClipLoader } from "react-spinners";
 import { PiPlus } from "react-icons/pi";
 
+import api from "@/lib/axios";
+
 type Props = {};
 
 export default function Page({}: Props) {
@@ -27,62 +28,17 @@ export default function Page({}: Props) {
   const [loading, setLoading] = React.useState<boolean>(true);
   const [error, setError] = React.useState<boolean>(false);
 
-  const onAdd = async (newCustomer: Customer) => {
-    const response = await fetch(
-      process.env.NEXT_PUBLIC_API_URL + "/api/customers",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${getCookie("token")}`,
-        },
-        body: JSON.stringify(newCustomer),
-      }
-    );
-
-    if (!response.ok) {
-      const errorText = await response.json();
-      const errorMessages =
-        errorText.message ||
-        errorText?.errors.map((error: any) => error.msg).join("\n");
-
-      console.log(errorMessages);
-
-      throw new Error(
-        errorMessages || errorText.message || "Failed to add customer"
-      );
-    }
-
-    const data = await response.json();
-    console.log(data);
-    fetchCustomers();
-  };
-
   const fetchCustomers = React.useCallback(async () => {
     try {
       setLoading(true);
       setError(false);
-      const response = await fetch(
-        process.env.NEXT_PUBLIC_API_URL +
-          "/api/customers?" +
-          `${search ? `search=${search}` : ""}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${getCookie("token")}`,
-          },
-        }
-      );
-      if (!response.ok) {
-        throw new Error("Failed to fetch invoices");
-      }
-
-      const data = await response.json();
-      setCustomers(data);
-      console.log(data);
+      const response = await api.get("/customers", {
+        params: {
+          search: search || undefined,
+        },
+      });
+      setCustomers(response.data);
     } catch (error) {
-      console.error(error);
       setError(true);
     } finally {
       setLoading(false);
@@ -134,7 +90,6 @@ export default function Page({}: Props) {
                   {t("customers.customer_add")}
                 </Button>
               }
-              onAdd={(newCustomer) => onAdd(newCustomer)}
             />
           </div>
           <div className="flex flex-col w-full gap-6">

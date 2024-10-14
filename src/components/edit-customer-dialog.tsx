@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
 
 import { Customer } from "@/types/Customer";
@@ -21,46 +20,40 @@ import {
 import { PhoneInput } from "@/components/ui/phone-input";
 import { ScrollArea } from "./ui/scroll-area";
 import { useToast } from "@/components/ui/use-toast";
-import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
-import { AlertTriangle } from "lucide-react";
+
+import api from "@/lib/axios";
 
 type Props = {
   trigger: React.ReactNode;
-  onModify: (newCustomer: Customer) => void;
   customer: Customer | null;
 };
 
-export default function EditCustomerDialog({
-  trigger,
-  onModify,
-  customer,
-}: Props) {
+export default function EditCustomerDialog({ trigger, customer }: Props) {
   const [open, setOpen] = React.useState<boolean>(false);
   const [newCustomer, setNewCustomer] = React.useState<Customer>(
     customer || ({} as Customer)
   );
   const [loading, setLoading] = React.useState<boolean>(false);
-  const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
 
   const t = useTranslations();
   const { toast } = useToast();
 
-  const handleOnModify = async () => {
-    setLoading(true);
-    setErrorMessage(null);
+  const handleOnEdit = async () => {
     try {
-      await onModify(newCustomer);
-      setNewCustomer({} as Customer);
+      setLoading(true);
+      const response = await api.put(`/customers/${newCustomer.client_id}`, {
+        ...newCustomer,
+      });
+      toast({
+        title: "Client modifié",
+        description: "Le client a été modifié avec succès",
+      });
       setOpen(false);
     } catch (error) {
-      if (error instanceof Error) {
-        setErrorMessage(error.message);
-      }
       toast({
         variant: "destructive",
-        title: "Une erreur s'est produite",
-        description:
-          "Une erreur s'est produite lors de la modification du client",
+        title: "Erreur",
+        description: "Une erreur s'est produite",
       });
     } finally {
       setLoading(false);
@@ -70,7 +63,6 @@ export default function EditCustomerDialog({
   useEffect(() => {
     if (!open) {
       setNewCustomer(customer || ({} as Customer));
-      setErrorMessage(null);
     }
   }, [open]);
 
@@ -87,21 +79,6 @@ export default function EditCustomerDialog({
               </CredenzaDescription>
             </CredenzaHeader>
             <CredenzaBody className="flex flex-col space-y-4">
-              {errorMessage && (
-                <Alert variant="destructive">
-                  <AlertTriangle className="w-5 h-5" />
-                  <AlertTitle>Une erreur s&apos;est produite</AlertTitle>
-                  <AlertDescription>
-                    {errorMessage && (
-                      <ul>
-                        {errorMessage.split("\n").map((msg, index) => (
-                          <li key={index}>{msg}</li>
-                        ))}
-                      </ul>
-                    )}
-                  </AlertDescription>
-                </Alert>
-              )}
               <div className="flex flex-col gap-2 sm:flex-row">
                 <div className="flex flex-col gap-2 sm:w-1/2">
                   <Label htmlFor="first_name">
@@ -272,7 +249,7 @@ export default function EditCustomerDialog({
                   {t("common.common_cancel")}
                 </Button>
               </CredenzaClose>
-              <Button onClick={handleOnModify} disabled={loading}>
+              <Button onClick={handleOnEdit} disabled={loading}>
                 {loading
                   ? t("customers.customer_update_loading")
                   : t("customers.customer_update")}

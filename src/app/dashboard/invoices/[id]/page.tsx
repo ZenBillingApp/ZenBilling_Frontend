@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { getCookie } from "cookies-next";
 
 import useFormattedAmount from "@/hooks/useFormattedAmount";
 import useFormattedDate from "@/hooks/useFormattedDate";
@@ -13,7 +12,6 @@ import { Item } from "@/types/Item";
 
 import SelectStatusInvoice from "@/components/selectStatusInvoice";
 import { Button } from "@/components/ui/button";
-import { Download } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { ToastAction } from "@/components/ui/toast";
@@ -26,7 +24,10 @@ import EditTableItems from "@/components/edit-table-items";
 
 import { ClipLoader } from "react-spinners";
 import { ChevronDownIcon } from "lucide-react";
+import { Download } from "lucide-react";
 import { MdOutlineEdit, MdDeleteOutline, MdClose } from "react-icons/md";
+
+import api from "@/lib/axios";
 
 type Props = {};
 
@@ -44,61 +45,43 @@ export default function Page({}: Props) {
   const [editOpen, setEditOpen] = useState(false);
 
   const handleChangeCustomer = async (customer: Customer) => {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/invoices/${id}`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${getCookie("token")}`,
-        },
-        body: JSON.stringify({ client_id: customer.client_id }),
-      }
-    );
-
-    if (!response.ok) {
-      const errorText = await response.json();
-      const errorMessages = errorText.errors
-        .map((error: any) => error.msg)
-        .join("\n");
-      throw new Error(
-        errorMessages ||
-          "une erreur s'est produite lors de la mise à jour du client"
-      );
+    try {
+      await api.put(`/invoices/${id}`, {
+        client_id: customer.client_id,
+      });
+      setInvoice((prev) => (prev ? { ...prev, Client: customer } : prev));
+    } catch (error) {
+      console.error(error);
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: "Échec de la mise à jour du client",
+        action: (
+          <ToastAction
+            altText="Retry"
+            onClick={() => handleChangeCustomer(customer)}
+          >
+            Réessayer
+          </ToastAction>
+        ),
+      });
     }
-    toast({
-      title: "Succés",
-      description: "Client mis à jour avec succès",
-    });
-    setInvoice((prev) => (prev ? { ...prev, Client: customer } : prev));
   };
 
   useEffect(() => {
     const fetchInvoiceDetails = async () => {
       try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/invoices/${id}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${getCookie("token")}`,
-            },
-          }
-        );
-        if (!response.ok) {
-          throw new Error(
-            "Une erreur s'est produite lors de la récupération des détails de la facture"
-          );
-        }
-
-        const data = await response.json();
-        setInvoice(data);
+        const response = await api.get(`/invoices/${id}`);
+        setInvoice(response.data);
       } catch (error) {
         console.error(error);
-      } finally {
-        setLoading(false);
+        toast({
+          variant: "destructive",
+          title: "Erreur",
+          description: "Échec du chargement des détails de la facture",
+        });
       }
+      setLoading(false);
     };
     fetchInvoiceDetails();
   }, [id]);
@@ -125,64 +108,35 @@ export default function Page({}: Props) {
 
   const handleDownload = async () => {
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/invoices/${id}/pdf`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${getCookie("token")}`,
-          },
-        }
-      );
+      const response = await api.get(`/invoices/${id}/pdf`, {
+        responseType: "blob",
+      });
 
-      if (!response.ok) {
-        throw new Error(
-          "Une erreur s'est produite lors du téléchargement de la facture"
-        );
-      }
-
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${invoice?.invoice_id}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `invoice_${id}.pdf`);
+      document.body.appendChild(link);
+      link.click();
     } catch (error) {
       console.error(error);
       toast({
         variant: "destructive",
         title: "Erreur",
         description: "Échec du téléchargement de la facture",
+        action: (
+          <ToastAction altText="Retry" onClick={handleDownload}>
+            Réessayer
+          </ToastAction>
+        ),
       });
     }
   };
 
   const handleChangeStatus = async (status: string) => {
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/invoices/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${getCookie("token")}`,
-          },
-          body: JSON.stringify({ status }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(
-          " Une erreur s'est produite lors de la mise à jour du statut de la facture"
-        );
-      }
-
-      toast({
-        title: "Succès",
-        description: "Statut de la facture mis à jour avec succès",
+      await api.put(`/invoices/${id}`, {
+        status,
       });
       setInvoice((prev) => (prev ? { ...prev, status } : prev));
     } catch (error) {
@@ -211,30 +165,11 @@ export default function Page({}: Props) {
     const isoDate = localDate.toISOString().split("T")[0]; // Garde seulement la partie date sans l'heure
 
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/invoices/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${getCookie("token")}`,
-          },
-          body: JSON.stringify({ due_date: isoDate }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(
-          "Une erreur s'est produite lors de la mise à jour de la date d'échéance"
-        );
-      }
-
-      toast({
-        title: "Succès",
-        description: "Date d'échéance mise à jour avec succès",
+      await api.put(`/invoices/${id}`, {
+        due_date: isoDate,
       });
       setInvoice((prev) =>
-        prev ? { ...prev, due_date: isoDate as unknown as Date } : prev
+        prev ? { ...prev, due_date: new Date(isoDate) } : prev
       );
     } catch (error) {
       console.error(error);
@@ -256,42 +191,17 @@ export default function Page({}: Props) {
 
   const handleSaveItems = async (items: Item[]) => {
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/invoices/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${getCookie("token")}`,
-          },
-          body: JSON.stringify({ items }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(
-          "Une erreur s'est produite lors de la mise à jour des articles"
-        );
-      }
-
-      const responseData = await response.json(); // Parse the response data
-
-      toast({
-        title: "Succès",
-        description: "Articles mis à jour avec succès",
+      await api.put(`/invoices/${id}`, {
+        items,
       });
-
-      setInvoice((prev) =>
-        prev ? { ...prev, InvoiceItems: responseData.InvoiceItems } : prev
-      );
-
+      setInvoice((prev) => (prev ? { ...prev, InvoiceItems: items } : prev));
       setEditOpen(false);
     } catch (error) {
       console.error(error);
       toast({
         variant: "destructive",
         title: "Erreur",
-        description: (error instanceof Error ? error.message : "Échec de la mise à jour des articles"),
+        description: "Échec de la mise à jour des articles de la facture",
         action: (
           <ToastAction altText="Retry" onClick={() => handleSaveItems(items)}>
             Réessayer
@@ -303,28 +213,8 @@ export default function Page({}: Props) {
 
   const HandleOnDelete = async () => {
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/invoices/${id}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${getCookie("token")}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(
-          "Une erreur s'est produite lors de la suppression de la facture"
-        );
-      }
-
+      await api.delete(`/invoices/${id}`);
       router.push("/dashboard/invoices");
-      toast({
-        title: "Succès",
-        description: "Facture supprimée avec succès",
-      });
     } catch (error) {
       console.error(error);
       toast({

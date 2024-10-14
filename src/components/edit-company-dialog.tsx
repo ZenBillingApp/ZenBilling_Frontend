@@ -1,0 +1,277 @@
+import React from "react";
+
+import { Company } from "@/types/Company";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Credenza,
+  CredenzaContent,
+  CredenzaFooter,
+  CredenzaHeader,
+  CredenzaTitle,
+  CredenzaTrigger,
+  CredenzaClose,
+  CredenzaDescription,
+} from "@/components/ui/credenza";
+import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+
+import { AlertTriangle } from "lucide-react";
+import { MdOutlineEdit } from "react-icons/md";
+
+type Props = {
+  company: Company | null;
+  onSave: (updatedCompany: Company) => void;
+};
+
+export default function ({ company, onSave }: Props) {
+  const [editCompany, setEditCompany] = React.useState<Company | null>(company);
+  const [loading, setLoading] = React.useState<boolean>(false);
+  const [open, setOpen] = React.useState<boolean>(false);
+  const [error, setError] = React.useState<boolean>(false);
+
+  const onClose = () => {
+    setOpen(false);
+  };
+
+  return (
+    <Credenza open={open} onOpenChange={setOpen}>
+      <CredenzaTrigger>
+        <Button
+          className="flex items-center gap-2"
+          onClick={() => setOpen(true)}
+        >
+          <MdOutlineEdit size={20} />
+          Modify
+        </Button>
+      </CredenzaTrigger>
+      <CredenzaContent className="h-[80vh] overflow-auto">
+        <CredenzaHeader>
+          <CredenzaTitle>Modify Company Profile</CredenzaTitle>
+        </CredenzaHeader>
+        <CredenzaDescription>
+          <p>Change your company information</p>
+        </CredenzaDescription>
+        {error && (
+          <Alert variant="destructive">
+            <AlertTriangle className="w-5 h-5" />
+            <AlertTitle>Failed to update company</AlertTitle>
+            <AlertDescription>
+              Please check your information and try again.
+            </AlertDescription>
+          </Alert>
+        )}
+        <div className="flex flex-col w-full gap-2">
+          <Label>Company Name</Label>
+          <Input
+            type="text"
+            value={editCompany?.name || ""}
+            onChange={(e) =>
+              setEditCompany(
+                (prev) =>
+                  prev && {
+                    ...prev,
+                    name: e.target.value,
+                  }
+              )
+            }
+          />
+        </div>
+        <div className="flex flex-col w-full gap-2">
+          <Label>Industry</Label>
+          <Input
+            type="text"
+            value={editCompany?.industry || ""}
+            onChange={(e) =>
+              setEditCompany(
+                (prev) =>
+                  prev && {
+                    ...prev,
+                    industry: e.target.value,
+                  }
+              )
+            }
+          />
+        </div>
+        <div className="flex flex-col w-full gap-2">
+          <Label>Street Address</Label>
+          <Input
+            type="text"
+            value={editCompany?.street_address || ""}
+            onChange={(e) =>
+              setEditCompany(
+                (prev) =>
+                  prev && {
+                    ...prev,
+                    street_address: e.target.value,
+                  }
+              )
+            }
+          />
+        </div>
+        <div className="flex gap-2">
+          <div className="flex flex-col w-1/2 gap-2">
+            <Label>City</Label>
+            <Input
+              type="text"
+              value={editCompany?.city || ""}
+              onChange={(e) =>
+                setEditCompany(
+                  (prev) =>
+                    prev && {
+                      ...prev,
+                      city: e.target.value,
+                    }
+                )
+              }
+            />
+          </div>
+          <div className="flex flex-col w-1/2 gap-2">
+            <Label>State</Label>
+            <Input
+              type="text"
+              value={editCompany?.state || ""}
+              onChange={(e) =>
+                setEditCompany(
+                  (prev) =>
+                    prev && {
+                      ...prev,
+                      state: e.target.value,
+                    }
+                )
+              }
+            />
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <div className="flex flex-col w-1/2 gap-2">
+            <Label>Postal Code</Label>
+            <Input
+              type="text"
+              value={editCompany?.postal_code || ""}
+              onChange={(e) =>
+                setEditCompany(
+                  (prev) =>
+                    prev && {
+                      ...prev,
+                      postal_code: e.target.value,
+                    }
+                )
+              }
+            />
+          </div>
+          <div className="flex flex-col w-1/2 gap-2">
+            <Label>Country</Label>
+            <Input
+              type="text"
+              value={editCompany?.country || ""}
+              onChange={(e) =>
+                setEditCompany(
+                  (prev) =>
+                    prev && {
+                      ...prev,
+                      country: e.target.value,
+                    }
+                )
+              }
+            />
+          </div>
+        </div>
+        <div className="flex flex-col w-full gap-2">
+          <Label>Email</Label>
+          <Input
+            type="email"
+            value={editCompany?.email || ""}
+            onChange={(e) =>
+              setEditCompany(
+                (prev) =>
+                  prev && {
+                    ...prev,
+                    email: e.target.value,
+                  }
+              )
+            }
+          />
+        </div>
+        <div className="flex flex-col w-full gap-2">
+          <Label>Phone</Label>
+          <Input
+            type="tel"
+            value={editCompany?.phone || ""}
+            onChange={(e) =>
+              setEditCompany(
+                (prev) =>
+                  prev && {
+                    ...prev,
+                    phone: e.target.value,
+                  }
+              )
+            }
+          />
+        </div>
+        <div className="flex flex-col w-full gap-2">
+          <div className="flex flex-col gap-2">
+            <Label>VAT Number</Label>
+            <Input
+              type="text"
+              value={editCompany?.vat_number || ""}
+              onChange={(e) =>
+                setEditCompany(
+                  (prev) =>
+                    prev && {
+                      ...prev,
+                      vat_number: e.target.value,
+                    }
+                )
+              }
+            />
+          </div>
+          <div className="flex flex-col gap-2">
+            <Label>SIRET Number</Label>
+            <Input
+              type="text"
+              value={editCompany?.siret_number || ""}
+              onChange={(e) =>
+                setEditCompany(
+                  (prev) =>
+                    prev && {
+                      ...prev,
+                      siret_number: e.target.value,
+                    }
+                )
+              }
+            />
+          </div>
+        </div>
+
+        <CredenzaFooter>
+          <Button
+            disabled={
+              !editCompany?.name ||
+              !editCompany?.industry ||
+              !editCompany?.email ||
+              !editCompany?.phone ||
+              !editCompany?.street_address ||
+              !editCompany?.city ||
+              !editCompany?.state ||
+              !editCompany?.postal_code ||
+              !editCompany?.country ||
+              !editCompany?.vat_number ||
+              loading
+            }
+            onClick={() => {}}
+          >
+            {loading ? "Saving..." : "Save"}
+          </Button>
+
+          <CredenzaClose asChild>
+            <Button variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+          </CredenzaClose>
+        </CredenzaFooter>
+      </CredenzaContent>
+    </Credenza>
+  );
+}
