@@ -70,16 +70,7 @@ export default function SheetCustomers({
   }, [data]);
 
   const onAdd = async (newCustomer: Customer) => {
-    try {
-      const response = await api.post("/customers", newCustomer, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      setCustomers([...customers, response.data]);
-    } catch (error) {
-      console.log(error);
-    }
+    setCustomers([...customers, newCustomer]);
   };
 
   return (
@@ -106,6 +97,7 @@ export default function SheetCustomers({
                     <MdAdd size={20} />
                   </Button>
                 }
+                onSave={onAdd}
               />
             </div>
           </SheetDescription>

@@ -85,7 +85,7 @@ export default function Page({ params: { locale } }: Props) {
             alt="Error"
           />
           <h1 className="text-2xl font-semibold">
-            Une erreur s'est produite lors du chargement des données
+            Une erreur s&apos;est produite lors du chargement des données
           </h1>
           <Button onClick={fetchData}>Réessayer</Button>
         </div>

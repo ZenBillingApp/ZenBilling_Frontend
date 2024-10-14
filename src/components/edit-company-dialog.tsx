@@ -115,7 +115,7 @@ const CompanyEditor: React.FC<Props> = ({ company, onSave }) => {
           <Alert variant="destructive">
             <AlertTriangle className="w-5 h-5" />
             <AlertTitle>
-              Une erreur s'est produite lors de la sauvegarde
+              Une erreur s&apos;est produite lors de la sauvegarde
             </AlertTitle>
             <AlertDescription>
               {typeof error === "string"
@@ -125,7 +125,7 @@ const CompanyEditor: React.FC<Props> = ({ company, onSave }) => {
           </Alert>
         )}
         <div className="flex flex-col w-full gap-2">
-          <Label>Nom de l'entreprise</Label>
+          <Label>Nom de l&apos;entreprise</Label>
           <Input
             type="text"
             value={editCompany?.name || ""}
@@ -137,7 +137,7 @@ const CompanyEditor: React.FC<Props> = ({ company, onSave }) => {
           />
         </div>
         <div className="flex flex-col w-full gap-2">
-          <Label>Secteur d'activité</Label>
+          <Label>Secteur d&apos;activité</Label>
           <Input
             type="text"
             value={editCompany?.industry || ""}

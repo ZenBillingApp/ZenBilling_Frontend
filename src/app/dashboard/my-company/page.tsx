@@ -68,19 +68,19 @@ export default function MyCompanyPage({}: Props) {
               <div className="flex w-full flex-col justify-center p-4 gap-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Informations de l'entreprise</CardTitle>
+                    <CardTitle>Informations de l&apos;entreprise</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="flex flex-col gap-2">
                       <div>
                         <span className="font-semibold">
-                          Nom de l'entreprise:&nbsp;
+                          Nom de l&apos;entreprise:&nbsp;
                         </span>
                         {company?.name}
                       </div>
                       <div>
                         <span className="font-semibold">
-                          Secteur d'activité:&nbsp;
+                          Secteur d&apos;activité:&nbsp;
                         </span>
                         {company?.industry}
                       </div>
@@ -99,7 +99,7 @@ export default function MyCompanyPage({}: Props) {
                 </Card>
                 <Card>
                   <CardHeader>
-                    <CardTitle>Adresse de l'entreprise</CardTitle>
+                    <CardTitle>Adresse de l&apos;entreprise</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="flex flex-col gap-2">

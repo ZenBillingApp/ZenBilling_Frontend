@@ -82,7 +82,7 @@ export default function Login() {
               <AlertTitle>{t("login.login_error")}</AlertTitle>
               <AlertDescription>
                 {Array.isArray(error) ? (
-                  error.map((e) => <p>{e.msg}</p>)
+                  error.map((e) => <p key={e.msg}>{e.msg}</p>)
                 ) : (
                   <p>{error}</p>
                 )}

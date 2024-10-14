@@ -9,123 +9,116 @@ import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
 import useFormattedAmount from "@/hooks/useFormattedAmount";
 import useFormattedDate from "@/hooks/useFormattedDate";
 
 type Props = {
-    invoices: Invoice[] | undefined;
-    search: string | null | undefined;
+  invoices: Invoice[] | undefined;
+  search: string | null | undefined;
 };
 
 export default function TableInvoices({ invoices, search }: Props) {
-    const t = useTranslations();
-    const router = useRouter();
-    const { formatAmount } = useFormattedAmount();
-    const { formatDate } = useFormattedDate();
-    const handleSelectInvoice = (invoiceId: number) => {
-        router.push(`/dashboard/invoices/${invoiceId}`);
-    };
-    return (
-        <Table>
-            <TableHeader>
-                <TableRow>
-                    <TableHead className="min-w-[120px]">
-                        {t("invoices.invoice_table_header_invoice_number")}
-                    </TableHead>
-                    <TableHead className="min-w-[120px]">
-                        {t("invoices.invoice_table_header_first_name")}
-                    </TableHead>
-                    <TableHead className="min-w-[120px]">
-                        {t("invoices.invoice_table_header_last_name")}
-                    </TableHead>
-                    <TableHead className="min-w-[120px]">
-                        {t("invoices.invoice_table_header_status")}
-                    </TableHead>
-                    <TableHead className="min-w-[120px]">
-                        {t("invoices.invoice_table_header_items")}
-                    </TableHead>
-                    <TableHead className="min-w-[120px]">
-                        {t("invoices.invoice_table_header_amount")}
-                    </TableHead>
-                    <TableHead className="min-w-[150px]">
-                        {t("invoices.invoice_table_header_invoice_date")}
-                    </TableHead>
-                    <TableHead className="min-w-[150px]">
-                        {t("invoices.invoice_table_header_due_date")}
-                    </TableHead>
-                </TableRow>
-            </TableHeader>
-            <TableBody>
-                {invoices?.length === 0 ? (
-                    <TableRow>
-                        <TableCell colSpan={8} className="text-center">
-                            {search
-                                ? t("invoices.invoice_table_no_invoices")
-                                : t(
-                                      "invoices.invoice_table_no_invoices_description"
-                                  )}
-                        </TableCell>
-                    </TableRow>
-                ) : (
-                    invoices?.map((invoice) => (
-                        <TableRow
-                            key={invoice.invoice_id}
-                            onClick={() =>
-                                handleSelectInvoice(invoice.invoice_id)
-                            }
-                            className="cursor-pointer"
-                        >
-                            <TableCell className="min-w-[120px]">
-                                {invoice.invoice_id || "N/A"}
-                            </TableCell>
-                            <TableCell className="min-w-[120px]">
-                                {invoice.Client.first_name || "N/A"}
-                            </TableCell>
-                            <TableCell className="min-w-[120px]">
-                                {invoice.Client.last_name || "N/A"}
-                            </TableCell>
-                            <TableCell className="min-w-[120px]">
-                                <Badge
-                                    className={cn(
-                                        invoice.status === "paid"
-                                            ? "bg-green-500 text-white hover:bg-green-600"
-                                            : invoice.status === "pending"
-                                            ? "bg-yellow-500 text-white hover:bg-yellow-600"
-                                            : "bg-red-500 text-white hover:bg-red-600"
-                                    )}
-                                >
-                                    {t(
-                                        `invoices.invoice_table_status_${invoice.status}`
-                                    ) || "N/A"}
-                                </Badge>
-                            </TableCell>
-                            <TableCell className="min-w-[120px]">
-                                {invoice?.InvoiceItems?.length || 0}
-                            </TableCell>
-                            <TableCell className="min-w-[120px]">
-                                {formatAmount(invoice.total_amount, {
-                                    currency: "EUR",
-                                })}
-                            </TableCell>
-                            <TableCell className="min-w-[150px]">
-                                {formatDate(new Date(invoice.invoice_date)) ||
-                                    "N/A"}
-                            </TableCell>
-                            <TableCell className="min-w-[150px]">
-                                {formatDate(new Date(invoice.due_date)) ||
-                                    "N/A"}
-                            </TableCell>
-                        </TableRow>
-                    ))
-                )}
-            </TableBody>
-        </Table>
-    );
+  const t = useTranslations();
+  const router = useRouter();
+  const { formatAmount } = useFormattedAmount();
+  const { formatDate } = useFormattedDate();
+  const handleSelectInvoice = (invoiceId: number) => {
+    router.push(`/dashboard/invoices/${invoiceId}`);
+  };
+  return (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead className="min-w-[120px]">
+            {t("invoices.invoice_table_header_invoice_number")}
+          </TableHead>
+          <TableHead className="min-w-[120px]">
+            {t("invoices.invoice_table_header_first_name")}
+          </TableHead>
+          <TableHead className="min-w-[120px]">
+            {t("invoices.invoice_table_header_last_name")}
+          </TableHead>
+          <TableHead className="min-w-[120px]">
+            {t("invoices.invoice_table_header_status")}
+          </TableHead>
+          <TableHead className="min-w-[120px]">
+            {t("invoices.invoice_table_header_items")}
+          </TableHead>
+          <TableHead className="min-w-[120px]">
+            {t("invoices.invoice_table_header_amount")}
+          </TableHead>
+          <TableHead className="min-w-[150px]">
+            {t("invoices.invoice_table_header_invoice_date")}
+          </TableHead>
+          <TableHead className="min-w-[150px]">
+            {t("invoices.invoice_table_header_due_date")}
+          </TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {invoices?.length === 0 ? (
+          <TableRow>
+            <TableCell colSpan={8} className="text-center">
+              {search
+                ? t("invoices.invoice_table_no_invoices")
+                : t("invoices.invoice_table_no_invoices_description")}
+            </TableCell>
+          </TableRow>
+        ) : (
+          invoices?.map((invoice) => (
+            <TableRow
+              key={invoice.invoice_id}
+              onClick={() => handleSelectInvoice(invoice.invoice_id)}
+              className="cursor-pointer"
+            >
+              <TableCell className="min-w-[120px]">
+                {invoice.invoice_id || "N/A"}
+              </TableCell>
+              <TableCell className="min-w-[120px]">
+                {invoice.Clients.first_name || "N/A"}
+              </TableCell>
+              <TableCell className="min-w-[120px]">
+                {invoice.Clients.last_name || "N/A"}
+              </TableCell>
+              <TableCell className="min-w-[120px]">
+                <Badge
+                  className={cn(
+                    invoice.status === "paid"
+                      ? "bg-green-500 text-white hover:bg-green-600"
+                      : invoice.status === "pending"
+                      ? "bg-yellow-500 text-white hover:bg-yellow-600"
+                      : "bg-red-500 text-white hover:bg-red-600"
+                  )}
+                >
+                  {t(`invoices.invoice_table_status_${invoice.status}`) ||
+                    "N/A"}
+                </Badge>
+              </TableCell>
+              <TableCell className="min-w-[120px]">
+                {invoice?.InvoiceItems?.length || 0}
+              </TableCell>
+              <TableCell className="min-w-[120px]">
+                {formatAmount(invoice.total_amount, {
+                  currency: "EUR",
+                })}
+              </TableCell>
+              <TableCell className="min-w-[150px]">
+                {formatDate(new Date(invoice.invoice_date)) || "N/A"}
+              </TableCell>
+              <TableCell className="min-w-[150px]">
+                {formatDate(new Date(invoice.due_date)) || "N/A"}
+              </TableCell>
+            </TableRow>
+          ))
+        )}
+      </TableBody>
+    </Table>
+  );
 }

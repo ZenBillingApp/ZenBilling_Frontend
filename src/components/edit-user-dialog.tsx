@@ -108,7 +108,7 @@ export default function EditUserDialog({ trigger, user, onSave }: Props) {
                 <Alert variant="destructive">
                   <AlertTriangle className="w-5 h-5" />
                   <AlertTitle>
-                    Une erreur s'est produite lors de la sauvegarde
+                    Une erreur s&apos;est produite lors de la sauvegarde
                   </AlertTitle>
                   <AlertDescription>
                     {Array.isArray(error)

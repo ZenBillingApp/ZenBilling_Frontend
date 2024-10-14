@@ -146,7 +146,7 @@ export default function SignupPage() {
               <AlertTitle>{t("register.register_error")}</AlertTitle>
               <AlertDescription>
                 {Array.isArray(error)
-                  ? error.map((e) => <p>{e.msg}</p>)
+                  ? error.map((e) => <p key={e.msg}>{e.msg}</p>)
                   : error}
               </AlertDescription>
             </Alert>
