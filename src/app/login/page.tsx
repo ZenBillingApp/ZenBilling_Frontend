@@ -23,21 +23,33 @@ export default function Login() {
   const [email, setEmail] = React.useState<string>("");
   const [password, setPassword] = React.useState<string>("");
   const [loading, setLoading] = React.useState<boolean>(false);
-  const [error, setError] = React.useState<boolean>(false);
+  const [error, setError] = React.useState<
+    | string
+    | [
+        {
+          msg: string;
+        }
+      ]
+    | null
+  >(null);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       setLoading(true);
-      setError(false);
+      setError(null);
       const response = await api.post("/auth/login", {
         email,
         password,
       });
       setCookie("token", response.data.token);
       router.push("/");
-    } catch (error) {
-      setError(true);
+    } catch (error: any) {
+      setError(
+        error.response.data.message ||
+          error.response.data.errors ||
+          "Une erreur s'est produite"
+      );
     } finally {
       setLoading(false);
     }
@@ -69,7 +81,11 @@ export default function Login() {
               <AlertTriangle className="w-5 h-5" />
               <AlertTitle>{t("login.login_error")}</AlertTitle>
               <AlertDescription>
-                {t("login.login_error_check_credentials")}
+                {Array.isArray(error) ? (
+                  error.map((e) => <p>{e.msg}</p>)
+                ) : (
+                  <p>{error}</p>
+                )}
               </AlertDescription>
             </Alert>
           )}

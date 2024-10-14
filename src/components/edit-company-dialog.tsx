@@ -1,7 +1,5 @@
-import React from "react";
-
+import React, { useEffect } from "react";
 import { Company } from "@/types/Company";
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -16,23 +14,78 @@ import {
 } from "@/components/ui/credenza";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-
+import { useToast } from "./ui/use-toast";
 import { AlertTriangle } from "lucide-react";
 import { MdOutlineEdit } from "react-icons/md";
+import api from "@/lib/axios";
 
 type Props = {
   company: Company | null;
   onSave: (updatedCompany: Company) => void;
 };
 
-export default function ({ company, onSave }: Props) {
+const CompanyEditor: React.FC<Props> = ({ company, onSave }) => {
+  const { toast } = useToast();
+
   const [editCompany, setEditCompany] = React.useState<Company | null>(company);
   const [loading, setLoading] = React.useState<boolean>(false);
   const [open, setOpen] = React.useState<boolean>(false);
-  const [error, setError] = React.useState<boolean>(false);
+  const [error, setError] = React.useState<
+    | string
+    | [
+        {
+          msg: string;
+        }
+      ]
+    | null
+  >(null);
 
   const onClose = () => {
     setOpen(false);
+    setError(null);
+  };
+
+  useEffect(() => {
+    if (open) {
+      setEditCompany(company);
+    }
+  }, [open, company]);
+
+  const handleSave = async () => {
+    if (editCompany) {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await api.put(`/company`, editCompany);
+        onSave(response.data);
+        toast({
+          title: "Entreprise mise à jour",
+          description:
+            "Les informations de votre entreprise ont été mises à jour avec succès.",
+        });
+        setOpen(false);
+      } catch (err: any) {
+        setError(
+          err.response?.data.message ||
+            err.response?.data.errors ||
+            "Une erreur s'est produite"
+        );
+        toast({
+          variant: "destructive",
+          title: "Erreur lors de la sauvegarde",
+          description:
+            err.response?.data.message ||
+            err.response?.data.errors
+              .map((e: { msg: string }) => e.msg)
+              .join(", ") ||
+            "Une erreur s'est produite",
+        });
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      setError("Données de l'entreprise non valides");
+    }
   };
 
   return (
@@ -43,102 +96,91 @@ export default function ({ company, onSave }: Props) {
           onClick={() => setOpen(true)}
         >
           <MdOutlineEdit size={20} />
-          Modify
+          Modifier mon entreprise
         </Button>
       </CredenzaTrigger>
       <CredenzaContent className="h-[80vh] overflow-auto">
         <CredenzaHeader>
-          <CredenzaTitle>Modify Company Profile</CredenzaTitle>
+          <CredenzaTitle>
+            Modifier les informations de votre entreprise
+          </CredenzaTitle>
         </CredenzaHeader>
         <CredenzaDescription>
-          <p>Change your company information</p>
+          <p>
+            Les informations de votre entreprise sont utilisées pour générer des
+            documents tels que les factures et les devis.
+          </p>
         </CredenzaDescription>
         {error && (
           <Alert variant="destructive">
             <AlertTriangle className="w-5 h-5" />
-            <AlertTitle>Failed to update company</AlertTitle>
+            <AlertTitle>
+              Une erreur s'est produite lors de la sauvegarde
+            </AlertTitle>
             <AlertDescription>
-              Please check your information and try again.
+              {typeof error === "string"
+                ? error
+                : error.map((e) => e.msg).join(", ")}
             </AlertDescription>
           </Alert>
         )}
         <div className="flex flex-col w-full gap-2">
-          <Label>Company Name</Label>
+          <Label>Nom de l'entreprise</Label>
           <Input
             type="text"
             value={editCompany?.name || ""}
             onChange={(e) =>
-              setEditCompany(
-                (prev) =>
-                  prev && {
-                    ...prev,
-                    name: e.target.value,
-                  }
+              setEditCompany((prev) =>
+                prev ? { ...prev, name: e.target.value } : null
               )
             }
           />
         </div>
         <div className="flex flex-col w-full gap-2">
-          <Label>Industry</Label>
+          <Label>Secteur d'activité</Label>
           <Input
             type="text"
             value={editCompany?.industry || ""}
             onChange={(e) =>
-              setEditCompany(
-                (prev) =>
-                  prev && {
-                    ...prev,
-                    industry: e.target.value,
-                  }
+              setEditCompany((prev) =>
+                prev ? { ...prev, industry: e.target.value } : null
               )
             }
           />
         </div>
         <div className="flex flex-col w-full gap-2">
-          <Label>Street Address</Label>
+          <Label>Adresse</Label>
           <Input
             type="text"
             value={editCompany?.street_address || ""}
             onChange={(e) =>
-              setEditCompany(
-                (prev) =>
-                  prev && {
-                    ...prev,
-                    street_address: e.target.value,
-                  }
+              setEditCompany((prev) =>
+                prev ? { ...prev, street_address: e.target.value } : null
               )
             }
           />
         </div>
         <div className="flex gap-2">
           <div className="flex flex-col w-1/2 gap-2">
-            <Label>City</Label>
+            <Label>Ville</Label>
             <Input
               type="text"
               value={editCompany?.city || ""}
               onChange={(e) =>
-                setEditCompany(
-                  (prev) =>
-                    prev && {
-                      ...prev,
-                      city: e.target.value,
-                    }
+                setEditCompany((prev) =>
+                  prev ? { ...prev, city: e.target.value } : null
                 )
               }
             />
           </div>
           <div className="flex flex-col w-1/2 gap-2">
-            <Label>State</Label>
+            <Label>État/Région</Label>
             <Input
               type="text"
               value={editCompany?.state || ""}
               onChange={(e) =>
-                setEditCompany(
-                  (prev) =>
-                    prev && {
-                      ...prev,
-                      state: e.target.value,
-                    }
+                setEditCompany((prev) =>
+                  prev ? { ...prev, state: e.target.value } : null
                 )
               }
             />
@@ -146,33 +188,25 @@ export default function ({ company, onSave }: Props) {
         </div>
         <div className="flex gap-2">
           <div className="flex flex-col w-1/2 gap-2">
-            <Label>Postal Code</Label>
+            <Label>Code postal</Label>
             <Input
               type="text"
               value={editCompany?.postal_code || ""}
               onChange={(e) =>
-                setEditCompany(
-                  (prev) =>
-                    prev && {
-                      ...prev,
-                      postal_code: e.target.value,
-                    }
+                setEditCompany((prev) =>
+                  prev ? { ...prev, postal_code: e.target.value } : null
                 )
               }
             />
           </div>
           <div className="flex flex-col w-1/2 gap-2">
-            <Label>Country</Label>
+            <Label>Pays</Label>
             <Input
               type="text"
               value={editCompany?.country || ""}
               onChange={(e) =>
-                setEditCompany(
-                  (prev) =>
-                    prev && {
-                      ...prev,
-                      country: e.target.value,
-                    }
+                setEditCompany((prev) =>
+                  prev ? { ...prev, country: e.target.value } : null
                 )
               }
             />
@@ -184,70 +218,54 @@ export default function ({ company, onSave }: Props) {
             type="email"
             value={editCompany?.email || ""}
             onChange={(e) =>
-              setEditCompany(
-                (prev) =>
-                  prev && {
-                    ...prev,
-                    email: e.target.value,
-                  }
+              setEditCompany((prev) =>
+                prev ? { ...prev, email: e.target.value } : null
               )
             }
           />
         </div>
         <div className="flex flex-col w-full gap-2">
-          <Label>Phone</Label>
+          <Label>Téléphone</Label>
           <Input
             type="tel"
             value={editCompany?.phone || ""}
             onChange={(e) =>
-              setEditCompany(
-                (prev) =>
-                  prev && {
-                    ...prev,
-                    phone: e.target.value,
-                  }
+              setEditCompany((prev) =>
+                prev ? { ...prev, phone: e.target.value } : null
               )
             }
           />
         </div>
         <div className="flex flex-col w-full gap-2">
           <div className="flex flex-col gap-2">
-            <Label>VAT Number</Label>
+            <Label>Numéro de TVA</Label>
             <Input
               type="text"
               value={editCompany?.vat_number || ""}
               onChange={(e) =>
-                setEditCompany(
-                  (prev) =>
-                    prev && {
-                      ...prev,
-                      vat_number: e.target.value,
-                    }
+                setEditCompany((prev) =>
+                  prev ? { ...prev, vat_number: e.target.value } : null
                 )
               }
             />
           </div>
           <div className="flex flex-col gap-2">
-            <Label>SIRET Number</Label>
+            <Label>Numéro SIRET</Label>
             <Input
               type="text"
               value={editCompany?.siret_number || ""}
               onChange={(e) =>
-                setEditCompany(
-                  (prev) =>
-                    prev && {
-                      ...prev,
-                      siret_number: e.target.value,
-                    }
+                setEditCompany((prev) =>
+                  prev ? { ...prev, siret_number: e.target.value } : null
                 )
               }
             />
           </div>
         </div>
-
         <CredenzaFooter>
           <Button
             disabled={
+              loading ||
               !editCompany?.name ||
               !editCompany?.industry ||
               !editCompany?.email ||
@@ -258,20 +276,21 @@ export default function ({ company, onSave }: Props) {
               !editCompany?.postal_code ||
               !editCompany?.country ||
               !editCompany?.vat_number ||
-              loading
+              !editCompany?.siret_number
             }
-            onClick={() => {}}
+            onClick={handleSave}
           >
-            {loading ? "Saving..." : "Save"}
+            {loading ? "Enregistrement..." : "Enregistrer"}
           </Button>
-
           <CredenzaClose asChild>
             <Button variant="outline" onClick={onClose}>
-              Cancel
+              Annuler
             </Button>
           </CredenzaClose>
         </CredenzaFooter>
       </CredenzaContent>
     </Credenza>
   );
-}
+};
+
+export default CompanyEditor;

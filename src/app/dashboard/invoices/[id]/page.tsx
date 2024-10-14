@@ -368,25 +368,25 @@ export default function Page({}: Props) {
             </h2>
             <div className="flex flex-col pl-2">
               <h2 className="text-sm font-semibold">
-                {invoice?.Client?.first_name} {invoice?.Client?.last_name}
+                {invoice?.Clients?.first_name} {invoice?.Clients?.last_name}
               </h2>
-              <p className="text-sm">{invoice?.Client?.street_address}</p>
+              <p className="text-sm">{invoice?.Clients?.street_address}</p>
               <p className="text-sm">
-                {invoice?.Client?.city}, {invoice?.Client?.state}{" "}
-                {invoice?.Client?.postal_code}
+                {invoice?.Clients?.city}, {invoice?.Clients?.state}{" "}
+                {invoice?.Clients?.postal_code}
               </p>
-              <p className="text-sm">{invoice?.Client?.country}</p>
+              <p className="text-sm">{invoice?.Clients?.country}</p>
               <p className="text-sm">
                 <span className="font-semibold">
                   {t("common.common_email")} :
                 </span>{" "}
-                {invoice?.Client?.email}
+                {invoice?.Clients?.email}
               </p>
               <p className="text-sm">
                 <span className="font-semibold">
                   {t("common.common_phone")} :
                 </span>{" "}
-                {invoice?.Client?.phone}
+                {invoice?.Clients?.phone}
               </p>
             </div>
           </Card>

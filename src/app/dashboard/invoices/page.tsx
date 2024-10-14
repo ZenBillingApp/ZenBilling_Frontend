@@ -28,7 +28,15 @@ export default function Page({}: Props) {
   const [search, setSearch] = React.useState<string>("");
   const [selectedFilter, setSelectedFilter] = React.useState<string>("all");
   const [loading, setLoading] = React.useState<boolean>(true);
-  const [error, setError] = React.useState<boolean>(false);
+  const [error, setError] = React.useState<
+    | string
+    | [
+        {
+          msg: string;
+        }
+      ]
+    | null
+  >(null);
   const [page, setPage] = React.useState<number>(1);
   const [totalPages, setTotalPages] = React.useState<number>(1);
 
@@ -38,7 +46,7 @@ export default function Page({}: Props) {
 
   const fetchInvoices = React.useCallback(async () => {
     setLoading(true);
-    setError(false);
+    setError(null);
     try {
       const response = await api.get("/invoices", {
         params: {
@@ -49,8 +57,8 @@ export default function Page({}: Props) {
       });
       setInvoices(response.data.invoices);
       setTotalPages(response.data.totalPages);
-    } catch (error) {
-      setError(true);
+    } catch (err: any) {
+      setError(err.response?.data?.message || "Une erreur s'est produite");
     } finally {
       setLoading(false);
     }

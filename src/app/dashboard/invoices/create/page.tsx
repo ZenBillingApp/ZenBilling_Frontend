@@ -40,6 +40,15 @@ export default function Page({}: Props) {
   const [editItems, setEditItems] = useState<boolean>(false);
   const [items, setItems] = useState<Item[]>([]);
   const [date, setDate] = useState<Date>(new Date());
+  const [error, setError] = useState<
+    | string
+    | [
+        {
+          msg: string;
+        }
+      ]
+    | null
+  >(null);
 
   const handleCreateInvoice = async () => {
     const localDate = new Date(
@@ -48,6 +57,7 @@ export default function Page({}: Props) {
     const isoDate = localDate.toISOString().split("T")[0]; // Garde seulement la partie date sans l'heure
 
     try {
+      setError(null);
       const response = await api.post("/invoices", {
         client_id: selectedCustomer?.client_id,
         due_date: isoDate,
@@ -58,12 +68,19 @@ export default function Page({}: Props) {
         description: "La facture a été créée avec succès",
       });
       router.push(`/dashboard/invoices/${response.data.invoice_id}`);
-    } catch (error) {
+    } catch (err: any) {
+      setError(
+        err.response?.data.message ||
+          err.response?.data.errors ||
+          "Une erreur s'est produite"
+      );
       toast({
         variant: "destructive",
         title: "Erreur lors de la création de la facture",
         description:
-          "Une erreur est survenue lors de la création de la facture",
+          err.response?.data.message ||
+          err.response?.data.errors.map((e: { msg: string }) => e.msg) ||
+          "Une erreur s'est produite lors de la création de la facture",
       });
     }
   };

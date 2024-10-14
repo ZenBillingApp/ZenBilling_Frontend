@@ -145,7 +145,7 @@ export default function Page({}: Props) {
                     </div>
                     <div>
                       <span className="font-semibold">
-                        {t("profile.profile_zip")} {" : "}
+                        {t("profile.profile_postal_code")} {" : "}
                       </span>{" "}
                       {user?.postal_code}
                     </div>

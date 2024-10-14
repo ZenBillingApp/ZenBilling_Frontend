@@ -26,9 +26,10 @@ import api from "@/lib/axios";
 
 type Props = {
   trigger: React.ReactNode;
+  onSave: (newCustomer: Customer) => void;
 };
 
-export default function AddCustomerDialog({ trigger }: Props) {
+export default function AddCustomerDialog({ trigger, onSave }: Props) {
   const t = useTranslations();
   const { toast } = useToast();
 
@@ -37,6 +38,15 @@ export default function AddCustomerDialog({ trigger }: Props) {
     {} as Customer
   );
   const [loading, setLoading] = React.useState<boolean>(false);
+  const [error, setError] = React.useState<
+    | string
+    | [
+        {
+          msg: string;
+        }
+      ]
+    | null
+  >(null);
 
   useEffect(() => {
     if (!open) {
@@ -47,19 +57,29 @@ export default function AddCustomerDialog({ trigger }: Props) {
   const handleOnAdd = async () => {
     try {
       setLoading(true);
+      setError(null);
       await api.post("/customers", {
         ...newCustomer,
       });
+      onSave(newCustomer);
       toast({
         title: "Client ajouté",
         description: "Le client a été ajouté avec succès",
       });
       setOpen(false);
-    } catch (error) {
+    } catch (err: any) {
+      setError(
+        err.response?.data?.message ||
+          err.response?.data?.errors ||
+          "Une erreur s'est produite"
+      );
       toast({
         variant: "destructive",
         title: "Erreur",
-        description: "Une erreur s'est produite",
+        description:
+          err.response?.data?.message ||
+          err.response?.data?.errors.map((e: { msg: string }) => e.msg) ||
+          "Une erreur s'est produite",
       });
     } finally {
       setLoading(false);

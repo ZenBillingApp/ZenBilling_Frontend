@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
 import { useRouter } from "next/navigation";
-import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
 
 import { ArrowRightIcon } from "lucide-react";
@@ -19,6 +18,8 @@ import { AlertTriangle } from "lucide-react";
 import { setCookie } from "cookies-next";
 
 import { cn } from "@/lib/utils";
+
+import api from "@/lib/axios";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -52,8 +53,15 @@ export default function SignupPage() {
   });
 
   const [loading, setLoading] = React.useState<boolean>(false);
-  const [error, setError] = React.useState<boolean>(false);
-  const [errorMessage, setErrorMessage] = React.useState<string>("");
+  const [error, setError] = React.useState<
+    | string
+    | [
+        {
+          msg: string;
+        }
+      ]
+    | null
+  >(null);
 
   const { toast } = useToast();
 
@@ -78,45 +86,33 @@ export default function SignupPage() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (user.password !== confirmPassword) {
-      setErrorMessage("Passwords do not match.");
-      setError(true);
+      setError("Les mots de passe ne correspondent pas");
       return;
     }
 
     try {
       setLoading(true);
-      setError(false);
-      const response = await fetch(
-        process.env.NEXT_PUBLIC_API_URL + "/api/auth/register",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(user),
-        }
-      );
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message);
-      }
-      const data = await response.json();
-
+      setError(null);
+      const response = await api.post("/auth/register", user);
+      setCookie("token", response.data.token, {
+        maxAge: 30 * 24 * 60 * 60,
+      });
       toast({
-        title: "Account created.",
-        description: "You have successfully signed up.",
+        title: "Inscription réussie",
+        description: "Inscription réussie avec succès",
       });
-      setCookie("token", data.token, {
-        maxAge: 3600,
-        path: "/",
+      router.push("/dashboard");
+    } catch (err: any) {
+      setError(
+        err.response.data.message ||
+          err.response.data.errors ||
+          "Une erreur s'est produite"
+      );
+      toast({
+        variant: "destructive",
+        title: "Une erreur s'est produite",
+        description: Array.isArray(error) ? error.map((e) => e.msg) : error,
       });
-      router.push("/dashboard/home");
-    } catch (error) {
-      console.error(error);
-      if (error instanceof Error) {
-        setErrorMessage(error.message);
-      }
-      setError(true);
     } finally {
       setLoading(false);
     }
@@ -149,7 +145,9 @@ export default function SignupPage() {
               <AlertTriangle className="w-5 h-5" />
               <AlertTitle>{t("register.register_error")}</AlertTitle>
               <AlertDescription>
-                {errorMessage || t("register.register_error_message")}
+                {Array.isArray(error)
+                  ? error.map((e) => <p>{e.msg}</p>)
+                  : error}
               </AlertDescription>
             </Alert>
           )}

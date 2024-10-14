@@ -107,6 +107,10 @@ export default function Page({}: Props) {
     fetchCustomer();
   }, [id]);
 
+  const handleOnEdit = async (newCustomer: Customer) => {
+    setCustomer({ ...customer, ...newCustomer });
+  };
+
   return (
     <ContentLayout title={t("customers.customer_details")}>
       <div className="flex flex-col w-full gap-6">
@@ -135,6 +139,7 @@ export default function Page({}: Props) {
                     </Button>
                   }
                   customer={customer}
+                  onSave={handleOnEdit}
                 />
 
                 <AlertDialog

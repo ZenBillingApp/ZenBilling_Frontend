@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import { useTranslations } from "next-intl";
-import { getCookie } from "cookies-next";
 
 import { User } from "@/types/User";
 
@@ -19,11 +18,14 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertTriangle } from "lucide-react";
 import { ScrollArea } from "./ui/scroll-area";
 import { PhoneInput } from "./ui/phone-input";
 import { ToastAction } from "@/components/ui/toast";
 import { useToast } from "@/components/ui/use-toast";
+
+import { AlertTriangle } from "lucide-react";
+
+import api from "@/lib/axios";
 
 type Props = {
   trigger: React.ReactNode;
@@ -38,7 +40,15 @@ export default function EditUserDialog({ trigger, user, onSave }: Props) {
   const [open, setOpen] = React.useState(false);
   const [newUser, setNewUser] = React.useState<User>(user);
   const [loading, setLoading] = React.useState(false);
-  const [error, setError] = React.useState(null);
+  const [error, setError] = React.useState<
+    | string
+    | [
+        {
+          msg: string;
+        }
+      ]
+    | null
+  >(null);
 
   useEffect(() => {
     if (open) {
@@ -51,41 +61,29 @@ export default function EditUserDialog({ trigger, user, onSave }: Props) {
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch(
-        process.env.NEXT_PUBLIC_API_URL + `/api/auth/profile`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${getCookie("token")}`,
-          },
-          body: JSON.stringify(newUser),
-        }
+      const response = await api.put(`/user`, newUser);
+      onSave(response.data);
+      toast({
+        title: "Mise à jour de l'utilisateur",
+        description:
+          "Les informations de l'utilisateur ont été mises à jour avec succès.",
+      });
+      setOpen(false);
+    } catch (err: any) {
+      setError(
+        err.response?.data?.message ||
+          err.response?.data?.errors ||
+          "Une erreur s'est produite"
       );
-      if (!response.ok) {
-        throw new Error(await response.text());
-      }
-
-      const updatedUser = await response.json();
-      onSave(updatedUser);
-    } catch (error: any) {
-      console.error(error);
-      setError(error.message);
-
       toast({
         variant: "destructive",
-        title: "Error",
-        description: error.message,
-        action: (
-          <ToastAction
-            altText="Retry"
-            onClick={() => {
-              handleSave(newUser);
-            }}
-          >
-            Retry
-          </ToastAction>
-        ),
+        title: "Échec de la mise à jour de l'utilisateur",
+        description:
+          err.response?.data?.message ||
+          err.response?.data?.errors
+            .map((error: { msg: string }) => error.msg)
+            .join(", ") ||
+          "Une erreur s'est produite",
       });
     } finally {
       setLoading(false);
@@ -109,8 +107,14 @@ export default function EditUserDialog({ trigger, user, onSave }: Props) {
               {error && (
                 <Alert variant="destructive">
                   <AlertTriangle className="w-5 h-5" />
-                  <AlertTitle>Failed to update user</AlertTitle>
-                  <AlertDescription>{error}</AlertDescription>
+                  <AlertTitle>
+                    Une erreur s'est produite lors de la sauvegarde
+                  </AlertTitle>
+                  <AlertDescription>
+                    {Array.isArray(error)
+                      ? error.map((e) => e.msg).join(", ")
+                      : error}
+                  </AlertDescription>
                 </Alert>
               )}
               <div className="flex gap-2">

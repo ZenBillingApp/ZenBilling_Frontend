@@ -57,6 +57,10 @@ export default function Page({}: Props) {
     router.push(`/dashboard/customers/${customerId}`);
   };
 
+  const handleOnAdd = (newCustomer: Customer) => {
+    setCustomers((prev) => [...prev, newCustomer]);
+  };
+
   if (error) {
     console.error("Error fetching data");
     return (
@@ -90,6 +94,7 @@ export default function Page({}: Props) {
                   {t("customers.customer_add")}
                 </Button>
               }
+              onSave={handleOnAdd}
             />
           </div>
           <div className="flex flex-col w-full gap-6">

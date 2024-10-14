@@ -26,14 +26,26 @@ import api from "@/lib/axios";
 type Props = {
   trigger: React.ReactNode;
   customer: Customer | null;
+  onSave: (updatedCustomer: Customer) => void;
 };
 
-export default function EditCustomerDialog({ trigger, customer }: Props) {
+export default function EditCustomerDialog({
+  trigger,
+  customer,
+  onSave,
+}: Props) {
   const [open, setOpen] = React.useState<boolean>(false);
-  const [newCustomer, setNewCustomer] = React.useState<Customer>(
-    customer || ({} as Customer)
-  );
+  const [newCustomer, setNewCustomer] = React.useState<Customer | null>(null);
   const [loading, setLoading] = React.useState<boolean>(false);
+  const [error, setError] = React.useState<
+    | string
+    | [
+        {
+          msg: string;
+        }
+      ]
+    | null
+  >(null);
 
   const t = useTranslations();
   const { toast } = useToast();
@@ -41,19 +53,33 @@ export default function EditCustomerDialog({ trigger, customer }: Props) {
   const handleOnEdit = async () => {
     try {
       setLoading(true);
-      const response = await api.put(`/customers/${newCustomer.client_id}`, {
-        ...newCustomer,
-      });
-      toast({
-        title: "Client modifié",
-        description: "Le client a été modifié avec succès",
-      });
-      setOpen(false);
-    } catch (error) {
+      setError(null);
+      if (newCustomer) {
+        const response = await api.put(`/customers/${newCustomer.client_id}`, {
+          ...newCustomer,
+        });
+        onSave(response.data);
+        toast({
+          title: "Client modifié",
+          description: "Le client a été modifié avec succès",
+        });
+        setOpen(false);
+      }
+    } catch (err: any) {
+      setError(
+        err.response?.data?.message ||
+          err.response?.data?.errors ||
+          "Une erreur s'est produite lors de la mise à jour du client"
+      );
       toast({
         variant: "destructive",
         title: "Erreur",
-        description: "Une erreur s'est produite",
+        description:
+          err.response?.data?.message ||
+          err.response?.data?.errors
+            .map((e: { msg: string }) => e.msg)
+            .join(", ") ||
+          "Une erreur s'est produite lors de la mise à jour du client",
       });
     } finally {
       setLoading(false);
@@ -61,8 +87,8 @@ export default function EditCustomerDialog({ trigger, customer }: Props) {
   };
 
   useEffect(() => {
-    if (!open) {
-      setNewCustomer(customer || ({} as Customer));
+    if (open) {
+      setNewCustomer(customer);
     }
   }, [open]);
 
@@ -73,9 +99,9 @@ export default function EditCustomerDialog({ trigger, customer }: Props) {
         <ScrollArea className="flex w-full max-h-[80vh] overflow-y-auto">
           <div className="flex flex-col w-full gap-4 p-2">
             <CredenzaHeader>
-              <CredenzaTitle>{t("customers.customer_add")}</CredenzaTitle>
+              <CredenzaTitle>{t("customers.customer_update")}</CredenzaTitle>
               <CredenzaDescription>
-                {t("customers.customer_add_description")}
+                {t("customers.customer_update_description")}
               </CredenzaDescription>
             </CredenzaHeader>
             <CredenzaBody className="flex flex-col space-y-4">
@@ -89,12 +115,12 @@ export default function EditCustomerDialog({ trigger, customer }: Props) {
                     id="first_name"
                     type="text"
                     placeholder={t("customers.customer_first_name_placeholder")}
-                    value={newCustomer.first_name}
+                    value={newCustomer?.first_name || ""}
                     onChange={(e) =>
                       setNewCustomer({
                         ...newCustomer,
                         first_name: e.target.value,
-                      })
+                      } as Customer)
                     }
                   />
                 </div>
@@ -107,12 +133,12 @@ export default function EditCustomerDialog({ trigger, customer }: Props) {
                     id="last_name"
                     type="text"
                     placeholder={t("customers.customer_last_name_placeholder")}
-                    value={newCustomer.last_name}
+                    value={newCustomer?.last_name || ""}
                     onChange={(e) =>
                       setNewCustomer({
                         ...newCustomer,
-                        last_name: e.target.value,
-                      })
+                        last_name: e.target.value || "",
+                      } as Customer)
                     }
                   />
                 </div>
@@ -126,12 +152,12 @@ export default function EditCustomerDialog({ trigger, customer }: Props) {
                   id="address"
                   type="text"
                   placeholder={t("customers.customer_address_placeholder")}
-                  value={newCustomer.street_address}
+                  value={newCustomer?.street_address || ""}
                   onChange={(e) =>
                     setNewCustomer({
                       ...newCustomer,
-                      street_address: e.target.value,
-                    })
+                      street_address: e.target.value || "",
+                    } as Customer)
                   }
                 />
               </div>
@@ -143,12 +169,12 @@ export default function EditCustomerDialog({ trigger, customer }: Props) {
                     id="city"
                     type="text"
                     placeholder={t("customers.customer_city_placeholder")}
-                    value={newCustomer.city}
+                    value={newCustomer?.city || ""}
                     onChange={(e) =>
                       setNewCustomer({
                         ...newCustomer,
-                        city: e.target.value,
-                      })
+                        city: e.target.value || "",
+                      } as Customer)
                     }
                   />
                 </div>
@@ -159,12 +185,12 @@ export default function EditCustomerDialog({ trigger, customer }: Props) {
                     id="state"
                     type="text"
                     placeholder={t("customers.customer_state_placeholder")}
-                    value={newCustomer.state}
+                    value={newCustomer?.state || ""}
                     onChange={(e) =>
                       setNewCustomer({
                         ...newCustomer,
-                        state: e.target.value,
-                      })
+                        state: e.target.value || "",
+                      } as Customer)
                     }
                   />
                 </div>
@@ -181,12 +207,12 @@ export default function EditCustomerDialog({ trigger, customer }: Props) {
                     placeholder={t(
                       "customers.customer_postal_code_placeholder"
                     )}
-                    value={newCustomer.postal_code}
+                    value={newCustomer?.postal_code || ""}
                     onChange={(e) =>
                       setNewCustomer({
                         ...newCustomer,
-                        postal_code: e.target.value,
-                      })
+                        postal_code: e.target.value || "",
+                      } as Customer)
                     }
                   />
                 </div>
@@ -199,12 +225,12 @@ export default function EditCustomerDialog({ trigger, customer }: Props) {
                     id="country"
                     type="text"
                     placeholder={t("customers.customer_country_placeholder")}
-                    value={newCustomer.country}
+                    value={newCustomer?.country || ""}
                     onChange={(e) =>
                       setNewCustomer({
                         ...newCustomer,
-                        country: e.target.value,
-                      })
+                        country: e.target.value || "",
+                      } as Customer)
                     }
                   />
                 </div>
@@ -216,12 +242,12 @@ export default function EditCustomerDialog({ trigger, customer }: Props) {
                   id="email"
                   type="email"
                   placeholder={t("customers.customer_email_placeholder")}
-                  value={newCustomer.email}
+                  value={newCustomer?.email || ""}
                   onChange={(e) =>
                     setNewCustomer({
                       ...newCustomer,
-                      email: e.target.value,
-                    })
+                      email: e.target.value || "",
+                    } as Customer)
                   }
                 />
               </div>
@@ -232,13 +258,13 @@ export default function EditCustomerDialog({ trigger, customer }: Props) {
                   id="company.phone"
                   name="company.phone"
                   placeholder={t("customers.customer_phone_placeholder")}
-                  value={newCustomer.phone}
+                  value={newCustomer?.phone || ""}
                   defaultCountry="FR"
                   onChange={(phone) =>
                     setNewCustomer({
                       ...newCustomer,
-                      phone,
-                    })
+                      phone: phone || "",
+                    } as Customer)
                   }
                 />
               </div>

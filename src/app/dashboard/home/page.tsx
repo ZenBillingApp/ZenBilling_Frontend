@@ -37,16 +37,24 @@ export default function Page({ params: { locale } }: Props) {
 
   const [data, setData] = React.useState<Dashboard>({} as Dashboard);
   const [loading, setLoading] = React.useState(true);
-  const [error, setError] = React.useState(false);
+  const [error, setError] = React.useState<
+    | string
+    | [
+        {
+          msg: string;
+        }
+      ]
+    | null
+  >(null);
 
   const fetchData = async () => {
     setLoading(true);
-    setError(false);
+    setError(null);
     try {
       const response = await api.get("/dashboard");
       setData(response.data);
-    } catch (error) {
-      setError(true);
+    } catch (err: any) {
+      setError(err.response?.data?.message || "Une erreur s'est produite");
     } finally {
       setLoading(false);
     }
@@ -77,9 +85,9 @@ export default function Page({ params: { locale } }: Props) {
             alt="Error"
           />
           <h1 className="text-2xl font-semibold">
-            An error occurred while fetching data
+            Une erreur s'est produite lors du chargement des données
           </h1>
-          <Button onClick={fetchData}>Retry</Button>
+          <Button onClick={fetchData}>Réessayer</Button>
         </div>
       </ContentLayout>
     );

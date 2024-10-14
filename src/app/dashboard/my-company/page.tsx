@@ -1,11 +1,8 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
 
 import { Company } from "@/types/Company";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Card,
   CardContent,
@@ -13,65 +10,32 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Credenza,
-  CredenzaBody,
-  CredenzaClose,
-  CredenzaContent,
-  CredenzaDescription,
-  CredenzaFooter,
-  CredenzaHeader,
-  CredenzaTitle,
-  CredenzaTrigger,
-} from "@/components/ui/credenza";
-import { Label } from "@/components/ui/label";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { ContentLayout } from "@/components/admin-panel/content-layout";
+import EditCompanyDialog from "@/components/edit-company-dialog";
 
-import { AlertTriangle } from "lucide-react";
 import { ClipLoader } from "react-spinners";
-import { getCookie } from "cookies-next";
-import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
 
 import api from "@/lib/axios";
-import EditCompanyDialog from "@/components/edit-company-dialog";
 
 type Props = {};
 
 export default function MyCompanyPage({}: Props) {
-  const { id } = useParams();
-  const router = useRouter();
-
   const [company, setCompany] = useState<Company | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchCompany = async () => {
       try {
-        const response = await fetch(
-          process.env.NEXT_PUBLIC_API_URL + `/api/company`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${getCookie("token")}`,
-            },
-          }
-        );
-        if (!response.ok) {
-          throw new Error("Failed to fetch company");
-        }
-
-        const data = await response.json();
-        setCompany(data);
-      } catch (error) {
-        console.error(error);
+        const response = await api.get(`/company`);
+        setCompany(response.data);
+      } catch (err) {
+        console.error(err);
       } finally {
         setLoading(false);
       }
     };
     fetchCompany();
-  }, [id]);
+  }, []);
 
   const handleUpdateCompany = (updatedCompany: Company) => {
     setCompany(updatedCompany);
@@ -88,8 +52,10 @@ export default function MyCompanyPage({}: Props) {
           <>
             <div className="flex items-center justify-between">
               <div className="flex flex-col items-start gap-2">
-                <h1 className="text-3xl font-semibold">My Company</h1>
-                <p className="text-gray-500">Manage your company information</p>
+                <h1 className="text-3xl font-semibold">Mon entreprise</h1>
+                <p className="text-gray-500">
+                  Informations sur votre entreprise
+                </p>
               </div>
               <div className="flex items-center gap-2">
                 <EditCompanyDialog
@@ -102,24 +68,30 @@ export default function MyCompanyPage({}: Props) {
               <div className="flex w-full flex-col justify-center p-4 gap-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Company Information</CardTitle>
+                    <CardTitle>Informations de l'entreprise</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="flex flex-col gap-2">
                       <div>
-                        <span className="font-semibold">Name: </span>
+                        <span className="font-semibold">
+                          Nom de l'entreprise:&nbsp;
+                        </span>
                         {company?.name}
                       </div>
                       <div>
-                        <span className="font-semibold">Industry: </span>{" "}
+                        <span className="font-semibold">
+                          Secteur d'activité:&nbsp;
+                        </span>
                         {company?.industry}
                       </div>
                       <div>
-                        <span className="font-semibold">Email: </span>{" "}
+                        <span className="font-semibold">Email:&nbsp;</span>
                         {company?.email}
                       </div>
                       <div>
-                        <span className="font-semibold">Phone: </span>{" "}
+                        <span className="font-semibold">
+                          Numéro de téléphone:&nbsp;
+                        </span>
                         {company?.phone}
                       </div>
                     </div>
@@ -127,28 +99,32 @@ export default function MyCompanyPage({}: Props) {
                 </Card>
                 <Card>
                   <CardHeader>
-                    <CardTitle>Address</CardTitle>
+                    <CardTitle>Adresse de l'entreprise</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="flex flex-col gap-2">
                       <div>
-                        <span className="font-semibold">Street Address:</span>{" "}
+                        <span className="font-semibold">Adresse:&nbsp;</span>
                         {company?.street_address}
                       </div>
                       <div>
-                        <span className="font-semibold">City:</span>{" "}
+                        <span className="font-semibold">Ville:&nbsp;</span>
                         {company?.city}
                       </div>
                       <div>
-                        <span className="font-semibold">State:</span>{" "}
+                        <span className="font-semibold">
+                          État/Région:&nbsp;
+                        </span>
                         {company?.state}
                       </div>
                       <div>
-                        <span className="font-semibold">Postal Code:</span>{" "}
+                        <span className="font-semibold">
+                          Code postal:&nbsp;
+                        </span>
                         {company?.postal_code}
                       </div>
                       <div>
-                        <span className="font-semibold">Country:</span>{" "}
+                        <span className="font-semibold">Pays:&nbsp;</span>
                         {company?.country}
                       </div>
                     </div>
@@ -156,16 +132,22 @@ export default function MyCompanyPage({}: Props) {
                 </Card>
                 <Card>
                   <CardHeader>
-                    <CardTitle>VAT Information</CardTitle>
+                    <CardTitle>
+                      Informations sur la société (SIRET, TVA)
+                    </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="flex flex-col gap-2">
                       <div>
-                        <span className="font-semibold">VAT Number:</span>{" "}
+                        <span className="font-semibold">
+                          Numéro de TVA:&nbsp;
+                        </span>
                         {company?.vat_number}
                       </div>
                       <div>
-                        <span className="font-semibold">SIRET Number:</span>{" "}
+                        <span className="font-semibold">
+                          Numéro de SIRET:&nbsp;
+                        </span>
                         {company?.siret_number}
                       </div>
                     </div>
