@@ -13,7 +13,7 @@ export interface Invoice {
         email: string;
         vat_number: string;
     };
-    Clients: {
+    Client: {
         client_id: number;
         first_name: string;
         last_name: string;

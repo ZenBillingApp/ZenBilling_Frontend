@@ -82,10 +82,10 @@ export default function TableInvoices({ invoices, search }: Props) {
                 {invoice.invoice_id || "N/A"}
               </TableCell>
               <TableCell className="min-w-[120px]">
-                {invoice.Clients.first_name || "N/A"}
+                {invoice.Client.first_name || "N/A"}
               </TableCell>
               <TableCell className="min-w-[120px]">
-                {invoice.Clients.last_name || "N/A"}
+                {invoice.Client.last_name || "N/A"}
               </TableCell>
               <TableCell className="min-w-[120px]">
                 <Badge
