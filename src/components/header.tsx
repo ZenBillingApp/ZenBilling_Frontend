@@ -9,23 +9,23 @@ import { CountryCode } from "libphonenumber-js";
 type Props = {};
 
 const Header: React.FC<Props> = () => {
-    const [locale, setLocale] = useState<CountryCode | null>(null);
-    useEffect(() => {
-        const fetchLocale = async () => {
-            const userLocale = await getUserLocale();
-            setLocale(userLocale as CountryCode);
-        };
-        fetchLocale();
-    }, []);
-
-    const handleLocaleChange = (newLocale: CountryCode) => {
-        setUserLocale(newLocale);
-        setLocale(newLocale);
+  const [locale, setLocale] = useState<CountryCode | null>(null);
+  useEffect(() => {
+    const fetchLocale = async () => {
+      const userLocale = await getUserLocale();
+      setLocale(userLocale as CountryCode);
     };
-    return (
-        <nav className=" w-full bg-transparent flex items-center justify-between px-2 ">
-            <Brand />
-            {locale && (
+    fetchLocale();
+  }, []);
+
+  const handleLocaleChange = (newLocale: CountryCode) => {
+    setUserLocale(newLocale);
+    setLocale(newLocale);
+  };
+  return (
+    <nav className=" w-full bg-transparent flex items-center justify-between px-2 ">
+      <Brand />
+      {/* {locale && (
                 <FlagComponent
                     value={locale}
                     onChange={(newLocale) =>
@@ -33,9 +33,9 @@ const Header: React.FC<Props> = () => {
                     }
                     options={locales as CountryCode[]}
                 />
-            )}
-        </nav>
-    );
+            )} */}
+    </nav>
+  );
 };
 
 export default Header;

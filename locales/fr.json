@@ -182,7 +182,7 @@
     },
     "login": {
         "login": "Connexion",
-        "login_title": "<b>R</b>e Bonjour ! 🎉",
+        "login_title": "<b>R</b>e Bonjour !",
         "login_new_here": "Nouveau ici ?",
         "email": "Email",
         "password": "Mot de passe",
@@ -196,7 +196,7 @@
     },
     "register": {
         "register": "Inscription",
-        "register_title": "<b>R</b>ejoignez-nous ! 🚀",
+        "register_title": "<b>R</b>ejoignez-nous !",
         "first_name": "Prénom",
         "first_name_placeholder": "Prénom",
         "last_name": "Nom",
