@@ -1,6 +1,6 @@
 export interface Item {
     description: string;
-    item_id: number;
+    item_id?: number;
     total_price: number;
     quantity: number;
     unit_price: number;

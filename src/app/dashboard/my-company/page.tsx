@@ -3,15 +3,12 @@ import React, { useEffect, useState } from "react";
 
 import { Company } from "@/types/Company";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ContentLayout } from "@/components/admin-panel/content-layout";
 import EditCompanyDialog from "@/components/edit-company-dialog";
+import { Button } from "@/components/ui/button";
+
+import { MdOutlineEdit } from "react-icons/md";
 
 import { ClipLoader } from "react-spinners";
 
@@ -59,6 +56,12 @@ export default function MyCompanyPage({}: Props) {
               </div>
               <div className="flex items-center gap-2">
                 <EditCompanyDialog
+                  trigger={
+                    <Button className="flex items-center gap-2">
+                      <MdOutlineEdit size={20} />
+                      Modifier mon entreprise
+                    </Button>
+                  }
                   company={company}
                   onSave={handleUpdateCompany}
                 />
