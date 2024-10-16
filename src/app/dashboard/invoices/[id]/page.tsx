@@ -231,235 +231,237 @@ export default function Page({}: Props) {
   };
 
   return (
-    <ContentLayout title={t("invoices.invoice_details")}>
-      <div className="flex flex-col flex-1 gap-6">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-          <h1 className="text-2xl font-semibold">
-            {" "}
-            {t("invoices.invoice") + " / " + id}
-          </h1>
-          <div className="flex gap-4">
-            <Button
-              variant="outline"
-              className="flex items-center gap-2"
-              onClick={handleDownload}
-            >
-              <Download size={16} />
-              {t("common.common_download_pdf")}
-            </Button>
+    <>
+      <ContentLayout title={t("invoices.invoice_details")}>
+        <div className="flex flex-col flex-1 gap-6">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <h1 className="text-2xl font-semibold">
+              {" "}
+              {t("invoices.invoice") + " / " + id}
+            </h1>
+            <div className="flex gap-4">
+              <Button
+                variant="outline"
+                className="flex items-center gap-2"
+                onClick={handleDownload}
+              >
+                <Download size={16} />
+                {t("common.common_download_pdf")}
+              </Button>
 
-            <AlertDialog
-              trigger={
-                <Button
-                  variant="destructive"
-                  className="flex items-center gap-2"
-                >
-                  <MdDeleteOutline size={20} />
-                  {t("common.common_delete")}
-                </Button>
-              }
-              title={t("invoices.invoice_delete")}
-              description={t("invoices.invoice_delete_confirm")}
-              confirmText={t("common.common_delete")}
-              handleOnConfirm={HandleOnDelete}
-            />
-          </div>
-        </div>
-        <Card className="flex flex-col justify-between p-6 md:flex-row gap-4">
-          <div className="flex flex-col w-full gap-4 md:w-1/2">
-            <div className="flex items-center justify-between">
-              <h2 className="text-sm font-semibold">
-                {t("invoices.invoice_id")}
-              </h2>
-              <p className="flex text-sm text-right">{invoice?.invoice_id}</p>
-            </div>
-            <div className="flex items-center justify-between">
-              <h2 className="text-sm font-semibold">
-                {t("invoices.invoice_date")}
-              </h2>
-              <p className="flex text-sm text-right">
-                {invoice?.invoice_date
-                  ? formatDate(new Date(invoice.invoice_date))
-                  : ""}
-              </p>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <h2 className="text-sm font-semibold">
-                {t("invoices.invoice_status")}
-              </h2>
-              <div className="flex">
-                <SelectStatusInvoice
-                  invoice={invoice}
-                  handleChangeStatus={handleChangeStatus}
-                />
-              </div>
-            </div>
-          </div>
-          <div className="flex flex-col w-full gap-4 md:w-1/2">
-            <div className="flex items-center justify-between">
-              <h2 className="text-sm font-semibold">
-                {t("invoices.invoice_due_date")}
-              </h2>
-              <DatePicker
+              <AlertDialog
                 trigger={
                   <Button
-                    variant="ghost"
-                    className="p-0 h-fit justify-start text-left font-normal hover:bg-transparent"
+                    variant="destructive"
+                    className="flex items-center gap-2"
                   >
-                    {formatDate(new Date(invoice?.due_date as Date)) ||
-                      "Select Due Date"}
-                    <ChevronDownIcon size={16} className="ml-2 opacity-50" />
+                    <MdDeleteOutline size={20} />
+                    {t("common.common_delete")}
                   </Button>
                 }
-                value={invoice?.due_date}
-                onChange={handleSelectDueDate}
+                title={t("invoices.invoice_delete")}
+                description={t("invoices.invoice_delete_confirm")}
+                confirmText={t("common.common_delete")}
+                handleOnConfirm={HandleOnDelete}
               />
             </div>
           </div>
-        </Card>
-        <div className="flex flex-col gap-6 md:flex-row">
-          <Card className="flex flex-col w-full gap-2 p-6">
-            <h2 className="text-lg font-semibold">
-              {t("invoices.invoice_myCompany")}
-            </h2>
-            <div className="flex flex-col pl-2">
-              <h2 className="text-sm font-semibold">
-                {invoice?.Company?.name}
-              </h2>
-              <p className="text-sm">{invoice?.Company?.street_address}</p>
-              <p className="text-sm">
-                {invoice?.Company?.city}, {invoice?.Company?.state}{" "}
-                {invoice?.Company?.postal_code}
-              </p>
-              <p className="text-sm">{invoice?.Company?.country}</p>
-              <p className="text-sm">
-                <span className="font-semibold">
-                  {t("common.common_email")} :
-                </span>{" "}
-                {invoice?.Company?.email}
-              </p>
-              <p className="text-sm">
-                <span className="font-semibold">
-                  {t("common.common_phone")} :
-                </span>{" "}
-                {invoice?.Company?.phone}
-              </p>
-              <p className="text-sm">
-                <span className="font-semibold">
-                  {t("common.common_vat_number")} :
-                </span>{" "}
-                {invoice?.Company?.vat_number}
-              </p>
+          <Card className="flex flex-col justify-between p-6 md:flex-row gap-4">
+            <div className="flex flex-col w-full gap-4 md:w-1/2">
+              <div className="flex items-center justify-between">
+                <h2 className="text-sm font-semibold">
+                  {t("invoices.invoice_id")}
+                </h2>
+                <p className="flex text-sm text-right">{invoice?.invoice_id}</p>
+              </div>
+              <div className="flex items-center justify-between">
+                <h2 className="text-sm font-semibold">
+                  {t("invoices.invoice_date")}
+                </h2>
+                <p className="flex text-sm text-right">
+                  {invoice?.invoice_date
+                    ? formatDate(new Date(invoice.invoice_date))
+                    : ""}
+                </p>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <h2 className="text-sm font-semibold">
+                  {t("invoices.invoice_status")}
+                </h2>
+                <div className="flex">
+                  <SelectStatusInvoice
+                    invoice={invoice}
+                    handleChangeStatus={handleChangeStatus}
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="flex flex-col w-full gap-4 md:w-1/2">
+              <div className="flex items-center justify-between">
+                <h2 className="text-sm font-semibold">
+                  {t("invoices.invoice_due_date")}
+                </h2>
+                <DatePicker
+                  trigger={
+                    <Button
+                      variant="ghost"
+                      className="p-0 h-fit justify-start text-left font-normal hover:bg-transparent"
+                    >
+                      {formatDate(new Date(invoice?.due_date as Date)) ||
+                        "Select Due Date"}
+                      <ChevronDownIcon size={16} className="ml-2 opacity-50" />
+                    </Button>
+                  }
+                  value={invoice?.due_date}
+                  onChange={handleSelectDueDate}
+                />
+              </div>
             </div>
           </Card>
-          <Card className="relative flex flex-col w-full gap-2 p-6">
-            <SheetCustomers
-              trigger={
+          <div className="flex flex-col gap-6 md:flex-row">
+            <Card className="flex flex-col w-full gap-2 p-6">
+              <h2 className="text-lg font-semibold">
+                {t("invoices.invoice_myCompany")}
+              </h2>
+              <div className="flex flex-col pl-2">
+                <h2 className="text-sm font-semibold">
+                  {invoice?.Company?.name}
+                </h2>
+                <p className="text-sm">{invoice?.Company?.street_address}</p>
+                <p className="text-sm">
+                  {invoice?.Company?.city}, {invoice?.Company?.state}{" "}
+                  {invoice?.Company?.postal_code}
+                </p>
+                <p className="text-sm">{invoice?.Company?.country}</p>
+                <p className="text-sm">
+                  <span className="font-semibold">
+                    {t("common.common_email")} :
+                  </span>{" "}
+                  {invoice?.Company?.email}
+                </p>
+                <p className="text-sm">
+                  <span className="font-semibold">
+                    {t("common.common_phone")} :
+                  </span>{" "}
+                  {invoice?.Company?.phone}
+                </p>
+                <p className="text-sm">
+                  <span className="font-semibold">
+                    {t("common.common_vat_number")} :
+                  </span>{" "}
+                  {invoice?.Company?.vat_number}
+                </p>
+              </div>
+            </Card>
+            <Card className="relative flex flex-col w-full gap-2 p-6">
+              <SheetCustomers
+                trigger={
+                  <MdOutlineEdit
+                    size={20}
+                    className="absolute top-2 right-2 cursor-pointer"
+                  />
+                }
+                handleSelectCustomer={handleChangeCustomer}
+              />
+              <h2 className="text-lg font-semibold">
+                {t("invoices.invoice_billTo")} :
+              </h2>
+              <div className="flex flex-col pl-2">
+                <h2 className="text-sm font-semibold">
+                  {invoice?.Client?.first_name} {invoice?.Client?.last_name}
+                </h2>
+                <p className="text-sm">{invoice?.Client?.street_address}</p>
+                <p className="text-sm">
+                  {invoice?.Client?.city}, {invoice?.Client?.state}{" "}
+                  {invoice?.Client?.postal_code}
+                </p>
+                <p className="text-sm">{invoice?.Client?.country}</p>
+                <p className="text-sm">
+                  <span className="font-semibold">
+                    {t("common.common_email")} :
+                  </span>{" "}
+                  {invoice?.Client?.email}
+                </p>
+                <p className="text-sm">
+                  <span className="font-semibold">
+                    {t("common.common_phone")} :
+                  </span>{" "}
+                  {invoice?.Client?.phone}
+                </p>
+              </div>
+            </Card>
+          </div>
+          <Card className="relative">
+            <CardHeader>
+              <CardTitle>{t("items.items")}</CardTitle>
+              {editOpen ? (
+                <MdClose
+                  size={20}
+                  className="absolute top-2 right-2 cursor-pointer"
+                  onClick={() => setEditOpen((prev) => !prev)}
+                />
+              ) : (
                 <MdOutlineEdit
                   size={20}
                   className="absolute top-2 right-2 cursor-pointer"
+                  onClick={() => setEditOpen((prev) => !prev)}
                 />
-              }
-              handleSelectCustomer={handleChangeCustomer}
-            />
-            <h2 className="text-lg font-semibold">
-              {t("invoices.invoice_billTo")} :
-            </h2>
-            <div className="flex flex-col pl-2">
-              <h2 className="text-sm font-semibold">
-                {invoice?.Client?.first_name} {invoice?.Client?.last_name}
-              </h2>
-              <p className="text-sm">{invoice?.Client?.street_address}</p>
-              <p className="text-sm">
-                {invoice?.Client?.city}, {invoice?.Client?.state}{" "}
-                {invoice?.Client?.postal_code}
-              </p>
-              <p className="text-sm">{invoice?.Client?.country}</p>
-              <p className="text-sm">
-                <span className="font-semibold">
-                  {t("common.common_email")} :
-                </span>{" "}
-                {invoice?.Client?.email}
-              </p>
-              <p className="text-sm">
-                <span className="font-semibold">
-                  {t("common.common_phone")} :
-                </span>{" "}
-                {invoice?.Client?.phone}
-              </p>
-            </div>
-          </Card>
-        </div>
-        <Card className="relative">
-          <CardHeader>
-            <CardTitle>{t("items.items")}</CardTitle>
-            {editOpen ? (
-              <MdClose
-                size={20}
-                className="absolute top-2 right-2 cursor-pointer"
-                onClick={() => setEditOpen((prev) => !prev)}
-              />
-            ) : (
-              <MdOutlineEdit
-                size={20}
-                className="absolute top-2 right-2 cursor-pointer"
-                onClick={() => setEditOpen((prev) => !prev)}
-              />
-            )}
-          </CardHeader>
-          <CardContent>
-            {editOpen ? (
-              <EditTableItems
-                items={invoice?.InvoiceItems || []}
-                handleOnSaveItems={handleSaveItems}
-              />
-            ) : (
-              <TableItems items={invoice?.InvoiceItems || []} />
-            )}
-          </CardContent>
-        </Card>
-
-        <div className={"flex flex-col items-end w-full"}>
-          <Card className="w-full md:w-1/2 xl:w-1/3">
-            <CardHeader>
-              <CardTitle>{t("invoices.invoice_summary")}</CardTitle>
+              )}
             </CardHeader>
-            <CardContent className="flex flex-col gap-2">
-              <div className="flex justify-between">
-                <h2 className="text-sm font-semibold">
-                  {t("invoices.invoice_subtotal")} :
-                </h2>
-                <p className="flex  text-sm items-end text-right">
-                  {formatAmount(totalAmountWithoutVAT, {
-                    currency: "EUR",
-                  })}
-                </p>
-              </div>
-              <div className="flex justify-between">
-                <h2 className="text-sm font-semibold">
-                  {t("invoices.invoice_vat")} :
-                </h2>
-                <p className="flex  text-sm items-end text-right">
-                  {formatAmount(totalAmount - totalAmountWithoutVAT, {
-                    currency: "EUR",
-                  })}
-                </p>
-              </div>
-              <div className="flex justify-between">
-                <h2 className="text-sm font-semibold">
-                  {t("invoices.invoice_total")} :
-                </h2>
-                <p className="flex  text-sm items-end text-right">
-                  {formatAmount(totalAmount, {
-                    currency: "EUR",
-                  })}
-                </p>
-              </div>
+            <CardContent>
+              {editOpen ? (
+                <EditTableItems
+                  items={invoice?.InvoiceItems || []}
+                  handleOnSaveItems={handleSaveItems}
+                />
+              ) : (
+                <TableItems items={invoice?.InvoiceItems || []} />
+              )}
             </CardContent>
           </Card>
+
+          <div className={"flex flex-col items-end w-full"}>
+            <Card className="w-full md:w-1/2 xl:w-1/3">
+              <CardHeader>
+                <CardTitle>{t("invoices.invoice_summary")}</CardTitle>
+              </CardHeader>
+              <CardContent className="flex flex-col gap-2">
+                <div className="flex justify-between">
+                  <h2 className="text-sm font-semibold">
+                    {t("invoices.invoice_subtotal")} :
+                  </h2>
+                  <p className="flex  text-sm items-end text-right">
+                    {formatAmount(totalAmountWithoutVAT, {
+                      currency: "EUR",
+                    })}
+                  </p>
+                </div>
+                <div className="flex justify-between">
+                  <h2 className="text-sm font-semibold">
+                    {t("invoices.invoice_vat")} :
+                  </h2>
+                  <p className="flex  text-sm items-end text-right">
+                    {formatAmount(totalAmount - totalAmountWithoutVAT, {
+                      currency: "EUR",
+                    })}
+                  </p>
+                </div>
+                <div className="flex justify-between">
+                  <h2 className="text-sm font-semibold">
+                    {t("invoices.invoice_total")} :
+                  </h2>
+                  <p className="flex  text-sm items-end text-right">
+                    {formatAmount(totalAmount, {
+                      currency: "EUR",
+                    })}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
-      </div>
-    </ContentLayout>
+      </ContentLayout>
+    </>
   );
 }

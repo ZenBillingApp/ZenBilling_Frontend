@@ -21,57 +21,55 @@ const i18nNamespaces = ["common", "dashboard", "invoices"];
 
 // Metadata for the application
 export const metadata: Metadata = {
+  title: "ZenBilling",
+  description: "ZenBilling est un gestionnaire de factures simple et efficace.",
+  keywords:
+    "factures, gestion, ZenBilling, entreprise, comptabilité, gestionnaire, facturation, devis, paiement, clients, produits, services, TVA, taxes,gratuit, open-source",
+  openGraph: {
     title: "ZenBilling",
-    description:
-        "ZenBilling is a simple billing system that allows you to create and manage invoices",
+    description: "Gestionnaire de factures en ligne.",
+    url: "https://zenbilling.dynamicwebforge.fr",
+    type: "website",
+    locale: "fr_FR",
+    siteName: "ZenBilling",
+  },
 };
 
 // Define the props for the RootLayout component
 type RootLayoutProps = {
-    children: React.ReactNode;
+  children: React.ReactNode;
 };
 
 // The main RootLayout component
 export default async function RootLayout({ children }: RootLayoutProps) {
-    const locale = await getLocale();
+  const locale = await getLocale();
 
-    // Providing all messages to the client
-    // side is the easiest way to get started
-    const messages = await getMessages();
+  // Providing all messages to the client
+  // side is the easiest way to get started
+  const messages = await getMessages();
 
-    return (
-        <html lang={locale} suppressHydrationWarning>
-            <meta
-                name="keywords"
-                content="ZenBilling, billing, invoices, management"
-            />
-            <meta name="application-name" content="ZenBilling" />
-            <meta charSet="utf-8" />
-            <meta name="author" content="ZenBilling" />
-            <link rel="icon" href="/favicon.ico" />
-            <link rel="apple-touch-icon" href="/favicon.ico" />
-            <body
-                className={cn(
-                    process.env.NODE_ENV === "production"
-                        ? null
-                        : "debug-screens",
-                    inter.className
-                )}
-            >
-                <ThemeProvider
-                    attribute="class"
-                    defaultTheme="system"
-                    enableSystem
-                    disableTransitionOnChange
-                >
-                    <NextIntlClientProvider messages={messages}>
-                        <div vaul-drawer-wrapper="" className="bg-background">
-                            {children}
-                        </div>
-                    </NextIntlClientProvider>
-                    <Toaster />
-                </ThemeProvider>
-            </body>
-        </html>
-    );
+  return (
+    <html lang={locale} suppressHydrationWarning>
+      <body
+        className={cn(
+          process.env.NODE_ENV === "production" ? null : "debug-screens",
+          inter.className
+        )}
+      >
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <NextIntlClientProvider messages={messages}>
+            <div vaul-drawer-wrapper="" className="bg-background">
+              {children}
+            </div>
+          </NextIntlClientProvider>
+          <Toaster />
+        </ThemeProvider>
+      </body>
+    </html>
+  );
 }

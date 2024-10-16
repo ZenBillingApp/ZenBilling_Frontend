@@ -18,7 +18,6 @@ import EditTableItems from "@/components/edit-table-items";
 import TableItems from "@/components/table-items";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
-import { ToastAction } from "@/components/ui/toast";
 
 import { ChevronDownIcon, Plus } from "lucide-react";
 import { MdClose, MdOutlineEdit } from "react-icons/md";
@@ -108,137 +107,139 @@ export default function Page({}: Props) {
   };
 
   return (
-    <ContentLayout title={t("invoices.create_invoice")}>
-      <div className="flex flex-col w-full h-full gap-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold">
-            {t("invoices.create_invoice")}
-          </h1>
-        </div>
-        <div className="flex flex-col gap-6">
-          <div className="flex gap-2">
-            <div className="flex flex-col items-start w-96 gap-2">
-              <Label>{t("invoices.invoice_due_date")}</Label>
-              <DatePicker
+    <>
+      <ContentLayout title={t("invoices.create_invoice")}>
+        <div className="flex flex-col w-full h-full gap-6">
+          <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-semibold">
+              {t("invoices.create_invoice")}
+            </h1>
+          </div>
+          <div className="flex flex-col gap-6">
+            <div className="flex gap-2">
+              <div className="flex flex-col items-start w-96 gap-2">
+                <Label>{t("invoices.invoice_due_date")}</Label>
+                <DatePicker
+                  trigger={
+                    <Button
+                      variant="outline"
+                      className="w-full flex items-center justify-between"
+                    >
+                      {date.toLocaleDateString() ?? "Select a date"}
+                      <ChevronDownIcon size={16} className="ml-2 opacity-50" />
+                    </Button>
+                  }
+                  value={date}
+                  onChange={(date) => setDate(date)}
+                />
+              </div>
+            </div>
+            <div className="flex flex-col items-start w-full gap-2 sm:w-96">
+              <Label>{t("invoices.invoice_billTo")} </Label>
+              <SheetCustomers
                 trigger={
-                  <Button
-                    variant="outline"
-                    className="w-full flex items-center justify-between"
-                  >
-                    {date.toLocaleDateString() ?? "Select a date"}
-                    <ChevronDownIcon size={16} className="ml-2 opacity-50" />
-                  </Button>
+                  <Input
+                    type="text"
+                    className="w-full cursor-pointer"
+                    placeholder={t(
+                      "invoices.invoice_placeholder_select_customer"
+                    )}
+                    value={
+                      selectedCustomer
+                        ? `${selectedCustomer.first_name} ${selectedCustomer.last_name}`
+                        : ""
+                    }
+                  />
                 }
-                value={date}
-                onChange={(date) => setDate(date)}
+                handleSelectCustomer={(customer) => {
+                  setSelectedCustomer(customer);
+                }}
               />
             </div>
-          </div>
-          <div className="flex flex-col items-start w-full gap-2 sm:w-96">
-            <Label>{t("invoices.invoice_billTo")} </Label>
-            <SheetCustomers
-              trigger={
-                <Input
-                  type="text"
-                  className="w-full cursor-pointer"
-                  placeholder={t(
-                    "invoices.invoice_placeholder_select_customer"
-                  )}
-                  value={
-                    selectedCustomer
-                      ? `${selectedCustomer.first_name} ${selectedCustomer.last_name}`
-                      : ""
-                  }
-                />
-              }
-              handleSelectCustomer={(customer) => {
-                setSelectedCustomer(customer);
-              }}
-            />
-          </div>
-          <div className="flex flex-col items-start w-full gap-4 mb-4">
-            <Card className="relative w-full">
-              <CardHeader>
-                <CardTitle>{t("items.items")}</CardTitle>
-                {editItems ? (
-                  <MdClose
-                    size={20}
-                    className="absolute top-2 right-2 cursor-pointer"
-                    onClick={() => setEditItems((prev) => !prev)}
-                  />
-                ) : (
-                  <MdOutlineEdit
-                    size={20}
-                    className="absolute top-2 right-2 cursor-pointer"
-                    onClick={() => setEditItems((prev) => !prev)}
-                  />
-                )}
-              </CardHeader>
-              <CardContent>
-                {editItems ? (
-                  <EditTableItems
-                    items={items}
-                    handleOnSaveItems={(items) => {
-                      setItems(items);
-                      setEditItems(false);
-                    }}
-                  />
-                ) : (
-                  <TableItems items={items} />
-                )}
-              </CardContent>
-            </Card>
-            <div className={cn("flex flex-col items-end w-full")}>
-              <Card className="w-full md:w-1/2 xl:w-1/3">
+            <div className="flex flex-col items-start w-full gap-4 mb-4">
+              <Card className="relative w-full">
                 <CardHeader>
-                  <CardTitle>{t("invoices.invoice_summary")}</CardTitle>
+                  <CardTitle>{t("items.items")}</CardTitle>
+                  {editItems ? (
+                    <MdClose
+                      size={20}
+                      className="absolute top-2 right-2 cursor-pointer"
+                      onClick={() => setEditItems((prev) => !prev)}
+                    />
+                  ) : (
+                    <MdOutlineEdit
+                      size={20}
+                      className="absolute top-2 right-2 cursor-pointer"
+                      onClick={() => setEditItems((prev) => !prev)}
+                    />
+                  )}
                 </CardHeader>
-                <CardContent className="flex flex-col gap-2">
-                  <div className="flex justify-between w-full">
-                    <span className="font-light text-sm ">
-                      {t("invoices.invoice_subtotal")}:
-                    </span>
-                    <p className="flex  text-sm items-end text-right">
-                      {formatAmount(parseFloat(calculateSubtotal()), {
-                        currency: "EUR",
-                      })}
-                    </p>
-                  </div>
-                  <div className="flex justify-between w-full">
-                    <span className="font-light text-sm ">
-                      {t("invoices.invoice_vat")}:
-                    </span>
-                    <p className="flex  text-sm items-end text-right">
-                      {formatAmount(parseFloat(calculateTax()), {
-                        currency: "EUR",
-                      })}
-                    </p>
-                  </div>
-                  <div className="flex justify-between w-full">
-                    <span className="font-light text-sm ">
-                      {t("invoices.invoice_total")}:
-                    </span>
-                    <p className="flex  text-sm items-end text-right">
-                      {formatAmount(parseFloat(calculateTotal()), {
-                        currency: "EUR",
-                      })}
-                    </p>
-                  </div>
-
-                  <Button
-                    className="w-full mt-4"
-                    onClick={handleCreateInvoice}
-                    disabled={!selectedCustomer || items.length === 0}
-                  >
-                    <Plus size={20} className="mr-2" />
-                    {t("invoices.invoice_create")}
-                  </Button>
+                <CardContent>
+                  {editItems ? (
+                    <EditTableItems
+                      items={items}
+                      handleOnSaveItems={(items) => {
+                        setItems(items);
+                        setEditItems(false);
+                      }}
+                    />
+                  ) : (
+                    <TableItems items={items} />
+                  )}
                 </CardContent>
               </Card>
+              <div className={cn("flex flex-col items-end w-full")}>
+                <Card className="w-full md:w-1/2 xl:w-1/3">
+                  <CardHeader>
+                    <CardTitle>{t("invoices.invoice_summary")}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="flex flex-col gap-2">
+                    <div className="flex justify-between w-full">
+                      <span className="font-light text-sm ">
+                        {t("invoices.invoice_subtotal")}:
+                      </span>
+                      <p className="flex  text-sm items-end text-right">
+                        {formatAmount(parseFloat(calculateSubtotal()), {
+                          currency: "EUR",
+                        })}
+                      </p>
+                    </div>
+                    <div className="flex justify-between w-full">
+                      <span className="font-light text-sm ">
+                        {t("invoices.invoice_vat")}:
+                      </span>
+                      <p className="flex  text-sm items-end text-right">
+                        {formatAmount(parseFloat(calculateTax()), {
+                          currency: "EUR",
+                        })}
+                      </p>
+                    </div>
+                    <div className="flex justify-between w-full">
+                      <span className="font-light text-sm ">
+                        {t("invoices.invoice_total")}:
+                      </span>
+                      <p className="flex  text-sm items-end text-right">
+                        {formatAmount(parseFloat(calculateTotal()), {
+                          currency: "EUR",
+                        })}
+                      </p>
+                    </div>
+
+                    <Button
+                      className="w-full mt-4"
+                      onClick={handleCreateInvoice}
+                      disabled={!selectedCustomer || items.length === 0}
+                    >
+                      <Plus size={20} className="mr-2" />
+                      {t("invoices.invoice_create")}
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </ContentLayout>
+      </ContentLayout>
+    </>
   );
 }

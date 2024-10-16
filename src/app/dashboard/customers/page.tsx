@@ -80,47 +80,51 @@ export default function Page({}: Props) {
   }
 
   return (
-    <ContentLayout title={t("customers.customers")}>
-      <div className="flex flex-col w-full h-full gap-6">
-        <div className="flex flex-col gap-10">
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-semibold">
-              {t("customers.customers")}
-            </h1>
-            <AddCustomerDialog
-              trigger={
-                <Button variant="default" className="flex items-center gap-2">
-                  <PiPlus size={20} />
-                  {t("customers.customer_add")}
-                </Button>
-              }
-              onSave={handleOnAdd}
-            />
-          </div>
-          <div className="flex flex-col w-full gap-6">
-            <div className="flex flex-col gap-6 xl:flex-row xl:justify-between">
-              <div className="flex w-full py-2 gap-6 xl:w-2/6">
-                <Input
-                  type="text"
-                  placeholder={t("customers.customer_table_search_placeholder")}
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                />
+    <>
+      <ContentLayout title={t("customers.customers")}>
+        <div className="flex flex-col w-full h-full gap-6">
+          <div className="flex flex-col gap-10">
+            <div className="flex items-center justify-between">
+              <h1 className="text-2xl font-semibold">
+                {t("customers.customers")}
+              </h1>
+              <AddCustomerDialog
+                trigger={
+                  <Button variant="default" className="flex items-center gap-2">
+                    <PiPlus size={20} />
+                    {t("customers.customer_add")}
+                  </Button>
+                }
+                onSave={handleOnAdd}
+              />
+            </div>
+            <div className="flex flex-col w-full gap-6">
+              <div className="flex flex-col gap-6 xl:flex-row xl:justify-between">
+                <div className="flex w-full py-2 gap-6 xl:w-2/6">
+                  <Input
+                    type="text"
+                    placeholder={t(
+                      "customers.customer_table_search_placeholder"
+                    )}
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                  />
+                </div>
               </div>
             </div>
           </div>
+          {loading ? (
+            <div className="flex justify-center items-center w-full h-full ">
+              <ClipLoader color="#009933" size={50} />
+            </div>
+          ) : (
+            <TableCustomers
+              customers={customers}
+              handleSelectCustomer={handleSelectCustomer}
+            />
+          )}
         </div>
-        {loading ? (
-          <div className="flex justify-center items-center w-full h-full ">
-            <ClipLoader color="#009933" size={50} />
-          </div>
-        ) : (
-          <TableCustomers
-            customers={customers}
-            handleSelectCustomer={handleSelectCustomer}
-          />
-        )}
-      </div>
-    </ContentLayout>
+      </ContentLayout>
+    </>
   );
 }
