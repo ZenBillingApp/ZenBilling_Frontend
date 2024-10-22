@@ -121,7 +121,7 @@ export default function Page({}: Props) {
                   <Button className="w-full cursor-pointer" variant="outline">
                     {selectedCustomer
                       ? `${selectedCustomer.first_name} ${selectedCustomer.last_name}`
-                      : ""}
+                      : "Sélectionner un client"}
                   </Button>
                 }
                 handleSelectCustomer={(customer) => {

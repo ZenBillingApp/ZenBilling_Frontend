@@ -46,7 +46,7 @@ export default function Page({}: Props) {
   const [loading, setLoading] = React.useState<boolean>(true);
   const [error, setError] = React.useState<string | null>(null);
   const [monthlyInvoice, setMonthlyInvoice] = React.useState<
-    Array<{ mois: string; montant: number }>
+    Array<{ month: string; amount: number }>
   >([]);
 
   const handleOnDelete = async () => {
@@ -117,7 +117,7 @@ export default function Page({}: Props) {
       <ContentLayout title={"Client"}>
         <div className="flex flex-col w-full gap-6">
           {loading ? (
-            <div className="flex w-full h-screen items-center justify-center">
+            <div className="flex w-full h-full items-center justify-center">
               <ClipLoader color={cn("text-primary")} />
             </div>
           ) : (
@@ -233,10 +233,10 @@ export default function Page({}: Props) {
                       ) : (
                         <ResponsiveContainer width="100%" height={300}>
                           <BarChart data={monthlyInvoice}>
-                            <XAxis dataKey="mois" />
+                            <XAxis dataKey="month" />
                             <YAxis />
                             <Tooltip />
-                            <Bar dataKey="montant" fill={cn("text-primary")} />
+                            <Bar dataKey="amount" fill={cn("text-primary")} />
                           </BarChart>
                         </ResponsiveContainer>
                       )}
