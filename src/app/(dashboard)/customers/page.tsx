@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
 import Image from "next/image";
-import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 
 import { Customer } from "@/types/Customer";
@@ -11,35 +10,36 @@ import { Input } from "@/components/ui/input";
 import { ContentLayout } from "@/components/admin-panel/content-layout";
 import AddCustomerDialog from "@/components/add-customer-dialog";
 import TableCustomers from "@/components/table-customers";
+import ErrorScreen from "@/components/error-screen";
 
 import { ClipLoader } from "react-spinners";
 import { PiPlus } from "react-icons/pi";
 
 import api from "@/lib/axios";
+import { cn } from "@/lib/utils";
 
 type Props = {};
 
 export default function Page({}: Props) {
   const router = useRouter();
-  const t = useTranslations();
 
   const [customers, setCustomers] = React.useState<Customer[]>([]);
   const [search, setSearch] = React.useState<string>("");
   const [loading, setLoading] = React.useState<boolean>(true);
-  const [error, setError] = React.useState<boolean>(false);
+  const [error, setError] = React.useState<String | null>(null);
 
   const fetchCustomers = React.useCallback(async () => {
     try {
       setLoading(true);
-      setError(false);
+      setError(null);
       const response = await api.get("/customers", {
         params: {
           search: search || undefined,
         },
       });
       setCustomers(response.data);
-    } catch (error) {
-      setError(true);
+    } catch (err: any) {
+      setError(err.response?.data?.message || err.message);
     } finally {
       setLoading(false);
     }
@@ -54,45 +54,25 @@ export default function Page({}: Props) {
   }, [fetchCustomers]);
 
   const handleSelectCustomer = (customerId: number) => {
-    router.push(`/dashboard/customers/${customerId}`);
+    router.push(`/customers/${customerId}`);
   };
 
-  const handleOnAdd = (newCustomer: Customer) => {
-    setCustomers((prev) => [...prev, newCustomer]);
+  const handleOnAdd = () => {
+    fetchCustomers();
   };
-
-  if (error) {
-    console.error("Error fetching data");
-    return (
-      <div className="flex flex-col w-full h-full justify-center items-center gap-6">
-        <Image
-          src={"/assets/illustrations/illu_error.svg"}
-          width={200}
-          height={200}
-          alt="Error"
-        />
-        <h1 className="text-2xl font-semibold">
-          {t("common.common_error_fetch_message")}
-        </h1>
-        <Button onClick={fetchCustomers}>{t("common.common_retry")}</Button>
-      </div>
-    );
-  }
 
   return (
     <>
-      <ContentLayout title={t("customers.customers")}>
+      <ContentLayout title="Clients">
         <div className="flex flex-col w-full h-full gap-6">
           <div className="flex flex-col gap-10">
             <div className="flex items-center justify-between">
-              <h1 className="text-2xl font-semibold">
-                {t("customers.customers")}
-              </h1>
+              <h1 className="text-2xl font-semibold">{"Clients"}</h1>
               <AddCustomerDialog
                 trigger={
                   <Button variant="default" className="flex items-center gap-2">
                     <PiPlus size={20} />
-                    {t("customers.customer_add")}
+                    {"Ajouter un client"}
                   </Button>
                 }
                 onSave={handleOnAdd}
@@ -103,9 +83,7 @@ export default function Page({}: Props) {
                 <div className="flex w-full py-2 gap-6 xl:w-2/6">
                   <Input
                     type="text"
-                    placeholder={t(
-                      "customers.customer_table_search_placeholder"
-                    )}
+                    placeholder={"Rechercher un client"}
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                   />
@@ -115,7 +93,11 @@ export default function Page({}: Props) {
           </div>
           {loading ? (
             <div className="flex justify-center items-center w-full h-full ">
-              <ClipLoader color="#009933" size={50} />
+              <ClipLoader color={cn("text-primary")} />
+            </div>
+          ) : error ? (
+            <div className="flex justify-center items-center w-full h-full ">
+              <ErrorScreen handleRetry={fetchCustomers} />
             </div>
           ) : (
             <TableCustomers

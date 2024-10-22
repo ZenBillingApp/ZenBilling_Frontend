@@ -4,9 +4,6 @@ import { useRouter } from "next/navigation";
 
 import { Invoice } from "@/types/Invoice";
 
-import { useTranslations } from "next-intl";
-
-import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
@@ -16,8 +13,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+
 import useFormattedAmount from "@/hooks/useFormattedAmount";
 import useFormattedDate from "@/hooks/useFormattedDate";
+
+import { cn } from "@/lib/utils";
 
 type Props = {
   invoices: Invoice[] | undefined;
@@ -25,50 +25,45 @@ type Props = {
 };
 
 export default function TableInvoices({ invoices, search }: Props) {
-  const t = useTranslations();
   const router = useRouter();
   const { formatAmount } = useFormattedAmount();
   const { formatDate } = useFormattedDate();
+
   const handleSelectInvoice = (invoiceId: number) => {
-    router.push(`/dashboard/invoices/${invoiceId}`);
+    router.push(`/invoices/${invoiceId}`);
   };
+
+  const statusText = (status: string) => {
+    if (status === "paid") {
+      return "Payée";
+    } else if (status === "pending") {
+      return "En attente";
+    } else if (status === "cancelled") {
+      return "Annulée";
+    } else {
+      return "N/A";
+    }
+  };
+
   return (
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="min-w-[120px]">
-            {t("invoices.invoice_table_header_invoice_number")}
-          </TableHead>
-          <TableHead className="min-w-[120px]">
-            {t("invoices.invoice_table_header_first_name")}
-          </TableHead>
-          <TableHead className="min-w-[120px]">
-            {t("invoices.invoice_table_header_last_name")}
-          </TableHead>
-          <TableHead className="min-w-[120px]">
-            {t("invoices.invoice_table_header_status")}
-          </TableHead>
-          <TableHead className="min-w-[120px]">
-            {t("invoices.invoice_table_header_items")}
-          </TableHead>
-          <TableHead className="min-w-[120px]">
-            {t("invoices.invoice_table_header_amount")}
-          </TableHead>
-          <TableHead className="min-w-[150px]">
-            {t("invoices.invoice_table_header_invoice_date")}
-          </TableHead>
-          <TableHead className="min-w-[150px]">
-            {t("invoices.invoice_table_header_due_date")}
-          </TableHead>
+          <TableHead className="min-w-[120px]">ID</TableHead>
+          <TableHead className="min-w-[120px]">Prénom</TableHead>
+          <TableHead className="min-w-[120px]">Nom</TableHead>
+          <TableHead className="min-w-[120px]">Statut</TableHead>
+          <TableHead className="min-w-[120px]">Articles</TableHead>
+          <TableHead className="min-w-[120px]">Montant total</TableHead>
+          <TableHead className="min-w-[150px]">Date de facturation</TableHead>
+          <TableHead className="min-w-[150px]">Date d'échéance</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {invoices?.length === 0 ? (
           <TableRow>
             <TableCell colSpan={8} className="text-center">
-              {search
-                ? t("invoices.invoice_table_no_invoices")
-                : t("invoices.invoice_table_no_invoices_description")}
+              {search ? "Aucune facture trouvée" : "Aucune facture disponible"}
             </TableCell>
           </TableRow>
         ) : (
@@ -97,8 +92,7 @@ export default function TableInvoices({ invoices, search }: Props) {
                       : "bg-red-500 text-white hover:bg-red-600"
                   )}
                 >
-                  {t(`invoices.invoice_table_status_${invoice.status}`) ||
-                    "N/A"}
+                  {statusText(invoice.status)}
                 </Badge>
               </TableCell>
               <TableCell className="min-w-[120px]">

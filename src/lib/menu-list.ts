@@ -1,6 +1,5 @@
 import {
     Users,
-    Settings,
     User2Icon,
     LayoutGrid,
     LucideIcon,
@@ -36,59 +35,41 @@ export function GetMenuList(pathname: string): Group[] {
             groupLabel: "",
             menus: [
                 {
-                    href: "/dashboard/home",
+                    href: "/dashboard",
                     label: t("dashboard.dashboard"),
-                    active: pathname.includes("/home"),
+                    active: pathname === "/dashboard",
                     icon: LayoutGrid,
                     submenus: [],
                 },
             ],
         },
         {
-            groupLabel: "Management",
+            groupLabel: "Facturation",
             menus: [
                 {
-                    href: "",
-                    label: t("invoices.invoices"),
+                    href: "/invoices",
+                    label: "Factures",
                     active: pathname.includes("/invoices"),
                     icon: FolderArchive,
-                    submenus: [
-                        {
-                            href: "/dashboard/invoices",
-                            label: t("invoices.all_invoices"),
-                            active: pathname === "/dashboard/invoices",
-                        },
-                        {
-                            href: "/dashboard/invoices/create",
-                            label: t("invoices.create_invoice"),
-                            active: pathname === "/dashboard/invoices/create",
-                        },
-                    ],
+                    submenus: [],
                 },
                 {
-                    href: "/dashboard/customers",
-                    label: t("customers.customers"),
-                    active: pathname.includes("/dashboard/customers"),
+                    href: "/customers",
+                    label: "Clients",
+                    active: pathname.includes("/customers"),
                     icon: Users,
                     submenus: [],
                 },
             ],
         },
         {
-            groupLabel: t("settings.settings"),
+            groupLabel: "Paramètres",
             menus: [
                 {
-                    href: "/dashboard/profile",
-                    label: t("profile.profile"),
+                    href: "/profile",
+                    label: "Profil",
                     active: pathname.includes("/profile"),
                     icon: User2Icon,
-                    submenus: [],
-                },
-                {
-                    href: "/dashboard/my-company",
-                    label: t("company.company"),
-                    active: pathname.includes("/my-company"),
-                    icon: Home,
                     submenus: [],
                 },
             ],

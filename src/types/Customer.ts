@@ -13,6 +13,6 @@ export interface Customer {
     state: string;
     street_address: string;
     user_id: number;
-    invoice_count: number;
-    Invoices: Invoice[];
+    invoice_count?: number;
+    Invoices?: Invoice[];
 }

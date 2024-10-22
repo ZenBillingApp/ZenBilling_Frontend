@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
 import { useParams, useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
 
 import { Customer } from "@/types/Customer";
 
@@ -43,18 +42,18 @@ export default function Page({}: Props) {
   const router = useRouter();
   const { toast } = useToast();
 
-  const t = useTranslations();
-
   const [customer, setCustomer] = React.useState<Customer | null>(null);
   const [loading, setLoading] = React.useState<boolean>(true);
+  const [error, setError] = React.useState<string | null>(null);
   const [monthlyInvoice, setMonthlyInvoice] = React.useState<
-    Array<{ month: string; amount: number }>
+    Array<{ mois: string; montant: number }>
   >([]);
 
   const handleOnDelete = async () => {
     try {
       setLoading(true);
       await api.delete(`/customers/${id}`);
+      router.push("/customers");
       toast({
         title: "Client supprimé",
         description: "Le client a été supprimé avec succès",
@@ -67,7 +66,7 @@ export default function Page({}: Props) {
         description: "Impossible de supprimer le client",
       });
     } finally {
-      router.push("/dashboard/customers");
+      setLoading(false);
     }
   };
 
@@ -83,8 +82,6 @@ export default function Page({}: Props) {
           title: "Une erreur s'est produite",
           description: "Impossible de charger les revenus mensuels",
         });
-      } finally {
-        setLoading(false);
       }
     };
     fetchMonthlyInvoice();
@@ -93,15 +90,19 @@ export default function Page({}: Props) {
   React.useEffect(() => {
     const fetchCustomer = async () => {
       try {
+        setLoading(true);
+        setError(null);
         const response = await api.get(`/customers/${id}`);
         setCustomer(response.data);
-      } catch (error) {
-        console.error(error);
+      } catch (err: any) {
+        setError(err.response?.data?.message || err.message);
         toast({
           variant: "destructive",
           title: "Une erreur s'est produite",
           description: "Impossible de charger les informations du client",
         });
+      } finally {
+        setLoading(false);
       }
     };
     fetchCustomer();
@@ -113,11 +114,11 @@ export default function Page({}: Props) {
 
   return (
     <>
-      <ContentLayout title={t("customers.customer_details")}>
+      <ContentLayout title={"Client"}>
         <div className="flex flex-col w-full gap-6">
           {loading ? (
             <div className="flex w-full h-screen items-center justify-center">
-              <ClipLoader color="#009933" loading={loading} size={50} />
+              <ClipLoader color={cn("text-primary")} />
             </div>
           ) : (
             <>
@@ -132,13 +133,10 @@ export default function Page({}: Props) {
                     trigger={
                       <Button
                         variant="default"
-                        className={cn(
-                          "flex items-center gap-2",
-                          "hover:bg-green-500 hover:text-white"
-                        )}
+                        className={cn("flex items-center gap-2")}
                       >
                         <MdOutlineEdit size={20} />
-                        {t("common.common_edit")}
+                        Modifier
                       </Button>
                     }
                     customer={customer}
@@ -149,19 +147,16 @@ export default function Page({}: Props) {
                     trigger={
                       <Button
                         variant="destructive"
-                        className={cn(
-                          "flex items-center gap-2",
-                          "hover:bg-red-500 hover:text-white"
-                        )}
+                        className={cn("flex items-center gap-2")}
                       >
                         <MdDeleteOutline size={20} />
-                        {t("common.common_delete")}
+                        Supprimer
                       </Button>
                     }
                     handleOnConfirm={handleOnDelete}
-                    title={t("customers.customer_delete")}
-                    description={t("customers.customer_delete_confirm")}
-                    confirmText={t("common.common_delete")}
+                    title={"Supprimer le client"}
+                    description={`Voulez-vous vraiment supprimer le client ${customer?.first_name} ${customer?.last_name} ?`}
+                    confirmText={"Supprimer"}
                   />
                 </div>
               </div>
@@ -169,64 +164,50 @@ export default function Page({}: Props) {
                 <div className="flex w-full sm:w-1/2 flex-col gap-6">
                   <Card className="flex flex-col justify-center  ">
                     <CardHeader>
-                      <CardTitle>
-                        {t("customers.customer_contact_info")}
-                      </CardTitle>
+                      <CardTitle>{"Contact du client"}</CardTitle>
                       <CardDescription>
-                        {t("customers.customer_contact_info_description")}
+                        {"Informations de contact du client"}
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
                       <div className="flex gap-2">
-                        <span className="font-semibold">
-                          {t("common.common_email")} :{" "}
-                        </span>{" "}
+                        <span className="font-semibold">Email :</span>{" "}
                         {customer?.email}
                       </div>
                       <div className="flex gap-2">
-                        <span className="font-semibold">
-                          {t("common.common_phone")} :{" "}
-                        </span>{" "}
+                        <span className="font-semibold">Téléphone :</span>{" "}
                         {customer?.phone}
                       </div>
                     </CardContent>
                   </Card>
                   <Card className="flex flex-col ">
                     <CardHeader>
-                      <CardTitle>{t("customers.customer_address")}</CardTitle>
+                      <CardTitle>Adresse du client</CardTitle>
                       <CardDescription>
-                        {t("customers.customer_address_description")}
+                        {"Informations sur l'adresse du client"}
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
                       <div className="flex gap-2 break-word">
-                        <span className="font-semibold">
-                          {t("common.common_street")} :{" "}
-                        </span>{" "}
+                        <span className="font-semibold">Adresse :</span>{" "}
                         {customer?.street_address || "-"}
                       </div>
                       <div className="flex gap-2">
-                        <span className="font-semibold">
-                          {t("common.common_city")} :{" "}
-                        </span>{" "}
+                        <span className="font-semibold">Ville :</span>{" "}
                         {customer?.city}
                       </div>
                       <div className="flex gap-2">
                         <span className="font-semibold">
-                          {t("common.common_state")} :{" "}
+                          Département/Région :
                         </span>{" "}
                         {customer?.state}
                       </div>
                       <div className="flex gap-2">
-                        <span className="font-semibold">
-                          {t("common.common_zip")} :{" "}
-                        </span>{" "}
+                        <span className="font-semibold">Code postal :</span>{" "}
                         {customer?.postal_code}
                       </div>
                       <div className="flex gap-2">
-                        <span className="font-semibold">
-                          {t("common.common_country")} :{" "}
-                        </span>{" "}
+                        <span className="font-semibold">Pays :</span>{" "}
                         {customer?.country}
                       </div>
                     </CardContent>
@@ -235,33 +216,27 @@ export default function Page({}: Props) {
                 <div className="flex w-full sm:w-1/2">
                   <Card className="w-full">
                     <CardHeader>
-                      <CardTitle>
-                        {t("customers.customer_monthly_revenue")}
-                      </CardTitle>
+                      <CardTitle>Revenus mensuels du client</CardTitle>
                       <CardDescription>
-                        {t("customers.customer_monthly_revenue_description")}
+                        Revenus mensuels générés par le client
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
                       {monthlyInvoice.length === 0 ? (
                         <Alert>
                           <AlertTriangle className="w-5 h-5" />
-                          <AlertTitle>
-                            {t("invoices.invoice_table_no_invoices")}
-                          </AlertTitle>
+                          <AlertTitle>Aucune facture trouvée</AlertTitle>
                           <AlertDescription>
-                            {t(
-                              "invoices.invoice_table_no_invoices_description"
-                            )}
+                            Aucune facture trouvée pour ce client
                           </AlertDescription>
                         </Alert>
                       ) : (
                         <ResponsiveContainer width="100%" height={300}>
                           <BarChart data={monthlyInvoice}>
-                            <XAxis dataKey="month" />
-                            <YAxis name="Amount" />
+                            <XAxis dataKey="mois" />
+                            <YAxis />
                             <Tooltip />
-                            <Bar dataKey="amount" fill="#009933" />
+                            <Bar dataKey="montant" fill={cn("text-primary")} />
                           </BarChart>
                         </ResponsiveContainer>
                       )}
@@ -271,9 +246,9 @@ export default function Page({}: Props) {
               </div>
               <Card>
                 <CardHeader>
-                  <CardTitle>{t("invoices.invoices")}</CardTitle>
+                  <CardTitle>{"Factures du client"}</CardTitle>
                   <CardDescription>
-                    {t("customers.customer_invoices_description")}
+                    {"Liste des factures du client"}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>

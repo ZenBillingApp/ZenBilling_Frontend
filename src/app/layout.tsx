@@ -24,10 +24,11 @@ export const metadata: Metadata = {
   title: "ZenBilling",
   description: "ZenBilling est un gestionnaire de factures simple et efficace.",
   keywords:
-    "factures, gestion, ZenBilling, entreprise, comptabilité, gestionnaire, facturation, devis, paiement, clients, produits, services, TVA, taxes,gratuit, open-source",
+    "factures, gestion, ZenBilling, entreprise, comptabilité, gestionnaire, facturation, devis, paiement, clients, produits, services, TVA, taxes,gratuit, open-source, Zen Billing",
   openGraph: {
     title: "ZenBilling",
-    description: "Gestionnaire de factures en ligne.",
+    description:
+      "ZenBilling est un gestionnaire de factures simple et efficace.",
     url: "https://zenbilling.dynamicwebforge.fr",
     type: "website",
     locale: "fr_FR",

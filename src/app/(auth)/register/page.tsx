@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
 import { setCookie } from "cookies-next";
 import { useForm } from "react-hook-form";
 
@@ -20,7 +19,6 @@ import api from "@/lib/axios";
 
 export default function SignupPage() {
   const router = useRouter();
-  const t = useTranslations();
   const {
     register,
     handleSubmit,
@@ -50,7 +48,9 @@ export default function SignupPage() {
   const methods = useForm();
 
   const [loading, setLoading] = React.useState<boolean>(false);
-  const [error, setError] = React.useState<string | null>(null);
+  const [error, setError] = React.useState<string | [{ msg: string }] | null>(
+    null
+  );
 
   const onSubmit = async (data: {
     first_name: string;
@@ -115,7 +115,7 @@ export default function SignupPage() {
                 Une erreur s'est produite lors de l'inscription
               </AlertTitle>
               <AlertDescription>
-                <p>{error}</p>
+                {typeof error === "string" ? error : error.map((e) => e.msg)}
               </AlertDescription>
             </Alert>
           )}

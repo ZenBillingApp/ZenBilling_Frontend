@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { useTranslations } from "next-intl";
+import React from "react";
+import { useForm } from "react-hook-form";
 
 import { Customer } from "@/types/Customer";
 
@@ -17,11 +17,12 @@ import {
   CredenzaClose,
   CredenzaBody,
 } from "@/components/ui/credenza";
-import { PhoneInput } from "@/components/ui/phone-input";
+import { FormPhoneInput } from "@/components/ui/phone-input";
 import { ScrollArea } from "./ui/scroll-area";
 import { useToast } from "@/components/ui/use-toast";
 
 import api from "@/lib/axios";
+import { cn } from "@/lib/utils";
 
 type Props = {
   trigger: React.ReactNode;
@@ -34,254 +35,199 @@ export default function EditCustomerDialog({
   customer,
   onSave,
 }: Props) {
-  const [open, setOpen] = React.useState<boolean>(false);
-  const [newCustomer, setNewCustomer] = React.useState<Customer | null>(null);
-  const [loading, setLoading] = React.useState<boolean>(false);
-  const [error, setError] = React.useState<
-    | string
-    | [
-        {
-          msg: string;
-        }
-      ]
-    | null
-  >(null);
-
-  const t = useTranslations();
   const { toast } = useToast();
+  const [open, setOpen] = React.useState<boolean>(false);
+  const [loading, setLoading] = React.useState<boolean>(false);
 
-  const handleOnEdit = async () => {
+  const {
+    register,
+    handleSubmit,
+    control,
+    reset,
+    formState: { errors },
+  } = useForm<Customer>({
+    defaultValues: customer || undefined,
+  });
+
+  // Reset form when customer changes
+  React.useEffect(() => {
+    if (customer) {
+      reset(customer);
+    }
+  }, [customer, reset, open]);
+
+  const handleOnEdit = async (data: Customer) => {
+    if (!customer?.client_id) return;
+
     try {
       setLoading(true);
-      setError(null);
-      if (newCustomer) {
-        const response = await api.put(`/customers/${newCustomer.client_id}`, {
-          ...newCustomer,
-        });
-        onSave(response.data);
-        toast({
-          title: "Client modifié",
-          description: "Le client a été modifié avec succès",
-        });
-        setOpen(false);
-      }
-    } catch (err: any) {
-      setError(
-        err.response?.data?.message ||
-          err.response?.data?.errors ||
-          "Une erreur s'est produite lors de la mise à jour du client"
-      );
+      const response = await api.put(`/customers/${customer.client_id}`, data);
+      onSave(response.data);
+      toast({
+        title: "Client modifié",
+        description: "Le client a été modifié avec succès",
+      });
+      setOpen(false);
+    } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Erreur",
         description:
-          err.response?.data?.message ||
-          err.response?.data?.errors
-            .map((e: { msg: string }) => e.msg)
-            .join(", ") ||
-          "Une erreur s'est produite lors de la mise à jour du client",
+          error.response?.data?.message || "Une erreur s'est produite",
       });
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    if (open) {
-      setNewCustomer(customer);
-    }
-  }, [open]);
-
   return (
     <Credenza open={open} onOpenChange={setOpen}>
       <CredenzaTrigger>{trigger}</CredenzaTrigger>
       <CredenzaContent>
         <ScrollArea className="flex w-full max-h-[80vh] overflow-y-auto">
-          <div className="flex flex-col w-full gap-4 p-2">
-            <CredenzaHeader>
-              <CredenzaTitle>{t("customers.customer_update")}</CredenzaTitle>
-              <CredenzaDescription>
-                {t("customers.customer_update_description")}
-              </CredenzaDescription>
-            </CredenzaHeader>
-            <CredenzaBody className="flex flex-col space-y-4">
-              <div className="flex flex-col gap-2 sm:flex-row">
-                <div className="flex flex-col gap-2 sm:w-1/2">
-                  <Label htmlFor="first_name">
-                    {t("customers.customer_first_name")}
-                  </Label>
-                  <Input
-                    required
-                    id="first_name"
-                    type="text"
-                    placeholder={t("customers.customer_first_name_placeholder")}
-                    value={newCustomer?.first_name || ""}
-                    onChange={(e) =>
-                      setNewCustomer({
-                        ...newCustomer,
-                        first_name: e.target.value,
-                      } as Customer)
-                    }
-                  />
+          <form onSubmit={handleSubmit(handleOnEdit)}>
+            <div className="flex flex-col w-full gap-4 p-2">
+              <CredenzaHeader>
+                <CredenzaTitle>Modifier le client</CredenzaTitle>
+                <CredenzaDescription>
+                  Modifiez les informations du client
+                </CredenzaDescription>
+              </CredenzaHeader>
+              <CredenzaBody className="flex flex-col space-y-4">
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  <div className="flex flex-col gap-2 sm:w-1/2">
+                    <Label htmlFor="first_name">Prénom</Label>
+                    <Input
+                      {...register("first_name", { required: "Prénom requis" })}
+                      id="first_name"
+                      type="text"
+                      placeholder="Prénom"
+                    />
+                    <p className="text-xs text-red-500">
+                      {errors.first_name?.message}
+                    </p>
+                  </div>
+                  <div className="flex flex-col w-full gap-2 sm:w-1/2">
+                    <Label htmlFor="last_name">Nom</Label>
+                    <Input
+                      {...register("last_name", { required: "Nom requis" })}
+                      id="last_name"
+                      type="text"
+                      placeholder="Nom"
+                    />
+                    <p className="text-xs text-red-500">
+                      {errors.last_name?.message}
+                    </p>
+                  </div>
                 </div>
-                <div className="flex flex-col w-full gap-2 sm:w-1/2">
-                  <Label htmlFor="last_name">
-                    {t("customers.customer_last_name")}
-                  </Label>
+                <div className="grid grid-cols-1 gap-2">
+                  <Label htmlFor="street_address">Adresse</Label>
                   <Input
-                    required
-                    id="last_name"
+                    {...register("street_address", {
+                      required: "Adresse requise",
+                    })}
+                    id="street_address"
                     type="text"
-                    placeholder={t("customers.customer_last_name_placeholder")}
-                    value={newCustomer?.last_name || ""}
-                    onChange={(e) =>
-                      setNewCustomer({
-                        ...newCustomer,
-                        last_name: e.target.value || "",
-                      } as Customer)
-                    }
+                    placeholder="Adresse"
                   />
+                  <p className="text-xs text-red-500">
+                    {errors.street_address?.message}
+                  </p>
                 </div>
-              </div>
-              <div className="grid grid-cols-1 gap-2">
-                <Label htmlFor="address">
-                  {t("customers.customer_address")}
-                </Label>
-                <Input
-                  required
-                  id="address"
-                  type="text"
-                  placeholder={t("customers.customer_address_placeholder")}
-                  value={newCustomer?.street_address || ""}
-                  onChange={(e) =>
-                    setNewCustomer({
-                      ...newCustomer,
-                      street_address: e.target.value || "",
-                    } as Customer)
-                  }
-                />
-              </div>
-              <div className="flex flex-col gap-2 sm:flex-row">
-                <div className="flex flex-col gap-2 sm:w-1/2">
-                  <Label htmlFor="city">{t("customers.customer_city")}</Label>
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  <div className="flex flex-col gap-2 sm:w-1/2">
+                    <Label htmlFor="city">Ville</Label>
+                    <Input
+                      {...register("city", { required: "Ville requise" })}
+                      id="city"
+                      type="text"
+                      placeholder="Ville"
+                    />
+                    <p className="text-xs text-red-500">
+                      {errors.city?.message}
+                    </p>
+                  </div>
+                  <div className="flex flex-col w-full gap-2 sm:w-1/2">
+                    <Label htmlFor="state">Département/Région</Label>
+                    <Input
+                      {...register("state", {
+                        required: "Département/Région requis",
+                      })}
+                      id="state"
+                      type="text"
+                      placeholder="Département/Région"
+                    />
+                    <p className="text-xs text-red-500">
+                      {errors.state?.message}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  <div className="flex flex-col gap-2 sm:w-1/2">
+                    <Label htmlFor="postal_code">Code postal</Label>
+                    <Input
+                      {...register("postal_code", {
+                        required: "Code postal requis",
+                      })}
+                      id="postal_code"
+                      type="text"
+                      placeholder="Code postal"
+                    />
+                    <p className="text-xs text-red-500">
+                      {errors.postal_code?.message}
+                    </p>
+                  </div>
+                  <div className="flex flex-col w-full gap-2 sm:w-1/2">
+                    <Label htmlFor="country">Pays</Label>
+                    <Input
+                      {...register("country", { required: "Pays requis" })}
+                      id="country"
+                      type="text"
+                      placeholder="Pays"
+                    />
+                    <p className="text-xs text-red-500">
+                      {errors.country?.message}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex flex-col w-full gap-2">
+                  <Label htmlFor="email">Email</Label>
                   <Input
-                    required
-                    id="city"
-                    type="text"
-                    placeholder={t("customers.customer_city_placeholder")}
-                    value={newCustomer?.city || ""}
-                    onChange={(e) =>
-                      setNewCustomer({
-                        ...newCustomer,
-                        city: e.target.value || "",
-                      } as Customer)
-                    }
+                    {...register("email", { required: "Email requis" })}
+                    id="email"
+                    type="email"
+                    placeholder="Email"
                   />
+                  <p className="text-xs text-red-500">
+                    {errors.email?.message}
+                  </p>
                 </div>
-                <div className="flex flex-col w-full gap-2 sm:w-1/2">
-                  <Label htmlFor="state">{t("customers.customer_state")}</Label>
-                  <Input
-                    required
-                    id="state"
-                    type="text"
-                    placeholder={t("customers.customer_state_placeholder")}
-                    value={newCustomer?.state || ""}
-                    onChange={(e) =>
-                      setNewCustomer({
-                        ...newCustomer,
-                        state: e.target.value || "",
-                      } as Customer)
-                    }
+                <div className="flex flex-col w-full gap-2">
+                  <Label htmlFor="phone">Téléphone</Label>
+                  <FormPhoneInput
+                    name="phone"
+                    control={control}
+                    rules={{
+                      required: "Veuillez entrer le numéro de téléphone",
+                    }}
                   />
+                  <p className="text-xs text-red-500">
+                    {errors.phone?.message}
+                  </p>
                 </div>
-              </div>
-              <div className="flex flex-col gap-2 sm:flex-row">
-                <div className="flex flex-col gap-2 sm:w-1/2">
-                  <Label htmlFor="postal_code">
-                    {t("customers.customer_postal_code")}
-                  </Label>
-                  <Input
-                    required
-                    id="postal_code"
-                    type="text"
-                    placeholder={t(
-                      "customers.customer_postal_code_placeholder"
-                    )}
-                    value={newCustomer?.postal_code || ""}
-                    onChange={(e) =>
-                      setNewCustomer({
-                        ...newCustomer,
-                        postal_code: e.target.value || "",
-                      } as Customer)
-                    }
-                  />
-                </div>
-                <div className="flex flex-col w-full gap-2 sm:w-1/2">
-                  <Label htmlFor="country">
-                    {t("customers.customer_country")}
-                  </Label>
-                  <Input
-                    required
-                    id="country"
-                    type="text"
-                    placeholder={t("customers.customer_country_placeholder")}
-                    value={newCustomer?.country || ""}
-                    onChange={(e) =>
-                      setNewCustomer({
-                        ...newCustomer,
-                        country: e.target.value || "",
-                      } as Customer)
-                    }
-                  />
-                </div>
-              </div>
-              <div className="flex flex-col w-full gap-2">
-                <Label htmlFor="email">{t("customers.customer_email")}</Label>
-                <Input
-                  required
-                  id="email"
-                  type="email"
-                  placeholder={t("customers.customer_email_placeholder")}
-                  value={newCustomer?.email || ""}
-                  onChange={(e) =>
-                    setNewCustomer({
-                      ...newCustomer,
-                      email: e.target.value || "",
-                    } as Customer)
-                  }
-                />
-              </div>
-              <div className="flex flex-col w-full gap-2">
-                <Label htmlFor="phone">{t("customers.customer_phone")}</Label>
-                <PhoneInput
-                  required
-                  id="company.phone"
-                  name="company.phone"
-                  placeholder={t("customers.customer_phone_placeholder")}
-                  value={newCustomer?.phone || ""}
-                  defaultCountry="FR"
-                  onChange={(phone) =>
-                    setNewCustomer({
-                      ...newCustomer,
-                      phone: phone || "",
-                    } as Customer)
-                  }
-                />
-              </div>
-            </CredenzaBody>
-            <CredenzaFooter>
-              <CredenzaClose asChild>
-                <Button variant="outline" disabled={loading}>
-                  {t("common.common_cancel")}
+              </CredenzaBody>
+              <CredenzaFooter>
+                <CredenzaClose asChild>
+                  <Button variant="outline" disabled={loading}>
+                    Annuler
+                  </Button>
+                </CredenzaClose>
+                <Button disabled={loading} type="submit">
+                  {loading ? "Chargement..." : "Enregistrer"}
                 </Button>
-              </CredenzaClose>
-              <Button onClick={handleOnEdit} disabled={loading}>
-                {loading
-                  ? t("customers.customer_update_loading")
-                  : t("customers.customer_update")}
-              </Button>
-            </CredenzaFooter>
-          </div>
+              </CredenzaFooter>
+            </div>
+          </form>
         </ScrollArea>
       </CredenzaContent>
     </Credenza>

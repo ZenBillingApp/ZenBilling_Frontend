@@ -1,5 +1,4 @@
 import React from "react";
-import { useTranslations } from "next-intl";
 
 import { Customer } from "@/types/Customer";
 
@@ -22,6 +21,7 @@ import { MdAdd } from "react-icons/md";
 import { ClipLoader } from "react-spinners";
 
 import api from "@/lib/axios";
+import { cn } from "@/lib/utils";
 
 type Props = {
   trigger: React.ReactNode;
@@ -32,8 +32,6 @@ export default function SheetCustomers({
   handleSelectCustomer,
   trigger,
 }: Props) {
-  const t = useTranslations();
-
   const [open, setOpen] = React.useState(false);
   const [search, setSearch] = React.useState("");
   const [customers, setCustomers] = React.useState<Customer[]>([]);
@@ -42,22 +40,23 @@ export default function SheetCustomers({
   const [data, setData] = React.useState<Customer[]>([]);
   const debouncedSearch = useDebounce(search, 300);
 
+  const fetchCustomers = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get("/customers", {
+        params: {
+          search: debouncedSearch || undefined,
+        },
+      });
+      setData(response.data);
+      setLoading(false);
+    } catch (error) {
+      setError(true);
+      setLoading(false);
+    }
+  };
+
   React.useEffect(() => {
-    const fetchCustomers = async () => {
-      try {
-        setLoading(true);
-        const response = await api.get("/customers", {
-          params: {
-            search: debouncedSearch || undefined,
-          },
-        });
-        setData(response.data);
-        setLoading(false);
-      } catch (error) {
-        setError(true);
-        setLoading(false);
-      }
-    };
     if (open) {
       fetchCustomers();
     }
@@ -69,8 +68,8 @@ export default function SheetCustomers({
     }
   }, [data]);
 
-  const onAdd = async (newCustomer: Customer) => {
-    setCustomers([...customers, newCustomer]);
+  const onAdd = async () => {
+    fetchCustomers();
   };
 
   return (
@@ -80,14 +79,14 @@ export default function SheetCustomers({
         <SheetHeader className="mt-4 space-y-4">
           <SheetTitle>
             <h1 className="text-2xl font-semibold">
-              {t("customers.customer_select")}
+              {"Sélectionner un client"}
             </h1>
           </SheetTitle>
           <SheetDescription>
             <div className="flex items-center gap-2">
               <Input
                 type="text"
-                placeholder={t("customers.customer_placeholder_search")}
+                placeholder="Rechercher un client"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
@@ -106,17 +105,17 @@ export default function SheetCustomers({
           <div className="flex flex-col gap-2">
             {loading && (
               <div className="flex justify-center items-center">
-                <ClipLoader color="#009933" size={20} />
+                <ClipLoader color={cn("text-primary")} />
               </div>
             )}
             {error && (
               <p className="text-center text-sm text-red-500">
-                {t("customers.customer_failed_search")}
+                {"Une erreur s'est produite lors du chargement des clients"}
               </p>
             )}
             {customers && customers.length === 0 && !loading && (
               <p className="text-center text-sm text-gray-500">
-                {t("customers.customer_no_results")}
+                {"Aucun client trouvé"}
               </p>
             )}
             {customers &&

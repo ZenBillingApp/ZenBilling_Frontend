@@ -70,7 +70,6 @@ export default function Page({}: Props) {
           <>
             <div className={cn("flex flex-col w-full h-full gap-6")}>
               <div className="flex flex-col w-full gap-6">
-                <h1 className="text-2xl font-semibold">Tableau de bord</h1>
                 <div className="flex w-full justify-between">
                   <h1 className="text-s font-light">
                     <span className={cn("text-xl", "text-primary")}>
@@ -80,6 +79,7 @@ export default function Page({}: Props) {
                     attente de paiement.
                   </h1>
                 </div>
+                <h1 className="text-2xl font-semibold">Tableau de bord</h1>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <DashboardShorcut
