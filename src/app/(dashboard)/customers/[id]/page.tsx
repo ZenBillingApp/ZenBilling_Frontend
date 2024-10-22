@@ -115,7 +115,7 @@ export default function Page({}: Props) {
   return (
     <>
       <ContentLayout title={"Client"}>
-        <div className="flex flex-col w-full gap-6">
+        <div className="flex flex-col w-full h-full gap-6">
           {loading ? (
             <div className="flex w-full h-full items-center justify-center">
               <ClipLoader color={cn("text-primary")} />
