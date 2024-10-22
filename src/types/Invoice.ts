@@ -1,18 +1,9 @@
 import { Item } from "./Item";
+import { Company } from "./Company";
 export interface Invoice {
     invoice_id: number;
     invoice_date: Date;
-    Company: {
-        name: string;
-        street_address: string;
-        city: string;
-        state: string;
-        postal_code: string;
-        country: string;
-        phone: string;
-        email: string;
-        vat_number: string;
-    };
+    Company:  Company;
     Client: {
         client_id: number;
         first_name: string;

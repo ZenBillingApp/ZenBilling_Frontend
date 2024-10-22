@@ -38,7 +38,7 @@ export default function Login() {
       setCookie("token", response.data.token, {
         maxAge: 60 * 60 * 24 * 7,
       });
-      router.push("/");
+      router.push("/dashboard");
     } catch (err) {
       // Gère les erreurs d'API ici
       const errorMsg =

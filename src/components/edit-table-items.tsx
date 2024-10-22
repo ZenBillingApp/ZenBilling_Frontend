@@ -1,10 +1,7 @@
 import React, { useEffect } from "react";
-import { useTranslations } from "next-intl";
-
+import { useFieldArray, useForm } from "react-hook-form";
 import { Item } from "@/types/Item";
-
 import useFormattedAmount from "@/hooks/useFormattedAmount";
-
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import {
@@ -15,138 +12,178 @@ import {
   TableHeader,
   TableRow,
 } from "./ui/table";
-
-import { Plus, Save, DeleteIcon } from "lucide-react";
+import { Plus, Save, Trash2 } from "lucide-react";
 
 type Props = {
   items: Item[];
   handleOnSaveItems: (items: Item[]) => void;
 };
 
-export default function EditTableItems({ items, handleOnSaveItems }: Props) {
-  const t = useTranslations();
+type FormValues = {
+  items: Item[];
+};
 
+export default function EditTableItems({ items, handleOnSaveItems }: Props) {
   const { formatAmount } = useFormattedAmount();
 
-  const [newItems, setNewItems] = React.useState<Item[]>(items);
+  const {
+    control,
+    register,
+    handleSubmit,
+    reset,
+    watch,
+    formState: { errors },
+  } = useForm<FormValues>({
+    defaultValues: {
+      items: items,
+    },
+  });
 
-  const handleChangeItem = (index: number, key: string, value: any) => {
-    setNewItems(
-      newItems.map((item, i) =>
-        i === index ? { ...item, [key]: value } : item
-      )
-    );
-  };
-
-  const handleDeleteItem = (index: number) => {
-    setNewItems(newItems.filter((item, i) => i !== index));
-  };
-
-  const addItem = () => {
-    setNewItems((prev) => [...prev, {} as Item]);
-  };
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "items",
+  });
 
   useEffect(() => {
-    setNewItems(items);
-  }, [items]);
+    reset({ items });
+  }, [items, reset]);
+
+  const watchItems = watch("items");
+
+  const calculateTotal = (item: Item) => {
+    const price = item.unit_price || 0;
+    const quantity = item.quantity || 0;
+    const vatRate = item.vat_rate || 0;
+
+    const subtotal = price * quantity;
+    const vat = (vatRate / 100) * subtotal;
+    return subtotal + vat;
+  };
+
+  const onSubmit = (data: FormValues) => {
+    handleOnSaveItems(data.items);
+  };
 
   return (
-    <>
-      <Table className="w-full">
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="min-w-96">
-              {t("items.item_table_header_description")}
-            </TableHead>
-            <TableHead className="min-w-40">
-              {t("items.item_table_header_unit_price")}
-            </TableHead>
-            <TableHead className="min-w-32">
-              {t("items.item_table_header_quantity")}
-            </TableHead>
-            <TableHead className="min-w-32">
-              {t("items.item_table_header_vat_rate")}
-            </TableHead>
-            <TableHead className="min-w-32">
-              {t("items.item_table_header_total")}
-            </TableHead>
+            <TableHead className="min-w-96">Description</TableHead>
+            <TableHead className="min-w-40">Prix unitaire</TableHead>
+            <TableHead className="min-w-32">Quantité</TableHead>
+            <TableHead className="min-w-32">Taux TVA (%)</TableHead>
+            <TableHead className="min-w-32">Total TTC</TableHead>
+            <TableHead className="w-20"></TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody>
-          {newItems.map((item, index) => (
-            <TableRow key={index}>
-              <TableCell>
-                <Input
-                  type="text"
-                  value={item.description}
-                  placeholder={t("items.item_table_placeholder_description")}
-                  onChange={(e) =>
-                    handleChangeItem(index, "description", e.target.value)
-                  }
-                />
-              </TableCell>
-              <TableCell>
-                <Input
-                  type="number"
-                  value={item.unit_price}
-                  onChange={(e) =>
-                    handleChangeItem(index, "unit_price", e.target.value || 0)
-                  }
-                />
-              </TableCell>
-              <TableCell>
-                <Input
-                  type="number"
-                  value={item.quantity}
-                  onChange={(e) =>
-                    handleChangeItem(index, "quantity", e.target.value || 0)
-                  }
-                />
-              </TableCell>
 
+        <TableBody>
+          {fields.map((field, index) => (
+            <TableRow key={field.id}>
               <TableCell>
-                <Input
-                  type="number"
-                  value={item.vat_rate}
-                  onChange={(e) =>
-                    handleChangeItem(index, "vat_rate", e.target.value || 0)
-                  }
-                />
+                <div className="flex flex-col gap-2">
+                  <Input
+                    {...register(`items.${index}.description` as const, {
+                      required: "Veuillez saisir une description",
+                    })}
+                  />
+                  {errors.items?.[index]?.description && (
+                    <p className="text-red-500 text-xs">
+                      {errors.items[index]?.description?.message}
+                    </p>
+                  )}
+                </div>
               </TableCell>
               <TableCell>
-                {formatAmount(
-                  item.unit_price * item.quantity +
-                    (item.vat_rate / 100) * item.unit_price * item.quantity,
-                  {
-                    currency: "EUR",
-                  }
-                )}
+                <div className="flex flex-col gap-2">
+                  <Input
+                    type="number"
+                    step="0.01"
+                    {...register(`items.${index}.unit_price` as const, {
+                      required: "Veuillez saisir un prix unitaire",
+                      valueAsNumber: true,
+                      min: { value: 0, message: "Le prix doit être positif" },
+                    })}
+                  />
+                  {errors.items?.[index]?.unit_price && (
+                    <p className="text-red-500 text-xs">
+                      {errors.items[index]?.unit_price?.message}
+                    </p>
+                  )}
+                </div>
+              </TableCell>
+              <TableCell>
+                <div className="flex flex-col gap-2">
+                  <Input
+                    type="number"
+                    {...register(`items.${index}.quantity` as const, {
+                      required: "Veuillez saisir une quantité",
+                      valueAsNumber: true,
+                      min: { value: 1, message: "La quantité minimum est 1" },
+                    })}
+                  />
+                  {errors.items?.[index]?.quantity && (
+                    <p className="text-red-500 text-xs">
+                      {errors.items[index]?.quantity?.message}
+                    </p>
+                  )}
+                </div>
+              </TableCell>
+              <TableCell>
+                <div className="flex flex-col gap-2">
+                  <Input
+                    type="number"
+                    step="0.1"
+                    {...register(`items.${index}.vat_rate` as const, {
+                      required: "Veuillez saisir un taux de TVA",
+                      valueAsNumber: true,
+                      min: { value: 0, message: "Le taux doit être positif" },
+                      max: { value: 100, message: "Le taux maximum est 100%" },
+                    })}
+                  />
+                  {errors.items?.[index]?.vat_rate && (
+                    <p className="text-red-500 text-xs">
+                      {errors.items[index]?.vat_rate?.message}
+                    </p>
+                  )}
+                </div>
+              </TableCell>
+              <TableCell>
+                {formatAmount(calculateTotal(watchItems[index]), {
+                  currency: "EUR",
+                })}
               </TableCell>
               <TableCell>
                 <Button
+                  type="button"
                   variant="destructive"
-                  onClick={() => handleDeleteItem(index)}
+                  onClick={() => remove(index)}
+                  size="icon"
                 >
-                  <DeleteIcon size={20} />
+                  <Trash2 className="h-4 w-4" />
                 </Button>
               </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
-      <div className="flex justify-end mt-4 flex-wrap gap-2">
-        <Button className="flex gap-1" onClick={addItem}>
-          <Plus size={20} />
-          {t("items.item_table_add_item")}
-        </Button>
+
+      <div className="flex justify-end mt-4 gap-2">
         <Button
-          className="flex gap-1"
-          onClick={() => handleOnSaveItems(newItems)}
+          type="button"
+          variant="outline"
+          onClick={() => append({} as Item)}
+          className="flex gap-2"
         >
-          <Save size={20} />
-          {t("common.common_save")}
+          <Plus className="h-4 w-4" />
+          Ajouter un Article
+        </Button>
+        <Button type="submit" className="flex gap-2">
+          <Save className="h-4 w-4" />
+          Enregistrer
         </Button>
       </div>
-    </>
+    </form>
   );
 }
