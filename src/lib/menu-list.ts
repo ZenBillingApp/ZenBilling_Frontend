@@ -66,10 +66,10 @@ export function GetMenuList(pathname: string): Group[] {
             groupLabel: "Paramètres",
             menus: [
                 {
-                    href: "/profile",
-                    label: "Profil",
-                    active: pathname.includes("/profile"),
-                    icon: User2Icon,
+                    href: "/my-company",
+                    label: "Mon entreprise",
+                    active: pathname.includes("/my-company"),
+                    icon: Home,
                     submenus: [],
                 },
             ],

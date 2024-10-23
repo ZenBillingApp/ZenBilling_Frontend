@@ -10,5 +10,5 @@ export interface User {
     postal_code: string;
     country: string;
     phone: string;
-    company: Company;
+    Company: Company;
 }

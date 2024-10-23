@@ -80,7 +80,7 @@ export default function SignupPage() {
       setCookie("token", response.data.token, {
         maxAge: 60 * 60 * 24 * 7,
       });
-      router.push("/");
+      router.push("/dashboard");
     } catch (err) {
       const errorMsg =
         (err as any).response?.data?.message || "Erreur lors de l'inscription";

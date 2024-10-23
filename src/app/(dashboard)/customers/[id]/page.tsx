@@ -236,7 +236,7 @@ export default function Page({}: Props) {
                             <XAxis dataKey="month" />
                             <YAxis />
                             <Tooltip />
-                            <Bar dataKey="amount" fill={cn("text-primary")} />
+                            <Bar dataKey="amount" fill={"var(--border)"} />
                           </BarChart>
                         </ResponsiveContainer>
                       )}
