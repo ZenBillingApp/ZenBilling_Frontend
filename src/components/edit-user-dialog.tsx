@@ -19,7 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { ScrollArea } from "./ui/scroll-area";
-import { PhoneInput } from "./ui/phone-input";
+import { FormPhoneInput } from "./ui/phone-input";
 import { ToastAction } from "@/components/ui/toast";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -261,20 +261,14 @@ export default function EditUserDialog({ trigger, user, onSave }: Props) {
               </div>
               <div className="flex flex-col w-full gap-2">
                 <Label>{t("profile.profile_phone")}</Label>
-                <PhoneInput
+                {/* <FormPhoneInput
                   required
                   id="company.phone"
                   name="company.phone"
                   placeholder={t("customers.customer_phone_placeholder")}
-                  value={newUser.phone}
-                  defaultCountry="FR"
-                  onChange={(phone) =>
-                    setNewUser({
-                      ...newUser,
-                      phone,
-                    })
-                  }
-                />
+
+                  value={newUser?.phone || ""}
+                /> */}
               </div>
 
               <CredenzaFooter>

@@ -56,7 +56,7 @@ export default function TableInvoices({ invoices, search }: Props) {
           <TableHead className="min-w-[120px]">Articles</TableHead>
           <TableHead className="min-w-[120px]">Montant total</TableHead>
           <TableHead className="min-w-[150px]">Date de facturation</TableHead>
-          <TableHead className="min-w-[150px]">Date d'échéance</TableHead>
+          <TableHead className="min-w-[150px]">Date d&apos;échéance</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>

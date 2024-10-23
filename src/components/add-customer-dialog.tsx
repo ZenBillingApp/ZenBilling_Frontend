@@ -99,7 +99,7 @@ export default function AddCustomerDialog({ trigger, onSave }: Props) {
                   <Alert variant="destructive">
                     <AlertTriangle className="w-5 h-5" />
                     <AlertTitle>
-                      Une erreur s'est produite lors de l'inscription
+                      Une erreur s&apos;est produite lors de l&apos;inscription
                     </AlertTitle>
                     <AlertDescription>
                       {typeof error === "string"

@@ -111,7 +111,7 @@ export default function SignupPage() {
             <Alert variant="destructive">
               <AlertTriangle className="w-5 h-5" />
               <AlertTitle>
-                Une erreur s'est produite lors de l'inscription
+                Une erreur s&apos;est produite lors de l&apos;inscription
               </AlertTitle>
               <AlertDescription>
                 {typeof error === "string" ? error : error.map((e) => e.msg)}
@@ -212,7 +212,9 @@ export default function SignupPage() {
 
               <div className="w-full space-y-4">
                 <div>
-                  <h1 className="text-2xl">Information sur l'entreprise</h1>
+                  <h1 className="text-2xl">
+                    Information sur l&apos;entreprise
+                  </h1>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     Veuillez remplir les champs suivants pour créer votre compte
                     entreprise
@@ -220,7 +222,9 @@ export default function SignupPage() {
                 </div>
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="company.name">Nom de l'entreprise</Label>
+                    <Label htmlFor="company.name">
+                      Nom de l&apos;entreprise
+                    </Label>
                     <Input
                       {...register("company.name", {
                         required: "Veuillez entrer le nom de votre entreprise",
@@ -234,7 +238,9 @@ export default function SignupPage() {
                     </p>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="company.industry">Secteur d'activité</Label>
+                    <Label htmlFor="company.industry">
+                      Secteur d&apos;activité
+                    </Label>
                     <Input
                       {...register("company.industry", {
                         required:
@@ -250,7 +256,7 @@ export default function SignupPage() {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="company.street_address">
-                      Adresse de l'entreprise
+                      Adresse de l&apos;entreprise
                     </Label>
                     <Input
                       {...register("company.street_address", {
@@ -328,7 +334,9 @@ export default function SignupPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="company.email">Email de l'entreprise</Label>
+                    <Label htmlFor="company.email">
+                      Email de l&apos;entreprise
+                    </Label>
                     <Input
                       {...register("company.email", {
                         required: "Veuillez entrer l'email de votre entreprise",
@@ -347,7 +355,7 @@ export default function SignupPage() {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="company.phone">
-                      Téléphone de l'entreprise
+                      Téléphone de l&apos;entreprise
                     </Label>
                     <FormPhoneInput
                       name="company.phone"

@@ -312,7 +312,9 @@ export default function Page({}: Props) {
               </div>
               <div className="flex flex-col w-full gap-4 md:w-1/2">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-sm font-semibold">Date d'échéance</h2>
+                  <h2 className="text-sm font-semibold">
+                    Date d&apos;échéance
+                  </h2>
                   <DatePicker
                     trigger={
                       <Button
