@@ -72,7 +72,6 @@ export default function SignupPage() {
       siret_number: string;
     };
   }) => {
-    console.log(data);
     try {
       setLoading(true);
       setError(null);

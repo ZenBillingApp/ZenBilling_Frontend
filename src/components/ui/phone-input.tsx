@@ -43,7 +43,9 @@ const FormPhoneInput = React.forwardRef<
     control,
     rules,
   });
-
+  const handleChange = (val: string | undefined) => {
+    onChange(val || "");
+  };
   return (
     <RPNInput.default
       ref={ref as any}
@@ -52,7 +54,8 @@ const FormPhoneInput = React.forwardRef<
       countrySelectComponent={CountrySelect}
       inputComponent={PhoneInputComponent}
       value={value}
-      onChange={onChange}
+      defaultCountry="FR"
+      onChange={handleChange}
       {...props}
     />
   );

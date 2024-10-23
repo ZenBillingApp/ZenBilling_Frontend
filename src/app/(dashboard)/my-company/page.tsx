@@ -66,9 +66,7 @@ export default function Page({}: Props) {
               <div className="flex items-center justify-between">
                 <div className="flex flex-col items-start gap-2">
                   <h1 className="text-3xl font-semibold">Mon Entreprise</h1>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {user?.Company?.name} - {user?.Company?.industry}
-                  </p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400"></p>
                 </div>
                 <div className="flex items-center gap-2">
                   <EditCompanyDialog
@@ -79,9 +77,7 @@ export default function Page({}: Props) {
                       </Button>
                     }
                     company={user?.Company}
-                    onSave={(updatedCompany) =>
-                      setUser({ ...user, Company: updatedCompany })
-                    }
+                    onSave={() => fetchUser()}
                   />
                 </div>
               </div>
@@ -89,11 +85,19 @@ export default function Page({}: Props) {
                 <div className="flex w-full flex-col justify-center p-4 gap-6">
                   <Card>
                     <CardHeader>
-                      <CardTitle>
-                        Informations de contact de l'entreprise
-                      </CardTitle>
+                      <CardTitle>Informations de l'entreprise</CardTitle>
                     </CardHeader>
                     <CardContent>
+                      <div>
+                        <span className="font-semibold">Nom :</span>{" "}
+                        {user?.Company.name}
+                      </div>
+                      <div>
+                        <span className="font-semibold">
+                          Secteur d'activité :
+                        </span>{" "}
+                        {user?.Company.industry}
+                      </div>
                       <div>
                         <span className="font-semibold">Email :</span>{" "}
                         {user?.Company.email}

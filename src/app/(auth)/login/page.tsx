@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { setCookie } from "cookies-next";
 import { useForm } from "react-hook-form";
@@ -20,6 +20,7 @@ import api from "@/lib/axios";
 export default function Login() {
   const router = useRouter();
   const t = useTranslations();
+  const searchParams = useSearchParams();
   const {
     register,
     handleSubmit,
@@ -30,7 +31,6 @@ export default function Login() {
   const [error, setError] = React.useState<string | null>(null);
 
   const onSubmit = async (data: { email: string; password: string }) => {
-    console.log(data);
     try {
       setLoading(true);
       setError(null); // Réinitialise l'erreur avant l'appel API
@@ -38,7 +38,7 @@ export default function Login() {
       setCookie("token", response.data.token, {
         maxAge: 60 * 60 * 24 * 7,
       });
-      router.push("/dashboard");
+      router.push(searchParams.get("callbackUrl") || "/dashboard");
     } catch (err) {
       // Gère les erreurs d'API ici
       const errorMsg =

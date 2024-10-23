@@ -18,13 +18,13 @@ import {
 } from "@/components/ui/credenza";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Label } from "@/components/ui/label";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "./ui/use-toast";
+import { FormPhoneInput } from "./ui/phone-input";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 import { AlertTriangle } from "lucide-react";
 
 import api from "@/lib/axios";
-import { FormPhoneInput } from "./ui/phone-input";
 
 type Props = {
   company: Company | null;

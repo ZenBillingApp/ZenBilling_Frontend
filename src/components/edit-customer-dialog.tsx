@@ -20,9 +20,11 @@ import {
 import { FormPhoneInput } from "@/components/ui/phone-input";
 import { ScrollArea } from "./ui/scroll-area";
 import { useToast } from "@/components/ui/use-toast";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+
+import { AlertTriangle } from "lucide-react";
 
 import api from "@/lib/axios";
-import { cn } from "@/lib/utils";
 
 type Props = {
   trigger: React.ReactNode;
@@ -38,6 +40,9 @@ export default function EditCustomerDialog({
   const { toast } = useToast();
   const [open, setOpen] = React.useState<boolean>(false);
   const [loading, setLoading] = React.useState<boolean>(false);
+  const [error, setError] = React.useState<string | [{ msg: string }] | null>(
+    null
+  );
 
   const {
     register,
@@ -61,6 +66,7 @@ export default function EditCustomerDialog({
 
     try {
       setLoading(true);
+      setError(null);
       const response = await api.put(`/customers/${customer.client_id}`, data);
       onSave(response.data);
       toast({
@@ -68,12 +74,13 @@ export default function EditCustomerDialog({
         description: "Le client a été modifié avec succès",
       });
       setOpen(false);
-    } catch (error: any) {
+    } catch (err: any) {
+      setError(err.response?.data?.message || "Une erreur s'est produite");
       toast({
         variant: "destructive",
         title: "Erreur",
         description:
-          error.response?.data?.message || "Une erreur s'est produite",
+          "Une erreur s'est produite lors de la modification du client",
       });
     } finally {
       setLoading(false);
@@ -94,6 +101,19 @@ export default function EditCustomerDialog({
                 </CredenzaDescription>
               </CredenzaHeader>
               <CredenzaBody className="flex flex-col space-y-4">
+                {error && (
+                  <Alert variant="destructive">
+                    <AlertTriangle className="w-5 h-5" />
+                    <AlertTitle>
+                      Une erreur s&apos;est produite lors de la sauvegarde
+                    </AlertTitle>
+                    <AlertDescription>
+                      {typeof error === "string"
+                        ? error
+                        : error.map((e) => e.msg)}
+                    </AlertDescription>
+                  </Alert>
+                )}
                 <div className="flex flex-col gap-2 sm:flex-row">
                   <div className="flex flex-col gap-2 sm:w-1/2">
                     <Label htmlFor="first_name">Prénom</Label>
