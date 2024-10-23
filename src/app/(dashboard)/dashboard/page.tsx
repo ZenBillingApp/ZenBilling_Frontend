@@ -17,9 +17,10 @@ import { ContentLayout } from "@/components/admin-panel/content-layout";
 import DashboardShorcut from "@/components/dashboard-shorcut";
 import TableInvoices from "@/components/tableInvoices";
 
-import { LiaFileInvoiceDollarSolid } from "react-icons/lia";
 import { PiUsersThree } from "react-icons/pi";
 import { ClipLoader } from "react-spinners";
+
+import { FilePlus, FileClock } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import api from "@/lib/axios";
@@ -83,7 +84,7 @@ export default function Page({}: Props) {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <DashboardShorcut
-                  icon={<LiaFileInvoiceDollarSolid size={32} />}
+                  icon={<FileClock size={32} />}
                   title={"Factures en attente de paiement"}
                   value={data?.numberOfUnpaidInvoices || 0}
                 />
@@ -93,7 +94,7 @@ export default function Page({}: Props) {
                   value={data?.numberOfClients || 0}
                 />
                 <DashboardShorcut
-                  icon={<PiUsersThree size={32} />}
+                  icon={<FilePlus size={32} />}
                   title={"Nombre de factures ce mois-ci"}
                   value={data?.numberOfInvoicesThisMonth || 0}
                 />
