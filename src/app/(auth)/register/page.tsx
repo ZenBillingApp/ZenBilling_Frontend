@@ -92,9 +92,12 @@ export default function SignupPage() {
       toast({
         variant: "destructive",
         title: "Erreur lors de l'inscription",
-        description: (errorMsg as { msg: string }[])
-          .map((e) => t(`server.${e.msg}`))
-          .join(", "),
+        description:
+          typeof err === "string"
+            ? t(`server.${error}`)
+            : (err as { msg: string }[])
+                .map((e: { msg: string }) => t(`server.${e.msg}`))
+                .join(", "),
       });
     } finally {
       setLoading(false);
@@ -126,8 +129,10 @@ export default function SignupPage() {
               </AlertTitle>
               <AlertDescription>
                 {typeof error === "string"
-                  ? error
-                  : error.map((e) => <p>{t(`server.${e.msg}`)}</p>)}
+                  ? t(`server.${error}`) || error
+                  : error.map((e) => (
+                      <p key={e.msg}>{t(`server.${e.msg}`) || e.msg}</p>
+                    ))}
               </AlertDescription>
             </Alert>
           )}

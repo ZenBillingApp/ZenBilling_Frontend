@@ -40,7 +40,7 @@ import api from "@/lib/axios";
 
 type Props = {};
 
-const customTooltip = ({ active, payload, label }: any) => {
+const CustomTooltip = ({ active, payload, label }: any) => {
   const { formatAmount } = useFormattedAmount();
   if (active) {
     return (
@@ -251,7 +251,7 @@ export default function Page({}: Props) {
                           <BarChart data={monthlyInvoice}>
                             <XAxis dataKey="month" />
                             <YAxis />
-                            <Tooltip content={customTooltip} />
+                            <Tooltip content={CustomTooltip} />
                             <Bar dataKey="amount" fill={cn("bg-primary")} />
                           </BarChart>
                         </ResponsiveContainer>
