@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { useParams, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 import { Customer } from "@/types/Customer";
 
@@ -56,6 +57,7 @@ export default function Page({}: Props) {
   const { id } = useParams();
   const router = useRouter();
   const { toast } = useToast();
+  const t = useTranslations();
 
   const [customer, setCustomer] = React.useState<Customer | null>(null);
   const [loading, setLoading] = React.useState<boolean>(true);
@@ -73,12 +75,11 @@ export default function Page({}: Props) {
         title: "Client supprimé",
         description: "Le client a été supprimé avec succès",
       });
-    } catch (error) {
-      console.error(error);
+    } catch (err: any) {
       toast({
         variant: "destructive",
         title: "Une erreur s'est produite",
-        description: "Impossible de supprimer le client",
+        description: t(`server.${err.response?.data?.message}`),
       });
     } finally {
       setLoading(false);
@@ -90,41 +91,41 @@ export default function Page({}: Props) {
       try {
         const response = await api.get(`/customers/${id}/monthly-revenue`);
         setMonthlyInvoice(response.data);
-      } catch (error) {
-        console.error(error);
+      } catch (err: any) {
         toast({
           variant: "destructive",
           title: "Une erreur s'est produite",
-          description: "Impossible de charger les revenus mensuels",
+          description: t(`server.${err.response?.data?.message}`),
         });
       }
     };
     fetchMonthlyInvoice();
   }, [id]);
 
+  const fetchCustomer = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await api.get(`/customers/${id}`);
+      setCustomer(response.data);
+    } catch (err: any) {
+      setError(err.response?.data?.message || err.message);
+      toast({
+        variant: "destructive",
+        title: "Une erreur s'est produite",
+        description: t(`server.${err.response?.data?.message}`),
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   React.useEffect(() => {
-    const fetchCustomer = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const response = await api.get(`/customers/${id}`);
-        setCustomer(response.data);
-      } catch (err: any) {
-        setError(err.response?.data?.message || err.message);
-        toast({
-          variant: "destructive",
-          title: "Une erreur s'est produite",
-          description: "Impossible de charger les informations du client",
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchCustomer();
   }, [id]);
 
-  const handleOnEdit = async (newCustomer: Customer) => {
-    setCustomer({ ...customer, ...newCustomer });
+  const handleOnEdit = async () => {
+    fetchCustomer();
   };
 
   return (
@@ -251,7 +252,6 @@ export default function Page({}: Props) {
                             <XAxis dataKey="month" />
                             <YAxis />
                             <Tooltip content={customTooltip} />
-
                             <Bar dataKey="amount" fill={cn("bg-primary")} />
                           </BarChart>
                         </ResponsiveContainer>

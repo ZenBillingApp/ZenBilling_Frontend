@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { useParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 import { User } from "@/types/User";
 
@@ -13,7 +14,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ContentLayout } from "@/components/admin-panel/content-layout";
-import EditUserDialog from "@/components/edit-user-dialog";
+import { useToast } from "@/components/ui/use-toast";
 
 import { ClipLoader } from "react-spinners";
 import { MdOutlineEdit } from "react-icons/md";
@@ -27,6 +28,8 @@ type Props = {};
 
 export default function Page({}: Props) {
   const { id } = useParams();
+  const t = useTranslations();
+  const { toast } = useToast();
 
   const [user, setUser] = React.useState<User>({} as User);
   const [loading, setLoading] = React.useState<boolean>(true);
@@ -40,6 +43,11 @@ export default function Page({}: Props) {
       setUser(response.data);
     } catch (err: any) {
       setError(err.response.data.message);
+      toast({
+        variant: "destructive",
+        title: "Une Erreur s'est produite",
+        description: t(`server.${err.response.data.message}`),
+      });
     } finally {
       setLoading(false);
     }
@@ -82,7 +90,7 @@ export default function Page({}: Props) {
                 </div>
               </div>
               <div className="flex  w-full gap-6">
-                <div className="flex w-full flex-col justify-center p-4 gap-6">
+                <div className="flex w-full flex-col justify-center gap-6">
                   <Card>
                     <CardHeader>
                       <CardTitle>Informations de l&apos;entreprise</CardTitle>

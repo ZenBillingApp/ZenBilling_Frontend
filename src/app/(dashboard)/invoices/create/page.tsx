@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 import useFormattedAmount from "@/hooks/useFormattedAmount";
 
@@ -8,7 +9,6 @@ import { Item } from "@/types/Item";
 import { Customer } from "@/types/Customer";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ContentLayout } from "@/components/admin-panel/content-layout";
 import DatePicker from "@/components/datePicker";
@@ -30,6 +30,7 @@ export default function Page({}: Props) {
   const router = useRouter();
   const { toast } = useToast();
   const { formatAmount } = useFormattedAmount();
+  const t = useTranslations();
 
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
     null
@@ -60,8 +61,8 @@ export default function Page({}: Props) {
     } catch (err: any) {
       toast({
         variant: "destructive",
-        title: "Erreur lors de la création de la facture",
-        description: err.response?.data.message || "Une erreur s'est produite",
+        title: "Une Erreur s'est produite",
+        description: t(`server.${err.response?.data?.message}`),
       });
     }
   };

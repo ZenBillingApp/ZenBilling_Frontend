@@ -71,7 +71,7 @@ export default function Login() {
             <AlertTriangle className="w-5 h-5" />
             <AlertTitle>{t("login.login_error")}</AlertTitle>
             <AlertDescription>
-              <p>{error}</p>
+              <p>{t(`server.${error}`)}</p>
             </AlertDescription>
           </Alert>
         )}

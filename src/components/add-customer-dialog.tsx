@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { useTranslations } from "next-intl";
 
 import { Customer } from "@/types/Customer";
 
@@ -34,6 +35,7 @@ type Props = {
 
 export default function AddCustomerDialog({ trigger, onSave }: Props) {
   const { toast } = useToast();
+  const t = useTranslations();
 
   const {
     register,
@@ -67,7 +69,12 @@ export default function AddCustomerDialog({ trigger, onSave }: Props) {
       toast({
         variant: "destructive",
         title: "Une erreur s'est produite",
-        description: "Impossible d'ajouter le client",
+        description:
+          typeof err === "string"
+            ? t(`server.${error}`)
+            : (err as { msg: string }[])
+                .map((e: { msg: string }) => t(`server.${e.msg}`))
+                .join(", "),
       });
     } finally {
       setLoading(false);
@@ -87,7 +94,7 @@ export default function AddCustomerDialog({ trigger, onSave }: Props) {
       <CredenzaContent>
         <form onSubmit={handleSubmit(handleOnAdd)}>
           <ScrollArea className="flex w-full max-h-[80vh] overflow-y-auto">
-            <div className="flex flex-col w-full gap-4 p-2">
+            <div className="flex flex-col w-full gap-4">
               <CredenzaHeader>
                 <CredenzaTitle>{"Ajouter un client"}</CredenzaTitle>
                 <CredenzaDescription>
@@ -103,8 +110,10 @@ export default function AddCustomerDialog({ trigger, onSave }: Props) {
                     </AlertTitle>
                     <AlertDescription>
                       {typeof error === "string"
-                        ? error
-                        : error.map((e) => e.msg)}
+                        ? t(`server.${error}`) || error
+                        : error.map((e) => (
+                            <p key={e.msg}>{t(`server.${e.msg}`) || e.msg}</p>
+                          ))}
                     </AlertDescription>
                   </Alert>
                 )}

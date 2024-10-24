@@ -1,5 +1,6 @@
 import React from "react";
 import { useForm } from "react-hook-form";
+import { useTranslations } from "next-intl";
 
 import { Customer } from "@/types/Customer";
 
@@ -38,6 +39,8 @@ export default function EditCustomerDialog({
   onSave,
 }: Props) {
   const { toast } = useToast();
+  const t = useTranslations();
+
   const [open, setOpen] = React.useState<boolean>(false);
   const [loading, setLoading] = React.useState<boolean>(false);
   const [error, setError] = React.useState<string | [{ msg: string }] | null>(
@@ -78,9 +81,13 @@ export default function EditCustomerDialog({
       setError(err.response?.data?.message || "Une erreur s'est produite");
       toast({
         variant: "destructive",
-        title: "Erreur",
+        title: "Une Erreur s'est produite",
         description:
-          "Une erreur s'est produite lors de la modification du client",
+          typeof err === "string"
+            ? t(`server.${error}`)
+            : (err as { msg: string }[])
+                .map((e: { msg: string }) => t(`server.${e.msg}`))
+                .join(", "),
       });
     } finally {
       setLoading(false);
@@ -93,7 +100,7 @@ export default function EditCustomerDialog({
       <CredenzaContent>
         <ScrollArea className="flex w-full max-h-[80vh] overflow-y-auto">
           <form onSubmit={handleSubmit(handleOnEdit)}>
-            <div className="flex flex-col w-full gap-4 p-2">
+            <div className="flex flex-col w-full gap-4">
               <CredenzaHeader>
                 <CredenzaTitle>Modifier le client</CredenzaTitle>
                 <CredenzaDescription>
@@ -109,8 +116,8 @@ export default function EditCustomerDialog({
                     </AlertTitle>
                     <AlertDescription>
                       {typeof error === "string"
-                        ? error
-                        : error.map((e) => e.msg)}
+                        ? t(`server.${error}`) || error
+                        : error.map((e) => t(`server.${e.msg}`))}
                     </AlertDescription>
                   </Alert>
                 )}

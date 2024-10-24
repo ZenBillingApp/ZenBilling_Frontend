@@ -3,6 +3,7 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import { setCookie } from "cookies-next";
 import { useForm } from "react-hook-form";
+import { useTranslations } from "next-intl";
 
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -10,15 +11,19 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { FormPhoneInput } from "@/components/ui/phone-input";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { useTimeZone } from "next-intl";
 
 import { AlertTriangle } from "lucide-react";
 import { ArrowRightIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import api from "@/lib/axios";
+import { useToast } from "@/components/ui/use-toast";
 
 export default function SignupPage() {
   const router = useRouter();
+  const t = useTranslations();
+  const { toast } = useToast();
   const {
     register,
     handleSubmit,
@@ -84,7 +89,13 @@ export default function SignupPage() {
       const errorMsg =
         (err as any).response?.data?.message || "Erreur lors de l'inscription";
       setError(errorMsg);
-      console.log(err);
+      toast({
+        variant: "destructive",
+        title: "Erreur lors de l'inscription",
+        description: (errorMsg as { msg: string }[])
+          .map((e) => t(`server.${e.msg}`))
+          .join(", "),
+      });
     } finally {
       setLoading(false);
     }
@@ -114,7 +125,9 @@ export default function SignupPage() {
                 Une erreur s&apos;est produite lors de l&apos;inscription
               </AlertTitle>
               <AlertDescription>
-                {typeof error === "string" ? error : error.map((e) => e.msg)}
+                {typeof error === "string"
+                  ? error
+                  : error.map((e) => <p>{t(`server.${e.msg}`)}</p>)}
               </AlertDescription>
             </Alert>
           )}

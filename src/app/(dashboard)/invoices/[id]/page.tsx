@@ -1,6 +1,7 @@
 "use client";
 import React, { useCallback, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 import useFormattedAmount from "@/hooks/useFormattedAmount";
 import useFormattedDate from "@/hooks/useFormattedDate";
@@ -37,6 +38,7 @@ export default function Page({}: Props) {
   const { id } = useParams();
   const router = useRouter();
   const { toast } = useToast();
+  const t = useTranslations();
 
   const { formatAmount } = useFormattedAmount();
   const { formatDate } = useFormattedDate();
@@ -57,11 +59,10 @@ export default function Page({}: Props) {
         description: "Le client a été mis à jour avec succès",
       });
     } catch (error) {
-      console.error(error);
       toast({
         variant: "destructive",
-        title: "Erreur",
-        description: "Échec de la mise à jour du client",
+        title: "Une erreur s'est produite",
+        description: t(`server.${(error as any).response?.data.message}`),
         action: (
           <ToastAction
             altText="Retry"
@@ -82,6 +83,11 @@ export default function Page({}: Props) {
       setInvoice(response.data);
     } catch (err: any) {
       setError(err.response?.data.message || "Une erreur s'est produite");
+      toast({
+        variant: "destructive",
+        title: "Une Erreur s'est produite",
+        description: t(`server.${err.response?.data.message}`),
+      });
     } finally {
       setLoading(false);
     }
@@ -116,11 +122,10 @@ export default function Page({}: Props) {
       document.body.appendChild(link);
       link.click();
     } catch (error) {
-      console.error(error);
       toast({
         variant: "destructive",
-        title: "Erreur",
-        description: "Échec du téléchargement de la facture",
+        title: "Une erreur s'est produite",
+        description: t(`server.${(error as any).response?.data.message}`),
         action: (
           <ToastAction altText="Retry" onClick={handleDownload}>
             Réessayer
@@ -141,11 +146,10 @@ export default function Page({}: Props) {
         description: "Le statut de la facture a été mis à jour avec succès",
       });
     } catch (error) {
-      console.error(error);
       toast({
         variant: "destructive",
-        title: "Erreur",
-        description: "Échec de la mise à jour du statut de la facture",
+        title: "Une erreur s'est produite",
+        description: t(`server.${(error as any).response?.data.message}`),
         action: (
           <ToastAction
             altText="Retry"
@@ -177,11 +181,10 @@ export default function Page({}: Props) {
         description: "La date d'échéance a été mise à jour avec succès",
       });
     } catch (error) {
-      console.error(error);
       toast({
         variant: "destructive",
-        title: "Erreur",
-        description: "Échec de la mise à jour de la date d'échéance",
+        title: "Une erreur s'est produite",
+        description: t(`server.${(error as any).response?.data.message}`),
         action: (
           <ToastAction
             altText="Retry"
@@ -205,8 +208,8 @@ export default function Page({}: Props) {
       console.error(error);
       toast({
         variant: "destructive",
-        title: "Erreur",
-        description: "Échec de la mise à jour des articles de la facture",
+        title: "Une erreur s'est produite",
+        description: t(`server.${(error as any).response?.data.message}`),
         action: (
           <ToastAction altText="Retry" onClick={() => handleSaveItems(items)}>
             Réessayer
@@ -224,8 +227,8 @@ export default function Page({}: Props) {
       console.error(error);
       toast({
         variant: "destructive",
-        title: "Erreur",
-        description: "Échec de la suppression de la facture",
+        title: "Une erreur s'est produite",
+        description: t(`server.${(error as any).response?.data.message}`),
         action: (
           <ToastAction altText="Retry" onClick={HandleOnDelete}>
             Réessayer

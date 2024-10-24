@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 import { Customer } from "@/types/Customer";
 
@@ -11,6 +11,7 @@ import { ContentLayout } from "@/components/admin-panel/content-layout";
 import AddCustomerDialog from "@/components/add-customer-dialog";
 import TableCustomers from "@/components/table-customers";
 import ErrorScreen from "@/components/error-screen";
+import { useToast } from "@/components/ui/use-toast";
 
 import { ClipLoader } from "react-spinners";
 import { PiPlus } from "react-icons/pi";
@@ -22,6 +23,8 @@ type Props = {};
 
 export default function Page({}: Props) {
   const router = useRouter();
+  const t = useTranslations();
+  const { toast } = useToast();
 
   const [customers, setCustomers] = React.useState<Customer[]>([]);
   const [search, setSearch] = React.useState<string>("");
@@ -40,6 +43,11 @@ export default function Page({}: Props) {
       setCustomers(response.data);
     } catch (err: any) {
       setError(err.response?.data?.message || err.message);
+      toast({
+        variant: "destructive",
+        title: "Une Erreur s'est produite",
+        description: t(`server.${err.response?.data?.message}`),
+      });
     } finally {
       setLoading(false);
     }

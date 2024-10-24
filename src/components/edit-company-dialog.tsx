@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { useTranslations } from "next-intl";
 
 import { Company } from "@/types/Company";
 
@@ -34,6 +35,7 @@ type Props = {
 
 const EditCompanyDialog: React.FC<Props> = ({ company, onSave, trigger }) => {
   const { toast } = useToast();
+  const t = useTranslations();
 
   const {
     register,
@@ -74,9 +76,13 @@ const EditCompanyDialog: React.FC<Props> = ({ company, onSave, trigger }) => {
       setError(err.response?.data.message);
       toast({
         variant: "destructive",
-        title: "Erreur lors de la sauvegarde",
+        title: "Une Erreur s'est produite",
         description:
-          "Impossible de mettre à jour les informations de l'entreprise.",
+          typeof err.response?.data?.message === "string"
+            ? t(`server.${err.response.data.message}`)
+            : err.response?.data?.message.map((e: { msg: string }) =>
+                t(`server.${e.msg}`)
+              ),
       });
     } finally {
       setLoading(false);
@@ -89,18 +95,16 @@ const EditCompanyDialog: React.FC<Props> = ({ company, onSave, trigger }) => {
       <CredenzaContent>
         <form onSubmit={handleSubmit(handleSave)}>
           <ScrollArea className="flex w-full max-h-[80vh] overflow-y-auto">
-            <div className="flex flex-col w-full gap-4 p-2">
+            <div className="flex flex-col w-full gap-4 ">
               <CredenzaHeader>
                 <CredenzaTitle>
                   Modifier les informations de votre entreprise
                 </CredenzaTitle>
-              </CredenzaHeader>
-              <CredenzaDescription>
-                <p>
+                <CredenzaDescription>
                   Les informations de votre entreprise sont utilisées pour
                   générer des documents tels que les factures et les devis.
-                </p>
-              </CredenzaDescription>
+                </CredenzaDescription>
+              </CredenzaHeader>
 
               <CredenzaBody className="flex flex-col gap-2">
                 {error && (
@@ -111,8 +115,8 @@ const EditCompanyDialog: React.FC<Props> = ({ company, onSave, trigger }) => {
                     </AlertTitle>
                     <AlertDescription>
                       {typeof error === "string"
-                        ? error
-                        : error.map((e) => e.msg)}
+                        ? t(`server.${error}`) || error
+                        : error.map((e) => t(`server.${e.msg}`))}
                     </AlertDescription>
                   </Alert>
                 )}
