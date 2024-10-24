@@ -16,7 +16,7 @@ export default function useFormattedAmount() {
     ): string => {
         return formatter.number(amount, {
             style: "currency",
-            currency: options.currency || "USD",
+            currency: options.currency || "EUR",
             minimumFractionDigits: options.minimumFractionDigits ?? 2,
             maximumFractionDigits: options.maximumFractionDigits ?? 2,
         });

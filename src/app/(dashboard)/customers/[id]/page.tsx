@@ -4,6 +4,8 @@ import { useParams, useRouter } from "next/navigation";
 
 import { Customer } from "@/types/Customer";
 
+import useFormattedAmount from "@/hooks/useFormattedAmount";
+
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -36,6 +38,19 @@ import { cn } from "@/lib/utils";
 import api from "@/lib/axios";
 
 type Props = {};
+
+const customTooltip = ({ active, payload, label }: any) => {
+  const { formatAmount } = useFormattedAmount();
+  if (active) {
+    return (
+      <Card className="flex flex-col gap-2 p-4">
+        <h3>{label}</h3>
+        <p>{`Revenu : ${formatAmount(payload[0].value)}`}</p>
+      </Card>
+    );
+  }
+  return null;
+};
 
 export default function Page({}: Props) {
   const { id } = useParams();
@@ -235,8 +250,9 @@ export default function Page({}: Props) {
                           <BarChart data={monthlyInvoice}>
                             <XAxis dataKey="month" />
                             <YAxis />
-                            <Tooltip />
-                            <Bar dataKey="amount" fill={"var(--border)"} />
+                            <Tooltip content={customTooltip} />
+
+                            <Bar dataKey="amount" fill={cn("bg-primary")} />
                           </BarChart>
                         </ResponsiveContainer>
                       )}
