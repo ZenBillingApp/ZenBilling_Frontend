@@ -49,7 +49,7 @@ export default function TableInvoices({ invoices, search }: Props) {
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="min-w-[120px]">ID</TableHead>
+          <TableHead className="min-w-[120px]">N° Facture</TableHead>
           <TableHead className="min-w-[120px]">Prénom</TableHead>
           <TableHead className="min-w-[120px]">Nom</TableHead>
           <TableHead className="min-w-[120px]">Statut</TableHead>
@@ -74,7 +74,7 @@ export default function TableInvoices({ invoices, search }: Props) {
               className="cursor-pointer"
             >
               <TableCell className="min-w-[120px]">
-                {invoice.invoice_id || "N/A"}
+                {invoice.invoice_number || "N/A"}
               </TableCell>
               <TableCell className="min-w-[120px]">
                 {invoice.Client.first_name || "N/A"}

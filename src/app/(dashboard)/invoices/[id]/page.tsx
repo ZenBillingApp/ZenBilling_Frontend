@@ -289,7 +289,7 @@ export default function Page({}: Props) {
                 <div className="flex items-center justify-between">
                   <h2 className="text-sm font-semibold">Numéro de facture</h2>
                   <p className="flex text-sm text-right">
-                    {invoice?.invoice_id}
+                    {invoice?.invoice_number}
                   </p>
                 </div>
                 <div className="flex items-center justify-between">

@@ -4,6 +4,7 @@ export interface Invoice {
     invoice_id: number;
     invoice_date: Date;
     Company:  Company;
+    invoice_number: string;
     Client: {
         client_id: number;
         first_name: string;
