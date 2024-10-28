@@ -8,6 +8,7 @@ services:
       - "3000:3000"
     environment:
       - NEXT_PUBLIC_API_URL=https://zenbillingapi.dynamicwebforge.fr/api
+      - NEXT_PUBLIC_SIRET_API_KEY=LCjrX8Wy5bwgQCl3pJQyW3ITgsjYb20A
     networks:
       - app-network
 
