@@ -230,7 +230,7 @@ export default function SignupPage() {
               <div className="w-full space-y-4">
                 <div>
                   <h1 className="text-2xl">
-                    Récuperation des informations de l'entreprise
+                    Récuperation des informations de l&apos;entreprise
                   </h1>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     Veuillez entrer le numéro de SIRET de votre entreprise pour
