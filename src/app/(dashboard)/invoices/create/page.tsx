@@ -35,7 +35,7 @@ export default function Page({}: Props) {
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
     null
   );
-  const [editItems, setEditItems] = useState<boolean>(false);
+  const [editItems, setEditItems] = useState<boolean>(true);
   const [items, setItems] = useState<Item[]>([]);
   const [date, setDate] = useState<Date>(new Date());
   const [error, setError] = useState<string | null>(null);
