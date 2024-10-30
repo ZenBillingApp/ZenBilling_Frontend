@@ -3,7 +3,7 @@ import { NextRequest } from 'next/server'
 
 export const config = {
   matcher: [
-    '/customers','/customers/[id]','/dashboard','/invoices', '/invoices/[id]','/invoices/create','/my-company'
+    '/customers','/customers/:path*','/dashboard','/invoices', '/invoices/:path*','/my-company'
 
   ]
 }
