@@ -101,12 +101,6 @@ export default function Page({}: Props) {
                         {user?.Company.name}
                       </div>
                       <div>
-                        <span className="font-semibold">
-                          Secteur d&apos;activité :
-                        </span>{" "}
-                        {user?.Company.industry}
-                      </div>
-                      <div>
                         <span className="font-semibold">Email :</span>{" "}
                         {user?.Company.email}
                       </div>

@@ -134,18 +134,6 @@ const EditCompanyDialog: React.FC<Props> = ({ company, onSave, trigger }) => {
                   </p>
                 </div>
                 <div className="flex flex-col w-full gap-2">
-                  <Label>Secteur d&apos;activité</Label>
-                  <Input
-                    {...register("industry", {
-                      required: "Veuillez entrer un secteur d'activité",
-                    })}
-                    type="text"
-                  />
-                  <p className="text-sm text-red-500 italic">
-                    {errors.industry?.message}
-                  </p>
-                </div>
-                <div className="flex flex-col w-full gap-2">
                   <Label>Adresse</Label>
                   <Input
                     type="text"
@@ -168,19 +156,6 @@ const EditCompanyDialog: React.FC<Props> = ({ company, onSave, trigger }) => {
                     />
                     <p className="text-sm text-red-500 italic">
                       {errors.city?.message}
-                    </p>
-                  </div>
-                  <div className="flex flex-col w-1/2 gap-2">
-                    <Label>Département/Région</Label>
-                    <Input
-                      type="text"
-                      {...register("state", {
-                        required:
-                          "Veuillez entrer un département ou une région",
-                      })}
-                    />
-                    <p className="text-sm text-red-500 italic">
-                      {errors.state?.message}
                     </p>
                   </div>
                 </div>

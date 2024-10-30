@@ -343,12 +343,11 @@ export default function Page({}: Props) {
                 <h2 className="text-lg font-semibold">Emetteur :</h2>
                 <div className="flex flex-col pl-2">
                   <h2 className="text-sm font-semibold">
-                    {invoice?.Company?.name}
+                    {invoice?.Company?.name.toUpperCase()}
                   </h2>
                   <p className="text-sm">{invoice?.Company?.street_address}</p>
                   <p className="text-sm">
-                    {invoice?.Company?.city}, {invoice?.Company?.state}{" "}
-                    {invoice?.Company?.postal_code}
+                    {invoice?.Company?.city}, {invoice?.Company?.postal_code}
                   </p>
                   <p className="text-sm">{invoice?.Company?.country}</p>
                   <p className="text-sm">
@@ -382,12 +381,12 @@ export default function Page({}: Props) {
                 <h2 className="text-lg font-semibold">Destinataire :</h2>
                 <div className="flex flex-col pl-2">
                   <h2 className="text-sm font-semibold">
-                    {invoice?.Client?.first_name} {invoice?.Client?.last_name}
+                    {invoice?.Client?.first_name.toUpperCase()}{" "}
+                    {invoice?.Client?.last_name.toUpperCase()}
                   </h2>
                   <p className="text-sm">{invoice?.Client?.street_address}</p>
                   <p className="text-sm">
-                    {invoice?.Client?.city}, {invoice?.Client?.state}{" "}
-                    {invoice?.Client?.postal_code}
+                    {invoice?.Client?.city}, {invoice?.Client?.postal_code}
                   </p>
                   <p className="text-sm">{invoice?.Client?.country}</p>
                   <p className="text-sm">

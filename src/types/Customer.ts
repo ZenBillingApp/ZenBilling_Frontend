@@ -10,7 +10,6 @@ export interface Customer {
     last_name: string;
     phone: string;
     postal_code: string;
-    state: string;
     street_address: string;
     user_id: number;
     invoice_count?: number;

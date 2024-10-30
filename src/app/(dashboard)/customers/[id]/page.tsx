@@ -213,12 +213,6 @@ export default function Page({}: Props) {
                         {customer?.city}
                       </div>
                       <div className="flex gap-2">
-                        <span className="font-semibold">
-                          Département/Région :
-                        </span>{" "}
-                        {customer?.state}
-                      </div>
-                      <div className="flex gap-2">
                         <span className="font-semibold">Code postal :</span>{" "}
                         {customer?.postal_code}
                       </div>

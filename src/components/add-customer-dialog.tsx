@@ -170,20 +170,6 @@ export default function AddCustomerDialog({ trigger, onSave }: Props) {
                       {errors.city?.message}
                     </p>
                   </div>
-                  <div className="flex flex-col gap-2 sm:w-1/2">
-                    <Label htmlFor="state">{"Département/Région"}</Label>
-                    <Input
-                      {...register("state", {
-                        required: "Département/Région requis",
-                      })}
-                      id="state"
-                      type="text"
-                      placeholder={"Département/Région"}
-                    />
-                    <p className="text-xs text-red-500">
-                      {errors.state?.message}
-                    </p>
-                  </div>
                 </div>
                 <div className="flex flex-col gap-2 sm:flex-row">
                   <div className="flex flex-col gap-2 sm:w-1/2">

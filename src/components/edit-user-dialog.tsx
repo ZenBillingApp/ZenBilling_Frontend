@@ -188,23 +188,6 @@ export default function EditUserDialog({ trigger, user, onSave }: Props) {
                     }
                   />
                 </div>
-                <div className="flex flex-col w-full gap-2">
-                  <Label>{t("profile.profile_state")}</Label>
-                  <Input
-                    type="text"
-                    placeholder={t("profile.profile_state_placeholder")}
-                    value={newUser?.state || ""}
-                    onChange={(e) =>
-                      setNewUser(
-                        (prev) =>
-                          prev && {
-                            ...prev,
-                            state: e.target.value,
-                          }
-                      )
-                    }
-                  />
-                </div>
               </div>
               <div className="flex gap-2">
                 <div className="flex flex-col w-full gap-2">

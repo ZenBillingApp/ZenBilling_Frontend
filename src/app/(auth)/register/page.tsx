@@ -8,17 +8,15 @@ import { useTranslations } from "next-intl";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
-import { FormPhoneInput } from "@/components/ui/phone-input";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { useTimeZone } from "next-intl";
+import { useToast } from "@/components/ui/use-toast";
 
 import { AlertTriangle } from "lucide-react";
 import { ArrowRightIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import api from "@/lib/axios";
-import { useToast } from "@/components/ui/use-toast";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -29,28 +27,13 @@ export default function SignupPage() {
     handleSubmit,
     formState: { errors },
     watch,
-    control,
   } = useForm<{
     first_name: string;
     last_name: string;
     email: string;
     password: string;
     confirmPassword: string;
-    company: {
-      name: string;
-      industry: string;
-      street_address: string;
-      city: string;
-      state: string;
-      postal_code: string;
-      country: string;
-      email: string;
-      phone: string;
-      vat_number: string;
-      siret_number: string;
-    };
   }>();
-  const methods = useForm();
 
   const [loading, setLoading] = React.useState<boolean>(false);
   const [error, setError] = React.useState<string | [{ msg: string }] | null>(
@@ -63,19 +46,6 @@ export default function SignupPage() {
     email: string;
     password: string;
     confirmPassword: string;
-    company: {
-      name: string;
-      industry: string;
-      street_address: string;
-      city: string;
-      state: string;
-      postal_code: string;
-      country: string;
-      email: string;
-      phone: string;
-      vat_number: string;
-      siret_number: string;
-    };
   }) => {
     try {
       setLoading(true);
@@ -84,7 +54,7 @@ export default function SignupPage() {
       setCookie("token", response.data.token, {
         maxAge: 60 * 60 * 24 * 7,
       });
-      router.push("/dashboard");
+      router.push("/company-signup");
     } catch (err) {
       const errorMsg =
         (err as any).response?.data?.message || "Erreur lors de l'inscription";
@@ -227,204 +197,6 @@ export default function SignupPage() {
                   </div>
                 </div>
               </div>
-
-              <div className="w-full space-y-4">
-                <div>
-                  <h1 className="text-2xl">
-                    Information sur l&apos;entreprise
-                  </h1>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Veuillez remplir les champs suivants pour créer votre compte
-                    entreprise
-                  </p>
-                </div>
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="company.name">
-                      Nom de l&apos;entreprise
-                    </Label>
-                    <Input
-                      {...register("company.name", {
-                        required: "Veuillez entrer le nom de votre entreprise",
-                      })}
-                      id="company.name"
-                      placeholder="Nom de l'entreprise"
-                      type="text"
-                    />
-                    <p className="text-red-500 text-xs italic">
-                      {errors.company?.name?.message}
-                    </p>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="company.industry">
-                      Secteur d&apos;activité
-                    </Label>
-                    <Input
-                      {...register("company.industry", {
-                        required:
-                          "Veuillez entrer le secteur d'activité de votre entreprise",
-                      })}
-                      id="company.industry"
-                      placeholder="Secteur d'activité"
-                      type="text"
-                    />
-                    <p className="text-red-500 text-xs italic">
-                      {errors.company?.industry?.message}
-                    </p>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="company.street_address">
-                      Adresse de l&apos;entreprise
-                    </Label>
-                    <Input
-                      {...register("company.street_address", {
-                        required:
-                          "Veuillez entrer l'adresse de votre entreprise",
-                      })}
-                      id="company.street_address"
-                      placeholder="Adresse de l'entreprise"
-                      type="text"
-                    />
-                    <p className="text-red-500 text-xs italic">
-                      {errors.company?.street_address?.message}
-                    </p>
-                  </div>
-                  <div className="flex flex-col w-full space-y-2 lg:flex-row lg:space-x-4 lg:space-y-0">
-                    <div className="w-full space-y-2">
-                      <Label htmlFor="company.city">Ville</Label>
-                      <Input
-                        {...register("company.city", {
-                          required:
-                            "Veuillez entrer la ville de votre entreprise",
-                        })}
-                        id="company.city"
-                        placeholder="Ville"
-                        type="text"
-                      />
-                      <p className="text-red-500 text-xs italic">
-                        {errors.company?.city?.message}
-                      </p>
-                    </div>
-                    <div className="w-full space-y-2">
-                      <Label htmlFor="company.state">Département/Région</Label>
-                      <Input
-                        {...register("company.state", {
-                          required:
-                            "Veuillez entrer le département/région de votre entreprise",
-                        })}
-                        id="company.state"
-                        placeholder="Département/Région"
-                        type="text"
-                      />
-                      <p className="text-red-500 text-xs italic">
-                        {errors.company?.state?.message}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="w-full space-y-2">
-                    <Label htmlFor="company.postal_code">Code postal</Label>
-                    <Input
-                      {...register("company.postal_code", {
-                        required:
-                          "Veuillez entrer le code postal de votre entreprise",
-                      })}
-                      id="company.postal_code"
-                      placeholder="Code postal"
-                      type="text"
-                    />
-                    <p className="text-red-500 text-xs italic">
-                      {errors.company?.postal_code?.message}
-                    </p>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="company.country">Pays</Label>
-                    <Input
-                      {...register("company.country", {
-                        required: "Veuillez entrer le pays de votre entreprise",
-                      })}
-                      id="company.country"
-                      placeholder="Pays"
-                      type="text"
-                    />
-                    <p className="text-red-500 text-xs italic">
-                      {errors.company?.country?.message}
-                    </p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="company.email">
-                      Email de l&apos;entreprise
-                    </Label>
-                    <Input
-                      {...register("company.email", {
-                        required: "Veuillez entrer l'email de votre entreprise",
-                        pattern: {
-                          value: /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/,
-                          message: "Veuillez entrer un email valide",
-                        },
-                      })}
-                      id="company.email"
-                      placeholder="Email de l'entreprise"
-                      type="text"
-                    />
-                    <p className="text-red-500 text-xs italic">
-                      {errors.company?.email?.message}
-                    </p>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="company.phone">
-                      Téléphone de l&apos;entreprise
-                    </Label>
-                    <FormPhoneInput
-                      name="company.phone"
-                      control={control}
-                      rules={{
-                        required: "Veuillez entrer le numéro de téléphone",
-                        validate: (value) => {
-                          if (!value)
-                            return "Veuillez entrer le numéro de téléphone";
-                          return true;
-                        },
-                      }}
-                    />
-                    <p className="text-red-500 text-xs italic">
-                      {errors.company?.phone?.message}
-                    </p>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="company.vat_number">Numéro de TVA</Label>
-                    <Input
-                      {...register("company.vat_number", {
-                        required:
-                          "Veuillez entrer le numéro de TVA de votre entreprise",
-                      })}
-                      id="company.vat_number"
-                      placeholder="Numéro de TVA"
-                      type="text"
-                    />
-                    <p className="text-red-500 text-xs italic">
-                      {errors.company?.vat_number?.message}
-                    </p>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="company.siret_number">
-                      Numéro de SIRET
-                    </Label>
-                    <Input
-                      {...register("company.siret_number", {
-                        required:
-                          "Veuillez entrer le numéro de SIRET de votre entreprise",
-                      })}
-                      id="company.siret_number"
-                      placeholder="Numéro de SIRET"
-                      type="text"
-                    />
-                    <p className="text-red-500 text-xs italic">
-                      {errors.company?.siret_number?.message}
-                    </p>
-                  </div>
-                </div>
-              </div>
             </div>
             <Button
               variant="expandIcon"
@@ -434,7 +206,7 @@ export default function SignupPage() {
               disabled={loading}
               className="w-full"
             >
-              {loading ? "Chargement..." : "Créer un compte"}
+              {loading ? "Chargement..." : "S'inscrire"}
             </Button>
           </div>
         </form>
