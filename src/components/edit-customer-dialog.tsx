@@ -1,6 +1,5 @@
 import React from "react";
 import { useForm } from "react-hook-form";
-import { useTranslations } from "next-intl";
 
 import { Customer } from "@/types/Customer";
 
@@ -21,9 +20,6 @@ import {
 import { FormPhoneInput } from "@/components/ui/phone-input";
 import { ScrollArea } from "./ui/scroll-area";
 import { useToast } from "@/components/ui/use-toast";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-
-import { AlertTriangle } from "lucide-react";
 
 import api from "@/lib/axios";
 
@@ -39,13 +35,9 @@ export default function EditCustomerDialog({
   onSave,
 }: Props) {
   const { toast } = useToast();
-  const t = useTranslations();
 
   const [open, setOpen] = React.useState<boolean>(false);
   const [loading, setLoading] = React.useState<boolean>(false);
-  const [error, setError] = React.useState<string | [{ msg: string }] | null>(
-    null
-  );
 
   const {
     register,
@@ -69,7 +61,6 @@ export default function EditCustomerDialog({
 
     try {
       setLoading(true);
-      setError(null);
       const response = await api.put(`/customers/${customer.client_id}`, data);
       onSave(response.data);
       toast({
@@ -78,17 +69,7 @@ export default function EditCustomerDialog({
       });
       setOpen(false);
     } catch (err: any) {
-      setError(err.response?.data?.message || "Une erreur s'est produite");
-      toast({
-        variant: "destructive",
-        title: "Une Erreur s'est produite",
-        description:
-          typeof err === "string"
-            ? t(`server.${error}`)
-            : (err as { msg: string }[])
-                .map((e: { msg: string }) => t(`server.${e.msg}`))
-                .join(", "),
-      });
+      console.log(err);
     } finally {
       setLoading(false);
     }
@@ -108,21 +89,8 @@ export default function EditCustomerDialog({
                 </CredenzaDescription>
               </CredenzaHeader>
               <CredenzaBody className="flex flex-col space-y-4">
-                {error && (
-                  <Alert variant="destructive">
-                    <AlertTriangle className="w-5 h-5" />
-                    <AlertTitle>
-                      Une erreur s&apos;est produite lors de la sauvegarde
-                    </AlertTitle>
-                    <AlertDescription>
-                      {typeof error === "string"
-                        ? t(`server.${error}`) || error
-                        : error.map((e) => t(`server.${e.msg}`))}
-                    </AlertDescription>
-                  </Alert>
-                )}
                 <div className="flex flex-col gap-2 sm:flex-row">
-                  <div className="flex flex-col gap-2 sm:w-1/2">
+                  <div className="flex flex-col gap-1 sm:w-1/2">
                     <Label htmlFor="first_name">Prénom</Label>
                     <Input
                       {...register("first_name", { required: "Prénom requis" })}
@@ -130,11 +98,11 @@ export default function EditCustomerDialog({
                       type="text"
                       placeholder="Prénom"
                     />
-                    <p className="text-xs text-red-500">
+                    <p className="text-xs text-red-500 italic">
                       {errors.first_name?.message}
                     </p>
                   </div>
-                  <div className="flex flex-col w-full gap-2 sm:w-1/2">
+                  <div className="flex flex-col w-full gap-1 sm:w-1/2">
                     <Label htmlFor="last_name">Nom</Label>
                     <Input
                       {...register("last_name", { required: "Nom requis" })}
@@ -142,12 +110,12 @@ export default function EditCustomerDialog({
                       type="text"
                       placeholder="Nom"
                     />
-                    <p className="text-xs text-red-500">
+                    <p className="text-xs text-red-500 italic">
                       {errors.last_name?.message}
                     </p>
                   </div>
                 </div>
-                <div className="grid grid-cols-1 gap-2">
+                <div className="grid grid-cols-1 gap-1">
                   <Label htmlFor="street_address">Adresse</Label>
                   <Input
                     {...register("street_address", {
@@ -157,12 +125,12 @@ export default function EditCustomerDialog({
                     type="text"
                     placeholder="Adresse"
                   />
-                  <p className="text-xs text-red-500">
+                  <p className="text-xs text-red-500 italic">
                     {errors.street_address?.message}
                   </p>
                 </div>
-                <div className="flex flex-col gap-2 sm:flex-row">
-                  <div className="flex flex-col gap-2 sm:w-1/2">
+                <div className="flex flex-col gap-1 sm:flex-row">
+                  <div className="flex flex-col gap-1 sm:w-1/2">
                     <Label htmlFor="city">Ville</Label>
                     <Input
                       {...register("city", { required: "Ville requise" })}
@@ -170,13 +138,11 @@ export default function EditCustomerDialog({
                       type="text"
                       placeholder="Ville"
                     />
-                    <p className="text-xs text-red-500">
+                    <p className="text-xs text-red-500 italic">
                       {errors.city?.message}
                     </p>
                   </div>
-                </div>
-                <div className="flex flex-col gap-2 sm:flex-row">
-                  <div className="flex flex-col gap-2 sm:w-1/2">
+                  <div className="flex flex-col gap-1 sm:w-1/2">
                     <Label htmlFor="postal_code">Code postal</Label>
                     <Input
                       {...register("postal_code", {
@@ -186,24 +152,26 @@ export default function EditCustomerDialog({
                       type="text"
                       placeholder="Code postal"
                     />
-                    <p className="text-xs text-red-500">
+                    <p className="text-xs text-red-500 italic">
                       {errors.postal_code?.message}
                     </p>
                   </div>
-                  <div className="flex flex-col w-full gap-2 sm:w-1/2">
-                    <Label htmlFor="country">Pays</Label>
-                    <Input
-                      {...register("country", { required: "Pays requis" })}
-                      id="country"
-                      type="text"
-                      placeholder="Pays"
-                    />
-                    <p className="text-xs text-red-500">
-                      {errors.country?.message}
-                    </p>
-                  </div>
                 </div>
-                <div className="flex flex-col w-full gap-2">
+
+                <div className="flex flex-col w-full gap-1 ">
+                  <Label htmlFor="country">Pays</Label>
+                  <Input
+                    {...register("country", { required: "Pays requis" })}
+                    id="country"
+                    type="text"
+                    placeholder="Pays"
+                  />
+                  <p className="text-xs text-red-500 italic">
+                    {errors.country?.message}
+                  </p>
+                </div>
+
+                <div className="flex flex-col w-full gap-1">
                   <Label htmlFor="email">Email</Label>
                   <Input
                     {...register("email", { required: "Email requis" })}
@@ -211,11 +179,11 @@ export default function EditCustomerDialog({
                     type="email"
                     placeholder="Email"
                   />
-                  <p className="text-xs text-red-500">
+                  <p className="text-xs text-red-500 italic">
                     {errors.email?.message}
                   </p>
                 </div>
-                <div className="flex flex-col w-full gap-2">
+                <div className="flex flex-col w-full gap-1">
                   <Label htmlFor="phone">Téléphone</Label>
                   <FormPhoneInput
                     name="phone"
@@ -224,7 +192,7 @@ export default function EditCustomerDialog({
                       required: "Veuillez entrer le numéro de téléphone",
                     }}
                   />
-                  <p className="text-xs text-red-500">
+                  <p className="text-xs text-red-500 italic">
                     {errors.phone?.message}
                   </p>
                 </div>

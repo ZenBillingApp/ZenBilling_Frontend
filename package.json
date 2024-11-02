@@ -30,12 +30,14 @@
     "cookies-next": "^4.2.1",
     "date-fns": "^3.6.0",
     "framer-motion": "^11.3.8",
+    "fs": "^0.0.1-security",
     "leaflet-geosearch": "^4.0.0",
     "lucide-react": "^0.378.0",
     "next": "^14.2.3",
     "next-intl": "^3.17.2",
     "next-sitemap": "^4.2.3",
     "next-themes": "^0.3.0",
+    "path": "^0.12.7",
     "radix-ui": "^1.0.1",
     "react": "^18",
     "react-currency-input-field": "^3.8.0",
@@ -64,5 +66,4 @@
     "tailwindcss-debug-screens": "^2.2.1",
     "typescript": "^5"
   }
-  
 }

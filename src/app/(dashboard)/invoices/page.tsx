@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
 
 import { Invoice } from "@/types/Invoice";
 
@@ -12,7 +11,6 @@ import PaginationList from "@/components/pagination-list";
 import { ContentLayout } from "@/components/admin-panel/content-layout";
 import BtnFilter from "@/components/btn-filter";
 import ErrorScreen from "@/components/error-screen";
-import { useToast } from "@/components/ui/use-toast";
 
 import { PiPlus } from "react-icons/pi";
 import { ClipLoader } from "react-spinners";
@@ -24,8 +22,6 @@ type Props = {};
 
 export default function Page({}: Props) {
   const router = useRouter();
-  const t = useTranslations();
-  const { toast } = useToast();
 
   const [invoices, setInvoices] = React.useState<Invoice[]>([]);
   const [search, setSearch] = React.useState<string>("");
@@ -53,12 +49,7 @@ export default function Page({}: Props) {
       setInvoices(response.data.invoices);
       setTotalPages(response.data.totalPages);
     } catch (err: any) {
-      setError(err.response?.data?.message || "Une erreur s'est produite");
-      toast({
-        variant: "destructive",
-        title: "Une Erreur s'est produite",
-        description: t(`server.${err.response?.data?.message}`),
-      });
+      console.log(err);
     } finally {
       setLoading(false);
     }

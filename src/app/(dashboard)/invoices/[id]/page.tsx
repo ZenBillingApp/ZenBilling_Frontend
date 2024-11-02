@@ -1,7 +1,6 @@
 "use client";
 import React, { useCallback, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
 
 import useFormattedAmount from "@/hooks/useFormattedAmount";
 import useFormattedDate from "@/hooks/useFormattedDate";
@@ -21,16 +20,14 @@ import DatePicker from "@/components/datePicker";
 import SheetCustomers from "@/components/sheet-customers";
 import TableItems from "@/components/table-items";
 import EditTableItems from "@/components/edit-table-items";
+import ErrorScreen from "@/components/error-screen";
 
 import { ClipLoader } from "react-spinners";
-import { ChevronDownIcon } from "lucide-react";
-import { Download } from "lucide-react";
+import { ChevronDownIcon, Download, EyeIcon } from "lucide-react";
 import { MdOutlineEdit, MdDeleteOutline, MdClose } from "react-icons/md";
 
 import api from "@/lib/axios";
 import { cn } from "@/lib/utils";
-import { set } from "date-fns";
-import ErrorScreen from "@/components/error-screen";
 
 type Props = {};
 
@@ -38,7 +35,6 @@ export default function Page({}: Props) {
   const { id } = useParams();
   const router = useRouter();
   const { toast } = useToast();
-  const t = useTranslations();
 
   const { formatAmount } = useFormattedAmount();
   const { formatDate } = useFormattedDate();
@@ -59,19 +55,7 @@ export default function Page({}: Props) {
         description: "Le client a été mis à jour avec succès",
       });
     } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Une erreur s'est produite",
-        description: t(`server.${(error as any).response?.data.message}`),
-        action: (
-          <ToastAction
-            altText="Retry"
-            onClick={() => handleChangeCustomer(customer)}
-          >
-            Réessayer
-          </ToastAction>
-        ),
-      });
+      console.log(error);
     }
   };
 
@@ -82,12 +66,7 @@ export default function Page({}: Props) {
       const response = await api.get(`/invoices/${id}`);
       setInvoice(response.data);
     } catch (err: any) {
-      setError(err.response?.data.message || "Une erreur s'est produite");
-      toast({
-        variant: "destructive",
-        title: "Une Erreur s'est produite",
-        description: t(`server.${err.response?.data.message}`),
-      });
+      console.log(err);
     } finally {
       setLoading(false);
     }
@@ -122,16 +101,7 @@ export default function Page({}: Props) {
       document.body.appendChild(link);
       link.click();
     } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Une erreur s'est produite",
-        description: t(`server.${(error as any).response?.data.message}`),
-        action: (
-          <ToastAction altText="Retry" onClick={handleDownload}>
-            Réessayer
-          </ToastAction>
-        ),
-      });
+      console.log(error);
     }
   };
 
@@ -146,19 +116,7 @@ export default function Page({}: Props) {
         description: "Le statut de la facture a été mis à jour avec succès",
       });
     } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Une erreur s'est produite",
-        description: t(`server.${(error as any).response?.data.message}`),
-        action: (
-          <ToastAction
-            altText="Retry"
-            onClick={() => handleChangeStatus(status)}
-          >
-            Réessayer
-          </ToastAction>
-        ),
-      });
+      console.log(error);
     }
   };
 
@@ -181,19 +139,7 @@ export default function Page({}: Props) {
         description: "La date d'échéance a été mise à jour avec succès",
       });
     } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Une erreur s'est produite",
-        description: t(`server.${(error as any).response?.data.message}`),
-        action: (
-          <ToastAction
-            altText="Retry"
-            onClick={() => handleSelectDueDate(date)}
-          >
-            Réessayer
-          </ToastAction>
-        ),
-      });
+      console.log(error);
     }
   };
 
@@ -206,16 +152,6 @@ export default function Page({}: Props) {
       setEditOpen(false);
     } catch (error) {
       console.error(error);
-      toast({
-        variant: "destructive",
-        title: "Une erreur s'est produite",
-        description: t(`server.${(error as any).response?.data.message}`),
-        action: (
-          <ToastAction altText="Retry" onClick={() => handleSaveItems(items)}>
-            Réessayer
-          </ToastAction>
-        ),
-      });
     }
   };
 
@@ -225,16 +161,6 @@ export default function Page({}: Props) {
       router.push("/invoices");
     } catch (error) {
       console.error(error);
-      toast({
-        variant: "destructive",
-        title: "Une erreur s'est produite",
-        description: t(`server.${(error as any).response?.data.message}`),
-        action: (
-          <ToastAction altText="Retry" onClick={HandleOnDelete}>
-            Réessayer
-          </ToastAction>
-        ),
-      });
     }
   };
 
@@ -305,7 +231,7 @@ export default function Page({}: Props) {
                   <h2 className="text-sm font-semibold">
                     Statut de la facture
                   </h2>
-                  <div className="flex">
+                  <div className="flex ">
                     <SelectStatusInvoice
                       invoice={invoice}
                       handleChangeStatus={handleChangeStatus}
@@ -350,22 +276,6 @@ export default function Page({}: Props) {
                     {invoice?.Company?.city}, {invoice?.Company?.postal_code}
                   </p>
                   <p className="text-sm">{invoice?.Company?.country}</p>
-                  <p className="text-sm">
-                    <span className="font-semibold">Email :</span>{" "}
-                    {invoice?.Company?.email}
-                  </p>
-                  <p className="text-sm">
-                    <span className="font-semibold">Téléphone :</span>{" "}
-                    {invoice?.Company?.phone}
-                  </p>
-                  <p className="text-sm">
-                    <span className="font-semibold">N° TVA :</span>{" "}
-                    {invoice?.Company?.vat_number}
-                  </p>
-                  <p className="text-sm">
-                    <span className="font-semibold">N° SIRET :</span>{" "}
-                    {invoice?.Company?.siret_number}
-                  </p>
                 </div>
               </Card>
               <Card className="relative flex flex-col w-full gap-2 p-6">
@@ -378,6 +288,14 @@ export default function Page({}: Props) {
                   }
                   handleSelectCustomer={handleChangeCustomer}
                 />
+                <EyeIcon
+                  size={20}
+                  className="absolute top-2 right-8 cursor-pointer"
+                  onClick={() =>
+                    router.push(`/customers/${invoice?.Client?.client_id}`)
+                  }
+                />
+
                 <h2 className="text-lg font-semibold">Destinataire :</h2>
                 <div className="flex flex-col pl-2">
                   <h2 className="text-sm font-semibold">
@@ -389,14 +307,6 @@ export default function Page({}: Props) {
                     {invoice?.Client?.city}, {invoice?.Client?.postal_code}
                   </p>
                   <p className="text-sm">{invoice?.Client?.country}</p>
-                  <p className="text-sm">
-                    <span className="font-semibold">Email :</span>{" "}
-                    {invoice?.Client?.email}
-                  </p>
-                  <p className="text-sm">
-                    <span className="font-semibold">Téléphone :</span>{" "}
-                    {invoice?.Client?.phone}
-                  </p>
                 </div>
               </Card>
             </div>

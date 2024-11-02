@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
 import { useParams, useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
 
 import { Customer } from "@/types/Customer";
 
@@ -21,6 +20,7 @@ import { ContentLayout } from "@/components/admin-panel/content-layout";
 import AlertDialog from "@/components/alert-dialog";
 import EditCustomerDialog from "@/components/edit-customer-dialog";
 import { useToast } from "@/components/ui/use-toast";
+import ErrorScreen from "@/components/error-screen";
 
 import {
   BarChart,
@@ -57,7 +57,6 @@ export default function Page({}: Props) {
   const { id } = useParams();
   const router = useRouter();
   const { toast } = useToast();
-  const t = useTranslations();
 
   const [customer, setCustomer] = React.useState<Customer | null>(null);
   const [loading, setLoading] = React.useState<boolean>(true);
@@ -76,11 +75,7 @@ export default function Page({}: Props) {
         description: "Le client a été supprimé avec succès",
       });
     } catch (err: any) {
-      toast({
-        variant: "destructive",
-        title: "Une erreur s'est produite",
-        description: t(`server.${err.response?.data?.message}`),
-      });
+      console.log(err);
     } finally {
       setLoading(false);
     }
@@ -92,11 +87,7 @@ export default function Page({}: Props) {
         const response = await api.get(`/customers/${id}/monthly-revenue`);
         setMonthlyInvoice(response.data);
       } catch (err: any) {
-        toast({
-          variant: "destructive",
-          title: "Une erreur s'est produite",
-          description: t(`server.${err.response?.data?.message}`),
-        });
+        console.log(err);
       }
     };
     fetchMonthlyInvoice();
@@ -109,12 +100,8 @@ export default function Page({}: Props) {
       const response = await api.get(`/customers/${id}`);
       setCustomer(response.data);
     } catch (err: any) {
-      setError(err.response?.data?.message || err.message);
-      toast({
-        variant: "destructive",
-        title: "Une erreur s'est produite",
-        description: t(`server.${err.response?.data?.message}`),
-      });
+      console.log(err);
+      setError(err.response.data.message);
     } finally {
       setLoading(false);
     }
@@ -135,6 +122,10 @@ export default function Page({}: Props) {
           {loading ? (
             <div className="flex w-full h-full items-center justify-center">
               <ClipLoader color={cn("text-primary")} />
+            </div>
+          ) : error ? (
+            <div className="flex flex-col w-full h-full justify-center items-center gap-4">
+              <ErrorScreen handleRetry={fetchCustomer} />
             </div>
           ) : (
             <>

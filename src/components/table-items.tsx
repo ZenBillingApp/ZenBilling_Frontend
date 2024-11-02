@@ -1,5 +1,4 @@
 import React from "react";
-import { useTranslations } from "next-intl";
 
 import { Item } from "@/types/Item";
 
@@ -20,8 +19,6 @@ type Props = {
 };
 
 export default function TableItems({ items }: Props) {
-  const t = useTranslations();
-
   const { formatAmount } = useFormattedAmount();
   const { formatPercent } = useFormattedPercent();
 

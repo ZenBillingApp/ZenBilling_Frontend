@@ -2,16 +2,14 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import { useForm, Controller } from "react-hook-form";
-import { useTranslations } from "next-intl";
 
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { FormPhoneInput } from "@/components/ui/phone-input";
 import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "@/components/ui/use-toast";
 
-import { AlertTriangle, ArrowRightIcon } from "lucide-react";
+import { ArrowRightIcon } from "lucide-react";
 
 import api from "@/lib/axios";
 
@@ -31,11 +29,9 @@ interface CompanyFormData {
 
 export default function CompanySignupPage() {
   const router = useRouter();
-  const t = useTranslations();
   const { toast } = useToast();
 
   const [isLoading, setIsLoading] = React.useState(false);
-  const [apiError, setApiError] = React.useState<string | null>(null);
 
   const {
     register,
@@ -74,7 +70,6 @@ export default function CompanySignupPage() {
 
     try {
       setIsLoading(true);
-      setApiError(null);
 
       const response = await api.get(`/company/${siretNumber}`);
       const companyData = response.data;
@@ -106,14 +101,7 @@ export default function CompanySignupPage() {
         description: "Les informations ont été pré-remplies",
       });
     } catch (error: any) {
-      setApiError(
-        error?.response?.data?.message || "Erreur lors de la recherche"
-      );
-      toast({
-        variant: "destructive",
-        title: "Erreur",
-        description: "Impossible de trouver l'entreprise",
-      });
+      console.log(error);
     } finally {
       setIsLoading(false);
     }
@@ -122,7 +110,6 @@ export default function CompanySignupPage() {
   const onSubmit = async (data: CompanyFormData) => {
     try {
       setIsLoading(true);
-      setApiError(null);
 
       await api.post("/company", data);
 
@@ -133,14 +120,7 @@ export default function CompanySignupPage() {
 
       router.push("/dashboard");
     } catch (error: any) {
-      setApiError(
-        error?.response?.data?.message || "Erreur lors de l'inscription"
-      );
-      toast({
-        variant: "destructive",
-        title: "Erreur",
-        description: "Impossible de créer l'entreprise",
-      });
+      console.log(error);
     } finally {
       setIsLoading(false);
     }
@@ -149,26 +129,15 @@ export default function CompanySignupPage() {
   return (
     <div className="container max-w-4xl py-8">
       <div className="space-y-6">
-        {apiError && (
-          <Alert variant="destructive">
-            <AlertTriangle className="h-4 w-4" />
-            <AlertTitle>Erreur</AlertTitle>
-            <AlertDescription>
-              {t(`errors.${apiError}`) || apiError}
-            </AlertDescription>
-          </Alert>
-        )}
-
         <div className="space-y-2">
           <h1 className="text-2xl font-bold">
-            Information de l&apos;entreprise
+            Completer les informations de votre entreprise
           </h1>
           <p className="text-muted-foreground">
             Veuillez entrer le numéro de SIRET de votre entreprise pour
             continuer
           </p>
         </div>
-
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {/* Section SIRET */}
           <div className="space-y-2">
@@ -184,6 +153,7 @@ export default function CompanySignupPage() {
                 })}
                 placeholder="12345678901234"
                 className="flex-1"
+                maxLength={14}
               />
               <Button
                 type="button"
@@ -194,7 +164,7 @@ export default function CompanySignupPage() {
               </Button>
             </div>
             {errors.siret_number && (
-              <p className="text-sm text-red-500">
+              <p className="text-sm text-red-500 italic">
                 {errors.siret_number.message}
               </p>
             )}
@@ -209,10 +179,13 @@ export default function CompanySignupPage() {
                 {...register("name", {
                   required: "Le nom de l'entreprise est requis",
                 })}
+                disabled={true}
                 placeholder="Nom de l'entreprise"
               />
               {errors.name && (
-                <p className="text-sm text-red-500">{errors.name.message}</p>
+                <p className="text-sm text-red-500 italic">
+                  {errors.name.message}
+                </p>
               )}
             </div>
 
@@ -223,10 +196,11 @@ export default function CompanySignupPage() {
                 {...register("street_address", {
                   required: "L'adresse est requise",
                 })}
+                disabled={true}
                 placeholder="Adresse"
               />
               {errors.street_address && (
-                <p className="text-sm text-red-500">
+                <p className="text-sm text-red-500 italic">
                   {errors.street_address.message}
                 </p>
               )}
@@ -239,10 +213,13 @@ export default function CompanySignupPage() {
                 {...register("city", {
                   required: "La ville est requise",
                 })}
+                disabled={true}
                 placeholder="Ville"
               />
               {errors.city && (
-                <p className="text-sm text-red-500">{errors.city.message}</p>
+                <p className="text-sm text-red-500 italic">
+                  {errors.city.message}
+                </p>
               )}
             </div>
 
@@ -253,10 +230,11 @@ export default function CompanySignupPage() {
                 {...register("postal_code", {
                   required: "Le code postal est requis",
                 })}
+                disabled={true}
                 placeholder="Code postal"
               />
               {errors.postal_code && (
-                <p className="text-sm text-red-500">
+                <p className="text-sm text-red-500 italic">
                   {errors.postal_code.message}
                 </p>
               )}
@@ -268,11 +246,46 @@ export default function CompanySignupPage() {
                 {...register("country", {
                   required: "Le pays est requis",
                 })}
+                disabled={true}
                 placeholder="Pays"
                 defaultValue="France"
               />
               {errors.country && (
-                <p className="text-sm text-red-500">{errors.country.message}</p>
+                <p className="text-sm text-red-500 italic">
+                  {errors.country.message}
+                </p>
+              )}
+            </div>
+
+            {/* TVA & SIREN */}
+            <div className="space-y-2">
+              <Label htmlFor="siren_number">Numéro de SIREN</Label>
+              <Input
+                {...register("siren_number", {
+                  required: "Le numéro de SIREN est requis",
+                })}
+                disabled={true}
+                placeholder="Numéro de SIREN"
+              />
+              {errors.siren_number && (
+                <p className="text-sm text-red-500 italic">
+                  {errors.siren_number.message}
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="vat_number">Numéro de TVA</Label>
+              <Input
+                {...register("vat_number", {
+                  required: "Le numéro de TVA est requis",
+                })}
+                placeholder="Numéro de TVA"
+              />
+              {errors.vat_number && (
+                <p className="text-sm text-red-500 italic">
+                  {errors.vat_number.message}
+                </p>
               )}
             </div>
 
@@ -291,7 +304,9 @@ export default function CompanySignupPage() {
                 type="email"
               />
               {errors.email && (
-                <p className="text-sm text-red-500">{errors.email.message}</p>
+                <p className="text-sm text-red-500 italic">
+                  {errors.email.message}
+                </p>
               )}
             </div>
 
@@ -307,29 +322,15 @@ export default function CompanySignupPage() {
                 )}
               />
               {errors.phone && (
-                <p className="text-sm text-red-500">{errors.phone.message}</p>
-              )}
-            </div>
-
-            {/* TVA */}
-            <div className="space-y-2 md:col-span-2">
-              <Label htmlFor="vat_number">Numéro de TVA</Label>
-              <Input
-                {...register("vat_number", {
-                  required: "Le numéro de TVA est requis",
-                })}
-                placeholder="Numéro de TVA"
-              />
-              {errors.vat_number && (
-                <p className="text-sm text-red-500">
-                  {errors.vat_number.message}
+                <p className="text-sm text-red-500 italic">
+                  {errors.phone.message}
                 </p>
               )}
             </div>
           </div>
 
           <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? "Chargement..." : "Créer l'entreprise"}
+            {isLoading ? "Chargement..." : "Finaliser l'inscription"}
             <ArrowRightIcon className="ml-2 h-4 w-4" />
           </Button>
         </form>

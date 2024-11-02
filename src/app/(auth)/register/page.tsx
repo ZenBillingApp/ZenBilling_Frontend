@@ -3,16 +3,12 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import { setCookie } from "cookies-next";
 import { useForm } from "react-hook-form";
-import { useTranslations } from "next-intl";
 
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { useToast } from "@/components/ui/use-toast";
 
-import { AlertTriangle } from "lucide-react";
 import { ArrowRightIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -20,8 +16,6 @@ import api from "@/lib/axios";
 
 export default function SignupPage() {
   const router = useRouter();
-  const t = useTranslations();
-  const { toast } = useToast();
   const {
     register,
     handleSubmit,
@@ -36,9 +30,6 @@ export default function SignupPage() {
   }>();
 
   const [loading, setLoading] = React.useState<boolean>(false);
-  const [error, setError] = React.useState<string | [{ msg: string }] | null>(
-    null
-  );
 
   const onSubmit = async (data: {
     first_name: string;
@@ -49,26 +40,13 @@ export default function SignupPage() {
   }) => {
     try {
       setLoading(true);
-      setError(null);
       const response = await api.post("/auth/register", data);
       setCookie("token", response.data.token, {
         maxAge: 60 * 60 * 24 * 7,
       });
       router.push("/company-signup");
     } catch (err) {
-      const errorMsg =
-        (err as any).response?.data?.message || "Erreur lors de l'inscription";
-      setError(errorMsg);
-      toast({
-        variant: "destructive",
-        title: "Erreur lors de l'inscription",
-        description:
-          typeof err === "string"
-            ? t(`server.${error}`)
-            : (err as { msg: string }[])
-                .map((e: { msg: string }) => t(`server.${e.msg}`))
-                .join(", "),
-      });
+      console.log(err);
     } finally {
       setLoading(false);
     }
@@ -91,22 +69,6 @@ export default function SignupPage() {
           </p>
         </div>
         <form className="w-full space-y-4" onSubmit={handleSubmit(onSubmit)}>
-          {error && (
-            <Alert variant="destructive">
-              <AlertTriangle className="w-5 h-5" />
-              <AlertTitle>
-                Une erreur s&apos;est produite lors de l&apos;inscription
-              </AlertTitle>
-              <AlertDescription>
-                {typeof error === "string"
-                  ? t(`server.${error}`) || error
-                  : error.map((e) => (
-                      <p key={e.msg}>{t(`server.${e.msg}`) || e.msg}</p>
-                    ))}
-              </AlertDescription>
-            </Alert>
-          )}
-
           <div className="flex flex-col space-y-4">
             <div className="w-full space-y-4">
               <div>
@@ -206,7 +168,7 @@ export default function SignupPage() {
               disabled={loading}
               className="w-full"
             >
-              {loading ? "Chargement..." : "S'inscrire"}
+              {loading ? "Chargement..." : "Continuer"}
             </Button>
           </div>
         </form>

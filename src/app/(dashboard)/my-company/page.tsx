@@ -3,35 +3,27 @@ import React from "react";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 
-import { User } from "@/types/User";
+import { Company } from "@/types/Company";
 
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ContentLayout } from "@/components/admin-panel/content-layout";
-import { useToast } from "@/components/ui/use-toast";
+import EditCompanyDialog from "@/components/edit-company-dialog";
+import ErrorScreen from "@/components/error-screen";
 
 import { ClipLoader } from "react-spinners";
 import { MdOutlineEdit } from "react-icons/md";
 
 import api from "@/lib/axios";
 import { cn } from "@/lib/utils";
-import EditCompanyDialog from "@/components/edit-company-dialog";
-import ErrorScreen from "@/components/error-screen";
 
 type Props = {};
 
 export default function Page({}: Props) {
   const { id } = useParams();
   const t = useTranslations();
-  const { toast } = useToast();
 
-  const [user, setUser] = React.useState<User>({} as User);
+  const [company, setCompany] = React.useState<Company>({} as Company);
   const [loading, setLoading] = React.useState<boolean>(true);
   const [error, setError] = React.useState<string | null>(null);
 
@@ -39,15 +31,10 @@ export default function Page({}: Props) {
     try {
       setLoading(true);
       setError(null);
-      const response = await api.get(`/user`);
-      setUser(response.data);
+      const response = await api.get(`/company`);
+      setCompany(response.data);
     } catch (err: any) {
-      setError(err.response.data.message);
-      toast({
-        variant: "destructive",
-        title: "Une Erreur s'est produite",
-        description: t(`server.${err.response.data.message}`),
-      });
+      console.log(err);
     } finally {
       setLoading(false);
     }
@@ -84,7 +71,7 @@ export default function Page({}: Props) {
                         Modifier
                       </Button>
                     }
-                    company={user?.Company}
+                    company={company}
                     onSave={() => fetchUser()}
                   />
                 </div>
@@ -98,15 +85,15 @@ export default function Page({}: Props) {
                     <CardContent>
                       <div>
                         <span className="font-semibold">Nom :</span>{" "}
-                        {user?.Company.name}
+                        {company.name}
                       </div>
                       <div>
                         <span className="font-semibold">Email :</span>{" "}
-                        {user?.Company.email}
+                        {company.email}
                       </div>
                       <div>
                         <span className="font-semibold">Téléphone :</span>{" "}
-                        {user?.Company.phone}
+                        {company.phone}
                       </div>
                     </CardContent>
                   </Card>
@@ -117,19 +104,19 @@ export default function Page({}: Props) {
                     <CardContent>
                       <div>
                         <span className="font-semibold">Adresse :</span>{" "}
-                        {user?.Company.street_address}
+                        {company.street_address}
                       </div>
                       <div>
                         <span className="font-semibold">Ville :</span>{" "}
-                        {user?.Company.city}
+                        {company.city}
                       </div>
                       <div>
                         <span className="font-semibold">Code postal :</span>{" "}
-                        {user?.Company.postal_code}
+                        {company.postal_code}
                       </div>
                       <div>
                         <span className="font-semibold">Pays :</span>{" "}
-                        {user?.Company.country}
+                        {company.country}
                       </div>
                     </CardContent>
                   </Card>
@@ -141,12 +128,24 @@ export default function Page({}: Props) {
                     </CardHeader>
                     <CardContent>
                       <div>
-                        <span className="font-semibold">N° de TVA :</span>{" "}
-                        {user?.Company.vat_number}
+                        <span className="font-semibold">
+                          TVA intracommunautaire :
+                        </span>{" "}
+                        {company.vat_number}
                       </div>
                       <div>
                         <span className="font-semibold">N° de SIRET :</span>{" "}
-                        {user?.Company.siret_number}
+                        {company.siret_number}
+                      </div>
+                      <div>
+                        <span className="font-semibold">N° de SIREN :</span>{" "}
+                        {company.siren_number}
+                      </div>
+                      <div>
+                        <span className="font-semibold">
+                          Type d&apos;entreprise :
+                        </span>{" "}
+                        {company.category}
                       </div>
                     </CardContent>
                   </Card>

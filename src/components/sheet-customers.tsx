@@ -1,7 +1,6 @@
 import React from "react";
 
 import { Customer } from "@/types/Customer";
-
 import { useDebounce } from "@/hooks/use-debounce";
 
 import {
@@ -23,53 +22,87 @@ import { ClipLoader } from "react-spinners";
 import api from "@/lib/axios";
 import { cn } from "@/lib/utils";
 
-type Props = {
+interface SheetCustomersProps {
   trigger: React.ReactNode;
   handleSelectCustomer: (customer: Customer) => void;
-};
+}
 
 export default function SheetCustomers({
   handleSelectCustomer,
   trigger,
-}: Props) {
+}: SheetCustomersProps) {
   const [open, setOpen] = React.useState(false);
   const [search, setSearch] = React.useState("");
   const [customers, setCustomers] = React.useState<Customer[]>([]);
-  const [loading, setLoading] = React.useState(false);
-  const [error, setError] = React.useState(false);
-  const [data, setData] = React.useState<Customer[]>([]);
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
+
   const debouncedSearch = useDebounce(search, 300);
 
-  const fetchCustomers = async () => {
+  const fetchCustomers = React.useCallback(async () => {
+    if (!open) return;
+
     try {
-      setLoading(true);
+      setIsLoading(true);
+      setError(null);
+
       const response = await api.get("/customers", {
         params: {
           search: debouncedSearch || undefined,
         },
       });
-      setData(response.data);
-      setLoading(false);
-    } catch (error) {
-      setError(true);
-      setLoading(false);
-    }
-  };
 
-  React.useEffect(() => {
-    if (open) {
-      fetchCustomers();
+      setCustomers(response.data.customers);
+    } catch (error) {
+      setError("Une erreur s'est produite lors du chargement des clients");
+    } finally {
+      setIsLoading(false);
     }
   }, [debouncedSearch, open]);
 
   React.useEffect(() => {
-    if (data) {
-      setCustomers(data);
-    }
-  }, [data]);
-
-  const onAdd = async () => {
     fetchCustomers();
+  }, [fetchCustomers]);
+
+  const handleCustomerSelect = (customer: Customer) => {
+    setOpen(false);
+    handleSelectCustomer(customer);
+  };
+
+  const renderContent = () => {
+    if (isLoading) {
+      return (
+        <div className="flex justify-center items-center py-4">
+          <ClipLoader color={cn("text-primary")} />
+        </div>
+      );
+    }
+
+    if (error) {
+      return <p className="text-center text-sm text-red-500 py-4">{error}</p>;
+    }
+
+    if (customers.length === 0) {
+      return (
+        <p className="text-center text-sm text-gray-500 py-4">
+          Aucun client trouvé
+        </p>
+      );
+    }
+
+    return (
+      <div className="flex flex-col gap-2">
+        {customers.map((customer) => (
+          <Button
+            variant="outline"
+            key={customer.client_id}
+            onClick={() => handleCustomerSelect(customer)}
+          >
+            {customer.first_name} {customer.last_name}
+          </Button>
+        ))}
+      </div>
+    );
   };
 
   return (
@@ -78,9 +111,7 @@ export default function SheetCustomers({
       <SheetContent className="p-4 flex flex-col h-full">
         <SheetHeader className="mt-4 space-y-4">
           <SheetTitle>
-            <h1 className="text-2xl font-semibold">
-              {"Sélectionner un client"}
-            </h1>
+            <h1 className="text-2xl font-semibold">Sélectionner un client</h1>
           </SheetTitle>
           <SheetDescription>
             <div className="flex items-center gap-2">
@@ -96,43 +127,12 @@ export default function SheetCustomers({
                     <MdAdd size={20} />
                   </Button>
                 }
-                onSave={onAdd}
+                onSave={fetchCustomers}
               />
             </div>
           </SheetDescription>
         </SheetHeader>
-        <ScrollArea className="mt-4 flex-1">
-          <div className="flex flex-col gap-2">
-            {loading && (
-              <div className="flex justify-center items-center">
-                <ClipLoader color={cn("text-primary")} />
-              </div>
-            )}
-            {error && (
-              <p className="text-center text-sm text-red-500">
-                {"Une erreur s'est produite lors du chargement des clients"}
-              </p>
-            )}
-            {customers && customers.length === 0 && !loading && (
-              <p className="text-center text-sm text-gray-500">
-                {"Aucun client trouvé"}
-              </p>
-            )}
-            {customers &&
-              customers.map((customer) => (
-                <Button
-                  variant="outline"
-                  key={customer.client_id}
-                  onClick={() => {
-                    setOpen(false);
-                    handleSelectCustomer(customer);
-                  }}
-                >
-                  {customer.first_name} {customer.last_name}
-                </Button>
-              ))}
-          </div>
-        </ScrollArea>
+        <ScrollArea className="mt-4 flex-1">{renderContent()}</ScrollArea>
       </SheetContent>
     </Sheet>
   );

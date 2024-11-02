@@ -17,13 +17,9 @@ import {
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { ScrollArea } from "./ui/scroll-area";
-import { FormPhoneInput } from "./ui/phone-input";
-import { ToastAction } from "@/components/ui/toast";
-import { useToast } from "@/components/ui/use-toast";
 
-import { AlertTriangle } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 import api from "@/lib/axios";
 
@@ -70,21 +66,7 @@ export default function EditUserDialog({ trigger, user, onSave }: Props) {
       });
       setOpen(false);
     } catch (err: any) {
-      setError(
-        err.response?.data?.message ||
-          err.response?.data?.errors ||
-          "Une erreur s'est produite"
-      );
-      toast({
-        variant: "destructive",
-        title: "Échec de la mise à jour de l'utilisateur",
-        description:
-          err.response?.data?.message ||
-          err.response?.data?.errors
-            .map((error: { msg: string }) => error.msg)
-            .join(", ") ||
-          "Une erreur s'est produite",
-      });
+      console.log(err);
     } finally {
       setLoading(false);
     }
@@ -104,19 +86,6 @@ export default function EditUserDialog({ trigger, user, onSave }: Props) {
             </CredenzaHeader>
 
             <CredenzaBody className="flex flex-col gap-4">
-              {error && (
-                <Alert variant="destructive">
-                  <AlertTriangle className="w-5 h-5" />
-                  <AlertTitle>
-                    Une erreur s&apos;est produite lors de la sauvegarde
-                  </AlertTitle>
-                  <AlertDescription>
-                    {Array.isArray(error)
-                      ? error.map((e) => e.msg).join(", ")
-                      : error}
-                  </AlertDescription>
-                </Alert>
-              )}
               <div className="flex gap-2">
                 <div className="flex flex-col w-1/2 gap-2">
                   <Label>{t("customers.customer_first_name")}</Label>

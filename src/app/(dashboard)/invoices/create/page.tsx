@@ -1,7 +1,6 @@
 "use client";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
 
 import useFormattedAmount from "@/hooks/useFormattedAmount";
 
@@ -30,7 +29,6 @@ export default function Page({}: Props) {
   const router = useRouter();
   const { toast } = useToast();
   const { formatAmount } = useFormattedAmount();
-  const t = useTranslations();
 
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
     null
@@ -38,7 +36,7 @@ export default function Page({}: Props) {
   const [editItems, setEditItems] = useState<boolean>(true);
   const [items, setItems] = useState<Item[]>([]);
   const [date, setDate] = useState<Date>(new Date());
-  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handleCreateInvoice = async () => {
     const localDate = new Date(
@@ -47,7 +45,7 @@ export default function Page({}: Props) {
     const isoDate = localDate.toISOString().split("T")[0];
 
     try {
-      setError(null);
+      setLoading(true);
       const response = await api.post("/invoices", {
         client_id: selectedCustomer?.client_id,
         due_date: isoDate,
@@ -59,11 +57,9 @@ export default function Page({}: Props) {
       });
       router.push(`/invoices/${response.data.invoice_id}`);
     } catch (err: any) {
-      toast({
-        variant: "destructive",
-        title: "Une Erreur s'est produite",
-        description: t(`server.${err.response?.data?.message}`),
-      });
+      console.log(err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -200,8 +196,14 @@ export default function Page({}: Props) {
                       onClick={handleCreateInvoice}
                       disabled={!selectedCustomer || items.length === 0}
                     >
-                      <Plus size={20} className="mr-2" />
-                      {"Créer la facture"}
+                      {" "}
+                      {loading ? (
+                        "Création en cours..."
+                      ) : (
+                        <>
+                          <Plus size={20} className="mr-2" /> Créer la facture
+                        </>
+                      )}
                     </Button>
                   </CardContent>
                 </Card>

@@ -1,8 +1,6 @@
 "use client";
 import React from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
-import { useTranslations } from "next-intl";
 
 import { Dashboard } from "@/types/Dashboard";
 
@@ -17,7 +15,6 @@ import {
 import { ContentLayout } from "@/components/admin-panel/content-layout";
 import DashboardShorcut from "@/components/dashboard-shorcut";
 import TableInvoices from "@/components/tableInvoices";
-import { useToast } from "@/components/ui/use-toast";
 
 import { PiUsersThree } from "react-icons/pi";
 import { ClipLoader } from "react-spinners";
@@ -32,8 +29,6 @@ type Props = {};
 
 export default function Page({}: Props) {
   const router = useRouter();
-  const t = useTranslations();
-  const { toast } = useToast();
 
   const [data, setData] = React.useState<Dashboard>({} as Dashboard);
   const [loading, setLoading] = React.useState(true);
@@ -46,12 +41,7 @@ export default function Page({}: Props) {
       const response = await api.get("/dashboard");
       setData(response.data);
     } catch (err: any) {
-      setError(err.response?.data?.message || "Une erreur s'est produite");
-      toast({
-        variant: "destructive",
-        title: "Une Erreur s'est produite",
-        description: t(`server.${err.response?.data?.message}`),
-      });
+      console.log(err);
     } finally {
       setLoading(false);
     }

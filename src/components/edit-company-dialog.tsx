@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { useTranslations } from "next-intl";
 
 import { Company } from "@/types/Company";
 
@@ -21,9 +20,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Label } from "@/components/ui/label";
 import { useToast } from "./ui/use-toast";
 import { FormPhoneInput } from "./ui/phone-input";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-
-import { AlertTriangle } from "lucide-react";
 
 import api from "@/lib/axios";
 
@@ -35,7 +31,6 @@ type Props = {
 
 const EditCompanyDialog: React.FC<Props> = ({ company, onSave, trigger }) => {
   const { toast } = useToast();
-  const t = useTranslations();
 
   const {
     register,
@@ -49,21 +44,16 @@ const EditCompanyDialog: React.FC<Props> = ({ company, onSave, trigger }) => {
 
   const [loading, setLoading] = React.useState<boolean>(false);
   const [open, setOpen] = React.useState<boolean>(false);
-  const [error, setError] = React.useState<string | [{ msg: string }] | null>(
-    null
-  );
 
   useEffect(() => {
     if (!open) {
       reset();
-      setError(null);
     }
   }, [open]);
 
   const handleSave = async (data: Company) => {
     try {
       setLoading(true);
-      setError(null);
       const response = await api.put(`/company`, data);
       onSave(data);
       toast({
@@ -73,17 +63,7 @@ const EditCompanyDialog: React.FC<Props> = ({ company, onSave, trigger }) => {
       });
       setOpen(false);
     } catch (err: any) {
-      setError(err.response?.data.message);
-      toast({
-        variant: "destructive",
-        title: "Une Erreur s'est produite",
-        description:
-          typeof err.response?.data?.message === "string"
-            ? t(`server.${err.response.data.message}`)
-            : err.response?.data?.message.map((e: { msg: string }) =>
-                t(`server.${e.msg}`)
-              ),
-      });
+      console.log(err);
     } finally {
       setLoading(false);
     }
@@ -98,93 +78,13 @@ const EditCompanyDialog: React.FC<Props> = ({ company, onSave, trigger }) => {
             <div className="flex flex-col w-full gap-4 ">
               <CredenzaHeader>
                 <CredenzaTitle>
-                  Modifier les informations de votre entreprise
+                  Modifier les informations de contact de votre entreprise
                 </CredenzaTitle>
                 <CredenzaDescription>
-                  Les informations de votre entreprise sont utilisées pour
-                  générer des documents tels que les factures et les devis.
+                  Ces informations seront utilisées pour vous contacter
                 </CredenzaDescription>
               </CredenzaHeader>
-
               <CredenzaBody className="flex flex-col gap-2">
-                {error && (
-                  <Alert variant="destructive">
-                    <AlertTriangle className="w-5 h-5" />
-                    <AlertTitle>
-                      Une erreur s&apos;est produite lors de la sauvegarde
-                    </AlertTitle>
-                    <AlertDescription>
-                      {typeof error === "string"
-                        ? t(`server.${error}`) || error
-                        : error.map((e) => t(`server.${e.msg}`))}
-                    </AlertDescription>
-                  </Alert>
-                )}
-
-                <div className="flex flex-col w-full gap-2">
-                  <Label>Nom de l&apos;entreprise</Label>
-                  <Input
-                    {...register("name", {
-                      required: "Veuillez entrer un nom",
-                    })}
-                    type="text"
-                  />
-                  <p className="text-sm text-red-500 italic">
-                    {errors.name?.message}
-                  </p>
-                </div>
-                <div className="flex flex-col w-full gap-2">
-                  <Label>Adresse</Label>
-                  <Input
-                    type="text"
-                    {...register("street_address", {
-                      required: "Veuillez entrer une adresse",
-                    })}
-                  />
-                  <p className="text-sm text-red-500 italic">
-                    {errors.street_address?.message}
-                  </p>
-                </div>
-                <div className="flex gap-2">
-                  <div className="flex flex-col w-1/2 gap-2">
-                    <Label>Ville</Label>
-                    <Input
-                      type="text"
-                      {...register("city", {
-                        required: "Veuillez entrer une ville",
-                      })}
-                    />
-                    <p className="text-sm text-red-500 italic">
-                      {errors.city?.message}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <div className="flex flex-col w-1/2 gap-2">
-                    <Label>Code postal</Label>
-                    <Input
-                      type="text"
-                      {...register("postal_code", {
-                        required: "Veuillez entrer un code postal",
-                      })}
-                    />
-                    <p className="text-sm text-red-500 italic">
-                      {errors.postal_code?.message}
-                    </p>
-                  </div>
-                  <div className="flex flex-col w-1/2 gap-2">
-                    <Label>Pays</Label>
-                    <Input
-                      type="text"
-                      {...register("country", {
-                        required: "Veuillez entrer un pays",
-                      })}
-                    />
-                    <p className="text-sm text-red-500 italic">
-                      {errors.country?.message}
-                    </p>
-                  </div>
-                </div>
                 <div className="flex flex-col w-full gap-2">
                   <Label>Email</Label>
                   <Input
@@ -209,32 +109,6 @@ const EditCompanyDialog: React.FC<Props> = ({ company, onSave, trigger }) => {
                   <p className="text-sm text-red-500 italic">
                     {errors.phone?.message}
                   </p>
-                </div>
-                <div className="flex flex-col w-full gap-2">
-                  <div className="flex flex-col gap-2">
-                    <Label>Numéro de TVA</Label>
-                    <Input
-                      type="text"
-                      {...register("vat_number", {
-                        required: "Veuillez entrer un numéro de TVA",
-                      })}
-                    />
-                    <p className="text-sm text-red-500 italic">
-                      {errors.vat_number?.message}
-                    </p>
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <Label>Numéro SIRET</Label>
-                    <Input
-                      type="text"
-                      {...register("siret_number", {
-                        required: "Veuillez entrer un numéro de SIRET",
-                      })}
-                    />
-                    <p className="text-sm text-red-500 italic">
-                      {errors.siret_number?.message}
-                    </p>
-                  </div>
                 </div>
               </CredenzaBody>
               <CredenzaFooter>

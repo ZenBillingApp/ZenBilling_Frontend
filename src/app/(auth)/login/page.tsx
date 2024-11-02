@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useTranslations } from "next-intl";
 import { setCookie } from "cookies-next";
 import { useForm } from "react-hook-form";
 
@@ -9,9 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { PasswordInput } from "@/components/ui/password-input";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
-import { AlertTriangle } from "lucide-react";
 import { ArrowRightIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -19,7 +16,6 @@ import api from "@/lib/axios";
 
 export default function Login() {
   const router = useRouter();
-  const t = useTranslations();
   const searchParams = useSearchParams();
   const {
     register,
@@ -28,22 +24,16 @@ export default function Login() {
   } = useForm<{ email: string; password: string }>();
 
   const [loading, setLoading] = React.useState(false);
-  const [error, setError] = React.useState<string | null>(null);
 
   const onSubmit = async (data: { email: string; password: string }) => {
     try {
       setLoading(true);
-      setError(null); // Réinitialise l'erreur avant l'appel API
       const response = await api.post("/auth/login", data);
       setCookie("token", response.data.token, {
         maxAge: 60 * 60 * 24 * 7,
       });
       router.push(searchParams.get("callbackUrl") || "/dashboard");
     } catch (err) {
-      // Gère les erreurs d'API ici
-      const errorMsg =
-        (err as any).response?.data?.message || "Erreur de connexion";
-      setError(errorMsg);
       console.log(err);
     } finally {
       setLoading(false);
@@ -66,15 +56,6 @@ export default function Login() {
             </Button>
           </p>
         </div>
-        {error && (
-          <Alert variant="destructive">
-            <AlertTriangle className="w-5 h-5" />
-            <AlertTitle>{t("login.login_error")}</AlertTitle>
-            <AlertDescription>
-              <p>{t(`server.${error}`)}</p>
-            </AlertDescription>
-          </Alert>
-        )}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>

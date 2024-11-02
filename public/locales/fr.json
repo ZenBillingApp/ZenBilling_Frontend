@@ -361,6 +361,7 @@
         "REGISTER_FAILED" : "L'inscription a échoué",
         "LOGIN_FAILED" : "La connexion a échoué",
         "PASSWORD_RESET_FAILED" : "La réinitialisation du mot de passe a échoué",
-        "PASSWORD_RESET_SUCCESS" : "La réinitialisation du mot de passe a réussi"
+        "PASSWORD_RESET_SUCCESS" : "La réinitialisation du mot de passe a réussi",
+        "PASSWORD_MIN_LENGTH" : "Le mot de passe doit contenir au moins 6 caractères"
     }
 }
