@@ -95,6 +95,12 @@ export default function CompanySignupPage() {
         "category",
         companyData.etablissement.unite_legale.categorie_entreprise
       );
+      setValue(
+        "vat_number",
+        `FR${(12 + 3 * (companyData.etablissement.siren % 97)) % 97}${
+          companyData.etablissement.siren
+        }`
+      );
 
       toast({
         title: "Entreprise trouvée",
@@ -275,11 +281,12 @@ export default function CompanySignupPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="vat_number">Numéro de TVA</Label>
+              <Label htmlFor="vat_number">TVA intracommunautaire</Label>
               <Input
                 {...register("vat_number", {
                   required: "Le numéro de TVA est requis",
                 })}
+                disabled={true}
                 placeholder="Numéro de TVA"
               />
               {errors.vat_number && (
