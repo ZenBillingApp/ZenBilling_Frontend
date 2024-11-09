@@ -1,143 +1,173 @@
 "use client";
-import React from "react";
+
 import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
+import { Plus } from "lucide-react";
 
 import { Invoice } from "@/types/Invoice";
 
-import TableInvoices from "@/components/tableInvoices";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import TableInvoices from "@/components/tableInvoices";
 import PaginationList from "@/components/pagination-list";
 import { ContentLayout } from "@/components/admin-panel/content-layout";
-import BtnFilter from "@/components/btn-filter";
+import FilterButton from "@/components/btn-filter";
 import ErrorScreen from "@/components/error-screen";
 
-import { PiPlus } from "react-icons/pi";
 import { ClipLoader } from "react-spinners";
 
 import api from "@/lib/axios";
 import { cn } from "@/lib/utils";
 
-type Props = {};
+interface InvoicesState {
+  data: Invoice[];
+  isLoading: boolean;
+  error: string | null;
+  totalPages: number;
+}
 
-export default function Page({}: Props) {
+interface FilterConfig {
+  id: string;
+  text: string;
+  value: string;
+}
+
+const FILTERS: FilterConfig[] = [
+  { id: "all", text: "Toutes", value: "all" },
+  { id: "paid", text: "Payées", value: "paid" },
+  { id: "pending", text: "En attente", value: "pending" },
+  { id: "cancelled", text: "Annulées", value: "cancelled" },
+];
+
+const DEBOUNCE_DELAY = 300;
+
+const initialState: InvoicesState = {
+  data: [],
+  isLoading: true,
+  error: null,
+  totalPages: 1,
+};
+
+export default function InvoicesPage() {
   const router = useRouter();
+  const [{ data: invoices, isLoading, error, totalPages }, setState] =
+    useState<InvoicesState>(initialState);
+  const [search, setSearch] = useState("");
+  const [selectedFilter, setSelectedFilter] = useState<string>("all");
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const [invoices, setInvoices] = React.useState<Invoice[]>([]);
-  const [search, setSearch] = React.useState<string>("");
-  const [selectedFilter, setSelectedFilter] = React.useState<string>("all");
-  const [loading, setLoading] = React.useState<boolean>(true);
-  const [error, setError] = React.useState<string | null>(null);
-  const [page, setPage] = React.useState<number>(1);
-  const [totalPages, setTotalPages] = React.useState<number>(1);
+  const fetchInvoicesData = useCallback(async () => {
+    try {
+      setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
-  const handleChangePage = (page: number) => {
-    setPage(page);
+      const params = {
+        page: currentPage,
+        search: search || undefined,
+        status: selectedFilter === "all" ? undefined : selectedFilter,
+      };
+
+      const response = await api.get("/invoices", { params });
+
+      setState((prev) => ({
+        ...prev,
+        data: response.data.invoices,
+        totalPages: response.data.totalPages,
+        isLoading: false,
+      }));
+    } catch (err) {
+      console.error("Failed to fetch invoices:", err);
+      setState((prev) => ({
+        ...prev,
+        error: "Impossible de charger les factures",
+        isLoading: false,
+      }));
+    }
+  }, [currentPage, search, selectedFilter]);
+
+  useEffect(() => {
+    const timer = setTimeout(fetchInvoicesData, DEBOUNCE_DELAY);
+    return () => clearTimeout(timer);
+  }, [fetchInvoicesData]);
+
+  const handleCreateInvoice = () => router.push("/invoices/create");
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(event.target.value);
+    setCurrentPage(1); // Reset to first page on new search
   };
 
-  const fetchInvoices = React.useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await api.get("/invoices", {
-        params: {
-          page: page,
-          search: search || undefined,
-          status: selectedFilter === "all" ? undefined : selectedFilter,
-        },
-      });
-      setInvoices(response.data.invoices);
-      setTotalPages(response.data.totalPages);
-    } catch (err: any) {
-      console.log(err);
-    } finally {
-      setLoading(false);
-    }
-  }, [page, search, selectedFilter]);
+  const handleFilterChange = (filter: string) => {
+    setSelectedFilter(filter);
+    setCurrentPage(1); // Reset to first page on filter change
+  };
 
-  React.useEffect(() => {
-    const delayDebounceFn = setTimeout(() => {
-      fetchInvoices();
-    }, 300);
-
-    return () => clearTimeout(delayDebounceFn);
-  }, [fetchInvoices]);
+  if (error) {
+    return (
+      <ContentLayout title="Factures">
+        <div className="flex flex-col w-full h-full justify-center items-center gap-4">
+          <ErrorScreen handleRetry={fetchInvoicesData} />
+        </div>
+      </ContentLayout>
+    );
+  }
 
   return (
-    <ContentLayout title={"Factures"}>
-      {error ? (
-        <div className="flex flex-col w-full h-full justify-center items-center gap-4">
-          <ErrorScreen handleRetry={fetchInvoices} />
-        </div>
-      ) : (
-        <div className="flex flex-col w-full h-full gap-4">
-          <div className="flex flex-col gap-6">
-            <div className="flex flex-col xl:flex-row xl:justify-between xl:items-center gap-6">
-              <h1 className="text-2xl font-semibold">Factures</h1>
-              <Button onClick={() => router.push("/invoices/create")}>
-                <PiPlus className="mr-2" size={20} />
-                Créer une facture
-              </Button>
-            </div>
-            <div className="flex flex-col w-full gap-6">
-              <div className="flex flex-col gap-6 xl:flex-row xl:justify-between">
-                <div className="grid grid-cols-2 items-center gap-4 sm:grid-cols-4">
-                  <BtnFilter
-                    filter="all"
-                    text="Toutes"
-                    selectedFilter={selectedFilter}
-                    setSelectedFilter={setSelectedFilter}
+    <ContentLayout title="Factures">
+      <div className="flex flex-col w-full h-full gap-4">
+        <header className="flex flex-col gap-6">
+          <div className="flex flex-col xl:flex-row xl:justify-between xl:items-center gap-6">
+            <h1 className="text-2xl font-semibold">Factures</h1>
+            <Button onClick={handleCreateInvoice}>
+              <Plus className="w-5 h-5 mr-2" />
+              Créer une facture
+            </Button>
+          </div>
+
+          <div className="flex flex-col w-full gap-6">
+            <div className="flex flex-col gap-6 xl:flex-row xl:justify-between">
+              <div className="grid grid-cols-2 items-center gap-4 sm:grid-cols-4">
+                {FILTERS.map((filter) => (
+                  <FilterButton
+                    key={filter.id}
+                    filter={filter.value}
+                    text={filter.text}
+                    selectedFilter={selectedFilter === filter.value}
+                    setSelectedFilter={handleFilterChange}
                   />
-                  <BtnFilter
-                    filter="paid"
-                    text={"Payées"}
-                    selectedFilter={selectedFilter}
-                    setSelectedFilter={setSelectedFilter}
-                  />
-                  <BtnFilter
-                    filter="pending"
-                    text={"En attente"}
-                    selectedFilter={selectedFilter}
-                    setSelectedFilter={setSelectedFilter}
-                  />
-                  <BtnFilter
-                    filter="cancelled"
-                    text={"Annulées"}
-                    selectedFilter={selectedFilter}
-                    setSelectedFilter={setSelectedFilter}
-                  />
-                </div>
-                <div className="flex w-full py-2 gap-6 xl:w-2/6">
-                  <Input
-                    type="text"
-                    placeholder={"Rechercher une facture..."}
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                  />
-                </div>
+                ))}
+              </div>
+
+              <div className="flex w-full py-2 gap-6 xl:w-2/6">
+                <Input
+                  type="search"
+                  placeholder="Rechercher une facture..."
+                  value={search}
+                  onChange={handleSearchChange}
+                  className="w-full"
+                />
               </div>
             </div>
           </div>
-          {loading ? (
-            <div className="flex justify-center items-center w-full h-full">
-              <ClipLoader color={cn("text-primary")} />
-            </div>
-          ) : (
-            <>
-              <div className="flex flex-col gap-6">
-                <TableInvoices invoices={invoices} search={search} />
-              </div>
-              {totalPages > 1 && (
-                <PaginationList
-                  currentPage={page}
-                  totalPages={totalPages}
-                  handleChangePage={handleChangePage}
-                />
-              )}
-            </>
-          )}
-        </div>
-      )}
+        </header>
+
+        {isLoading ? (
+          <div className="flex justify-center items-center w-full h-full">
+            <ClipLoader color={cn("text-primary")} />
+          </div>
+        ) : (
+          <main className="flex flex-col gap-6">
+            <TableInvoices invoices={invoices} search={search} />
+
+            {totalPages > 1 && (
+              <PaginationList
+                currentPage={currentPage}
+                totalPages={totalPages}
+                handleChangePage={setCurrentPage}
+              />
+            )}
+          </main>
+        )}
+      </div>
     </ContentLayout>
   );
 }
