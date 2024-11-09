@@ -40,9 +40,9 @@ export default function Page({}: Props) {
 
   const handleCreateInvoice = async () => {
     const localDate = new Date(
-      date.getTime() - date.getTimezoneOffset() * 60000
+      date?.getTime() - date?.getTimezoneOffset() * 60000
     );
-    const isoDate = localDate.toISOString().split("T")[0];
+    const isoDate = localDate?.toISOString().split("T")[0];
 
     try {
       setLoading(true);
@@ -102,12 +102,18 @@ export default function Page({}: Props) {
                       variant="outline"
                       className="w-full flex items-center justify-between"
                     >
-                      {date.toLocaleDateString() ?? "Select a date"}
+                      {date?.toLocaleDateString() ?? "Sélectionner une date"}
                       <ChevronDownIcon size={16} className="ml-2 opacity-50" />
                     </Button>
                   }
                   value={date}
-                  onChange={(date) => setDate(date)}
+                  onChange={(date) => {
+                    if (date) {
+                      setDate(date);
+                    } else {
+                      setDate(new Date());
+                    }
+                  }}
                 />
               </div>
             </div>

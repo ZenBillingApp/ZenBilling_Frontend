@@ -29,6 +29,7 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
+  CartesianGrid,
 } from "recharts";
 
 import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
@@ -37,6 +38,7 @@ import { ClipLoader } from "react-spinners";
 
 import { cn } from "@/lib/utils";
 import api from "@/lib/axios";
+import { format } from "path";
 
 type Props = {};
 
@@ -57,6 +59,8 @@ export default function Page({}: Props) {
   const { id } = useParams();
   const router = useRouter();
   const { toast } = useToast();
+
+  const { formatAmount } = useFormattedAmount();
 
   const [customer, setCustomer] = React.useState<Customer | null>(null);
   const [loading, setLoading] = React.useState<boolean>(true);
@@ -167,9 +171,9 @@ export default function Page({}: Props) {
                   />
                 </div>
               </div>
-              <div className="flex flex-col w-full  sm:flex-row gap-6">
-                <div className="flex w-full sm:w-1/2 flex-col gap-6">
-                  <Card className="flex flex-col justify-center  ">
+              <div className="flex flex-col w-full  gap-6">
+                <div className="flex flex-col xl:flex-row w-full gap-6">
+                  <Card className="flex flex-col justify-center w-full xl:w-1/2">
                     <CardHeader>
                       <CardTitle>{"Contact du client"}</CardTitle>
                       <CardDescription>
@@ -187,7 +191,7 @@ export default function Page({}: Props) {
                       </div>
                     </CardContent>
                   </Card>
-                  <Card className="flex flex-col ">
+                  <Card className="flex flex-col justify-center w-full xl:w-1/2">
                     <CardHeader>
                       <CardTitle>Adresse du client</CardTitle>
                       <CardDescription>
@@ -214,7 +218,7 @@ export default function Page({}: Props) {
                     </CardContent>
                   </Card>
                 </div>
-                <div className="flex w-full sm:w-1/2">
+                <div className="flex w-full gap-6">
                   <Card className="w-full">
                     <CardHeader>
                       <CardTitle>Revenus mensuels du client</CardTitle>
@@ -234,10 +238,22 @@ export default function Page({}: Props) {
                       ) : (
                         <ResponsiveContainer width="100%" height={300}>
                           <BarChart data={monthlyInvoice}>
-                            <XAxis dataKey="month" />
-                            <YAxis />
+                            <CartesianGrid horizontal={true} vertical={false} />
+                            <XAxis
+                              dataKey="month"
+                              tick={{ fontSize: 12 }}
+                              tickLine={false}
+                            />
+                            <YAxis
+                              tickLine={false}
+                              tick={{ fontSize: 12 }}
+                              tickFormatter={(value) => formatAmount(value)}
+                            />
                             <Tooltip content={CustomTooltip} />
-                            <Bar dataKey="amount" fill={cn("bg-primary")} />
+                            <Bar
+                              dataKey="amount"
+                              fill={"hsl(var(--primary))"}
+                            />
                           </BarChart>
                         </ResponsiveContainer>
                       )}

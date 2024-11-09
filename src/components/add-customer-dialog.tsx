@@ -70,7 +70,7 @@ export default function AddCustomerDialog({ trigger, onSave }: Props) {
     <Credenza open={open} onOpenChange={setOpen}>
       <CredenzaTrigger>{trigger}</CredenzaTrigger>
       <CredenzaContent>
-        <ScrollArea className="w-full max-h-[80vh]">
+        <ScrollArea className="flex w-full max-h-[80vh] overflow-y-auto">
           <form onSubmit={handleSubmit(handleOnAdd)}>
             <div className="flex flex-col w-full gap-4 p-2">
               <CredenzaHeader>
@@ -79,9 +79,9 @@ export default function AddCustomerDialog({ trigger, onSave }: Props) {
                   {"Veuillez remplir les informations du client"}
                 </CredenzaDescription>
               </CredenzaHeader>
-              <CredenzaBody className="flex flex-col space-y-4">
+              <CredenzaBody className="flex flex-col space-y-2">
                 <div className="flex flex-col gap-2 sm:flex-row">
-                  <div className="flex flex-col gap-1 sm:w-1/2">
+                  <div className="flex flex-col gap-2 sm:w-1/2">
                     <Label htmlFor="first_name">{"Prénom"}</Label>
                     <Input
                       {...register("first_name", { required: "Prénom requis" })}
@@ -93,7 +93,7 @@ export default function AddCustomerDialog({ trigger, onSave }: Props) {
                       {errors.first_name?.message}
                     </p>
                   </div>
-                  <div className="flex flex-col w-full gap-1 sm:w-1/2">
+                  <div className="flex flex-col w-full gap-2 sm:w-1/2">
                     <Label htmlFor="last_name">{"Nom"}</Label>
                     <Input
                       {...register("last_name", { required: "Nom requis" })}
@@ -106,7 +106,7 @@ export default function AddCustomerDialog({ trigger, onSave }: Props) {
                     </p>
                   </div>
                 </div>
-                <div className="grid grid-cols-1 gap-1">
+                <div className="grid grid-cols-1 gap-2">
                   <Label htmlFor="address">{"Adresse"}</Label>
                   <Input
                     {...register("street_address", {
@@ -120,22 +120,20 @@ export default function AddCustomerDialog({ trigger, onSave }: Props) {
                     {errors.street_address?.message}
                   </p>
                 </div>
-                <div className="flex flex-col gap-1 sm:flex-row">
-                  <div className="flex flex-col gap-2 sm:w-1/2">
-                    <Label htmlFor="city">{"Ville"}</Label>
-                    <Input
-                      {...register("city", { required: "Ville requise" })}
-                      id="city"
-                      type="text"
-                      placeholder={"Ville"}
-                    />
-                    <p className="text-xs text-red-500 italic">
-                      {errors.city?.message}
-                    </p>
-                  </div>
+                <div className="flex flex-col gap-2">
+                  <Label htmlFor="city">{"Ville"}</Label>
+                  <Input
+                    {...register("city", { required: "Ville requise" })}
+                    id="city"
+                    type="text"
+                    placeholder={"Ville"}
+                  />
+                  <p className="text-xs text-red-500 italic">
+                    {errors.city?.message}
+                  </p>
                 </div>
-                <div className="flex flex-col gap-1 sm:flex-row">
-                  <div className="flex flex-col gap-1 sm:w-1/2">
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  <div className="flex flex-col gap-2 sm:w-1/2">
                     <Label htmlFor="postal_code">{"Code postal"}</Label>
                     <Input
                       {...register("postal_code", {
@@ -149,7 +147,7 @@ export default function AddCustomerDialog({ trigger, onSave }: Props) {
                       {errors.postal_code?.message}
                     </p>
                   </div>
-                  <div className="flex flex-col gap-1 sm:w-1/2">
+                  <div className="flex flex-col gap-2 sm:w-1/2">
                     <Label htmlFor="country">{"Pays"}</Label>
                     <Input
                       {...register("country", { required: "Pays requis" })}
@@ -162,7 +160,7 @@ export default function AddCustomerDialog({ trigger, onSave }: Props) {
                     </p>
                   </div>
                 </div>
-                <div className="flex flex-col w-full gap-1">
+                <div className="flex flex-col w-full gap-2">
                   <Label htmlFor="email">{"Email"}</Label>
                   <Input
                     {...register("email", { required: "Email requis" })}
@@ -174,7 +172,7 @@ export default function AddCustomerDialog({ trigger, onSave }: Props) {
                     {errors.email?.message}
                   </p>
                 </div>
-                <div className="flex flex-col w-full gap-1">
+                <div className="flex flex-col w-full gap-2">
                   <Label htmlFor="phone">{"Téléphone"}</Label>
                   <FormPhoneInput
                     control={control}

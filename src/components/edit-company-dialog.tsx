@@ -75,7 +75,7 @@ const EditCompanyDialog: React.FC<Props> = ({ company, onSave, trigger }) => {
       <CredenzaContent>
         <form onSubmit={handleSubmit(handleSave)}>
           <ScrollArea className="flex w-full max-h-[80vh] overflow-y-auto">
-            <div className="flex flex-col w-full gap-4 ">
+            <div className="flex flex-col w-full gap-4 p-2">
               <CredenzaHeader>
                 <CredenzaTitle>
                   Modifier les informations de contact de votre entreprise

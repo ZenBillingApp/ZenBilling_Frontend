@@ -122,6 +122,7 @@ export default function Page({}: Props) {
 
   const handleSelectDueDate = async (date: Date) => {
     // Ajuster manuellement le décalage de fuseau horaire
+
     const localDate = new Date(
       date.getTime() - date.getTimezoneOffset() * 60000
     );

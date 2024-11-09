@@ -81,16 +81,16 @@ export default function EditCustomerDialog({
       <CredenzaContent>
         <ScrollArea className="flex w-full max-h-[80vh] overflow-y-auto">
           <form onSubmit={handleSubmit(handleOnEdit)}>
-            <div className="flex flex-col w-full gap-4">
+            <div className="flex flex-col w-full gap-4 p-2">
               <CredenzaHeader>
                 <CredenzaTitle>Modifier le client</CredenzaTitle>
                 <CredenzaDescription>
                   Modifiez les informations du client
                 </CredenzaDescription>
               </CredenzaHeader>
-              <CredenzaBody className="flex flex-col space-y-4">
+              <CredenzaBody className="flex flex-col space-y-2">
                 <div className="flex flex-col gap-2 sm:flex-row">
-                  <div className="flex flex-col gap-1 sm:w-1/2">
+                  <div className="flex flex-col gap-2 sm:w-1/2">
                     <Label htmlFor="first_name">Prénom</Label>
                     <Input
                       {...register("first_name", { required: "Prénom requis" })}
@@ -102,7 +102,7 @@ export default function EditCustomerDialog({
                       {errors.first_name?.message}
                     </p>
                   </div>
-                  <div className="flex flex-col w-full gap-1 sm:w-1/2">
+                  <div className="flex flex-col w-full gap-2 sm:w-1/2">
                     <Label htmlFor="last_name">Nom</Label>
                     <Input
                       {...register("last_name", { required: "Nom requis" })}
@@ -115,7 +115,7 @@ export default function EditCustomerDialog({
                     </p>
                   </div>
                 </div>
-                <div className="grid grid-cols-1 gap-1">
+                <div className="grid grid-cols-1 gap-2">
                   <Label htmlFor="street_address">Adresse</Label>
                   <Input
                     {...register("street_address", {
@@ -129,8 +129,8 @@ export default function EditCustomerDialog({
                     {errors.street_address?.message}
                   </p>
                 </div>
-                <div className="flex flex-col gap-1 sm:flex-row">
-                  <div className="flex flex-col gap-1 sm:w-1/2">
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  <div className="flex flex-col gap-2 sm:w-1/2">
                     <Label htmlFor="city">Ville</Label>
                     <Input
                       {...register("city", { required: "Ville requise" })}
@@ -142,7 +142,7 @@ export default function EditCustomerDialog({
                       {errors.city?.message}
                     </p>
                   </div>
-                  <div className="flex flex-col gap-1 sm:w-1/2">
+                  <div className="flex flex-col gap-2 sm:w-1/2">
                     <Label htmlFor="postal_code">Code postal</Label>
                     <Input
                       {...register("postal_code", {
@@ -158,7 +158,7 @@ export default function EditCustomerDialog({
                   </div>
                 </div>
 
-                <div className="flex flex-col w-full gap-1 ">
+                <div className="flex flex-col w-full gap-2">
                   <Label htmlFor="country">Pays</Label>
                   <Input
                     {...register("country", { required: "Pays requis" })}
@@ -171,7 +171,7 @@ export default function EditCustomerDialog({
                   </p>
                 </div>
 
-                <div className="flex flex-col w-full gap-1">
+                <div className="flex flex-col w-full gap-2">
                   <Label htmlFor="email">Email</Label>
                   <Input
                     {...register("email", { required: "Email requis" })}
@@ -183,7 +183,7 @@ export default function EditCustomerDialog({
                     {errors.email?.message}
                   </p>
                 </div>
-                <div className="flex flex-col w-full gap-1">
+                <div className="flex flex-col w-full gap-2">
                   <Label htmlFor="phone">Téléphone</Label>
                   <FormPhoneInput
                     name="phone"
