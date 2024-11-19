@@ -1,88 +1,111 @@
 "use client";
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
 
-import useFormattedAmount from "@/hooks/useFormattedAmount";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { ChevronDown, Plus } from "lucide-react";
+import { MdClose, MdOutlineEdit } from "react-icons/md";
 
 import { Item } from "@/types/Item";
 import { Customer } from "@/types/Customer";
 
+import useFormattedAmount from "@/hooks/useFormattedAmount";
+import { useToast } from "@/components/ui/use-toast";
+
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ContentLayout } from "@/components/admin-panel/content-layout";
 import DatePicker from "@/components/datePicker";
 import SheetCustomers from "@/components/sheet-customers";
 import EditTableItems from "@/components/edit-table-items";
 import TableItems from "@/components/table-items";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useToast } from "@/components/ui/use-toast";
 
-import { ChevronDownIcon, Plus } from "lucide-react";
-import { MdClose, MdOutlineEdit } from "react-icons/md";
-
-import { cn } from "@/lib/utils";
 import api from "@/lib/axios";
+import { cn } from "@/lib/utils";
 
-type Props = {};
+interface CreateInvoiceFormData {
+  client: Customer | null;
+  items: Item[];
+  dueDate: Date;
+  isEditingItems: boolean;
+  isSubmitting: boolean;
+}
 
-export default function Page({}: Props) {
+const initialFormState: CreateInvoiceFormData = {
+  client: null,
+  items: [],
+  dueDate: new Date(),
+  isEditingItems: true,
+  isSubmitting: false,
+};
+
+interface InvoiceTotals {
+  totalAmountWithoutVAT: number;
+  totalVAT: number;
+  totalAmount: number;
+}
+
+const calculateInvoiceTotals = (items: Item[] = []): InvoiceTotals => {
+  return items.reduce(
+    (acc, item) => {
+      const itemTotal = item.unit_price * item.quantity;
+      const itemVAT = (item.vat_rate / 100) * itemTotal;
+
+      return {
+        totalAmountWithoutVAT: acc.totalAmountWithoutVAT + itemTotal,
+        totalVAT: acc.totalVAT + itemVAT,
+        totalAmount: acc.totalAmount + itemTotal + itemVAT,
+      };
+    },
+    { totalAmountWithoutVAT: 0, totalVAT: 0, totalAmount: 0 }
+  );
+};
+
+export default function CreateInvoicePage() {
   const router = useRouter();
   const { toast } = useToast();
   const { formatAmount } = useFormattedAmount();
 
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
-    null
-  );
-  const [editItems, setEditItems] = useState<boolean>(true);
-  const [items, setItems] = useState<Item[]>([]);
-  const [date, setDate] = useState<Date>(new Date());
-  const [loading, setLoading] = useState<boolean>(false);
+  const [formData, setFormData] =
+    useState<CreateInvoiceFormData>(initialFormState);
+  const { client, items, dueDate, isEditingItems, isSubmitting } = formData;
+
+  const { totalAmount, totalAmountWithoutVAT, totalVAT } =
+    calculateInvoiceTotals(items);
 
   const handleCreateInvoice = async () => {
-    const localDate = new Date(
-      date?.getTime() - date?.getTimezoneOffset() * 60000
-    );
-    const isoDate = localDate?.toISOString().split("T")[0];
+    if (!client || items.length === 0) return;
 
     try {
-      setLoading(true);
+      setFormData((prev) => ({ ...prev, isSubmitting: true }));
+
+      const localDate = new Date(
+        dueDate.getTime() - dueDate.getTimezoneOffset() * 60000
+      );
+      const isoDate = localDate.toISOString().split("T")[0];
+
       const response = await api.post("/invoices", {
-        client_id: selectedCustomer?.client_id,
+        client_id: client.client_id,
         due_date: isoDate,
         items,
       });
+
       toast({
         title: "Facture créée",
         description: "La facture a été créée avec succès",
       });
+
       router.push(`/invoices/${response.data.invoice_id}`);
-    } catch (err: any) {
-      console.log(err);
+    } catch (error) {
+      console.error("Failed to create invoice:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de créer la facture",
+        variant: "destructive",
+      });
     } finally {
-      setLoading(false);
+      setFormData((prev) => ({ ...prev, isSubmitting: false }));
     }
-  };
-
-  const calculateSubtotal = () => {
-    return items
-      .reduce((total, item) => total + item.quantity * item.unit_price, 0)
-      .toFixed(2);
-  };
-
-  const calculateTax = () => {
-    return items
-      .reduce(
-        (total, item) =>
-          total + (item.quantity * item.unit_price * item.vat_rate) / 100,
-        0
-      )
-      .toFixed(2);
-  };
-
-  const calculateTotal = () => {
-    return (
-      parseFloat(calculateSubtotal()) + parseFloat(calculateTax())
-    ).toFixed(2);
   };
 
   return (
@@ -102,16 +125,17 @@ export default function Page({}: Props) {
                       variant="outline"
                       className="w-full flex items-center justify-between"
                     >
-                      {date?.toLocaleDateString() ?? "Sélectionner une date"}
-                      <ChevronDownIcon size={16} className="ml-2 opacity-50" />
+                      {formData.dueDate?.toLocaleDateString() ??
+                        "Sélectionner une date"}
+                      <ChevronDown size={16} className="ml-2 opacity-50" />
                     </Button>
                   }
-                  value={date}
+                  value={formData.dueDate}
                   onChange={(date) => {
                     if (date) {
-                      setDate(date);
+                      setFormData((prev) => ({ ...prev, dueDate: date }));
                     } else {
-                      setDate(new Date());
+                      setFormData((prev) => ({ ...prev, dueDate: new Date() }));
                     }
                   }}
                 />
@@ -122,13 +146,13 @@ export default function Page({}: Props) {
               <SheetCustomers
                 trigger={
                   <Button className="w-full cursor-pointer" variant="outline">
-                    {selectedCustomer
-                      ? `${selectedCustomer.first_name} ${selectedCustomer.last_name}`
+                    {formData.client
+                      ? `${formData.client.first_name} ${formData.client.last_name}`
                       : "Sélectionner un client"}
                   </Button>
                 }
                 handleSelectCustomer={(customer) => {
-                  setSelectedCustomer(customer);
+                  setFormData((prev) => ({ ...prev, client: customer }));
                 }}
               />
             </div>
@@ -136,27 +160,40 @@ export default function Page({}: Props) {
               <Card className="relative w-full">
                 <CardHeader>
                   <CardTitle>{"Articles"}</CardTitle>
-                  {editItems ? (
+                  {isEditingItems ? (
                     <MdClose
                       size={20}
                       className="absolute top-2 right-2 cursor-pointer"
-                      onClick={() => setEditItems((prev) => !prev)}
+                      onClick={() =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          isEditingItems: false,
+                        }))
+                      }
                     />
                   ) : (
                     <MdOutlineEdit
                       size={20}
                       className="absolute top-2 right-2 cursor-pointer"
-                      onClick={() => setEditItems((prev) => !prev)}
+                      onClick={() =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          isEditingItems: true,
+                        }))
+                      }
                     />
                   )}
                 </CardHeader>
                 <CardContent>
-                  {editItems ? (
+                  {isEditingItems ? (
                     <EditTableItems
                       items={items}
                       handleOnSaveItems={(items) => {
-                        setItems(items);
-                        setEditItems(false);
+                        setFormData((prev) => ({ ...prev, items }));
+                        setFormData((prev) => ({
+                          ...prev,
+                          isEditingItems: false,
+                        }));
                       }}
                     />
                   ) : (
@@ -175,7 +212,7 @@ export default function Page({}: Props) {
                         {"Sous-total"}:
                       </span>
                       <p className="flex  text-sm items-end text-right">
-                        {formatAmount(parseFloat(calculateSubtotal()), {
+                        {formatAmount(totalAmountWithoutVAT, {
                           currency: "EUR",
                         })}
                       </p>
@@ -183,27 +220,23 @@ export default function Page({}: Props) {
                     <div className="flex justify-between w-full">
                       <span className="font-light text-sm ">{"TVA"}:</span>
                       <p className="flex  text-sm items-end text-right">
-                        {formatAmount(parseFloat(calculateTax()), {
-                          currency: "EUR",
-                        })}
+                        {formatAmount(totalVAT, { currency: "EUR" })}
                       </p>
                     </div>
                     <div className="flex justify-between w-full">
                       <span className="font-light text-sm ">{"Total"}:</span>
                       <p className="flex  text-sm items-end text-right">
-                        {formatAmount(parseFloat(calculateTotal()), {
-                          currency: "EUR",
-                        })}
+                        {formatAmount(totalAmount, { currency: "EUR" })}
                       </p>
                     </div>
 
                     <Button
                       className="w-full mt-4"
                       onClick={handleCreateInvoice}
-                      disabled={!selectedCustomer || items.length === 0}
+                      disabled={!formData.client || items.length === 0}
                     >
                       {" "}
-                      {loading ? (
+                      {isSubmitting ? (
                         "Création en cours..."
                       ) : (
                         <>
