@@ -242,7 +242,7 @@ export default function CustomerDetailsPage() {
             <CardHeader>
               <CardTitle>Adresse du client</CardTitle>
               <CardDescription>
-                Informations sur l'adresse du client
+                Informations sur l&apos;adresse du client
               </CardDescription>
             </CardHeader>
             <CardContent>
