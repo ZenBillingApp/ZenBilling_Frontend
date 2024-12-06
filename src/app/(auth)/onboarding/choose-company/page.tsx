@@ -216,7 +216,7 @@ export default function CompanySignupPage() {
   return (
     <div className="container max-w-4xl p-8">
       <div className="flex flex-col gap-2 items-center justify-between mb-8 md:flex-row">
-        <h1 className="text-2xl font-bold">Inscription de l'entreprise</h1>
+        <h1 className="text-2xl font-bold">Inscription de l&apos;entreprise</h1>
         <Button
           variant="outline"
           onClick={handleSignOut}
@@ -308,7 +308,7 @@ export default function CompanySignupPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Informations de l'entreprise</CardTitle>
+              <CardTitle>Informations de l&apos;entreprise</CardTitle>
               <CardDescription>
                 Vérifiez les informations avant de continuer
               </CardDescription>

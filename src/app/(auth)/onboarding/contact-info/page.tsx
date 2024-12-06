@@ -73,7 +73,7 @@ function ContactInfo({}: Props) {
   return (
     <div className="container mx-auto">
       <div className="flex flex-col gap-2 items-center justify-between mb-8 md:flex-row">
-        <h1 className="text-2xl font-bold">Inscription de l'entreprise</h1>
+        <h1 className="text-2xl font-bold">Inscription de l&apos;entreprise</h1>
         <Button
           variant="outline"
           onClick={handleSignOut}
@@ -132,7 +132,7 @@ function ContactInfo({}: Props) {
         </CardContent>
         <CardFooter>
           <Button onClick={handleSubmit(onSubmit)}>
-            finaliser l'inscription
+            finaliser l&apos;inscription
             <ArrowRightIcon className="ml-2 h-4 w-4" />
           </Button>
         </CardFooter>
