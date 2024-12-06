@@ -1,42 +1,45 @@
 "use client";
 import React from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { setCookie } from "cookies-next";
 import { useForm } from "react-hook-form";
+
+import { useAuthStore } from "@/store/authStore";
 
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { PasswordInput } from "@/components/ui/password-input";
+import { useToast } from "@/components/ui/use-toast";
 
 import { ArrowRightIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import api from "@/lib/axios";
 
 export default function Login() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { toast } = useToast();
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<{ email: string; password: string }>();
 
-  const [loading, setLoading] = React.useState(false);
+  const { signIn, isLoading, error } = useAuthStore();
 
   const onSubmit = async (data: { email: string; password: string }) => {
-    try {
-      setLoading(true);
-      const response = await api.post("/auth/login", data);
-      setCookie("token", response.data.token, {
-        maxAge: 60 * 60 * 24 * 7,
+    const success = await signIn(data.email, data.password);
+
+    if (success) {
+      console.log("success");
+      const redirect = searchParams.get("redirect") || "/dashboard";
+      router.push(redirect);
+    } else {
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: error?.message || "Une erreur est survenue",
       });
-      router.push(searchParams.get("callbackUrl") || "/dashboard");
-    } catch (err) {
-      console.log(err);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -49,7 +52,7 @@ export default function Login() {
             Pas de compte ?{" "}
             <Button
               variant="linkHover2"
-              onClick={() => router.push("/register")}
+              onClick={() => router.push("/onboarding")}
               className={cn("text-primary", "p-0")}
             >
               Créer un compte
@@ -94,10 +97,10 @@ export default function Login() {
             Icon={ArrowRightIcon}
             iconPlacement="right"
             type="submit"
-            disabled={loading}
+            disabled={isLoading}
             className="w-full"
           >
-            {loading ? "Chargement..." : "Se connecter"}
+            {isLoading ? "Chargement..." : "Se connecter"}
           </Button>
         </form>
       </div>

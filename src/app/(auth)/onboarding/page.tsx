@@ -44,7 +44,7 @@ export default function SignupPage() {
       setCookie("token", response.data.token, {
         maxAge: 60 * 60 * 24 * 7,
       });
-      router.push("/company-signup");
+      router.push("/onboarding/choose-company");
     } catch (err) {
       console.log(err);
     } finally {

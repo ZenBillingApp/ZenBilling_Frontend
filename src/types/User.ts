@@ -1,4 +1,12 @@
 import { Company } from "./Company";
+
+export enum Enum {
+    "CHOSING_COMPANY",
+    "CONTACT_INFO",
+    "FINISH"
+}
+
+
 export interface User {
     first_name: string;
     last_name: string;
@@ -10,4 +18,7 @@ export interface User {
     country: string;
     phone: string;
     Company: Company;
+    onboarding_completed: boolean;
+    onboarding_step: Enum;
+
 }
