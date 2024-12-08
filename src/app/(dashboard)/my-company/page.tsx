@@ -179,7 +179,7 @@ export default function Page({}: Props) {
                         </span>
                       </div>
                       <div className="flex flex-col gap-1">
-                        <span className="text-sm">Type d'entreprise</span>
+                        <span className="text-sm">Type d&apos;entreprise</span>
                         <span className="text-md font-semibold">
                           {company.category ? company.category : "N/A"}
                         </span>
