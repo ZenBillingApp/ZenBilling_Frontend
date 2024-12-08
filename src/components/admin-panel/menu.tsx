@@ -1,21 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { Ellipsis, LogOut } from "lucide-react";
-import { usePathname, useRouter } from "next/navigation";
+import { Ellipsis } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 import { cn } from "@/lib/utils";
 import { GetMenuList } from "@/lib/menu-list";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { CollapseMenuButton } from "@/components/admin-panel/collapse-menu-button";
+
 import {
   Tooltip,
   TooltipTrigger,
   TooltipContent,
   TooltipProvider,
 } from "@/components/ui/tooltip";
-import { deleteCookie } from "cookies-next";
 
 interface MenuProps {
   isOpen: boolean | undefined;
@@ -24,7 +23,6 @@ interface MenuProps {
 export function Menu({ isOpen }: MenuProps) {
   const pathname = usePathname();
   const menuList = GetMenuList(pathname);
-  const router = useRouter();
 
   return (
     <nav className="w-full h-full overflow-y-auto mt-5">
@@ -101,40 +99,6 @@ export function Menu({ isOpen }: MenuProps) {
             )}
           </li>
         ))}
-        <li
-          className="w-full grow flex items-end"
-          onClick={() => {
-            deleteCookie("token");
-            router.replace("/login");
-          }}
-        >
-          <TooltipProvider disableHoverableContent>
-            <Tooltip delayDuration={100}>
-              <TooltipTrigger asChild>
-                <Button
-                  onClick={() => {}}
-                  variant="outline"
-                  className="w-full justify-center h-10 mt-5"
-                >
-                  <span className={cn(isOpen === false ? "" : "mr-4")}>
-                    <LogOut size={18} />
-                  </span>
-                  <p
-                    className={cn(
-                      "whitespace-nowrap",
-                      isOpen === false ? "opacity-0 hidden" : "opacity-100"
-                    )}
-                  >
-                    Sign out
-                  </p>
-                </Button>
-              </TooltipTrigger>
-              {isOpen === false && (
-                <TooltipContent side="right">Sign out</TooltipContent>
-              )}
-            </Tooltip>
-          </TooltipProvider>
-        </li>
       </ul>
     </nav>
   );

@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { User } from "@/types/User";
-import { setCookie, deleteCookie } from "cookies-next";
+import { setCookie, deleteCookie,getCookie } from "cookies-next";
 
 
 interface AuthResponse {
@@ -21,6 +21,7 @@ interface AuthState {
   setUser: (user: User) => void;
   signIn: (email: string, password: string) => Promise<boolean>;
   signOut: () => void;
+  getUser: () => void;
   clearError: () => void;
 }
 
@@ -78,7 +79,6 @@ export const useAuthStore = create<AuthState>((set) => ({
       });
 
       set({ 
-        user: data.user,
         isLoading: false,
         error: null,
         isAuthenticated: true
@@ -96,6 +96,57 @@ export const useAuthStore = create<AuthState>((set) => ({
       });
       return false;
       
+    }
+  },
+  getUser: async () => {
+    try {
+      set({ isLoading: true, error: null });
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/user`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${getCookie("token")}`
+          },
+          credentials: "include"
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        set({ 
+          error: {
+            message: errorData.message || "Une erreur est survenue lors de la récupération de l'utilisateur",
+            code: errorData.code
+          },
+          isLoading: false,
+          isAuthenticated: false 
+        });
+        
+        return false;
+      }
+
+      const data: User = await response.json();
+      set({ 
+        user: data, 
+        isAuthenticated: true,
+        error: null,
+        isLoading: false
+      });
+
+      return true;
+    } catch (error) {
+      set({ 
+        error: {
+          message: "Une erreur réseau est survenue",
+          code: "NETWORK_ERROR"
+        },
+        isLoading: false,
+        isAuthenticated: false
+      });
+      return false;
     }
   },
 

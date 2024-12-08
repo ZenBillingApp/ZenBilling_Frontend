@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Menu } from "@/components/admin-panel/menu";
 import { useSidebarToggle } from "@/hooks/use-sidebar-toggle";
 import { SidebarToggle } from "@/components/admin-panel/sidebar-toggle";
+import { UserNav } from "./user-nav";
 
 export function Sidebar() {
   const sidebar = useStore(useSidebarToggle, (state) => state);
@@ -58,6 +59,7 @@ export function Sidebar() {
           </Link>
         </Button>
         <Menu isOpen={sidebar?.isOpen} />
+        <UserNav />
       </div>
     </aside>
   );

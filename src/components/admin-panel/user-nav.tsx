@@ -1,76 +1,84 @@
 "use client";
+import { useRouter } from "next/navigation";
 
-import Link from "next/link";
-import { LayoutGrid, LogOut, User } from "lucide-react";
+import { LogOut, ChevronsUpDown } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-  TooltipProvider
-} from "@/components/ui/tooltip";
+import { useAuthStore } from "@/store/authStore";
+
+import { useStore } from "@/hooks/use-store";
+import { useSidebarToggle } from "@/hooks/use-sidebar-toggle";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
+  DropdownMenuTrigger,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger
+  DropdownMenuGroup,
+  DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
-export function UserNav() {
+export function UserNav({ mobile = false }) {
+  const { user, signOut } = useAuthStore();
+  const router = useRouter();
+  const sidebar = useStore(useSidebarToggle, (state) => state);
+
   return (
     <DropdownMenu>
-      <TooltipProvider disableHoverableContent>
-        <Tooltip delayDuration={100}>
-          <TooltipTrigger asChild>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                className="relative h-8 w-8 rounded-full"
-              >
-                <Avatar className="h-8 w-8">
-                  <AvatarImage src="#" alt="Avatar" />
-                  <AvatarFallback className="bg-transparent">JD</AvatarFallback>
-                </Avatar>
-              </Button>
-            </DropdownMenuTrigger>
-          </TooltipTrigger>
-          <TooltipContent side="bottom">Profile</TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-
-      <DropdownMenuContent className="w-56" align="end" forceMount>
-        <DropdownMenuLabel className="font-normal">
-          <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">John Doe</p>
-            <p className="text-xs leading-none text-muted-foreground">
-              johndoe@example.com
-            </p>
+      <DropdownMenuTrigger>
+        <div className="flex items-center gap-2">
+          <Avatar className="h-8 w-8 rounded-lg">
+            <AvatarFallback className="rounded-lg">
+              {(user?.first_name?.charAt(0).toUpperCase() || "") +
+                (user?.last_name?.charAt(0).toUpperCase() || "")}
+            </AvatarFallback>
+          </Avatar>
+          <div
+            className={`grid flex-1 text-left text-sm leading-tight ${
+              !sidebar?.isOpen && !mobile ? "hidden" : ""
+            }`}
+          >
+            <span className="truncate font-semibold">
+              {user?.first_name} {user?.last_name}
+            </span>
+            <span className="truncate text-xs">{user?.email}</span>
+          </div>
+          <ChevronsUpDown className="ml-auto size-4" />
+        </div>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent
+        className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+        side={mobile ? "bottom" : "right"}
+        align="end"
+        sideOffset={4}
+      >
+        <DropdownMenuLabel className="p-0 font-normal">
+          <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+            <Avatar className="h-8 w-8 rounded-lg">
+              <AvatarFallback className="rounded-lg">
+                {" "}
+                {(user?.first_name?.charAt(0).toUpperCase() || "") +
+                  (user?.last_name?.charAt(0).toUpperCase() || "")}
+              </AvatarFallback>
+            </Avatar>
+            <div className="grid flex-1 text-left text-sm leading-tight">
+              <span className="truncate font-semibold">
+                {user?.first_name} {user?.last_name}
+              </span>
+              <span className="truncate text-xs">{user?.email}</span>
+            </div>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuItem className="hover:cursor-pointer" asChild>
-            <Link href="/dashboard" className="flex items-center">
-              <LayoutGrid className="w-4 h-4 mr-3 text-muted-foreground" />
-              Dashboard
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem className="hover:cursor-pointer" asChild>
-            <Link href="/account" className="flex items-center">
-              <User className="w-4 h-4 mr-3 text-muted-foreground" />
-              Account
-            </Link>
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem className="hover:cursor-pointer" onClick={() => {}}>
-          <LogOut className="w-4 h-4 mr-3 text-muted-foreground" />
-          Sign out
+        <DropdownMenuItem
+          className="flex items-center gap-2"
+          onClick={() => {
+            signOut();
+            router.push("/login");
+          }}
+        >
+          <LogOut className="size-4" />
+          Déconnexion
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -1,8 +1,5 @@
 import { ModeToggle } from "@/components/mode-toggle";
-import { UserNav } from "@/components/admin-panel/user-nav";
 import { SheetMenu } from "@/components/admin-panel/sheet-menu";
-import FlagComponent from "../language-switcher";
-import { locales } from "@/config";
 import { setUserLocale, getUserLocale } from "@/hooks/locale";
 import { CountryCode } from "libphonenumber-js";
 import React, { useEffect, useState } from "react";
@@ -35,17 +32,7 @@ const Navbar: React.FC<NavbarProps> = ({ title }) => {
           <h1 className="font-bold">{title}</h1>
         </div>
         <div className="flex flex-1 items-center space-x-2 justify-end">
-          {/* {locale && (
-                        <FlagComponent
-                            value={locale}
-                            onChange={(newLocale) =>
-                                handleLocaleChange(newLocale as CountryCode)
-                            }
-                            options={locales as CountryCode[]}
-                        />
-                    )} */}
           <ModeToggle />
-          {/* <UserNav /> */}
         </div>
       </div>
     </header>
