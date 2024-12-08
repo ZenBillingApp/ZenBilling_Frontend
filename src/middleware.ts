@@ -9,15 +9,6 @@ interface User {
     onboarding_step?: OnboardingStep;
 }
 
-class ApiError extends Error {
-    status?: number;
-    constructor(message: string, status?: number) {
-        super(message);
-        this.status = status;
-    }
-}
-
-// Configuration
 export const config = {
     matcher: [
         "/customers/:path*",
@@ -30,72 +21,49 @@ export const config = {
     ],
 };
 
-const ONBOARDING_STEPS: Readonly<Record<OnboardingStep, string>> = {
+const ONBOARDING_STEPS: Record<OnboardingStep, string> = {
     CHOOSING_COMPANY: "/onboarding/choose-company",
     CONTACT_INFO: "/onboarding/contact-info",
     FINISH: "/dashboard",
-} as const;
+};
 
 const API_TIMEOUT = 5000;
-const PUBLIC_PATHS = new Set(["/login", "/register"]);
+const PUBLIC_PATHS = ["/login", "/register"];
 
-// Middleware principal
 export async function middleware(request: NextRequest) {
-    const path = request.nextUrl.pathname.replace(/\/$/, ""); // Normalisation du chemin
+    const path = request.nextUrl.pathname.replace(/\/$/, "");
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+    
+    if (!apiUrl) {
+        throw new Error("NEXT_PUBLIC_API_URL is not defined");
+    }
+    
+    const token = request.cookies.get("token")?.value;
 
-    if (isPublicPath(path)) {
-        return handlePublicPath(request, path);
+    if (PUBLIC_PATHS.some(publicPath => path.startsWith(publicPath))) {
+        if (token) {
+            return redirectTo(request, "/dashboard");
+        }
+        return NextResponse.next();
+    }
+
+    if (!token) {
+        return redirectTo(request, "/login");
     }
 
     try {
-        await validateEnvironment();
-        const user = await authenticateAndGetUser(request);
+        const user = await fetchUser(apiUrl, token);
         return handleUserAccess(request, user, path);
     } catch (error) {
-        return handleMiddlewareError(request, error);
+       
+            const response = redirectTo(request, "/login");
+            response.cookies.delete("token");
+            return response;
+        
     }
 }
 
-// Chemins publics
-function isPublicPath(path: string): boolean {
-    return Array.from(PUBLIC_PATHS).some((publicPath) =>
-        path.startsWith(publicPath)
-    );
-}
-
-function handlePublicPath(request: NextRequest, path: string): NextResponse {
-    const token = request.cookies.get("token")?.value;
-
-    if (token && isPublicPath(path)) {
-        return NextResponse.redirect(new URL("/dashboard", request.url));
-    }
-
-    return NextResponse.next();
-}
-
-// Validation de l'environnement
-async function validateEnvironment(): Promise<void> {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-    if (!apiUrl) {
-        throw new Error("Configuration error: NEXT_PUBLIC_API_URL is missing");
-    }
-}
-
-// Authentification et récupération des données utilisateur
-async function authenticateAndGetUser(request: NextRequest): Promise<User> {
-    const token = request.cookies.get("token")?.value;
-    if (!token) {
-        throw new ApiError("Authentication required", 401);
-    }
-
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL!;
-    return fetchUserWithTimeout(apiUrl, token);
-}
-
-async function fetchUserWithTimeout(
-    apiUrl: string,
-    token: string
-): Promise<User> {
+async function fetchUser(apiUrl: string, token: string): Promise<User> {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT);
 
@@ -103,115 +71,35 @@ async function fetchUserWithTimeout(
         const response = await fetch(`${apiUrl}/user`, {
             headers: {
                 Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
             },
-            method: "GET",
             signal: controller.signal,
             cache: "no-store",
         });
 
         if (!response.ok) {
-            throw new ApiError(
-                `API error: ${response.status} ${response.statusText}`,
-                response.status
-            );
+            throw new Error(response.status === 401 ? "Unauthorized" : "Failed to fetch user data");
         }
 
-        const userData: User = await response.json();
-        validateUserData(userData);
-        return userData;
+        return await response.json();
     } finally {
         clearTimeout(timeoutId);
     }
 }
 
-function validateUserData(userData: unknown): asserts userData is User {
-    if (!userData || typeof userData !== "object") {
-        throw new Error("Invalid user data format");
-    }
+function handleUserAccess(request: NextRequest, user: User, path: string): NextResponse {
+    const onboardingRedirectPath = ONBOARDING_STEPS[user.onboarding_step ?? "CHOOSING_COMPANY"];
 
-    const user = userData as Partial<User>;
-    if (typeof user.onboarding_completed !== "boolean") {
-        throw new Error("Missing or invalid onboarding_completed status");
-    }
-
-    if (
-        user.onboarding_step &&
-        !Object.keys(ONBOARDING_STEPS).includes(user.onboarding_step)
-    ) {
-        console.log("user.onboarding_step", user.onboarding_step);
-        throw new Error("Invalid onboarding_step value");
-    }
-}
-
-// Gestion des accès utilisateur
-function handleUserAccess(
-    request: NextRequest,
-    user: User,
-    path: string
-): NextResponse {
-    if (!user.onboarding_completed && !path.startsWith("/onboarding")) {
-        return redirectTo(
-            request,
-            getOnboardingRedirectPath(user.onboarding_step)
-        );
-    }
-
-    if (user.onboarding_completed && path.startsWith("/onboarding")) {
+    if (!user.onboarding_completed) {
+        if (!path.startsWith("/onboarding") || path !== onboardingRedirectPath) {
+            return redirectTo(request, onboardingRedirectPath);
+        }
+    } else if (path.startsWith("/onboarding")) {
         return redirectTo(request, "/dashboard");
-    }
-
-    if (
-        !user.onboarding_completed &&
-        path.startsWith("/onboarding") &&
-        path !== getOnboardingRedirectPath(user.onboarding_step)
-    ) {
-        return redirectTo(
-            request,
-            getOnboardingRedirectPath(user.onboarding_step)
-        );
     }
 
     return NextResponse.next();
 }
 
-function getOnboardingRedirectPath(step?: OnboardingStep): string {
-    return step && ONBOARDING_STEPS[step]
-        ? ONBOARDING_STEPS[step]
-        : "/onboarding/choose-company";
-}
-
-// Redirections centralisées
 function redirectTo(request: NextRequest, path: string): NextResponse {
     return NextResponse.redirect(new URL(path, request.url));
-}
-
-// Gestion des erreurs
-function handleMiddlewareError(
-    request: NextRequest,
-    error: unknown
-): NextResponse {
-    console.error("Middleware error:", error);
-
-    const loginUrl = new URL("/login", request.url);
-    if (error instanceof ApiError) {
-        if (error.status === 401) {
-            loginUrl.searchParams.set("error", "session_expired");
-        } else {
-            loginUrl.searchParams.set("error", "api_error");
-        }
-    } else {
-        loginUrl.searchParams.set("error", "unknown_error");
-    }
-
-    loginUrl.searchParams.set(
-        "message",
-        error instanceof Error
-            ? error.message
-            : "Une erreur inattendue est survenue"
-    );
-
-    const response = NextResponse.redirect(loginUrl);
-    response.cookies.delete("token");
-    return response;
 }
