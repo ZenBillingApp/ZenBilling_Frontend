@@ -59,9 +59,18 @@ export default function Page({}: Props) {
           ) : (
             <>
               <div className="flex items-center justify-between">
-                <div className="flex flex-col items-start gap-2">
-                  <h1 className="text-3xl font-semibold">Mon Entreprise</h1>
-                  <p className="text-sm text-gray-600 dark:text-gray-400"></p>
+                <div className="flex">
+                  <div className="flex justify-center items-center p-2 rounded-full bg-primary w-16 h-16">
+                    <span className="text-2xl font-bold text-white">
+                      {company.name.charAt(0)}
+                    </span>
+                  </div>
+                  <div className="flex flex-col ml-4 justify-center">
+                    <h1 className="text-xl font-semibold">{company.name}</h1>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      {company.email}
+                    </p>
+                  </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <EditCompanyDialog
@@ -76,80 +85,118 @@ export default function Page({}: Props) {
                   />
                 </div>
               </div>
-              <div className="flex  w-full gap-6">
-                <div className="flex w-full flex-col justify-center gap-6">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Informations de l&apos;entreprise</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div>
-                        <span className="font-semibold">Nom :</span>{" "}
-                        {company.name}
+              <div className="container mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Informations</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex flex-col gap-2">
+                      <div className="flex flex-col gap-1">
+                        <span className="text-sm">Nom</span>
+                        <span className="text-md font-semibold">
+                          {company.name ? company.name : "N/A"}
+                        </span>
                       </div>
-                      <div>
-                        <span className="font-semibold">Email :</span>{" "}
-                        {company.email}
+                      <div className="flex flex-col gap-1">
+                        <span className="text-sm">Activité</span>
+                        <span className="text-md font-semibold">
+                          {company.activity ? company.activity : "N/A"}
+                        </span>
                       </div>
-                      <div>
-                        <span className="font-semibold">Téléphone :</span>{" "}
-                        {company.phone}
+                      <div className="flex flex-col gap-1">
+                        <span className="text-sm">Email</span>
+                        <span className="text-md font-semibold">
+                          {company.email ? company.email : "N/A"}
+                        </span>
                       </div>
-                    </CardContent>
-                  </Card>
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Adresse de l&apos;entreprise</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div>
-                        <span className="font-semibold">Adresse :</span>{" "}
-                        {company.street_address}
+                      <div className="flex flex-col gap-1">
+                        <span className="text-sm">Téléphone</span>
+                        <span className="text-md font-semibold">
+                          {company.phone ? company.phone : "N/A"}
+                        </span>
                       </div>
-                      <div>
-                        <span className="font-semibold">Ville :</span>{" "}
-                        {company.city}
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Adresse</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex flex-col gap-2">
+                      <div className="flex flex-col gap-1">
+                        <span className="text-sm">Adresse</span>
+                        <span className="text-md font-semibold">
+                          {company.street_address
+                            ? company.street_address
+                            : "N/A"}
+                        </span>
                       </div>
-                      <div>
-                        <span className="font-semibold">Code postal :</span>{" "}
-                        {company.postal_code}
+                      <div className="flex flex-col gap-1">
+                        <span className="text-sm">Ville</span>
+                        <span className="text-md font-semibold">
+                          {company.city ? company.city : "N/A"}
+                        </span>
                       </div>
-                      <div>
-                        <span className="font-semibold">Pays :</span>{" "}
-                        {company.country}
+                      <div className="flex flex-col gap-1">
+                        <span className="text-sm">Code Postal</span>
+                        <span className="text-md font-semibold">
+                          {company.postal_code ? company.postal_code : "N/A"}
+                        </span>
                       </div>
-                    </CardContent>
-                  </Card>
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>
-                        Informations légales de l&apos;entreprise
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div>
-                        <span className="font-semibold">
-                          TVA intracommunautaire :
-                        </span>{" "}
-                        {company.vat_number}
+                      <div className="flex flex-col gap-1">
+                        <span className="text-sm">Pays</span>
+                        <span className="text-md font-semibold">
+                          {company.country ? company.country : "N/A"}
+                        </span>
                       </div>
-                      <div>
-                        <span className="font-semibold">N° de SIRET :</span>{" "}
-                        {company.siret_number}
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Informations Légales</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex flex-col gap-2">
+                      <div className="flex flex-col gap-1">
+                        <span className="text-sm">SIRET</span>
+                        <span className="text-md font-semibold">
+                          {company.siret_number ? company.siret_number : "N/A"}
+                        </span>
                       </div>
-                      <div>
-                        <span className="font-semibold">N° de SIREN :</span>{" "}
-                        {company.siren_number}
+                      <div className="flex flex-col gap-1">
+                        <span className="text-sm">SIREN</span>
+                        <span className="text-md font-semibold">
+                          {company.siren_number ? company.siren_number : "N/A"}
+                        </span>
                       </div>
-                      <div>
-                        <span className="font-semibold">
-                          Type d&apos;entreprise :
-                        </span>{" "}
-                        {company.category}
+                      <div className="flex flex-col gap-1">
+                        <span className="text-sm">TVA</span>
+                        <span className="text-md font-semibold">
+                          {company.vat_number ? company.vat_number : "N/A"}
+                        </span>
                       </div>
-                    </CardContent>
-                  </Card>
-                </div>
+                      <div className="flex flex-col gap-1">
+                        <span className="text-sm">Type d'entreprise</span>
+                        <span className="text-md font-semibold">
+                          {company.category ? company.category : "N/A"}
+                        </span>
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <span className="text-sm">Date de création</span>
+                        <span className="text-md font-semibold">
+                          {company.date_creation
+                            ? new Date(
+                                company.date_creation
+                              ).toLocaleDateString()
+                            : "N/A"}
+                        </span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
             </>
           )}
