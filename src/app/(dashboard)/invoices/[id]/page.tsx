@@ -199,7 +199,7 @@ export default function InvoicePage() {
 
   return (
     <ContentLayout title={"Factures"}>
-      <div className="flex flex-col flex-1 gap-6">
+      <div className="flex flex-col w-full gap-6">
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <h1 className="text-2xl font-semibold">
             Facture {invoice?.invoice_id}

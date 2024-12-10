@@ -184,133 +184,137 @@ export default function CustomerDetailsPage() {
 
   return (
     <ContentLayout title="Client">
-      <div className="flex flex-col w-full items-center py-4 justify-between sm:flex-row sm:items-center sm:justify-between gap-6">
-        <h1 className="text-3xl font-semibold">{fullName}</h1>
-        <div className="flex items-center gap-4">
-          <EditCustomerDialog
-            trigger={
-              <Button
-                variant="default"
-                className={cn("flex items-center gap-2")}
-              >
-                <Edit size={20} />
-                Modifier
-              </Button>
-            }
-            customer={customer}
-            onSave={fetchData}
-          />
-          <AlertDialog
-            trigger={
-              <Button
-                variant="destructive"
-                className={cn("flex items-center gap-2")}
-              >
-                <Trash size={20} />
-                Supprimer
-              </Button>
-            }
-            handleOnConfirm={handleDelete}
-            title="Supprimer le client"
-            description={`Voulez-vous vraiment supprimer le client ${fullName} ?`}
-            confirmText="Supprimer"
-          />
-        </div>
-      </div>
-
       <div className="flex flex-col w-full gap-6">
-        <div className="flex flex-col xl:flex-row w-full gap-6">
-          <Card className="flex flex-col justify-center w-full xl:w-1/2">
+        <div className="flex flex-col w-full items-center py-4 justify-between sm:flex-row sm:items-center sm:justify-between gap-6">
+          <h1 className="text-3xl font-semibold">{fullName}</h1>
+          <div className="flex items-center gap-4">
+            <EditCustomerDialog
+              trigger={
+                <Button
+                  variant="default"
+                  className={cn("flex items-center gap-2")}
+                >
+                  <Edit size={20} />
+                  Modifier
+                </Button>
+              }
+              customer={customer}
+              onSave={fetchData}
+            />
+            <AlertDialog
+              trigger={
+                <Button
+                  variant="destructive"
+                  className={cn("flex items-center gap-2")}
+                >
+                  <Trash size={20} />
+                  Supprimer
+                </Button>
+              }
+              handleOnConfirm={handleDelete}
+              title="Supprimer le client"
+              description={`Voulez-vous vraiment supprimer le client ${fullName} ?`}
+              confirmText="Supprimer"
+            />
+          </div>
+        </div>
+
+        <div className="flex flex-col w-full gap-6">
+          <div className="flex flex-col xl:flex-row w-full gap-6">
+            <Card className="flex flex-col justify-center w-full xl:w-1/2">
+              <CardHeader>
+                <CardTitle>Contact du client</CardTitle>
+                <CardDescription>
+                  Informations de contact du client
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex gap-2">
+                  <span className="font-semibold">Email :</span>{" "}
+                  {customer.email}
+                </div>
+                <div className="flex gap-2">
+                  <span className="font-semibold">Téléphone :</span>{" "}
+                  {customer.phone}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="flex flex-col justify-center w-full xl:w-1/2">
+              <CardHeader>
+                <CardTitle>Adresse du client</CardTitle>
+                <CardDescription>
+                  Informations sur l&apos;adresse du client
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex gap-2 break-words">
+                  <span className="font-semibold">Adresse :</span>
+                  {customer.street_address || "-"}
+                </div>
+                <div className="flex gap-2">
+                  <span className="font-semibold">Ville :</span> {customer.city}
+                </div>
+                <div className="flex gap-2">
+                  <span className="font-semibold">Code postal :</span>{" "}
+                  {customer.postal_code}
+                </div>
+                <div className="flex gap-2">
+                  <span className="font-semibold">Pays :</span>{" "}
+                  {customer.country}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card className="w-full">
             <CardHeader>
-              <CardTitle>Contact du client</CardTitle>
+              <CardTitle>Revenus mensuels du client</CardTitle>
               <CardDescription>
-                Informations de contact du client
+                Revenus mensuels générés par le client
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="flex gap-2">
-                <span className="font-semibold">Email :</span> {customer.email}
-              </div>
-              <div className="flex gap-2">
-                <span className="font-semibold">Téléphone :</span>{" "}
-                {customer.phone}
-              </div>
+              {monthlyRevenue.length === 0 ? (
+                <Alert>
+                  <AlertTriangle className="w-5 h-5" />
+                  <AlertTitle>Aucune facture trouvée</AlertTitle>
+                  <AlertDescription>
+                    Aucune facture trouvée pour ce client
+                  </AlertDescription>
+                </Alert>
+              ) : (
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={monthlyRevenue}>
+                    <CartesianGrid horizontal vertical={false} />
+                    <XAxis
+                      dataKey="month"
+                      tick={{ fontSize: 12 }}
+                      tickLine={false}
+                    />
+                    <YAxis
+                      tickLine={false}
+                      tick={{ fontSize: 12 }}
+                      tickFormatter={(value) => formatAmount(value)}
+                    />
+                    <Tooltip content={<CustomTooltip />} />
+                    <Bar dataKey="amount" fill="hsl(var(--primary))" />
+                  </BarChart>
+                </ResponsiveContainer>
+              )}
             </CardContent>
           </Card>
 
-          <Card className="flex flex-col justify-center w-full xl:w-1/2">
+          <Card>
             <CardHeader>
-              <CardTitle>Adresse du client</CardTitle>
-              <CardDescription>
-                Informations sur l&apos;adresse du client
-              </CardDescription>
+              <CardTitle>Factures du client</CardTitle>
+              <CardDescription>Liste des factures du client</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="flex gap-2 break-words">
-                <span className="font-semibold">Adresse :</span>
-                {customer.street_address || "-"}
-              </div>
-              <div className="flex gap-2">
-                <span className="font-semibold">Ville :</span> {customer.city}
-              </div>
-              <div className="flex gap-2">
-                <span className="font-semibold">Code postal :</span>{" "}
-                {customer.postal_code}
-              </div>
-              <div className="flex gap-2">
-                <span className="font-semibold">Pays :</span> {customer.country}
-              </div>
+              <TableInvoices invoices={customer.Invoices} search="" />
             </CardContent>
           </Card>
         </div>
-
-        <Card className="w-full">
-          <CardHeader>
-            <CardTitle>Revenus mensuels du client</CardTitle>
-            <CardDescription>
-              Revenus mensuels générés par le client
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {monthlyRevenue.length === 0 ? (
-              <Alert>
-                <AlertTriangle className="w-5 h-5" />
-                <AlertTitle>Aucune facture trouvée</AlertTitle>
-                <AlertDescription>
-                  Aucune facture trouvée pour ce client
-                </AlertDescription>
-              </Alert>
-            ) : (
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={monthlyRevenue}>
-                  <CartesianGrid horizontal vertical={false} />
-                  <XAxis
-                    dataKey="month"
-                    tick={{ fontSize: 12 }}
-                    tickLine={false}
-                  />
-                  <YAxis
-                    tickLine={false}
-                    tick={{ fontSize: 12 }}
-                    tickFormatter={(value) => formatAmount(value)}
-                  />
-                  <Tooltip content={<CustomTooltip />} />
-                  <Bar dataKey="amount" fill="hsl(var(--primary))" />
-                </BarChart>
-              </ResponsiveContainer>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Factures du client</CardTitle>
-            <CardDescription>Liste des factures du client</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <TableInvoices invoices={customer.Invoices} search="" />
-          </CardContent>
-        </Card>
       </div>
     </ContentLayout>
   );

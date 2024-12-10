@@ -68,7 +68,7 @@ export default function CustomersPage() {
 
   return (
     <ContentLayout title="Clients">
-      <div className="flex flex-col w-full h-full gap-6">
+      <div className="flex flex-col w-full gap-6">
         <header className="flex flex-col gap-10">
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-semibold">Clients</h1>

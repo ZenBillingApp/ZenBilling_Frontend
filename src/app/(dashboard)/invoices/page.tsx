@@ -113,7 +113,7 @@ export default function InvoicesPage() {
 
   return (
     <ContentLayout title="Factures">
-      <div className="flex flex-col w-full h-full gap-4">
+      <div className="flex flex-col w-full gap-4">
         <header className="flex flex-col gap-6">
           <div className="flex flex-col xl:flex-row xl:justify-between xl:items-center gap-6">
             <h1 className="text-2xl font-semibold">Factures</h1>

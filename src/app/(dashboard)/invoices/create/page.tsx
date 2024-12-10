@@ -111,7 +111,7 @@ export default function CreateInvoicePage() {
   return (
     <>
       <ContentLayout title={"Factures"}>
-        <div className="flex flex-col w-full h-full gap-6">
+        <div className="flex flex-col w-full gap-6">
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-semibold">{"Créer une facture"}</h1>
           </div>
