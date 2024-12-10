@@ -107,7 +107,7 @@ export default function DashboardPage() {
 
   return (
     <ContentLayout title="Tableau de bord">
-      <div className="flex flex-col  gap-6">
+      <div className="flex flex-col gap-6">
         <header className="flex flex-col w-full gap-6">
           <div className="flex w-full justify-between">
             <h1 className="text-s font-light">
