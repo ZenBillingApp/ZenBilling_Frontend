@@ -18,6 +18,7 @@ export const config = {
         "/login",
         "/register",
         "/onboarding/:path*",
+        "/profile",
     ],
 };
 

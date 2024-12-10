@@ -61,18 +61,6 @@ export function GetMenuList(pathname: string): Group[] {
                     submenus: [],
                 },
             ],
-        },
-        {
-            groupLabel: "Paramètres",
-            menus: [
-                {
-                    href: "/my-company",
-                    label: "Mon entreprise",
-                    active: pathname.includes("/my-company"),
-                    icon: Home,
-                    submenus: [],
-                },
-            ],
-        },
+        }
     ];
 }

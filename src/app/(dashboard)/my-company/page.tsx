@@ -1,7 +1,5 @@
 "use client";
 import React from "react";
-import { useParams } from "next/navigation";
-import { useTranslations } from "next-intl";
 
 import { Company } from "@/types/Company";
 
@@ -20,14 +18,11 @@ import { cn } from "@/lib/utils";
 type Props = {};
 
 export default function Page({}: Props) {
-  const { id } = useParams();
-  const t = useTranslations();
-
   const [company, setCompany] = React.useState<Company>({} as Company);
   const [loading, setLoading] = React.useState<boolean>(true);
   const [error, setError] = React.useState<string | null>(null);
 
-  const fetchUser = async () => {
+  const fetchCompanyData = async () => {
     try {
       setLoading(true);
       setError(null);
@@ -41,8 +36,8 @@ export default function Page({}: Props) {
   };
 
   React.useEffect(() => {
-    fetchUser();
-  }, [id]);
+    fetchCompanyData();
+  }, []);
 
   return (
     <>
@@ -54,7 +49,7 @@ export default function Page({}: Props) {
             </div>
           ) : error ? (
             <div className="flex w-full h-screen items-center justify-center">
-              <ErrorScreen handleRetry={() => fetchUser()} />
+              <ErrorScreen handleRetry={() => fetchCompanyData()} />
             </div>
           ) : (
             <>
@@ -81,7 +76,7 @@ export default function Page({}: Props) {
                       </Button>
                     }
                     company={company}
-                    onSave={() => fetchUser()}
+                    onSave={() => fetchCompanyData()}
                   />
                 </div>
               </div>

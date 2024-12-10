@@ -1,5 +1,5 @@
 "use client";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 import { LogOut, ChevronsUpDown } from "lucide-react";
 
@@ -20,8 +20,13 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 export function UserNav({ mobile = false }) {
   const { user, signOut } = useAuthStore();
+
   const router = useRouter();
+  const pathname = usePathname();
+
   const sidebar = useStore(useSidebarToggle, (state) => state);
+
+  console.log("pathname", pathname);
 
   return (
     <DropdownMenu>
@@ -69,6 +74,27 @@ export function UserNav({ mobile = false }) {
             </div>
           </div>
         </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          className={`flex items-center gap-2 ${
+            pathname === "/my-company" ? "bg-secondary" : ""
+          }`}
+          onClick={() => {
+            router.push("/my-company");
+          }}
+        >
+          Mon Entreprise
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          className={`flex items-center gap-2 ${
+            pathname === "/profile" ? "bg-secondary" : ""
+          }`}
+          onClick={() => {
+            router.push("/profile");
+          }}
+        >
+          Mon Profil
+        </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
           className="flex items-center gap-2"
