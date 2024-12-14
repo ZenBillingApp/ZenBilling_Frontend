@@ -11,6 +11,7 @@ export interface Invoice {
     status: string;
     total_amount: number;
     due_date: Date;
+    client_id: number;
     Payments: {
         payment_method: "cash" | "credit_card" | "bank_transfer";
         amount: number;

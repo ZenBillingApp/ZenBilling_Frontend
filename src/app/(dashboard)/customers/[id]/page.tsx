@@ -2,18 +2,11 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { AlertTriangle, Edit, Trash } from "lucide-react";
 import { Customer } from "@/types/Customer";
 import useFormattedAmount from "@/hooks/useFormattedAmount";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   BarChart,
@@ -24,6 +17,8 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from "recharts";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import { ClipLoader } from "react-spinners";
 import TableInvoices from "@/components/tableInvoices";
 import { ContentLayout } from "@/components/admin-panel/content-layout";
@@ -31,7 +26,21 @@ import AlertDialog from "@/components/alert-dialog";
 import EditCustomerDialog from "@/components/edit-customer-dialog";
 import ErrorScreen from "@/components/error-screen";
 import api from "@/lib/axios";
-import { cn } from "@/lib/utils";
+
+import {
+  BuildingIcon,
+  User2Icon,
+  Edit2Icon,
+  Trash2Icon,
+  AlertTriangleIcon,
+  MailIcon,
+  PhoneIcon,
+  MapPinIcon,
+  Building2Icon,
+  ReceiptIcon,
+  BanknoteIcon,
+  CalendarIcon,
+} from "lucide-react";
 
 interface CustomerDetailsState {
   customer: Customer | null;
@@ -160,11 +169,17 @@ export default function CustomerDetailsPage() {
     }
   };
 
+  const getCustomerName = (customer: Customer) => {
+    return customer.type === "company"
+      ? customer.name
+      : `${customer.first_name} ${customer.last_name}`;
+  };
+
   if (isLoading) {
     return (
       <ContentLayout title="Client">
-        <div className="flex w-full h-full items-center justify-center">
-          <ClipLoader color={cn("text-primary")} />
+        <div className="flex w-full h-[50vh] items-center justify-center">
+          <ClipLoader color="hsl(var(--primary))" size={40} />
         </div>
       </ContentLayout>
     );
@@ -180,21 +195,45 @@ export default function CustomerDetailsPage() {
 
   if (!customer) return null;
 
-  const fullName = `${customer.first_name} ${customer.last_name}`;
+  const isCompany = customer.type === "company";
+  const customerName = getCustomerName(customer);
 
   return (
     <ContentLayout title="Client">
-      <div className="flex flex-col w-full gap-6">
-        <div className="flex flex-col w-full items-center py-4 justify-between sm:flex-row sm:items-center sm:justify-between gap-6">
-          <h1 className="text-3xl font-semibold">{fullName}</h1>
-          <div className="flex items-center gap-4">
+      <div className="flex flex-col w-full gap-8">
+        {/* En-tête */}
+        <div className="flex flex-col sm:flex-row justify-between gap-6 bg-background border rounded-lg p-6">
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center gap-3">
+              <div className="p-3 rounded-full bg-primary/10">
+                {isCompany ? (
+                  <Building2Icon className="w-8 h-8 text-primary" />
+                ) : (
+                  <User2Icon className="w-8 h-8 text-primary" />
+                )}
+              </div>
+              <div className="space-y-1">
+                <h1 className="text-2xl font-bold">{customerName}</h1>
+                <div className="flex items-center gap-2">
+                  <Badge variant={isCompany ? "secondary" : "outline"}>
+                    {isCompany ? "Entreprise" : "Particulier"}
+                  </Badge>
+                  {(customer.invoice_count ?? 0) > 0 && (
+                    <Badge variant="default">
+                      {customer.invoice_count} facture
+                      {(customer.invoice_count ?? 0) > 1 ? "s" : ""}
+                    </Badge>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-3">
             <EditCustomerDialog
               trigger={
-                <Button
-                  variant="default"
-                  className={cn("flex items-center gap-2")}
-                >
-                  <Edit size={20} />
+                <Button variant="outline" size="sm" className="gap-2">
+                  <Edit2Icon className="w-4 h-4" />
                   Modifier
                 </Button>
               }
@@ -203,102 +242,172 @@ export default function CustomerDetailsPage() {
             />
             <AlertDialog
               trigger={
-                <Button
-                  variant="destructive"
-                  className={cn("flex items-center gap-2")}
-                >
-                  <Trash size={20} />
+                <Button variant="destructive" size="sm" className="gap-2">
+                  <Trash2Icon className="w-4 h-4" />
                   Supprimer
                 </Button>
               }
               handleOnConfirm={handleDelete}
               title="Supprimer le client"
-              description={`Voulez-vous vraiment supprimer le client ${fullName} ?`}
+              description={`Voulez-vous vraiment supprimer ${
+                isCompany ? "l'entreprise" : "le client"
+              } ${customerName} ?`}
               confirmText="Supprimer"
             />
           </div>
         </div>
 
-        <div className="flex flex-col w-full gap-6">
-          <div className="flex flex-col xl:flex-row w-full gap-6">
-            <Card className="flex flex-col justify-center w-full xl:w-1/2">
-              <CardHeader>
-                <CardTitle>Contact du client</CardTitle>
-                <CardDescription>
-                  Informations de contact du client
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex gap-2">
-                  <span className="font-semibold">Email :</span>{" "}
-                  {customer.email}
+        {/* Informations */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          {isCompany && (
+            <Card>
+              <CardHeader className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <BuildingIcon className="w-4 h-4 text-muted-foreground" />
+                  <CardTitle className="text-lg">
+                    Informations entreprise
+                  </CardTitle>
                 </div>
-                <div className="flex gap-2">
-                  <span className="font-semibold">Téléphone :</span>{" "}
-                  {customer.phone}
+                <Separator />
+              </CardHeader>
+              <CardContent className="grid gap-4">
+                <div className="space-y-3">
+                  <div className="flex flex-col">
+                    <span className="text-sm text-muted-foreground">SIRET</span>
+                    <span className="font-mono">
+                      {customer.siret_number || "-"}
+                    </span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-sm text-muted-foreground">SIREN</span>
+                    <span className="font-mono">
+                      {customer.siren_number || "-"}
+                    </span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-sm text-muted-foreground">
+                      N° TVA
+                    </span>
+                    <span className="font-mono">
+                      {customer.vat_number || "-"}
+                    </span>
+                  </div>
                 </div>
               </CardContent>
             </Card>
+          )}
 
-            <Card className="flex flex-col justify-center w-full xl:w-1/2">
-              <CardHeader>
-                <CardTitle>Adresse du client</CardTitle>
-                <CardDescription>
-                  Informations sur l&apos;adresse du client
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex gap-2 break-words">
-                  <span className="font-semibold">Adresse :</span>
-                  {customer.street_address || "-"}
-                </div>
-                <div className="flex gap-2">
-                  <span className="font-semibold">Ville :</span> {customer.city}
-                </div>
-                <div className="flex gap-2">
-                  <span className="font-semibold">Code postal :</span>{" "}
-                  {customer.postal_code}
-                </div>
-                <div className="flex gap-2">
-                  <span className="font-semibold">Pays :</span>{" "}
-                  {customer.country}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          <Card className="w-full">
-            <CardHeader>
-              <CardTitle>Revenus mensuels du client</CardTitle>
-              <CardDescription>
-                Revenus mensuels générés par le client
-              </CardDescription>
+          <Card>
+            <CardHeader className="space-y-1">
+              <div className="flex items-center gap-2">
+                <PhoneIcon className="w-4 h-4 text-muted-foreground" />
+                <CardTitle className="text-lg">Contact</CardTitle>
+              </div>
+              <Separator />
             </CardHeader>
-            <CardContent>
+            <CardContent className="grid gap-4">
+              {!isCompany && (
+                <div className="space-y-3">
+                  <div className="flex flex-col">
+                    <span className="text-sm text-muted-foreground">
+                      Prénom
+                    </span>
+                    <span>{customer.first_name}</span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-sm text-muted-foreground">Nom</span>
+                    <span>{customer.last_name}</span>
+                  </div>
+                  <Separator />
+                </div>
+              )}
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <MailIcon className="w-4 h-4 text-muted-foreground" />
+                  <span>{customer.email || "Aucun email"}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <PhoneIcon className="w-4 h-4 text-muted-foreground" />
+                  <span>{customer.phone || "Aucun téléphone"}</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="space-y-1">
+              <div className="flex items-center gap-2">
+                <MapPinIcon className="w-4 h-4 text-muted-foreground" />
+                <CardTitle className="text-lg">Adresse</CardTitle>
+              </div>
+              <Separator />
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {customer.street_address ? (
+                <div className="flex flex-col gap-1">
+                  <span>{customer.street_address}</span>
+                  <span>
+                    {customer.postal_code} {customer.city}
+                  </span>
+                  <span>{customer.country}</span>
+                </div>
+              ) : (
+                <span className="text-muted-foreground">Aucune adresse</span>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Statistiques */}
+        <div className="space-y-6">
+          <Card>
+            <CardHeader className="space-y-1">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <BanknoteIcon className="w-4 h-4 text-muted-foreground" />
+                  <CardTitle className="text-lg">Revenus mensuels</CardTitle>
+                </div>
+                <Badge variant="outline" className="gap-2">
+                  <CalendarIcon className="w-4 h-4" />
+                  12 derniers mois
+                </Badge>
+              </div>
+              <Separator />
+            </CardHeader>
+            <CardContent className="pt-6">
               {monthlyRevenue.length === 0 ? (
-                <Alert>
-                  <AlertTriangle className="w-5 h-5" />
-                  <AlertTitle>Aucune facture trouvée</AlertTitle>
+                <Alert variant="default" className="bg-muted/50">
+                  <AlertTriangleIcon className="w-4 h-4" />
+                  <AlertTitle>Aucune donnée</AlertTitle>
                   <AlertDescription>
-                    Aucune facture trouvée pour ce client
+                    Aucune facture n&apos;a été émise pour ce client
                   </AlertDescription>
                 </Alert>
               ) : (
                 <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={monthlyRevenue}>
-                    <CartesianGrid horizontal vertical={false} />
+                  <BarChart
+                    data={monthlyRevenue}
+                    margin={{ top: 0, right: 0, bottom: 0, left: 0 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
                     <XAxis
-                      dataKey="month"
+                      dataKey="month_name"
                       tick={{ fontSize: 12 }}
                       tickLine={false}
+                      axisLine={false}
                     />
                     <YAxis
                       tickLine={false}
+                      axisLine={false}
                       tick={{ fontSize: 12 }}
                       tickFormatter={(value) => formatAmount(value)}
                     />
                     <Tooltip content={<CustomTooltip />} />
-                    <Bar dataKey="amount" fill="hsl(var(--primary))" />
+                    <Bar
+                      dataKey="amount"
+                      fill="hsl(var(--primary))"
+                      radius={[4, 4, 0, 0]}
+                    />
                   </BarChart>
                 </ResponsiveContainer>
               )}
@@ -306,12 +415,21 @@ export default function CustomerDetailsPage() {
           </Card>
 
           <Card>
-            <CardHeader>
-              <CardTitle>Factures du client</CardTitle>
-              <CardDescription>Liste des factures du client</CardDescription>
+            <CardHeader className="space-y-1">
+              <div className="flex items-center gap-2">
+                <ReceiptIcon className="w-4 h-4 text-muted-foreground" />
+                <CardTitle className="text-lg">Factures</CardTitle>
+              </div>
+              <Separator />
             </CardHeader>
-            <CardContent>
-              <TableInvoices invoices={customer.Invoices} search="" />
+            <CardContent className="pt-6">
+              <TableInvoices
+                invoices={customer?.Invoices?.map((invoice) => ({
+                  ...invoice,
+                  Client: customer,
+                }))}
+                search=""
+              />
             </CardContent>
           </Card>
         </div>

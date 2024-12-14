@@ -2,23 +2,35 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronDown, Plus } from "lucide-react";
-import { MdClose, MdOutlineEdit } from "react-icons/md";
-
 import { Item } from "@/types/Item";
 import { Customer } from "@/types/Customer";
-
 import useFormattedAmount from "@/hooks/useFormattedAmount";
-import { useToast } from "@/components/ui/use-toast";
 
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ContentLayout } from "@/components/admin-panel/content-layout";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import DatePicker from "@/components/datePicker";
 import SheetCustomers from "@/components/sheet-customers";
 import EditTableItems from "@/components/edit-table-items";
 import TableItems from "@/components/table-items";
+
+import { useToast } from "@/components/ui/use-toast";
+
+import {
+  Calendar,
+  CircleDollarSign,
+  FileEdit,
+  Loader2,
+  PlusCircle,
+  Receipt,
+  User2,
+  XCircle,
+  Building2,
+  AlertCircle,
+} from "lucide-react";
 
 import api from "@/lib/axios";
 import { cn } from "@/lib/utils";
@@ -109,25 +121,93 @@ export default function CreateInvoicePage() {
   };
 
   return (
-    <>
-      <ContentLayout title={"Factures"}>
-        <div className="flex flex-col w-full gap-6">
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-semibold">{"Créer une facture"}</h1>
+    <ContentLayout title="Factures">
+      <div className="flex flex-col w-full gap-6">
+        {/* En-tête */}
+        <div className="flex flex-col sm:flex-row justify-between items-center p-6 bg-background rounded-lg border gap-4">
+          <div className="flex items-center gap-3">
+            <div className="p-3 rounded-full bg-primary/10">
+              <Receipt className="w-6 h-6 text-primary" />
+            </div>
+            <div className="space-y-1">
+              <h1 className="text-2xl font-bold">Créer une facture</h1>
+              <p className="text-sm text-muted-foreground">
+                Remplissez les informations pour créer une nouvelle facture
+              </p>
+            </div>
           </div>
-          <div className="flex flex-col gap-6">
-            <div className="flex gap-2">
-              <div className="flex flex-col items-start w-96 gap-2">
-                <Label>{"Date d'échéance"}</Label>
+        </div>
+
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+          <div className="space-y-6 xl:col-span-2">
+            {/* Client */}
+            <Card>
+              <CardHeader className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <User2 className="w-4 h-4 text-muted-foreground" />
+                  <CardTitle className="text-lg">Client</CardTitle>
+                </div>
+                <Separator />
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <SheetCustomers
+                  trigger={
+                    <Button
+                      variant="outline"
+                      className="w-full justify-between"
+                    >
+                      {client ? (
+                        <div className="flex items-center gap-2">
+                          {client.type === "company" ? (
+                            <Building2 className="w-4 h-4" />
+                          ) : (
+                            <User2 className="w-4 h-4" />
+                          )}
+                          <span>
+                            {client.type === "company"
+                              ? client.name
+                              : `${client.first_name} ${client.last_name}`}
+                          </span>
+                          <Badge variant="outline">
+                            {client.type === "company"
+                              ? "Entreprise"
+                              : "Particulier"}
+                          </Badge>
+                        </div>
+                      ) : (
+                        <span>Sélectionner un client</span>
+                      )}
+                      <PlusCircle className="w-4 h-4" />
+                    </Button>
+                  }
+                  handleSelectCustomer={(customer) => {
+                    setFormData((prev) => ({ ...prev, client: customer }));
+                  }}
+                />
+              </CardContent>
+            </Card>
+
+            {/* Date d'échéance */}
+            <Card>
+              <CardHeader className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-muted-foreground" />
+                  <CardTitle className="text-lg">
+                    Date d&apos;échéance
+                  </CardTitle>
+                </div>
+                <Separator />
+              </CardHeader>
+              <CardContent>
                 <DatePicker
                   trigger={
                     <Button
                       variant="outline"
-                      className="w-full flex items-center justify-between"
+                      className="w-full justify-between"
                     >
                       {formData.dueDate?.toLocaleDateString() ??
                         "Sélectionner une date"}
-                      <ChevronDown size={16} className="ml-2 opacity-50" />
+                      <Calendar className="w-4 h-4" />
                     </Button>
                   }
                   value={formData.dueDate}
@@ -139,118 +219,142 @@ export default function CreateInvoicePage() {
                     }
                   }}
                 />
-              </div>
-            </div>
-            <div className="flex flex-col items-start w-full gap-2 sm:w-96">
-              <Label>{"Client"}</Label>
-              <SheetCustomers
-                trigger={
-                  <Button className="w-full cursor-pointer" variant="outline">
-                    {formData.client
-                      ? `${formData.client.first_name} ${formData.client.last_name}`
-                      : "Sélectionner un client"}
-                  </Button>
-                }
-                handleSelectCustomer={(customer) => {
-                  setFormData((prev) => ({ ...prev, client: customer }));
-                }}
-              />
-            </div>
-            <div className="flex flex-col items-start w-full gap-4 mb-4">
-              <Card className="relative w-full">
-                <CardHeader>
-                  <CardTitle>{"Articles"}</CardTitle>
-                  {isEditingItems ? (
-                    <MdClose
-                      size={20}
-                      className="absolute top-2 right-2 cursor-pointer"
-                      onClick={() =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          isEditingItems: false,
-                        }))
-                      }
-                    />
-                  ) : (
-                    <MdOutlineEdit
-                      size={20}
-                      className="absolute top-2 right-2 cursor-pointer"
-                      onClick={() =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          isEditingItems: true,
-                        }))
-                      }
-                    />
-                  )}
-                </CardHeader>
-                <CardContent>
-                  {isEditingItems ? (
-                    <EditTableItems
-                      items={items}
-                      handleOnSaveItems={(items) => {
-                        setFormData((prev) => ({ ...prev, items }));
-                        setFormData((prev) => ({
-                          ...prev,
-                          isEditingItems: false,
-                        }));
-                      }}
-                    />
-                  ) : (
-                    <TableItems items={items} />
-                  )}
-                </CardContent>
-              </Card>
-              <div className={cn("flex flex-col items-end w-full")}>
-                <Card className="w-full md:w-1/2 xl:w-1/3">
-                  <CardHeader>
-                    <CardTitle>{"Résumé de la facture"}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="flex flex-col gap-2">
-                    <div className="flex justify-between w-full">
-                      <span className="font-light text-sm ">
-                        {"Sous-total"}:
-                      </span>
-                      <p className="flex  text-sm items-end text-right">
-                        {formatAmount(totalAmountWithoutVAT, {
-                          currency: "EUR",
-                        })}
-                      </p>
-                    </div>
-                    <div className="flex justify-between w-full">
-                      <span className="font-light text-sm ">{"TVA"}:</span>
-                      <p className="flex  text-sm items-end text-right">
-                        {formatAmount(totalVAT, { currency: "EUR" })}
-                      </p>
-                    </div>
-                    <div className="flex justify-between w-full">
-                      <span className="font-light text-sm ">{"Total"}:</span>
-                      <p className="flex  text-sm items-end text-right">
-                        {formatAmount(totalAmount, { currency: "EUR" })}
-                      </p>
-                    </div>
+              </CardContent>
+            </Card>
 
+            {/* Articles */}
+            <Card>
+              <CardHeader className="space-y-1">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Receipt className="w-4 h-4 text-muted-foreground" />
+                    <CardTitle className="text-lg">Articles</CardTitle>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        isEditingItems: !prev.isEditingItems,
+                      }))
+                    }
+                  >
+                    {isEditingItems ? (
+                      <XCircle className="w-4 h-4" />
+                    ) : (
+                      <FileEdit className="w-4 h-4" />
+                    )}
+                  </Button>
+                </div>
+                <Separator />
+              </CardHeader>
+              <CardContent>
+                {isEditingItems ? (
+                  <EditTableItems
+                    items={items}
+                    handleOnSaveItems={(items) => {
+                      setFormData((prev) => ({
+                        ...prev,
+                        items,
+                        isEditingItems: false,
+                      }));
+                    }}
+                  />
+                ) : (
+                  <>
+                    {items.length === 0 ? (
+                      <div className="flex flex-col items-center justify-center p-8 text-center border rounded-lg border-dashed gap-2">
+                        <AlertCircle className="w-8 h-8 text-muted-foreground" />
+                        <p className="text-sm text-muted-foreground">
+                          Aucun article ajouté
+                        </p>
+                        <Button
+                          variant="outline"
+                          onClick={() =>
+                            setFormData((prev) => ({
+                              ...prev,
+                              isEditingItems: true,
+                            }))
+                          }
+                        >
+                          Ajouter des articles
+                        </Button>
+                      </div>
+                    ) : (
+                      <TableItems items={items} />
+                    )}
+                  </>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Résumé */}
+          <div className="xl:col-span-1">
+            <div className="sticky top-6">
+              <Card>
+                <CardHeader className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <CircleDollarSign className="w-4 h-4 text-muted-foreground" />
+                    <CardTitle className="text-lg">Résumé</CardTitle>
+                  </div>
+                  <Separator />
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-muted-foreground">Sous-total</span>
+                      <span>{formatAmount(totalAmountWithoutVAT)}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-muted-foreground">TVA</span>
+                      <span>{formatAmount(totalVAT)}</span>
+                    </div>
+                    <Separator />
+                    <div className="flex justify-between items-center font-medium">
+                      <span>Total</span>
+                      <span className="text-lg">
+                        {formatAmount(totalAmount)}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    {!client && (
+                      <p className="text-sm text-muted-foreground">
+                        Sélectionnez un client pour créer la facture
+                      </p>
+                    )}
+                    {items.length === 0 && (
+                      <p className="text-sm text-muted-foreground">
+                        Ajoutez au moins un article
+                      </p>
+                    )}
                     <Button
-                      className="w-full mt-4"
+                      className="w-full gap-2"
                       onClick={handleCreateInvoice}
-                      disabled={!formData.client || items.length === 0}
+                      disabled={!client || items.length === 0 || isSubmitting}
                     >
-                      {" "}
                       {isSubmitting ? (
-                        "Création en cours..."
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          Création en cours...
+                        </>
                       ) : (
                         <>
-                          <Plus size={20} className="mr-2" /> Créer la facture
+                          <PlusCircle className="w-4 h-4" />
+                          Créer la facture
                         </>
                       )}
                     </Button>
-                  </CardContent>
-                </Card>
-              </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </div>
-      </ContentLayout>
-    </>
+      </div>
+    </ContentLayout>
   );
 }

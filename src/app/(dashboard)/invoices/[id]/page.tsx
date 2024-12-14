@@ -2,19 +2,16 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Download, Eye, ChevronDown } from "lucide-react";
-import { MdOutlineEdit, MdDeleteOutline, MdClose } from "react-icons/md";
-
 import { Invoice } from "@/types/Invoice";
 import { Customer } from "@/types/Customer";
 import { Item } from "@/types/Item";
-
 import useFormattedAmount from "@/hooks/useFormattedAmount";
 import useFormattedDate from "@/hooks/useFormattedDate";
-import { useToast } from "@/components/ui/use-toast";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import { ContentLayout } from "@/components/admin-panel/content-layout";
 import AlertDialog from "@/components/alert-dialog";
 import DatePicker from "@/components/datePicker";
@@ -23,6 +20,26 @@ import TableItems from "@/components/table-items";
 import EditTableItems from "@/components/edit-table-items";
 import ErrorScreen from "@/components/error-screen";
 import SelectStatusInvoice from "@/components/selectStatusInvoice";
+import { useToast } from "@/components/ui/use-toast";
+
+import {
+  Download,
+  Eye,
+  ChevronDown,
+  Printer,
+  Building2,
+  MapPin,
+  Mail,
+  Phone,
+  Receipt,
+  Calendar,
+  CircleDollarSign,
+  FileEdit,
+  XCircle,
+  Trash2,
+  ClockIcon,
+  Building,
+} from "lucide-react";
 
 import { ClipLoader } from "react-spinners";
 
@@ -90,14 +107,24 @@ export default function InvoicePage() {
   useEffect(() => {
     fetchInvoiceDetails();
   }, [fetchInvoiceDetails]);
-
   const handleUpdateInvoice = async (updates: Partial<Invoice>) => {
     try {
-      await api.put(`/invoices/${id}`, updates);
+      // Si la mise à jour contient des items, envoyer les items seuls
+      if ("InvoiceItems" in updates) {
+        await api.put(`/invoices/${id}`, {
+          items: updates.InvoiceItems,
+        });
+      } else {
+        await api.put(`/invoices/${id}`, updates);
+      }
+
+      // Rafraîchir les données complètes
+      const response = await api.get(`/invoices/${id}`);
       setState((prev) => ({
         ...prev,
-        data: prev.data ? { ...prev.data, ...updates } : null,
+        data: response.data,
       }));
+
       toast({
         title: "Mise à jour réussie",
         description: "La facture a été mise à jour avec succès",
@@ -113,24 +140,47 @@ export default function InvoicePage() {
   };
 
   const handleChangeCustomer = async (customer: Customer) => {
-    await handleUpdateInvoice({ Client: customer });
+    await handleUpdateInvoice({
+      client_id: customer.client_id,
+      Client: customer, // Pour la mise à jour locale
+    });
   };
 
   const handleChangeStatus = async (status: string) => {
+    if (!status) return;
     await handleUpdateInvoice({ status });
   };
 
-  const handleSelectDueDate = async (date: Date) => {
+  const handleSelectDueDate = async (date: Date | null) => {
+    if (!date) return;
+
+    // Conversion en date locale avec le bon format
     const localDate = new Date(
       date.getTime() - date.getTimezoneOffset() * 60000
     );
-    const isoDate = localDate.toISOString().split("T")[0];
-    await handleUpdateInvoice({ due_date: new Date(isoDate) });
+    const formattedDate = localDate.toISOString().split("T")[0];
+
+    await handleUpdateInvoice({
+      due_date: new Date(formattedDate),
+    });
   };
 
   const handleSaveItems = async (items: Item[]) => {
-    await handleUpdateInvoice({ InvoiceItems: items });
-    setIsEditingItems(false);
+    if (!items.length) {
+      toast({
+        title: "Erreur",
+        description: "La facture doit contenir au moins un article",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      await handleUpdateInvoice({ InvoiceItems: items });
+      setIsEditingItems(false);
+    } catch (error) {
+      setIsEditingItems(true); // Garder l'édition ouverte en cas d'erreur
+    }
   };
 
   const handleDownload = async () => {
@@ -198,148 +248,228 @@ export default function InvoicePage() {
   if (!invoice) return null;
 
   return (
-    <ContentLayout title={"Factures"}>
+    <ContentLayout title="Factures">
       <div className="flex flex-col w-full gap-6">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-          <h1 className="text-2xl font-semibold">
-            Facture {invoice?.invoice_id}
-          </h1>
-          <div className="flex gap-4">
+        {/* En-tête */}
+        <div className="flex flex-col sm:flex-row justify-between items-center p-6 bg-background rounded-lg border gap-4">
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-3">
+              <div className="p-3 rounded-full bg-primary/10">
+                <Receipt className="w-6 h-6 text-primary" />
+              </div>
+              <div className="space-y-1">
+                <h1 className="text-2xl font-bold">
+                  Facture #{invoice?.invoice_number}
+                </h1>
+                <div className="flex items-center gap-2">
+                  <SelectStatusInvoice
+                    invoice={invoice}
+                    handleChangeStatus={handleChangeStatus}
+                  />
+                  <Badge variant="outline" className="gap-2">
+                    <Calendar className="w-4 h-4" />
+                    {formatDate(new Date(invoice?.invoice_date))}
+                  </Badge>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="flex gap-3">
             <Button
               variant="outline"
-              className="flex items-center gap-2"
+              className="gap-2"
               onClick={handleDownload}
             >
-              <Download size={16} />
-              Télécharger PDF
+              <Download className="w-4 h-4" />
+              Télécharger
             </Button>
-
             <AlertDialog
               trigger={
-                <Button
-                  variant="destructive"
-                  className="flex items-center gap-2"
-                >
-                  <MdDeleteOutline size={20} />
+                <Button variant="destructive" className="gap-2">
+                  <Trash2 className="w-4 h-4" />
                   Supprimer
                 </Button>
               }
-              title={"Supprimer la facture"}
-              description={"Êtes-vous sûr de vouloir supprimer cette facture ?"}
-              confirmText={"Supprimer"}
+              title="Supprimer la facture"
+              description="Êtes-vous sûr de vouloir supprimer cette facture ?"
+              confirmText="Supprimer"
               handleOnConfirm={handleDelete}
             />
           </div>
         </div>
-        <Card className="flex flex-col justify-between p-6 md:flex-row gap-4">
-          <div className="flex flex-col w-full gap-4 md:w-1/2">
-            <div className="flex items-center justify-between">
-              <h2 className="text-sm font-semibold">Numéro de facture</h2>
-              <p className="flex text-sm text-right">
-                {invoice?.invoice_number}
-              </p>
-            </div>
-            <div className="flex items-center justify-between">
-              <h2 className="text-sm font-semibold">Date de facturation</h2>
-              <p className="flex text-sm text-right">
-                {invoice?.invoice_date
-                  ? formatDate(new Date(invoice.invoice_date))
-                  : ""}
-              </p>
-            </div>
 
-            <div className="flex items-center justify-between">
-              <h2 className="text-sm font-semibold">Statut de la facture</h2>
-              <div className="flex ">
-                <SelectStatusInvoice
-                  invoice={invoice}
-                  handleChangeStatus={handleChangeStatus}
+        {/* Informations principales */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          {/* Dates et Status */}
+          <Card>
+            <CardHeader className="space-y-1">
+              <div className="flex items-center gap-2">
+                <ClockIcon className="w-4 h-4 text-muted-foreground" />
+                <CardTitle className="text-lg">Dates</CardTitle>
+              </div>
+              <Separator />
+            </CardHeader>
+            <CardContent className="grid gap-4">
+              <div className="space-y-2">
+                <span className="text-sm text-muted-foreground">
+                  Date d&apos;émission
+                </span>
+                <div className="font-medium">
+                  {formatDate(new Date(invoice?.invoice_date))}
+                </div>
+              </div>
+              <div className="space-y-2">
+                <span className="text-sm text-muted-foreground">
+                  Date d&apos;échéance
+                </span>
+                <DatePicker
+                  trigger={
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start text-left font-normal"
+                    >
+                      {formatDate(new Date(invoice?.due_date)) ||
+                        "Sélectionner une date"}
+                      <ChevronDown className="ml-auto h-4 w-4 opacity-50" />
+                    </Button>
+                  }
+                  value={invoice?.due_date}
+                  onChange={handleSelectDueDate}
                 />
               </div>
-            </div>
-          </div>
-          <div className="flex flex-col w-full gap-4 md:w-1/2">
-            <div className="flex items-center justify-between">
-              <h2 className="text-sm font-semibold">Date d&apos;échéance</h2>
-              <DatePicker
-                trigger={
+            </CardContent>
+          </Card>
+
+          {/* Émetteur */}
+          <Card>
+            <CardHeader className="space-y-1">
+              <div className="flex items-center gap-2">
+                <Building2 className="w-4 h-4 text-muted-foreground" />
+                <CardTitle className="text-lg">Émetteur</CardTitle>
+              </div>
+              <Separator />
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-1">
+                <div className="font-medium">{invoice?.Company?.name}</div>
+                <div className="text-sm text-muted-foreground space-y-1">
+                  <div className="flex items-start gap-2">
+                    <MapPin className="w-4 h-4 mt-0.5" />
+                    <div>
+                      <div>{invoice?.Company?.street_address}</div>
+                      <div>
+                        {invoice?.Company?.postal_code} {invoice?.Company?.city}
+                      </div>
+                      <div>{invoice?.Company?.country}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Client */}
+          <Card>
+            <CardHeader className="space-y-1">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Building className="w-4 h-4 text-muted-foreground" />
+                  <CardTitle className="text-lg">Client</CardTitle>
+                </div>
+                <div className="flex items-center gap-2">
                   <Button
                     variant="ghost"
-                    className="p-0 h-fit justify-start text-left font-normal hover:bg-transparent"
+                    size="icon"
+                    onClick={() =>
+                      router.push(`/customers/${invoice?.Client?.client_id}`)
+                    }
                   >
-                    {formatDate(new Date(invoice?.due_date as Date)) ||
-                      "Sélectionner une date"}
-                    <ChevronDown size={16} className="ml-2 opacity-50" />
+                    <Eye className="w-4 h-4" />
                   </Button>
-                }
-                value={invoice?.due_date}
-                onChange={handleSelectDueDate}
-              />
-            </div>
-          </div>
-        </Card>
-        <div className="flex flex-col gap-6 md:flex-row">
-          <Card className="flex flex-col w-full gap-2 p-6">
-            <h2 className="text-lg font-semibold">Emetteur :</h2>
-            <div className="flex flex-col pl-2">
-              <h2 className="text-sm font-semibold">
-                {invoice?.Company?.name.toUpperCase()}
-              </h2>
-              <p className="text-sm">{invoice?.Company?.street_address}</p>
-              <p className="text-sm">
-                {invoice?.Company?.city}, {invoice?.Company?.postal_code}
-              </p>
-              <p className="text-sm">{invoice?.Company?.country}</p>
-            </div>
-          </Card>
-          <Card className="relative flex flex-col w-full gap-2 p-6">
-            <SheetCustomers
-              trigger={
-                <MdOutlineEdit
-                  size={20}
-                  className="absolute top-2 right-2 cursor-pointer"
-                />
-              }
-              handleSelectCustomer={handleChangeCustomer}
-            />
-            <Eye
-              size={20}
-              className="absolute top-2 right-8 cursor-pointer"
-              onClick={() =>
-                router.push(`/customers/${invoice?.Client?.client_id}`)
-              }
-            />
-
-            <h2 className="text-lg font-semibold">Destinataire :</h2>
-            <div className="flex flex-col pl-2">
-              <h2 className="text-sm font-semibold">
-                {invoice?.Client?.first_name.toUpperCase()}{" "}
-                {invoice?.Client?.last_name.toUpperCase()}
-              </h2>
-              <p className="text-sm">{invoice?.Client?.street_address}</p>
-              <p className="text-sm">
-                {invoice?.Client?.city}, {invoice?.Client?.postal_code}
-              </p>
-              <p className="text-sm">{invoice?.Client?.country}</p>
-            </div>
+                  <SheetCustomers
+                    trigger={
+                      <Button variant="ghost" size="icon">
+                        <FileEdit className="w-4 h-4" />
+                      </Button>
+                    }
+                    handleSelectCustomer={handleChangeCustomer}
+                  />
+                </div>
+              </div>
+              <Separator />
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-1">
+                <div className="font-medium">
+                  {invoice?.Client?.type === "company"
+                    ? invoice?.Client?.name
+                    : `${invoice?.Client?.first_name} ${invoice?.Client?.last_name}`}
+                  <Badge variant="outline" className="ml-2">
+                    {invoice?.Client?.type === "company"
+                      ? "Entreprise"
+                      : "Particulier"}
+                  </Badge>
+                </div>
+                {invoice?.Client?.type === "company" && (
+                  <div className="text-sm space-y-1 text-muted-foreground">
+                    {invoice?.Client?.siret_number && (
+                      <div>SIRET: {invoice?.Client?.siret_number}</div>
+                    )}
+                    {invoice?.Client?.vat_number && (
+                      <div>TVA: {invoice?.Client?.vat_number}</div>
+                    )}
+                  </div>
+                )}
+                <div className="text-sm text-muted-foreground space-y-1 mt-2">
+                  <div className="flex items-start gap-2">
+                    <MapPin className="w-4 h-4 mt-0.5" />
+                    <div>
+                      <div>{invoice?.Client?.street_address}</div>
+                      <div>
+                        {invoice?.Client?.postal_code} {invoice?.Client?.city}
+                      </div>
+                      <div>{invoice?.Client?.country}</div>
+                    </div>
+                  </div>
+                  {invoice?.Client?.email && (
+                    <div className="flex items-center gap-2">
+                      <Mail className="w-4 h-4" />
+                      {invoice?.Client?.email}
+                    </div>
+                  )}
+                  {invoice?.Client?.phone && (
+                    <div className="flex items-center gap-2">
+                      <Phone className="w-4 h-4" />
+                      {invoice?.Client?.phone}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </CardContent>
           </Card>
         </div>
-        <Card className="relative">
-          <CardHeader>
-            <CardTitle>{"Articles"}</CardTitle>
-            {isEditingItems ? (
-              <MdClose
-                size={20}
-                className="absolute top-2 right-2 cursor-pointer"
-                onClick={() => setIsEditingItems(false)}
-              />
-            ) : (
-              <MdOutlineEdit
-                size={20}
-                className="absolute top-2 right-2 cursor-pointer"
-                onClick={() => setIsEditingItems(true)}
-              />
-            )}
+
+        {/* Articles */}
+        <Card>
+          <CardHeader className="space-y-1">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Receipt className="w-4 h-4 text-muted-foreground" />
+                <CardTitle className="text-lg">Articles</CardTitle>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsEditingItems(!isEditingItems)}
+              >
+                {isEditingItems ? (
+                  <XCircle className="w-4 h-4" />
+                ) : (
+                  <FileEdit className="w-4 h-4" />
+                )}
+              </Button>
+            </div>
+            <Separator />
           </CardHeader>
           <CardContent>
             {isEditingItems ? (
@@ -353,38 +483,31 @@ export default function InvoicePage() {
           </CardContent>
         </Card>
 
-        <div className={"flex flex-col items-end w-full"}>
+        {/* Résumé */}
+        <div className="flex justify-end">
           <Card className="w-full md:w-1/2 xl:w-1/3">
-            <CardHeader>
-              <CardTitle>{"Résumé de la facture"}</CardTitle>
+            <CardHeader className="space-y-1">
+              <div className="flex items-center gap-2">
+                <CircleDollarSign className="w-4 h-4 text-muted-foreground" />
+                <CardTitle className="text-lg">Résumé</CardTitle>
+              </div>
+              <Separator />
             </CardHeader>
-            <CardContent className="flex flex-col gap-2">
-              <div className="flex justify-between">
-                <span className="text-sm font-light">{"Sous-total"}:</span>
-                <p className="flex  text-sm items-end text-right">
-                  {formatAmount(totals.totalAmountWithoutVAT, {
-                    currency: "EUR",
-                  })}
-                </p>
+            <CardContent className="space-y-4">
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-muted-foreground">Sous-total</span>
+                <span>{formatAmount(totals.totalAmountWithoutVAT)}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-sm font-light">{"TVA"}:</span>
-                <p className="flex  text-sm items-end text-right">
-                  {formatAmount(
-                    totals.totalAmount - totals.totalAmountWithoutVAT,
-                    {
-                      currency: "EUR",
-                    }
-                  )}
-                </p>
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-muted-foreground">TVA</span>
+                <span>{formatAmount(totals.totalVAT)}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-sm font-semibold">{"Total"}:</span>
-                <p className="flex  text-sm items-end text-right">
-                  {formatAmount(totals.totalAmount, {
-                    currency: "EUR",
-                  })}
-                </p>
+              <Separator />
+              <div className="flex justify-between items-center font-medium">
+                <span>Total</span>
+                <span className="text-lg">
+                  {formatAmount(totals.totalAmount)}
+                </span>
               </div>
             </CardContent>
           </Card>

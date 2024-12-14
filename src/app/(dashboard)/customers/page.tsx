@@ -37,11 +37,14 @@ export default function CustomersPage() {
   const [{ data: customers, isLoading, error }, setState] =
     useState<CustomersState>(initialState);
   const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState<"company" | "individual">("individual");
 
   const fetchCustomersData = useCallback(async () => {
     try {
       setState((prev) => ({ ...prev, isLoading: true, error: null }));
-      const response = await api.get("/customers", { params: { search } });
+      const response = await api.get("/customers", {
+        params: { search, type: filter },
+      });
       setState((prev) => ({
         ...prev,
         data: response.data.customers,
@@ -55,7 +58,7 @@ export default function CustomersPage() {
         isLoading: false,
       }));
     }
-  }, [search]);
+  }, [filter, search]);
 
   useEffect(() => {
     const timer = setTimeout(fetchCustomersData, DEBOUNCE_DELAY);
@@ -64,6 +67,10 @@ export default function CustomersPage() {
 
   const handleCustomerSelect = (customerId: number) => {
     router.push(`/customers/${customerId}`);
+  };
+
+  const handleChangeFilter = (type: "company" | "individual") => {
+    setFilter(type);
   };
 
   return (
@@ -85,6 +92,20 @@ export default function CustomersPage() {
 
           <div className="flex flex-col w-full gap-6">
             <div className="flex flex-col gap-6 xl:flex-row xl:justify-between">
+              <div className="flex gap-4">
+                <Button
+                  onClick={() => handleChangeFilter("individual")}
+                  variant={filter === "individual" ? "default" : "secondary"}
+                >
+                  Particuliers
+                </Button>
+                <Button
+                  onClick={() => handleChangeFilter("company")}
+                  variant={filter === "company" ? "default" : "secondary"}
+                >
+                  Entreprises
+                </Button>
+              </div>
               <div className="flex w-full py-2 gap-6 xl:w-2/6">
                 <Input
                   type="search"
@@ -110,6 +131,7 @@ export default function CustomersPage() {
           <TableCustomers
             customers={customers}
             handleSelectCustomer={handleCustomerSelect}
+            type={filter}
           />
         )}
       </div>
