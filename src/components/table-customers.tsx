@@ -27,7 +27,7 @@ export default function TableCustomers({
     {
       header: "Type",
       cell: (customer: Customer) => (
-        <div className="w-8">
+        <div className="w-8 text-nowrap">
           {customer.type === "company" ? (
             <BuildingIcon className="w-4 h-4" />
           ) : (
@@ -39,7 +39,7 @@ export default function TableCustomers({
     {
       header: "ID",
       cell: (customer: Customer) => (
-        <div className="text-xs text-muted-foreground">
+        <div className="text-xs text-muted-foreground text-nowrap">
           {customer.client_id}
         </div>
       ),
@@ -51,13 +51,13 @@ export default function TableCustomers({
     {
       header: "Raison sociale",
       cell: (customer: Customer) => (
-        <div className="font-medium">{customer.name || "-"}</div>
+        <div className="font-medium text-nowrap">{customer.name || "-"}</div>
       ),
     },
     {
       header: "SIRET",
       cell: (customer: Customer) => (
-        <div className="font-mono text-xs">
+        <div className="font-mono text-xs text-nowrap">
           {customer.siret_number
             ? `${customer.siret_number.slice(
                 0,
@@ -76,7 +76,9 @@ export default function TableCustomers({
     {
       header: "N° TVA",
       cell: (customer: Customer) => (
-        <div className="font-mono text-xs">{customer.vat_number || "-"}</div>
+        <div className="font-mono text-xs text-nowrap">
+          {customer.vat_number || "-"}
+        </div>
       ),
     },
   ];
@@ -86,7 +88,7 @@ export default function TableCustomers({
     {
       header: "Nom",
       cell: (customer: Customer) => (
-        <div className="font-medium">
+        <div className="font-medium text-nowrap">
           {customer.first_name} {customer.last_name}
         </div>
       ),
@@ -98,13 +100,15 @@ export default function TableCustomers({
     {
       header: "Email",
       cell: (customer: Customer) => (
-        <div className="text-sm">{customer.email || "-"}</div>
+        <div className="text-sm text-nowrap">{customer.email || "-"}</div>
       ),
     },
     {
       header: "Téléphone",
       cell: (customer: Customer) => (
-        <div className="font-mono text-sm">{customer.phone || "-"}</div>
+        <div className="font-mono text-sm text-nowrap">
+          {customer.phone || "-"}
+        </div>
       ),
     },
   ];
@@ -114,7 +118,7 @@ export default function TableCustomers({
     {
       header: "Factures",
       cell: (customer: Customer) => (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 text-nowrap">
           <Badge
             variant={
               (customer.invoice_count ?? 0) > 0 ? "secondary" : "outline"
