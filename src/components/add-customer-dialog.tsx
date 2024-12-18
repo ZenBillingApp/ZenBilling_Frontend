@@ -259,7 +259,7 @@ export default function AddCustomerDialog({ trigger, onSave }: Props) {
     <Credenza open={open} onOpenChange={setOpen}>
       <CredenzaTrigger>{trigger}</CredenzaTrigger>
       <CredenzaContent className="max-w-3xl">
-        <ScrollArea className="flex w-full max-h-[80vh] overflow-y-auto">
+        <ScrollArea className="flex w-full max-h-[80vh]">
           <form onSubmit={handleSubmit(handleOnAdd)}>
             <div className="flex flex-col w-full p-6 gap-6">
               <CredenzaHeader>
@@ -369,7 +369,7 @@ export default function AddCustomerDialog({ trigger, onSave }: Props) {
                       {inputValue.length > 2 && (
                         <Card className="absolute top-full left-0 right-0 z-50 mt-1 border-border/50">
                           <CardContent className="p-0">
-                            <ScrollArea className="max-h-[300px]">
+                            <ScrollArea className="max-h-[300px] overflow-y-auto">
                               {searchResults.length === 0 ? (
                                 <div className="p-4 text-center text-sm text-muted-foreground">
                                   {isSearching ? (
