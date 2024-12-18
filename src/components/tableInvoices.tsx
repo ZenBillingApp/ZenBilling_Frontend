@@ -104,7 +104,7 @@ export default function TableInvoices({ invoices, search }: Props) {
               className="group cursor-pointer"
             >
               <TableCell>
-                <div className="p-2 rounded-full bg-primary/5 group-hover:bg-primary/10">
+                <div className="p-2 rounded-full bg-primary/5 group-hover:bg-primary/10 text-nowrap">
                   {isCompany ? (
                     <Building2 className="w-4 h-4 text-primary" />
                   ) : (
@@ -114,14 +114,14 @@ export default function TableInvoices({ invoices, search }: Props) {
               </TableCell>
 
               <TableCell>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 text-nowrap">
                   <Receipt className="w-4 h-4 text-muted-foreground" />
                   <span className="font-medium">#{invoice.invoice_number}</span>
                 </div>
               </TableCell>
 
               <TableCell>
-                <div className="flex flex-col gap-1">
+                <div className="flex flex-col gap-1 text-nowrap">
                   <div className="font-medium flex items-center gap-2">
                     {isCompany ? (
                       <Building className="w-3 h-3 text-muted-foreground" />
@@ -145,7 +145,7 @@ export default function TableInvoices({ invoices, search }: Props) {
                 {isCompany &&
                   (invoice.Client.siret_number ||
                     invoice.Client.vat_number) && (
-                    <div className="flex flex-col gap-1">
+                    <div className="flex flex-col gap-1 text-nowrap">
                       {invoice.Client.siret_number && (
                         <div className="text-sm text-muted-foreground font-mono">
                           SIRET: {invoice.Client.siret_number}
@@ -161,7 +161,10 @@ export default function TableInvoices({ invoices, search }: Props) {
               </TableCell>
 
               <TableCell>
-                <Badge className={status.className} variant="outline">
+                <Badge
+                  className={status.className + "text-nowrap"}
+                  variant="outline"
+                >
                   {status.label}
                 </Badge>
               </TableCell>
@@ -184,13 +187,13 @@ export default function TableInvoices({ invoices, search }: Props) {
               </TableCell>
 
               <TableCell>
-                <div className="font-medium">
+                <div className="font-medium text-nowrap">
                   {formatAmount(invoice.total_amount)}
                 </div>
               </TableCell>
 
               <TableCell>
-                <div className="flex flex-col gap-1 text-sm">
+                <div className="flex flex-col gap-1 text-sm text-nowrap">
                   <div className="flex items-center gap-1">
                     <CalendarDays className="w-3 h-3 text-muted-foreground" />
                     <span>{formatDate(new Date(invoice.invoice_date))}</span>
