@@ -1,7 +1,6 @@
 "use client"
 import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'axios';
 import Cookies from 'js-cookie';
-import { useRouter } from 'next/navigation';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
 
@@ -32,14 +31,13 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
-    const router = useRouter();
     if (error.response) {
       // La requête a été faite et le serveur a répondu avec un code d'erreur
       switch (error.response.status) {
         case 401:
           // Gérer l'expiration du token ou l'authentification invalide
             Cookies.remove('token');
-            router.push('/login');
+           window.location.href = '/login';
           
           break;
         case 403:

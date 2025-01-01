@@ -44,6 +44,7 @@ export const useUpdateProduct = (productId: number) => {
             queryClient.invalidateQueries({ queryKey: ["products", productId] })
             queryClient.invalidateQueries({ queryKey: ["products"] })
         },
+        
     })
 }
 
