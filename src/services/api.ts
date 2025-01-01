@@ -68,7 +68,17 @@ axiosInstance.interceptors.response.use(
 
 interface ApiErrorResponse {
   message?: string;
-  [key: string]: unknown;
+  errors?: Array<{
+    field?: string;
+    message: string;
+  }>;
+}
+
+interface ApiError extends Error {
+  response?: {
+    data?: ApiErrorResponse;
+    status: number;
+  };
 }
 
 // Service API
@@ -78,8 +88,7 @@ export const api = {
       const response = await axiosInstance.get(endpoint);
       return response.data
     } catch (error) {
-      handleApiError(error as AxiosError<ApiErrorResponse>);
-      throw error;
+      throw handleApiError(error as AxiosError<ApiErrorResponse>);
     }
   },
 
@@ -88,18 +97,16 @@ export const api = {
       const response = await axiosInstance.post(endpoint, data);
       return response.data
     } catch (error) {
-      handleApiError(error as AxiosError<ApiErrorResponse>);
-      throw error;
+      throw handleApiError(error as AxiosError<ApiErrorResponse>);
     }
   },
 
   put: async (endpoint: string, data: unknown) => {
     try {
-        const response = await axiosInstance.put(endpoint, data);
+      const response = await axiosInstance.put(endpoint, data);
       return response.data
     } catch (error) {
-      handleApiError(error as AxiosError<ApiErrorResponse>);
-      throw error;
+      throw handleApiError(error as AxiosError<ApiErrorResponse>);
     }
   },
 
@@ -108,29 +115,63 @@ export const api = {
       const response = await axiosInstance.delete(endpoint);
       return response.data
     } catch (error) {
-      handleApiError(error as AxiosError<ApiErrorResponse>);
-      throw error;
+      throw handleApiError(error as AxiosError<ApiErrorResponse>);
     }
   },
 
   patch: async (endpoint: string, data: unknown) => {
     try {
-        const response = await axiosInstance.patch(endpoint, data);
-            return response.data
+      const response = await axiosInstance.patch(endpoint, data);
+      return response.data
     } catch (error) {
-      handleApiError(error as AxiosError<ApiErrorResponse>);
-      throw error;
+      throw handleApiError(error as AxiosError<ApiErrorResponse>);
     }
   },
 };
 
 // Fonction utilitaire pour gérer les erreurs
-const handleApiError = (error: AxiosError<ApiErrorResponse>) => {
-  if (error.response) {
-    const message = error.response.data?.message || 'Une erreur est survenue';
-    throw new Error(message);
+const handleApiError = (error: AxiosError<ApiErrorResponse>): never => {
+  if (error.response?.data) {
+    const { data } = error.response;
+    
+    // Si nous avons un tableau d'erreurs, on le retourne directement
+    if (Array.isArray(data.errors) && data.errors.length > 0) {
+      const errorObject = new Error() as ApiError;
+      errorObject.response = {
+        data: {
+          errors: data.errors
+        },
+        status: error.response.status
+      };
+      throw errorObject;
+    }
+    
+    // Si nous avons un message unique, on le transforme en tableau d'erreurs
+    if (data.message) {
+      const errorObject = new Error() as ApiError;
+      errorObject.response = {
+        data: {
+          errors: [{
+            message: data.message
+          }]
+        },
+        status: error.response.status
+      };
+      throw errorObject;
+    }
   }
-  throw error;
+
+  // Erreur par défaut
+  const errorObject = new Error('Une erreur inattendue est survenue') as ApiError;
+  errorObject.response = {
+    data: {
+      errors: [{
+        message: 'Une erreur inattendue est survenue'
+      }]
+    },
+    status: error.response?.status || 500
+  };
+  throw errorObject;
 };
 
 // Export de l'instance axios pour une utilisation directe si nécessaire

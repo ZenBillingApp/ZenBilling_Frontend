@@ -3,13 +3,18 @@ import { api } from "@/services/api"
 import type { ICreateProductRequest } from "@/types/Product.request.interface"
 import type { IUpdateProductRequest } from "@/types/Product.request.interface"
 
+interface ProductsQueryParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+}
 
-
-export const useProducts = () => {
+export const useProducts = (params: ProductsQueryParams = {}) => {
+    const { page = 1, limit = 10, search = "" } = params;
+    
     return useQuery({
-        queryKey: ["products"],
-        queryFn: () => api.get("/products"),
-        
+        queryKey: ["products", { page, limit, search }],
+        queryFn: () => api.get(`/products?page=${page}&limit=${limit}${search ? `&search=${search}` : ""}`),
         staleTime: 1000 * 60 * 5, // 5 minutes
     })
 }

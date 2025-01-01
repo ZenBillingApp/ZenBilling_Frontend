@@ -3,26 +3,42 @@
 import React, { useState } from 'react'
 import { useProducts } from '@/hooks/useProduct'
 import { useFormat } from '@/hooks/useFormat'
-import { ShoppingCart } from 'lucide-react'
+import { ShoppingCart, Search } from 'lucide-react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import {
+    Pagination,
+    PaginationContent,
+    PaginationItem,
+    PaginationLink,
+    PaginationNext,
+    PaginationPrevious,
+  } from "@/components/ui/pagination"
 import { Card } from '@/components/ui/card'
 import { Loader2 } from 'lucide-react'
 import { IProduct } from '@/types/Product.interface'
 import { EditProductDialog } from '@/components/products/edit-product-dialog'
 import { CreateProductDialog } from '@/components/products/create-product-dialog'
+import { Input } from '@/components/ui/input'
+import debounce from 'lodash/debounce'
 
 export default function ProductsPage() {
-  const { data, isLoading } = useProducts()
+  const [page, setPage] = useState(1)
+  const [search, setSearch] = useState("")
+  const { data, isLoading } = useProducts({ page, limit: 10, search })
   const { formatCurrency, formatPercentage } = useFormat()
   const [selectedProduct, setSelectedProduct] = useState<IProduct | null>(null)
 
-  if(isLoading) return <div className='flex justify-center items-center h-screen'>
-    <Loader2 className="w-6 h-6 animate-spin" />
-  </div>
+  const totalPages = data?.data.pagination.totalPages
+
+  const debouncedSearch = debounce((value: string) => {
+    setSearch(value)
+    setPage(1)
+  }, 300)
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center">
+    <div className="container mx-auto px-4 py-6 space-y-6 max-w-7xl">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h1 className="text-2xl font-bold font-dmSans flex items-center">
           <ShoppingCart className="w-6 h-6 mr-2" />
           Produits
@@ -30,63 +46,121 @@ export default function ProductsPage() {
         <CreateProductDialog />
       </div>
 
-      <Card className="flex flex-col mt-6">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>
-                <p className='text-sm font-medium text-nowrap'>
-                  Nom
-                </p>
-              </TableHead>
-              <TableHead className='w-1/2'>
-                <p className='text-sm font-medium text-nowrap'>
-                  Description
-                </p>
-              </TableHead>
-              <TableHead>
-                <p className='text-sm font-medium text-nowrap'>
-                  Taux de TVA
-                </p>
-              </TableHead>
-              <TableHead>
-                <p className='text-sm font-medium text-nowrap'>
-                  Prix HT
-                </p>
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {data?.data.map((product: IProduct) => (
-              <TableRow 
-                key={product.product_id} 
-                className="hover:bg-gray-100 cursor-pointer"
-                onClick={() => setSelectedProduct(product)}
-              >
-                <TableCell>
-                  <p className='text-sm font-medium text-nowrap'>
-                    {product.name}
-                  </p>
-                </TableCell>
-                <TableCell>
-                  <p className='text-sm font-medium text-ellipsis overflow-hidden line-clamp-3'>
-                    {product.description}
-                  </p>
-                </TableCell>
-                <TableCell>
-                  <p className='text-sm font-medium text-nowrap'>
-                    {formatPercentage(Number(product.vat_rate))}
-                  </p>
-                </TableCell>
-                <TableCell>
-                  <p className='text-sm font-medium text-nowrap'>
-                    {formatCurrency(product.price_excluding_tax)}
-                  </p>
-                </TableCell>
+      {/* Search */}
+      <div className="w-full max-w-md">
+        <div className="relative">
+          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Rechercher un produit..."
+            className="pl-8 w-full"
+            onChange={(e) => debouncedSearch(e.target.value)}
+          />
+        </div>
+      </div>
+
+      {/* Table Card */}
+      <Card className="overflow-hidden">
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[200px] min-w-[200px]">
+                  <p className='text-sm font-medium'>Nom</p>
+                </TableHead>
+                <TableHead className="w-full min-w-[300px]">
+                  <p className='text-sm font-medium'>Description</p>
+                </TableHead>
+                <TableHead className="w-[120px] min-w-[120px]">
+                  <p className='text-sm font-medium'>TVA</p>
+                </TableHead>
+                <TableHead className="w-[120px] min-w-[120px]">
+                  <p className='text-sm font-medium'>Prix HT</p>
+                </TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={4} className="h-24">
+                    <div className="flex justify-center items-center h-full w-full">
+                      <Loader2 className="w-6 h-6 animate-spin" />
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ) : data?.data.products.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={4} className="h-24">
+                    <div className="flex flex-col items-center justify-center text-center">
+                      <p className="text-sm text-muted-foreground">Aucun produit trouvé</p>
+                      {search && (
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Essayez de modifier votre recherche
+                        </p>
+                      )}
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                data?.data.products.map((product: IProduct) => (
+                  <TableRow 
+                    key={product.product_id} 
+                    className="hover:bg-gray-100 cursor-pointer transition-colors"
+                    onClick={() => setSelectedProduct(product)}
+                  >
+                    <TableCell className="font-medium">{product.name}</TableCell>
+                    <TableCell>
+                      <p className='text-sm text-muted-foreground line-clamp-2'>
+                        {product.description || "Aucune description"}
+                      </p>
+                    </TableCell>
+                    <TableCell>
+                      <span className="inline-flex items-center px-2 py-1 rounded-md bg-gray-100 text-xs font-medium">
+                        {formatPercentage(Number(product.vat_rate))}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <span className=" font-bold">
+                        {formatCurrency(product.price_excluding_tax)}
+                      </span>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex justify-center py-4 border-t">
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious className='hidden sm:flex cursor-pointer' onClick={() => setPage(p => Math.max(1, p - 1))} isActive={page !== 1} />
+                </PaginationItem>
+                {[...Array(totalPages)].map((_, i) => {
+                  // Afficher seulement les 3 pages autour de la page courante sur mobile
+                  if (window.innerWidth < 640 && Math.abs(page - (i + 1)) > 1) {
+                    return null;
+                  }
+                  return (
+                    <PaginationItem key={i + 1}>
+                      <PaginationLink
+                        onClick={() => setPage(i + 1)}
+                        isActive={page === i + 1}
+                      >
+                        {i + 1}
+                      </PaginationLink>
+                    </PaginationItem>
+                  );
+                })}
+                <PaginationItem>
+                  <PaginationNext className='hidden sm:flex cursor-pointer' onClick={() => setPage(p => Math.min(totalPages, p + 1))} isActive={page !== totalPages} />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+        )}
       </Card>
 
       {selectedProduct && (

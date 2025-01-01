@@ -15,6 +15,17 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { Textarea } from "@/components/ui/textarea"
+import { useState } from "react"
+import { AxiosError } from "axios"
+
+interface ApiError {
+  field?: string;
+  message: string;
+}
+
+interface ApiErrorResponse {
+  errors?: ApiError[];
+}
 
 const productSchema = z.object({
   name: z.string().min(1, "Le nom est requis").max(100, "Le nom ne peut pas dépasser 100 caractères"),
@@ -34,7 +45,7 @@ interface EditProductDialogProps {
 
 export function EditProductDialog({ product, isOpen, onClose }: EditProductDialogProps) {
   const updateProduct = useUpdateProduct(product.product_id!)
-
+  const [apiErrors, setApiErrors] = useState<ApiError[]>([])
 
   const { register, handleSubmit, formState: { errors } } = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
@@ -47,10 +58,17 @@ export function EditProductDialog({ product, isOpen, onClose }: EditProductDialo
   })
 
   const onSubmit = (data: ProductFormData) => {
+    setApiErrors([])
     updateProduct.mutate(data, {
       onSuccess: () => {
         onClose()
       },
+      onError: (error: Error) => {
+        const axiosError = error as AxiosError<ApiErrorResponse>;
+        if (axiosError.response?.data?.errors) {
+          setApiErrors(axiosError.response.data.errors)
+        }
+      }
     })
   }
 
@@ -60,6 +78,15 @@ export function EditProductDialog({ product, isOpen, onClose }: EditProductDialo
         <DialogHeader>
           <DialogTitle>Modifier le produit</DialogTitle>
         </DialogHeader>
+        {apiErrors.length > 0 && (
+          <div className="bg-red-50 p-2 rounded space-y-1">
+            {apiErrors.map((error, index) => (
+              <p key={index} className="text-red-500 text-sm">
+                {error.field ? `${error.message}` : error.message}
+              </p>
+            ))}
+          </div>
+        )}
         <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 py-4">
           <div className="grid gap-2">
             <Label htmlFor="name">Nom</Label>

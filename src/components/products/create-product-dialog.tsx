@@ -1,4 +1,11 @@
 "use client"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod"
+import { useState } from "react"
+import { AxiosError } from "axios"
+
+import { useCreateProduct } from "@/hooks/useProduct"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -10,12 +17,25 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useCreateProduct } from "@/hooks/useProduct"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
 import { Textarea } from "@/components/ui/textarea"
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
+
 import { Plus } from "lucide-react"
+
+interface ApiError {
+  field?: string;
+  message: string;
+}
+
+interface ApiErrorResponse {
+  errors?: ApiError[];
+}
 
 const productSchema = z.object({
   name: z.string().min(1, "Le nom est requis").max(100, "Le nom ne peut pas dépasser 100 caractères"),
@@ -29,8 +49,9 @@ type ProductFormData = z.infer<typeof productSchema>
 
 export function CreateProductDialog() {
   const createProduct = useCreateProduct()
+  const [apiErrors, setApiErrors] = useState<ApiError[]>([])
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<ProductFormData>({
+  const { register, handleSubmit,setValue, reset, formState: { errors } } = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
     defaultValues: {
       name: "",
@@ -41,12 +62,21 @@ export function CreateProductDialog() {
   })
 
   const onSubmit = (data: ProductFormData) => {
+    setApiErrors([])
     createProduct.mutate(data, {
       onSuccess: () => {
         reset()
       },
+      onError: (error: Error) => {
+        const axiosError = error as AxiosError<ApiErrorResponse>;
+        if (axiosError.response?.data?.errors) {
+          setApiErrors(axiosError.response.data.errors)
+        }
+      }
     })
   }
+
+
 
   return (
     <Dialog>
@@ -60,6 +90,15 @@ export function CreateProductDialog() {
         <DialogHeader>
           <DialogTitle>Créer un nouveau produit</DialogTitle>
         </DialogHeader>
+        {apiErrors.length > 0 && (
+          <div className="bg-red-50 p-2 rounded space-y-1">
+            {apiErrors.map((error, index) => (
+              <p key={index} className="text-red-500 text-sm">
+                {error.field ? `${error.message}` : error.message}
+              </p>
+            ))}
+          </div>
+        )}
         <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 py-4">
           <div className="grid gap-2">
             <Label htmlFor="name">Nom</Label>
@@ -89,12 +128,20 @@ export function CreateProductDialog() {
           </div>
           <div className="grid gap-2">
             <Label htmlFor="vat">TVA</Label>
-            <Input
-              id="vat"
-              type="number"
-              step="0.1"
-              {...register("vat_rate", { valueAsNumber: true })}
-            />
+            <Select
+              onValueChange={(value) => setValue('vat_rate', Number(value))} 
+              defaultValue="5.5"
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Sélectionner un taux de TVA" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="0">0%</SelectItem>
+                <SelectItem value="5.5">5.5%</SelectItem>
+                <SelectItem value="10">10%</SelectItem>
+                <SelectItem value="20">20%</SelectItem>
+              </SelectContent>
+            </Select>
             {errors.vat_rate && (
               <p className="text-red-500 italic text-xs">{errors.vat_rate.message}</p>
             )}
