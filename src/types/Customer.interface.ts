@@ -1,3 +1,6 @@
+import { IBusinessCustomer } from './BusinessCustomer.interface';
+import { IIndividualCustomer } from './IndividualCustomer.interface';
+
 export interface ICustomer {
   customer_id: number;
   user_id: number;
@@ -11,4 +14,7 @@ export interface ICustomer {
   country: string;
   createdAt: Date;
   updatedAt: Date;
+  BusinessCustomer?: IBusinessCustomer;
+  IndividualCustomer?: IIndividualCustomer;
 } 
+

@@ -1,8 +1,21 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { DM_Sans,Roboto } from "next/font/google";
 import "./globals.css";
+import { QueryProvider } from "@/providers/QueryProvider";
 
-const inter = Inter({
+
+
+const dmSans = DM_Sans({
+  weight: ["400", "500", "700"],
+  style: ["normal", "italic"],
+  variable: "--font-dm-sans",
+  subsets: ["latin"],
+});
+
+const roboto = Roboto({
+  weight: ["400", "500", "700"],
+  style: ["normal", "italic"],
+  variable: "--font-roboto",
   subsets: ["latin"],
 });
 
@@ -18,7 +31,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.className} antialiased`}>{children}</body>
+      <body className={`${dmSans.variable} ${roboto.variable} antialiased`}>
+        <QueryProvider>{children}</QueryProvider>
+      </body>
     </html>
   );
 }
