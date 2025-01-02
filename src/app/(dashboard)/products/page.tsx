@@ -24,7 +24,7 @@ import debounce from 'lodash/debounce'
 export default function ProductsPage() {
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState("")
-  const { data, isLoading } = useProducts({ page, limit: 10, search })
+  const { data, isLoading } = useProducts({ page, limit: 25, search })
   const { formatCurrency, formatPercentage } = useFormat()
   const [selectedProduct, setSelectedProduct] = useState<IProduct | null>(null)
 
@@ -81,15 +81,15 @@ export default function ProductsPage() {
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={4} className="h-24">
-                    <div className="flex justify-center items-center h-full w-full">
-                      <Loader2 className="w-6 h-6 animate-spin" />
-                    </div>
-                  </TableCell>
-                </TableRow>
+                <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
+                <div className="flex justify-center items-center h-full w-full">
+              <Loader2 className="w-6 h-6 animate-spin" />
+            </div>
+                </TableCell>
+            </TableRow>
               ) : data?.data.products.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={4} className="h-24">
+                  <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
                     <div className="flex flex-col items-center justify-center text-center">
                       <p className="text-sm text-muted-foreground">Aucun produit trouvé</p>
                       {search && (

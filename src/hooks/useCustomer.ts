@@ -1,16 +1,25 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { api } from "@/services/api"
-import type { ICreateCustomerRequest } from "@/types/Customer.request.interface"
-import type { IUpdateCustomerRequest } from "@/types/Customer.request.interface"
+import type { ICreateCustomerRequest, IUpdateCustomerRequest } from "@/types/Customer.request.interface"
 
+interface CustomersQueryParams {
+    page?: number;
+    limit?: number;
+    search?: string;
+    type?: 'individual' | 'company';
+}
 
-
-
-export const useCustomers = () => {
+export const useCustomers = (params: CustomersQueryParams = {}) => {
+    const { page = 1, limit = 10, search = "", type } = params;
+    
     return useQuery({
-        queryKey: ["customers"],
-        queryFn: () => api.get("/customers"),
-        
+        queryKey: ["customers", { page, limit, search, type }],
+        queryFn: () => {
+            let url = `/customers?page=${page}&limit=${limit}`;
+            if (search) url += `&search=${search}`;
+            if (type) url += `&type=${type}`;
+            return api.get(url);
+        },
         staleTime: 1000 * 60 * 5, // 5 minutes
     })
 }
