@@ -3,6 +3,8 @@ import { DM_Sans,Roboto } from "next/font/google";
 import "./globals.css";
 import { QueryProvider } from "@/providers/QueryProvider";
 import { NiceModalProvider } from "@/providers/NiceModalProvider";
+import { ThemeProvider } from "@/components/theme-provider"
+
 
 
 
@@ -33,9 +35,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${dmSans.variable} ${roboto.variable} antialiased`}>
-        <QueryProvider>
-          <NiceModalProvider>{children}</NiceModalProvider>
-        </QueryProvider>
+      <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+          <QueryProvider>
+            <NiceModalProvider>{children}</NiceModalProvider>
+          </QueryProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

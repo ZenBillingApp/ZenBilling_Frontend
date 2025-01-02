@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { useProducts } from '@/hooks/useProduct'
 import { useFormat } from '@/hooks/useFormat'
 import { ShoppingCart, Search } from 'lucide-react'
+import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import {
     Pagination,
@@ -104,7 +105,7 @@ export default function ProductsPage() {
                 data?.data.products.map((product: IProduct) => (
                   <TableRow 
                     key={product.product_id} 
-                    className="hover:bg-gray-100 cursor-pointer transition-colors"
+                    className="cursor-pointer transition-colors"
                     onClick={() => setSelectedProduct(product)}
                   >
                     <TableCell className="font-medium">{product.name}</TableCell>
@@ -114,9 +115,9 @@ export default function ProductsPage() {
                       </p>
                     </TableCell>
                     <TableCell>
-                      <span className="inline-flex items-center px-2 py-1 rounded-md bg-gray-100 text-xs font-medium">
+                      <Badge variant="outline" className="flex items-center gap-2 w-fit">
                         {formatPercentage(Number(product.vat_rate))}
-                      </span>
+                      </Badge>
                     </TableCell>
                     <TableCell>
                       <span className=" font-bold">

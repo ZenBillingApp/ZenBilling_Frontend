@@ -108,7 +108,7 @@ export default function CustomersPage() {
             {data?.data?.customers?.map((customer: ICustomer) => (
               <TableRow 
                 key={customer.customer_id} 
-                className="hover:bg-gray-100 cursor-pointer transition-colors"
+                className="cursor-pointer transition-colors"
                 onClick={() => handleEditCustomer(customer)}
               >
                 <TableCell>
