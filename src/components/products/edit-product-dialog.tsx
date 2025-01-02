@@ -9,13 +9,20 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { useUpdateProduct } from "@/hooks/useProduct"
 import { IProduct } from "@/types/Product.interface"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { Textarea } from "@/components/ui/textarea"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { AxiosError } from "axios"
 
 interface ApiError {
@@ -42,12 +49,12 @@ interface EditProductDialogProps {
   onClose: () => void
 }
 
-
 export function EditProductDialog({ product, isOpen, onClose }: EditProductDialogProps) {
   const updateProduct = useUpdateProduct(product.product_id!)
   const [apiErrors, setApiErrors] = useState<ApiError[]>([])
+  const [vatValue, setVatValue] = useState<string>(product.vat_rate.toString())
 
-  const { register, handleSubmit, formState: { errors } } = useForm<ProductFormData>({
+  const { register, handleSubmit, setValue, formState: { errors } } = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
     defaultValues: {
       name: product.name,
@@ -57,6 +64,12 @@ export function EditProductDialog({ product, isOpen, onClose }: EditProductDialo
     },
   })
 
+  
+  useEffect(() => {
+    const currentVat = product.vat_rate.toString()
+    setVatValue(currentVat)
+  }, [product.vat_rate])
+  
   const onSubmit = (data: ProductFormData) => {
     setApiErrors([])
     updateProduct.mutate(data, {
@@ -74,7 +87,7 @@ export function EditProductDialog({ product, isOpen, onClose }: EditProductDialo
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent >
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>Modifier le produit</DialogTitle>
         </DialogHeader>
@@ -116,12 +129,26 @@ export function EditProductDialog({ product, isOpen, onClose }: EditProductDialo
           </div>
           <div className="grid gap-2">
             <Label htmlFor="vat">TVA</Label>
-            <Input
-              id="vat"
-              type="number"
-              step="0.1"
-              {...register("vat_rate", { valueAsNumber: true })}
-            />
+            <Select
+              value={vatValue}
+              onValueChange={(value) => {
+                setVatValue(value)
+                setValue('vat_rate', Number(value))
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Sélectionner un taux de TVA" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="0">0%</SelectItem>
+                <SelectItem value="5.5">5.5%</SelectItem>
+                <SelectItem value="10">10%</SelectItem>
+                <SelectItem value="20">20%</SelectItem>
+              </SelectContent>
+            </Select>
+            {errors.vat_rate && (
+              <p className="text-red-500 italic text-xs">{errors.vat_rate.message}</p>
+            )}
           </div>
           <Button type="submit" disabled={updateProduct.isPending}>
             {updateProduct.isPending ? "Modification..." : "Modifier"}
@@ -130,4 +157,4 @@ export function EditProductDialog({ product, isOpen, onClose }: EditProductDialo
       </DialogContent>
     </Dialog>
   )
-} 
+}

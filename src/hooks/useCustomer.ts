@@ -35,7 +35,7 @@ export const useCreateCustomer = () => {
     })
 }
 
-export const useUpdateCustomer = (customerId: number) => {
+export const useUpdateCustomer = (customerId: number | undefined) => {
     const queryClient = useQueryClient()
 
     return useMutation({

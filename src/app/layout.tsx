@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { DM_Sans,Roboto } from "next/font/google";
 import "./globals.css";
 import { QueryProvider } from "@/providers/QueryProvider";
+import { NiceModalProvider } from "@/providers/NiceModalProvider";
 
 
 
@@ -32,7 +33,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${dmSans.variable} ${roboto.variable} antialiased`}>
-        <QueryProvider>{children}</QueryProvider>
+        <QueryProvider>
+          <NiceModalProvider>{children}</NiceModalProvider>
+        </QueryProvider>
       </body>
     </html>
   );

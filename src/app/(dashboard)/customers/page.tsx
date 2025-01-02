@@ -2,119 +2,112 @@
 
 import React from 'react'
 import { useCustomers } from '@/hooks/useCustomer'
-
-
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-  } from "@/components/ui/table"
-  import { Card } from '@/components/ui/card'
-
-import { Loader2, MapPin } from 'lucide-react'
-
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Card } from '@/components/ui/card'
+import { Loader2, MapPin, Plus } from 'lucide-react'
 import { ICustomer } from '@/types/Customer.interface'
-
-import { User, Building,User2Icon } from 'lucide-react'
+import { User, Building, User2Icon } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import NiceModal from '@ebay/nice-modal-react'
+import CreateCustomerDialog from '@/components/customers/create-customer-dialog'
+import EditCustomerDialog from '@/components/customers/edit-customer-dialog'
 
 export default function CustomersPage() {
   const { data, isLoading } = useCustomers()
 
-  if(isLoading) return <div className='flex justify-center items-center h-screen'><Loader2 className="w-6 h-6 animate-spin" /></div>
+  const handleCreateCustomer = () => {
+    NiceModal.show(CreateCustomerDialog)
+  }
+
+  const handleEditCustomer = (customer: ICustomer) => {
+    NiceModal.show(EditCustomerDialog, { customer })
+  }
+
+  if(isLoading) return <div className='flex justify-center items-center h-screen'>
+    <Loader2 className="w-6 h-6 animate-spin" />
+  </div>
 
   return (
-    <div className="p-6">
+    <div className="container mx-auto px-4 py-6 space-y-6 max-w-7xl">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h1 className="text-2xl font-bold font-dmSans flex items-center">
-            <User2Icon className="w-6 h-6 mr-2" />
-            Clients
+          <User2Icon className="w-6 h-6 mr-2" />
+          Clients
         </h1>
+        <Button onClick={handleCreateCustomer} className="flex items-center gap-2">
+          <Plus className="w-4 h-4" />
+          Nouveau client
+        </Button>
+      </div>
 
-        <Card className="flex flex-col mt-6">
-           <Table >
-            <TableHeader>
-                <TableRow>
-                    <TableHead>
-                        <p className='text-sm font-medium text-nowrap'>
-                            Type
-                        </p>
-                    </TableHead>
-                    
-                    <TableHead>
-                        <p className='text-sm font-medium text-nowrap'>
-                            Nom
-                        </p>
-                    </TableHead>
-                    <TableHead> 
-                        <p className='text-sm font-medium text-nowrap'>
-                            Email
-                        </p>
-                    </TableHead>
-                    <TableHead>
-                        <p className='text-sm font-medium text-nowrap'>
-                            Téléphone
-                        </p>
-                    </TableHead>
-                    <TableHead>
-                        <p className='text-sm font-medium text-nowrap'>
-                            Adresse
-                        </p>
-                    </TableHead>
-                    <TableHead>
-                        <p className='text-sm font-medium text-nowrap'>
-                            Ville
-                        </p>
-                    </TableHead>
-                </TableRow>
-            </TableHeader>
-            <TableBody>
-                  {data?.data.map((customer: ICustomer) => (
-                    <TableRow key={customer.customer_id} className="hover:bg-gray-100 cursor-pointer">
-                        <TableCell>
-                           
-                                {customer.type === 'company' ? 
-                                <Building className="w-4 h-4" />
-                            :
-                                <User className="w-4 h-4" />
-                            }
-                          
-                            
-                        </TableCell>
-                        <TableCell>
-                            <p className='text-sm font-medium text-nowrap'>
-                           {customer.type === 'company' ? customer.BusinessCustomer?.name : customer.IndividualCustomer?.first_name + ' ' + customer.IndividualCustomer?.last_name || "-"}
-                            </p>
-                        </TableCell>
-                        <TableCell>
-                            <p className='text-sm font-medium text-nowrap'>
-                            {customer.email || "-"}
-                            </p>
-                        </TableCell>
-                        <TableCell>
-                            <p className='text-sm font-medium text-nowrap'>
-                            {customer.phone || "-"}
-                            </p>
-                        </TableCell>
-                        <TableCell>
-                            <div className="flex items-center gap-2">
-                            <MapPin className="w-4 h-4" />
-                            {customer.address || "-"}
-                            </div>
-                        </TableCell>
-                        <TableCell>
-                            <p className='text-sm font-medium text-nowrap'>
-                            {customer.city || "-"}
-                            </p>
-                        </TableCell>
-                        
-                        
-                    </TableRow>
-                ))}
-            </TableBody>
-           </Table>
-        </Card>
+      <Card>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Type</TableHead>
+              <TableHead>Nom</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Téléphone</TableHead>
+              <TableHead>Adresse</TableHead>
+              <TableHead>Ville</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {data?.data?.customers?.map((customer: ICustomer) => (
+              <TableRow 
+                key={customer.customer_id} 
+                className="hover:bg-gray-100 cursor-pointer transition-colors"
+                onClick={() => handleEditCustomer(customer)}
+              >
+                <TableCell>
+                  {customer.type === 'company' ? (
+                    <Badge variant="outline" className="flex items-center gap-2 w-fit">
+                      <Building className="w-4 h-4" />
+                      Pro
+                    </Badge>
+                  ) : (
+                    <Badge variant="outline" className="flex items-center gap-2 w-fit">
+                      <User className="w-4 h-4" />
+                      Part.
+                    </Badge>
+                  )}
+                </TableCell>
+                <TableCell className="font-medium">
+                  {customer.type === 'company' 
+                    ? customer.BusinessCustomer?.name 
+                    : `${customer.IndividualCustomer?.first_name} ${customer.IndividualCustomer?.last_name}`}
+                </TableCell>
+                <TableCell>
+                  <span className="text-muted-foreground">
+                    {customer.email || "-"}
+                  </span>
+                </TableCell>
+                <TableCell>
+                  <span className="text-muted-foreground">
+                    {customer.phone || "-"}
+                  </span>
+                </TableCell>
+                <TableCell>
+                  {customer.address ? (
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <MapPin className="w-4 h-4 shrink-0" />
+                      <span className="truncate">{customer.address}</span>
+                    </div>
+                  ) : (
+                    <span className="text-muted-foreground">-</span>
+                  )}
+                </TableCell>
+                <TableCell>
+                  <span className="text-muted-foreground">
+                    {customer.city || "-"}
+                  </span>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </Card>
     </div>
   )
 }
