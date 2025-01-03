@@ -3,7 +3,6 @@
 import React, { useState } from 'react'
 import { useCustomers } from '@/hooks/useCustomer'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Card } from '@/components/ui/card'
 import { Loader2, MapPin, Plus, Search } from 'lucide-react'
 import { ICustomer } from '@/types/Customer.interface'
 import { User, Building, User2Icon } from 'lucide-react'
@@ -92,7 +91,6 @@ export default function CustomersPage() {
         </div>
       </div>
 
-      <Card>
         <Table>
           <TableHeader>
             <TableRow>
@@ -209,7 +207,6 @@ export default function CustomersPage() {
             </Pagination>
           </div>
         )}
-      </Card>
     </div>
   )
 }

@@ -14,7 +14,6 @@ import {
     PaginationNext,
     PaginationPrevious,
   } from "@/components/ui/pagination"
-import { Card } from '@/components/ui/card'
 import { Loader2 } from 'lucide-react'
 import { IProduct } from '@/types/Product.interface'
 import { EditProductDialog } from '@/components/products/edit-product-dialog'
@@ -60,7 +59,7 @@ export default function ProductsPage() {
       </div>
 
       {/* Table Card */}
-      <Card className="overflow-hidden">
+      
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
@@ -162,7 +161,7 @@ export default function ProductsPage() {
             </Pagination>
           </div>
         )}
-      </Card>
+        
 
       {selectedProduct && (
         <EditProductDialog
