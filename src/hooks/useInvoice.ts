@@ -1,12 +1,21 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { api } from "@/services/api"
-import type { ICreateInvoiceRequest, IUpdateInvoiceRequest } from "@/types/Invoice.request.interface"
+import type { ICreateInvoiceRequest, IUpdateInvoiceRequest, IInvoiceQueryParams } from "@/types/Invoice.request.interface"
 
-export const useInvoices = () => {
+export const useInvoices = (params: IInvoiceQueryParams = {}) => {
+    const { page = 1, limit = 10, search = "", status, customer_id, start_date, end_date, sortBy = 'invoice_date', sortOrder = 'DESC' } = params;
+
     return useQuery({
-        queryKey: ["invoices"],
-        queryFn: () => api.get("/invoices"),
-        
+        queryKey: ["invoices", { page, limit, search, status, customer_id, start_date, end_date, sortBy, sortOrder }],
+        queryFn: () => {
+            let url = `/invoices?page=${page}&limit=${limit}&sortBy=${sortBy}&sortOrder=${sortOrder}`;
+            if (search) url += `&search=${search}`;
+            if (status) url += `&status=${status}`;
+            if (customer_id) url += `&customer_id=${customer_id}`;
+            if (start_date) url += `&start_date=${start_date}`;
+            if (end_date) url += `&end_date=${end_date}`;
+            return api.get(url);
+        },
         staleTime: 1000 * 60 * 5, // 5 minutes
     })
 }

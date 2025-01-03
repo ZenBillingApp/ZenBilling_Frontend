@@ -34,3 +34,17 @@ export interface ICreatePaymentRequest {
   payment_method: PaymentMethod;
   description?: string;
 } 
+
+export interface IInvoiceQueryParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  status?: InvoiceStatus;
+  customer_id?: number;
+  start_date?: string;
+  end_date?: string;
+  min_amount?: number;
+  max_amount?: number;
+  sortBy?: 'invoice_date' | 'due_date' | 'amount_including_tax' | 'status' | 'invoice_number';
+  sortOrder?: 'ASC' | 'DESC';
+}
