@@ -11,6 +11,7 @@ const axiosInstance: AxiosInstance = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+
 });
 
 // Intercepteur pour les requêtes
@@ -87,6 +88,17 @@ export const api = {
     try {
       const response = await axiosInstance.get(endpoint);
       return response.data
+    } catch (error) {
+      throw handleApiError(error as AxiosError<ApiErrorResponse>);
+    }
+  },
+
+  getBinary: async (endpoint: string) => {
+    try {
+      const response = await axiosInstance.get(endpoint, {
+        responseType: 'blob'
+      });
+      return response;
     } catch (error) {
       throw handleApiError(error as AxiosError<ApiErrorResponse>);
     }

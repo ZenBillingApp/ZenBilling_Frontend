@@ -64,3 +64,29 @@ export const useDeleteInvoice = () => {
         },
     })
 }
+
+export const useDownloadInvoicePdf = () => {
+    return useMutation({
+        mutationFn: async (invoiceId: number) => {
+            const response = await api.getBinary(`/invoices/${invoiceId}/pdf`)
+            
+            // Créer un URL pour le blob
+            const blob = new Blob([response.data], { type: 'application/pdf' })
+            const url = window.URL.createObjectURL(blob)
+            
+            // Créer un lien temporaire et cliquer dessus
+            const link = document.createElement('a')
+            link.href = url
+            link.setAttribute('download', `facture-${invoiceId}.pdf`)
+            document.body.appendChild(link)
+            link.click()
+            
+            // Nettoyer
+            document.body.removeChild(link)
+            window.URL.revokeObjectURL(url)
+            
+            return response
+        }
+    })
+}
+

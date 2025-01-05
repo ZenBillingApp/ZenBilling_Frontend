@@ -1,7 +1,7 @@
 "use client"
 
 import { useParams, useRouter } from 'next/navigation'
-import { useInvoice } from '@/hooks/useInvoice'
+import { useInvoice, useDownloadInvoicePdf } from '@/hooks/useInvoice'
 import { useFormat } from '@/hooks/useFormat'
 
 import { IInvoiceItem } from '@/types/InvoiceItem.interface'
@@ -26,10 +26,11 @@ import {
     Clock,
     ArrowLeft,
     Download,
-    Send,
+    // Send,
     Ban,
     CheckCircle2,
-    AlertCircle
+    AlertCircle,
+    Loader2
 } from 'lucide-react'
 
 export default function InvoiceDetailsPage() {
@@ -38,6 +39,7 @@ export default function InvoiceDetailsPage() {
     const { formatCurrency, formatPercent } = useFormat()
 
     const { data: invoiceData, isLoading } = useInvoice(Number(params.id))
+    const downloadPdf = useDownloadInvoicePdf()
 
     const getStatusBadgeVariant = (status: string) => {
         switch (status) {
@@ -123,14 +125,22 @@ export default function InvoiceDetailsPage() {
                     </h1>
                 </div>
                 <div className="flex gap-2">
-                    <Button variant="outline">
-                        <Download className="w-4 h-4 mr-2" />
+                    <Button 
+                        variant="outline" 
+                        onClick={() => downloadPdf.mutate(Number(params.id))}
+                        disabled={downloadPdf.isPending}
+                    >
+                        {downloadPdf.isPending ? (
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        ) : (
+                            <Download className="w-4 h-4 mr-2" />
+                        )}
                         Télécharger
                     </Button>
-                    <Button variant="outline">
+                    {/* <Button variant="outline">
                         <Send className="w-4 h-4 mr-2" />
                         Envoyer
-                    </Button>
+                    </Button> */}
                 </div>
             </div>
 
