@@ -188,8 +188,8 @@ export default function InvoicesPage() {
                                             {getStatusLabel(invoice.status)}
                                         </Badge>
                                     </TableCell>
-                                    <TableCell>
-                                        <Badge variant="outline" className="flex items-center gap-2">
+                                    <TableCell className="text-center">
+                                        <Badge variant="outline" className="flex items-center gap-2 w-fit">
                                             <ShoppingCart className="w-4 h-4" />
                                             {invoice.InvoiceItems?.length || 0}
                                         </Badge>
