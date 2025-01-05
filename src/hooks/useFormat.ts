@@ -1,43 +1,37 @@
 "use client"
 
-interface FormatOptions {
-  locale?: string;
-  currency?: string;
-}
+import { useMemo } from 'react'
 
-export function useFormat(options: FormatOptions = {}) {
-  const {
-    locale = 'fr-FR',
-    currency = 'EUR'
-  } = options;
+export const useFormat = () => {
+    const formatters = useMemo(() => ({
+        currency: new Intl.NumberFormat('fr-FR', {
+            style: 'currency',
+            currency: 'EUR',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }),
+        
+        percent: new Intl.NumberFormat('fr-FR', {
+            style: 'percent',
+            minimumFractionDigits: 1,
+            maximumFractionDigits: 1
+        }),
+        
+        decimal: new Intl.NumberFormat('fr-FR', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }),
+        
+        quantity: new Intl.NumberFormat('fr-FR', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2
+        })
+    }), [])
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat(locale, {
-      style: 'currency',
-      currency: currency,
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(amount);
-  };
-
-  const formatPercentage = (value: number) => {
-    return new Intl.NumberFormat(locale, {
-      style: 'percent',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2,
-    }).format(value / 100);
-  };
-
-  const formatQuantity = (value: number) => {
-    return new Intl.NumberFormat(locale, {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2,
-    }).format(value);
-  };
-
-  return {
-    formatCurrency,
-    formatPercentage,
-    formatQuantity,
-  };
+    return {
+        formatCurrency: (value: number) => formatters.currency.format(value),
+        formatPercent: (value: number) => formatters.percent.format(value / 100),
+        formatDecimal: (value: number) => formatters.decimal.format(value),
+        formatQuantity: (value: number) => formatters.quantity.format(value)
+    }
 } 

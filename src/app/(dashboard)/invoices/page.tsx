@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { useInvoices } from '@/hooks/useInvoice'
 import { useFormat } from '@/hooks/useFormat'
 import { useDebounce } from '@/hooks/useDebounce'
@@ -41,6 +42,8 @@ import { IInvoice } from '@/types/Invoice.interface'
 import { User, Building, CalendarDays, Clock } from 'lucide-react'
 
 export default function InvoicesPage() {
+    const router = useRouter()
+    const { formatCurrency } = useFormat()
     const [search, setSearch] = useState('')
     const [page, setPage] = useState(1)
     const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'paid' | 'cancelled'>('all')
@@ -57,11 +60,10 @@ export default function InvoicesPage() {
         page: page
     })
 
-    const { formatCurrency } = useFormat()
     const totalPages = data?.data.pagination.totalPages
 
     const handleCreateInvoice = () => {
-        // TODO: Implement create invoice modal
+        router.push('/invoices/create')
     }
 
     const getStatusBadgeVariant = (status: string) => {

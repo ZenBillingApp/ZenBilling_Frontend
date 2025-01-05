@@ -25,7 +25,7 @@ export default function ProductsPage() {
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState("")
   const { data, isLoading } = useProducts({ page, limit: 25, search })
-  const { formatCurrency, formatPercentage } = useFormat()
+  const { formatCurrency, formatPercent } = useFormat()
   const [selectedProduct, setSelectedProduct] = useState<IProduct | null>(null)
 
   const totalPages = data?.data.pagination.totalPages
@@ -113,12 +113,12 @@ export default function ProductsPage() {
                         {product.description || "Aucune description"}
                       </p>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="text-center">
                       <Badge variant="outline" className="flex items-center gap-2 w-fit">
-                        {formatPercentage(Number(product.vat_rate))}
+                        {formatPercent(Number(product.vat_rate))}
                       </Badge>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="text-center">
                       <span className=" font-bold">
                         {formatCurrency(product.price_excluding_tax)}
                       </span>
