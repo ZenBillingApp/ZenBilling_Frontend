@@ -1,6 +1,7 @@
 import { ICustomer } from './Customer.interface';
 import { IInvoiceItem } from './InvoiceItem.interface';
 import { IPayment } from './Payment.interface';
+import { ICompany } from './Company.interface';
 
 export interface IInvoice {
   invoice_id?: number;
@@ -21,4 +22,5 @@ export interface IInvoice {
   Customer?: ICustomer;
   InvoiceItems?: IInvoiceItem[];
   Payments?: IPayment[];
+  Company?: ICompany;
 } 

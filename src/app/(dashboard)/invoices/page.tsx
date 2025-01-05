@@ -165,7 +165,7 @@ export default function InvoicesPage() {
                             </TableRow>
                         ) : (
                             data?.data?.invoices?.map((invoice: IInvoice) => (
-                                <TableRow key={invoice.invoice_id} className="cursor-pointer hover:bg-muted/50">
+                                <TableRow key={invoice.invoice_id} className="cursor-pointer hover:bg-muted/50" onClick={() => router.push(`/invoices/${invoice.invoice_id}`)}>
                                     <TableCell>
                                         <Badge variant="outline" className="w-fit">
                                             {invoice.Customer?.type === 'company' ? (
