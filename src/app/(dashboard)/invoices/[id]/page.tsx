@@ -1,10 +1,11 @@
 "use client"
 
 import { useParams, useRouter } from 'next/navigation'
-import { useInvoice, useDownloadInvoicePdf, useUpdateInvoice } from '@/hooks/useInvoice'
+import { useInvoice, useDownloadInvoicePdf, useUpdateInvoice, useAddPayment } from '@/hooks/useInvoice'
 import { useFormat } from '@/hooks/useFormat'
 import { useState } from 'react'
 import type { EditInvoiceSchema } from '@/components/invoices/edit-invoice-dialog'
+import type { AddPaymentSchema } from '@/components/invoices/add-payment-dialog'
 import type { ApiError } from '@/services/api'
 
 import type { IUpdateInvoiceRequest } from '@/types/Invoice.request.interface'
@@ -34,23 +35,32 @@ import {
     CheckCircle2,
     AlertCircle,
     Loader2,
-    Pencil
+    Pencil,
+    Plus
 } from 'lucide-react'
 import { EditInvoiceDialog } from '@/components/invoices/edit-invoice-dialog'
+import { AddPaymentDialog } from '@/components/invoices/add-payment-dialog'
 
 export default function InvoiceDetailsPage() {
     const params = useParams()
     const router = useRouter()
     const { formatCurrency, formatPercent } = useFormat()
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+    const [isAddPaymentDialogOpen, setIsAddPaymentDialogOpen] = useState(false)
 
     const { data: invoiceData, isLoading } = useInvoice(Number(params.id))
     const downloadPdf = useDownloadInvoicePdf()
     const updateInvoice = useUpdateInvoice(Number(params.id))
+    const addPayment = useAddPayment(Number(params.id))
 
     const handleUpdateInvoice = async (data: Partial<EditInvoiceSchema>) => {
         await updateInvoice.mutateAsync(data as IUpdateInvoiceRequest)
         setIsEditDialogOpen(false)
+    }
+
+    const handleAddPayment = async (data: AddPaymentSchema) => {
+        await addPayment.mutateAsync(data)
+        setIsAddPaymentDialogOpen(false)
     }
 
     const getStatusBadgeVariant = (status: string) => {
@@ -151,10 +161,25 @@ export default function InvoiceDetailsPage() {
                         isError={updateInvoice.isError}
                         error={(updateInvoice.error as ApiError)?.response?.data}
                     />
+                    <AddPaymentDialog
+                        open={isAddPaymentDialogOpen}
+                        onOpenChange={setIsAddPaymentDialogOpen}
+                        onSubmit={handleAddPayment}
+                        invoiceAmount={invoiceData.amount_including_tax}
+                        isLoading={addPayment.isPending}
+                        isError={addPayment.isError}
+                        error={(addPayment.error as ApiError)?.response?.data}
+                    />
                     <Button variant="outline" onClick={() => setIsEditDialogOpen(true)}>
                         <Pencil className="w-4 h-4 mr-2" />
                         Modifier
                     </Button>
+                    {invoiceData.status === 'pending' && (
+                        <Button variant="outline" onClick={() => setIsAddPaymentDialogOpen(true)}>
+                            <Plus className="w-4 h-4 mr-2" />
+                            Ajouter un paiement
+                        </Button>
+                    )}
                     <Button 
                         variant="outline" 
                         onClick={() => downloadPdf.mutate(Number(params.id))}

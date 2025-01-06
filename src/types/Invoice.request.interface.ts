@@ -1,6 +1,20 @@
 export type InvoiceStatus = 'pending' | 'paid' | 'cancelled';
 export type PaymentMethod = 'cash' | 'credit_card' | 'bank_transfer';
 
+export interface IInvoiceQueryParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  status?: InvoiceStatus;
+  customer_id?: number;
+  start_date?: string;
+  end_date?: string;
+  min_amount?: number;
+  max_amount?: number;
+  sortBy?: 'invoice_date' | 'due_date' | 'amount_including_tax' | 'status' | 'invoice_number';
+  sortOrder?: 'ASC' | 'DESC';
+}
+
 export interface IInvoiceItem {
   product_id?: number;
   name?: string;
@@ -33,18 +47,5 @@ export interface ICreatePaymentRequest {
   amount: number;
   payment_method: PaymentMethod;
   description?: string;
+  reference?: string;
 } 
-
-export interface IInvoiceQueryParams {
-  page?: number;
-  limit?: number;
-  search?: string;
-  status?: InvoiceStatus;
-  customer_id?: number;
-  start_date?: string;
-  end_date?: string;
-  min_amount?: number;
-  max_amount?: number;
-  sortBy?: 'invoice_date' | 'due_date' | 'amount_including_tax' | 'status' | 'invoice_number';
-  sortOrder?: 'ASC' | 'DESC';
-}

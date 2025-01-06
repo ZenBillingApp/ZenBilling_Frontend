@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { api } from "@/services/api"
 import type { ICreateInvoiceRequest, IUpdateInvoiceRequest, IInvoiceQueryParams } from "@/types/Invoice.request.interface"
+import type { AddPaymentSchema } from "@/components/invoices/add-payment-dialog"
 
 export const useInvoices = (params: IInvoiceQueryParams = {}) => {
     const { page = 1, limit = 10, search = "", status, customer_id, start_date, end_date, sortBy = 'invoice_date', sortOrder = 'DESC' } = params;
@@ -89,6 +90,22 @@ export const useDownloadInvoicePdf = () => {
             
             return response
         }
+    })
+}
+
+export const useAddPayment = (invoiceId: number) => {
+    const queryClient = useQueryClient()
+
+    return useMutation({
+        mutationFn: (data: AddPaymentSchema) =>
+            api.post(`/invoices/${invoiceId}/payments`, {
+                ...data,
+                amount: Number(data.amount)
+            }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["invoices", invoiceId] })
+            queryClient.invalidateQueries({ queryKey: ["invoices"] })
+        },
     })
 }
 

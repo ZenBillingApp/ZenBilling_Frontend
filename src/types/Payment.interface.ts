@@ -4,4 +4,6 @@ export interface IPayment {
   payment_date: Date;
   amount: number;
   payment_method: 'cash' | 'credit_card' | 'bank_transfer';
+  description?: string;
+  reference?: string;
 } 
