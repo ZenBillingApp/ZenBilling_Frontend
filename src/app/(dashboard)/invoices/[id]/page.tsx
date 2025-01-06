@@ -7,6 +7,7 @@ import { useState } from 'react'
 import type { EditInvoiceSchema } from '@/components/invoices/edit-invoice-dialog'
 import type { AddPaymentSchema } from '@/components/invoices/add-payment-dialog'
 import type { ApiError } from '@/services/api'
+import type { IPayment } from '@/types/Payment.interface'
 
 import type { IUpdateInvoiceRequest } from '@/types/Invoice.request.interface'
 import { IInvoiceItem } from '@/types/InvoiceItem.interface'
@@ -99,6 +100,19 @@ export default function InvoiceDetailsPage() {
                 return <Ban className="w-4 h-4" />
             default:
                 return null
+        }
+    }
+
+    const getPaymentMethodLabel = (method: string) => {
+        switch (method) {
+            case 'credit_card':
+                return 'Carte bancaire'
+            case 'bank_transfer':
+                return 'Virement'
+            case 'cash':
+                return 'Espèces'
+            default:
+                return method
         }
     }
 
@@ -431,6 +445,77 @@ export default function InvoiceDetailsPage() {
                                 <span>{formatCurrency(invoiceData.amount_including_tax)}</span>
                             </div>
                         </div>
+                    </CardContent>
+                </Card>
+
+                {/* Payments Table */}
+                <Card>
+                    <CardHeader>
+                        <div className="flex justify-between items-center">
+                            <CardTitle>Paiements</CardTitle>
+                            {invoiceData.status === 'pending' && (
+                                <Button variant="outline" onClick={() => setIsAddPaymentDialogOpen(true)}>
+                                    <Plus className="w-4 h-4 mr-2" />
+                                    Ajouter un paiement
+                                </Button>
+                            )}
+                        </div>
+                        <CardDescription>
+                            {invoiceData.Payments?.length 
+                                ? `${invoiceData.Payments.length} paiement${invoiceData.Payments.length > 1 ? 's' : ''} enregistré${invoiceData.Payments.length > 1 ? 's' : ''}`
+                                : 'Aucun paiement enregistré'
+                            }
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        {invoiceData.Payments && invoiceData.Payments.length > 0 ? (
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Date</TableHead>
+                                        <TableHead>Montant</TableHead>
+                                        <TableHead>Méthode</TableHead>
+                                        <TableHead>Description</TableHead>
+                                        <TableHead>Référence</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {invoiceData.Payments.map((payment: IPayment) => (
+                                        <TableRow key={payment.payment_id}>
+                                            <TableCell>
+                                                {new Date(payment.payment_date).toLocaleDateString()}
+                                            </TableCell>
+                                            <TableCell>
+                                                {formatCurrency(payment.amount)}
+                                            </TableCell>
+                                            <TableCell>
+                                                {getPaymentMethodLabel(payment.payment_method)}
+                                            </TableCell>
+                                            <TableCell>
+                                                {payment.description || '-'}
+                                            </TableCell>
+                                            <TableCell>
+                                                {payment.reference || '-'}
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        ) : (
+                            <div className="flex flex-col items-center justify-center py-6 text-center text-muted-foreground">
+                                <FileText className="w-12 h-12 mb-4" />
+                                <p>Aucun paiement n&apos;a été enregistré pour cette facture.</p>
+                                {invoiceData.status === 'pending' && (
+                                    <Button 
+                                        variant="link" 
+                                        onClick={() => setIsAddPaymentDialogOpen(true)}
+                                        className="mt-2"
+                                    >
+                                        Ajouter un paiement
+                                    </Button>
+                                )}
+                            </div>
+                        )}
                     </CardContent>
                 </Card>
 
