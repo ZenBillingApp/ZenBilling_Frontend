@@ -20,4 +20,4 @@ export interface ICreateCompanyRequest {
   website?: string;
 }
 
-export interface IUpdateCompanyRequest extends Partial<ICreateCompanyRequest> {} 
+export type IUpdateCompanyRequest = Partial<ICreateCompanyRequest> 

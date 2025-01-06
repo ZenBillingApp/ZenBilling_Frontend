@@ -1,4 +1,4 @@
-import { Users } from '../models/Users';
+import { IUser } from '@/types/User.interface';
 
 export interface ICompany {
   company_id: number;
@@ -20,5 +20,5 @@ export interface ICompany {
   email: string;
   phone: string;
   website?: string;
-  users?: Users[];
+  users?: IUser[];
 } 
