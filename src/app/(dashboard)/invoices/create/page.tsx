@@ -15,7 +15,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { DatePicker } from "@/components/ui/date-picker"
 import { CustomerSelectSheet } from "@/components/customers/customer-select-sheet"
 import { ProductSelectDialog } from "@/components/products/product-select-dialog"
-import { Building, User, Plus, X } from 'lucide-react'
+import { Building, User, Plus, X, FileText, ArrowLeft } from 'lucide-react'
 
 import type { ICustomer } from '@/types/Customer.interface'
 import type { IProduct } from '@/types/Product.interface'
@@ -99,9 +99,17 @@ export default function CreateInvoicePage() {
     return (
         <div className="container mx-auto px-4 py-6 space-y-6 max-w-5xl">
             <div className="flex justify-between items-center">
-                <h1 className="text-2xl font-bold">Nouvelle Facture</h1>
+            <div className="flex items-center gap-2">
+                    <Button variant="outline" size="icon" onClick={() => router.back()}>
+                        <ArrowLeft className="w-4 h-4" />
+                    </Button>
+                    <h1 className="text-2xl font-bold font-dmSans flex items-center">
+                        <FileText className="w-6 h-6 mr-2" />
+                        Nouvelle Facture
+                    </h1>
+                </div>
                 <Button onClick={handleCreateInvoice} disabled={!selectedCustomer || items.length === 0}>
-                    Créer la facture
+                        Créer la facture
                 </Button>
             </div>
 

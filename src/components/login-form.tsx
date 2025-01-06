@@ -56,14 +56,14 @@ export function LoginForm({
               </span>
             </a>
             <h1 className="text-xl font-bold">
-                Connexion 
+                Connexion à ZenBilling
             </h1>
-            <div className="text-center text-sm">
+            {/* <div className="text-center text-sm">
               Vous n&apos;avez pas de compte?{" "}
               <a href="#" className="underline underline-offset-4">
                 Créer un compte
               </a>
-            </div>
+            </div> */}
           </div>
           <div className="flex flex-col gap-6">
             <div className="grid gap-2">
