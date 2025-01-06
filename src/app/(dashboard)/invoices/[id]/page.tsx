@@ -1,9 +1,13 @@
 "use client"
 
 import { useParams, useRouter } from 'next/navigation'
-import { useInvoice, useDownloadInvoicePdf } from '@/hooks/useInvoice'
+import { useInvoice, useDownloadInvoicePdf, useUpdateInvoice } from '@/hooks/useInvoice'
 import { useFormat } from '@/hooks/useFormat'
+import { useState } from 'react'
+import type { EditInvoiceSchema } from '@/components/invoices/edit-invoice-dialog'
+import type { ApiError } from '@/services/api'
 
+import type { IUpdateInvoiceRequest } from '@/types/Invoice.request.interface'
 import { IInvoiceItem } from '@/types/InvoiceItem.interface'
 
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
@@ -26,20 +30,28 @@ import {
     Clock,
     ArrowLeft,
     Download,
-    // Send,
     Ban,
     CheckCircle2,
     AlertCircle,
-    Loader2
+    Loader2,
+    Pencil
 } from 'lucide-react'
+import { EditInvoiceDialog } from '@/components/invoices/edit-invoice-dialog'
 
 export default function InvoiceDetailsPage() {
     const params = useParams()
     const router = useRouter()
     const { formatCurrency, formatPercent } = useFormat()
+    const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
 
     const { data: invoiceData, isLoading } = useInvoice(Number(params.id))
     const downloadPdf = useDownloadInvoicePdf()
+    const updateInvoice = useUpdateInvoice(Number(params.id))
+
+    const handleUpdateInvoice = async (data: Partial<EditInvoiceSchema>) => {
+        await updateInvoice.mutateAsync(data as IUpdateInvoiceRequest)
+        setIsEditDialogOpen(false)
+    }
 
     const getStatusBadgeVariant = (status: string) => {
         switch (status) {
@@ -125,6 +137,24 @@ export default function InvoiceDetailsPage() {
                     </h1>
                 </div>
                 <div className="flex gap-2">
+                    <EditInvoiceDialog
+                        open={isEditDialogOpen}
+                        onOpenChange={setIsEditDialogOpen}
+                        onSubmit={handleUpdateInvoice}
+                        defaultValues={{
+                            invoice_date: invoiceData.invoice_date,
+                            due_date: invoiceData.due_date,
+                            conditions: invoiceData.conditions,
+                            late_payment_penalty: invoiceData.late_payment_penalty
+                        }}
+                        isLoading={updateInvoice.isPending}
+                        isError={updateInvoice.isError}
+                        error={(updateInvoice.error as ApiError)?.response?.data}
+                    />
+                    <Button variant="outline" onClick={() => setIsEditDialogOpen(true)}>
+                        <Pencil className="w-4 h-4 mr-2" />
+                        Modifier
+                    </Button>
                     <Button 
                         variant="outline" 
                         onClick={() => downloadPdf.mutate(Number(params.id))}
@@ -137,10 +167,6 @@ export default function InvoiceDetailsPage() {
                         )}
                         Télécharger
                     </Button>
-                    {/* <Button variant="outline">
-                        <Send className="w-4 h-4 mr-2" />
-                        Envoyer
-                    </Button> */}
                 </div>
             </div>
 

@@ -75,7 +75,7 @@ interface ApiErrorResponse {
   }>;
 }
 
-interface ApiError extends Error {
+export interface ApiError extends Error {
   response?: {
     data?: ApiErrorResponse;
     status: number;

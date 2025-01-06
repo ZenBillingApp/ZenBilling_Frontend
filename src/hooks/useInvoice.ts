@@ -36,6 +36,8 @@ export const useCreateInvoice = () => {
             api.post("/invoices", data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["invoices"] })
+            queryClient.invalidateQueries({ queryKey: ["products"] })
+            queryClient.invalidateQueries({ queryKey: ["customers"] })
         },
     })
 }
