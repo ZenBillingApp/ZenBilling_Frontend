@@ -16,14 +16,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert"
 import { useUpdateProduct } from "@/hooks/useProduct"
 import { IProduct } from "@/types/Product.interface"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { Textarea } from "@/components/ui/textarea"
-import { useEffect, useState } from "react"
+import { useState, useEffect } from "react"
 import { AxiosError } from "axios"
+
+// Constantes
+const VAT_RATES = [
+  { value: "0.00", label: "0%" },
+  { value: "5.50", label: "5.5%" },
+  { value: "10.00", label: "10%" },
+  { value: "20.00", label: "20%" },
+] as const;
 
 interface ApiError {
   field?: string;
@@ -50,11 +59,17 @@ interface EditProductDialogProps {
 }
 
 export function EditProductDialog({ product, isOpen, onClose }: EditProductDialogProps) {
-  const updateProduct = useUpdateProduct(product.product_id!)
+  const { mutate: updateProduct, isPending } = useUpdateProduct(product.product_id!)
   const [apiErrors, setApiErrors] = useState<ApiError[]>([])
-  const [vatValue, setVatValue] = useState<string>(product.vat_rate.toString())
+  const [vatValue, setVatValue] = useState<string>("")
 
-  const { register, handleSubmit, setValue, formState: { errors } } = useForm<ProductFormData>({
+  const { 
+    register, 
+    handleSubmit, 
+    setValue, 
+    reset,
+    formState: { errors } 
+  } = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
     defaultValues: {
       name: product.name,
@@ -64,20 +79,36 @@ export function EditProductDialog({ product, isOpen, onClose }: EditProductDialo
     },
   })
 
-  
+  // Initialiser la valeur de la TVA au montage et quand le produit change
   useEffect(() => {
-    const currentVat = product.vat_rate.toString()
-    setVatValue(currentVat)
-  }, [product.vat_rate])
+    const formattedVat = product.vat_rate.toString()
+    setVatValue(formattedVat)
+    setValue('vat_rate', Number(formattedVat))
+  }, [product, setValue])
+
+  // Réinitialiser le formulaire à la fermeture
+  const handleClose = () => {
+    reset()
+    setApiErrors([])
+    onClose()
+  }
   
   const onSubmit = (data: ProductFormData) => {
     setApiErrors([])
-    updateProduct.mutate(data, {
+    
+    // Formater les données avant l'envoi
+    const formattedData = {
+      ...data,
+      price_excluding_tax: Number(data.price_excluding_tax.toFixed(2)),
+      vat_rate: Number(Number(data.vat_rate).toFixed(2))
+    }
+
+    updateProduct(formattedData, {
       onSuccess: () => {
-        onClose()
+        handleClose()
       },
       onError: (error: Error) => {
-        const axiosError = error as AxiosError<ApiErrorResponse>;
+        const axiosError = error as AxiosError<ApiErrorResponse>
         if (axiosError.response?.data?.errors) {
           setApiErrors(axiosError.response.data.errors)
         }
@@ -86,47 +117,64 @@ export function EditProductDialog({ product, isOpen, onClose }: EditProductDialo
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent>
+    <Dialog open={isOpen} onOpenChange={handleClose}>
+      <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>Modifier le produit</DialogTitle>
         </DialogHeader>
+        
         {apiErrors.length > 0 && (
-          <div className="bg-red-50 p-2 rounded space-y-1">
-            {apiErrors.map((error, index) => (
-              <p key={index} className="text-red-500 text-sm">
-                {error.field ? `${error.message}` : error.message}
-              </p>
-            ))}
-          </div>
+          <Alert variant="destructive">
+            <AlertTitle>Erreurs</AlertTitle>
+            <AlertDescription>
+              {apiErrors.map((error, index) => (
+                <p key={index} className="mt-1">
+                  {error.field ? `${error.message}` : error.message}
+                </p>
+              ))}
+            </AlertDescription>
+          </Alert>
         )}
+
         <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 py-4">
           <div className="grid gap-2">
             <Label htmlFor="name">Nom</Label>
-            <Input id="name" {...register("name")} />
+            <Input 
+              id="name" 
+              {...register("name")}
+              placeholder="Nom du produit" 
+            />
             {errors.name && (
               <p className="text-red-500 text-xs">{errors.name.message}</p>
             )}
           </div>
+
           <div className="grid gap-2">
             <Label htmlFor="description">Description</Label>
-            <Textarea id="description" aria-describedby="description" {...register("description")} />
+            <Textarea 
+              id="description" 
+              {...register("description")}
+              placeholder="Description du produit" 
+            />
             {errors.description && (
-              <p className="text-red-500 italic text-xs">{errors.description.message}</p>
+              <p className="text-red-500 text-xs">{errors.description.message}</p>
             )}
           </div>
+
           <div className="grid gap-2">
             <Label htmlFor="price">Prix HT</Label>
             <Input
               id="price"
               type="number"
               step="0.01"
+              placeholder="0.00"
               {...register("price_excluding_tax", { valueAsNumber: true })}
             />
             {errors.price_excluding_tax && (
-              <p className="text-red-500 italic text-xs">{errors.price_excluding_tax.message}</p>
+              <p className="text-red-500 text-xs">{errors.price_excluding_tax.message}</p>
             )}
           </div>
+
           <div className="grid gap-2">
             <Label htmlFor="vat">TVA</Label>
             <Select
@@ -136,22 +184,28 @@ export function EditProductDialog({ product, isOpen, onClose }: EditProductDialo
                 setValue('vat_rate', Number(value))
               }}
             >
-              <SelectTrigger>
+              <SelectTrigger id="vat">
                 <SelectValue placeholder="Sélectionner un taux de TVA" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="0">0%</SelectItem>
-                <SelectItem value="5.5">5.5%</SelectItem>
-                <SelectItem value="10">10%</SelectItem>
-                <SelectItem value="20">20%</SelectItem>
+                {VAT_RATES.map(({ value, label }) => (
+                  <SelectItem key={value} value={value}>
+                    {label}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
             {errors.vat_rate && (
-              <p className="text-red-500 italic text-xs">{errors.vat_rate.message}</p>
+              <p className="text-red-500 text-xs">{errors.vat_rate.message}</p>
             )}
           </div>
-          <Button type="submit" disabled={updateProduct.isPending}>
-            {updateProduct.isPending ? "Modification..." : "Modifier"}
+
+          <Button 
+            type="submit" 
+            disabled={isPending}
+            className="w-full mt-2"
+          >
+            {isPending ? "Modification en cours..." : "Modifier"}
           </Button>
         </form>
       </DialogContent>

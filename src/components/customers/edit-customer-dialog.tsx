@@ -14,6 +14,7 @@ import { ICustomer } from '@/types/Customer.interface'
 import { IUpdateCustomerRequest } from '@/types/Customer.request.interface'
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert"
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -179,18 +180,22 @@ export default NiceModal.create(({ customer }: EditCustomerDialogProps) => {
         </DialogHeader>
 
         <ScrollArea className="max-h-[calc(90vh-8rem)]">
-          <div className="px-6 pb-6">
-            {apiErrors.length > 0 && (
-              <div className="bg-red-50 p-2 rounded space-y-1 mb-6">
-                {apiErrors.map((error, index) => (
-                  <p key={index} className="text-red-500 text-sm">
-                    {error.field ? `- ${error.message}` : error.message}
-                  </p>
-                ))}
-              </div>
-            )}
+          
+            
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 px-6 pb-6">
+            {apiErrors.length > 0 && (
+              <Alert variant="destructive">
+                <AlertTitle>Erreurs</AlertTitle>
+                <AlertDescription>
+                  {apiErrors.map((error, index) => (
+                    <p key={index}>
+                      {error.field ? `${error.message}` : error.message}
+                    </p>
+                  ))}
+              </AlertDescription>
+            </Alert>
+            )}
               {customer.type === 'individual' ? (
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
@@ -304,7 +309,7 @@ export default NiceModal.create(({ customer }: EditCustomerDialogProps) => {
                 </Button>
               </div>
             </form>
-          </div>
+          
         </ScrollArea>
       </DialogContent>
     </Dialog>

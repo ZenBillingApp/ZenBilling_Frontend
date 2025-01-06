@@ -11,6 +11,7 @@ import { ICreateCustomerRequest } from '@/types/Customer.request.interface'
 import { useCreateCustomer } from '@/hooks/useCustomer'
 import { useForm } from 'react-hook-form'
 import { Switch } from '@/components/ui/switch'
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert"
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { User, Building, Loader2 } from 'lucide-react'
@@ -148,6 +149,7 @@ export default NiceModal.create(() => {
 
   const handleClose = () => {
     reset()
+    setCustomerType('individual')
     setApiErrors([])
     modal.hide()
   }
@@ -160,8 +162,7 @@ export default NiceModal.create(() => {
         </DialogHeader>
 
         <ScrollArea className="max-h-[calc(90vh-8rem)]">
-          <div className="px-6 pb-6">
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 px-6 pb-6">
               <Tabs
                 defaultValue={customerType}
                 onValueChange={(value: string) => {
@@ -183,13 +184,16 @@ export default NiceModal.create(() => {
                 </TabsList>
 
                 {apiErrors.length > 0 && (
-                  <div className="bg-red-50 p-2 rounded space-y-1">
-                    {apiErrors.map((error, index) => (
-                      <p key={index} className="text-red-500 text-sm">
-                        {error.field ? `- ${error.message}` : error.message}
+                  <Alert variant="destructive">
+                    <AlertTitle>Erreurs</AlertTitle>
+                    <AlertDescription>
+                      {apiErrors.map((error, index) => (
+                        <p key={index} >
+                          {error.field ? `${error.message}` : error.message}
                       </p>
                     ))}
-                  </div>
+                  </AlertDescription>
+                </Alert>
                 )}
 
                 <TabsContent value="individual">
@@ -244,7 +248,7 @@ export default NiceModal.create(() => {
                       )}
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Switch id="tva_applicable" {...register('business.tva_applicable')} />
+                      <Switch id="tva_applicable" {...register('business.tva_applicable')} defaultChecked={false} onCheckedChange={(checked) => setValue('business.tva_applicable', checked)} />
                       <Label htmlFor="tva_applicable">TVA Applicable</Label>
                     </div>
                   </div>
@@ -308,7 +312,6 @@ export default NiceModal.create(() => {
                 </Button>
               </div>
             </form>
-          </div>
         </ScrollArea>
       </DialogContent>
     </Dialog>

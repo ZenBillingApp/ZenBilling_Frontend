@@ -18,6 +18,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert"
 import {
     Select,
     SelectContent,
@@ -90,16 +91,20 @@ export function CreateProductDialog() {
         <DialogHeader>
           <DialogTitle>Créer un nouveau produit</DialogTitle>
         </DialogHeader>
-        {apiErrors.length > 0 && (
-          <div className="bg-red-50 p-2 rounded space-y-1">
-            {apiErrors.map((error, index) => (
-              <p key={index} className="text-red-500 text-sm">
-                {error.field ? `${error.message}` : error.message}
-              </p>
-            ))}
-          </div>
-        )}
+        
         <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 py-4">
+        {apiErrors.length > 0 && (
+            <Alert variant="destructive">
+              <AlertTitle>Erreurs</AlertTitle>
+              <AlertDescription>
+                {apiErrors.map((error, index) => (
+                  <p key={index} >
+                    {error.field ? `${error.message}` : error.message}
+                </p>
+              ))}
+              </AlertDescription>
+            </Alert>
+        )}
           <div className="grid gap-2">
             <Label htmlFor="name">Nom</Label>
             <Input id="name" {...register("name")} />
