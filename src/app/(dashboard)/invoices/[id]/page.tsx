@@ -50,7 +50,7 @@ export default function InvoiceDetailsPage() {
     const [isAddPaymentDialogOpen, setIsAddPaymentDialogOpen] = useState(false)
 
     const { data: invoiceData, isLoading } = useInvoice(Number(params.id))
-    const downloadPdf = useDownloadInvoicePdf()
+    const downloadPdf = useDownloadInvoicePdf(invoiceData?.invoice_number)
     const updateInvoice = useUpdateInvoice(Number(params.id))
     const addPayment = useAddPayment(Number(params.id))
 

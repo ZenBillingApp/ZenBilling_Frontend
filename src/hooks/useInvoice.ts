@@ -68,7 +68,7 @@ export const useDeleteInvoice = () => {
     })
 }
 
-export const useDownloadInvoicePdf = () => {
+export const useDownloadInvoicePdf = (invoiceNumber: string) => {
     return useMutation({
         mutationFn: async (invoiceId: number) => {
             const response = await api.getBinary(`/invoices/${invoiceId}/pdf`)
@@ -80,7 +80,7 @@ export const useDownloadInvoicePdf = () => {
             // Créer un lien temporaire et cliquer dessus
             const link = document.createElement('a')
             link.href = url
-            link.setAttribute('download', `facture-${invoiceId}.pdf`)
+            link.setAttribute('download', `${invoiceNumber}.pdf`)
             document.body.appendChild(link)
             link.click()
             
