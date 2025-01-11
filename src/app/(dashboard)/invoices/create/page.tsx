@@ -18,7 +18,7 @@ import { ProductSelectDialog } from "@/components/products/product-select-dialog
 import { Building, User, Plus, X, FileText, ArrowLeft } from 'lucide-react'
 
 import type { ICustomer } from '@/types/Customer.interface'
-import type { IProduct } from '@/types/Product.interface'
+import type { IProduct, VatRate } from '@/types/Product.interface'
 import type { IInvoiceItem } from '@/types/Invoice.request.interface'
 import type { NewProductSchema } from '@/components/products/product-select-dialog'
 import { ProductUnit } from '@/types/Product.interface'
@@ -60,7 +60,7 @@ export default function CreateInvoicePage() {
             quantity: 1,
             unit: data.unit as ProductUnit,
             unit_price_excluding_tax: Number(data.price_excluding_tax),
-            vat_rate: Number(data.vat_rate),
+            vat_rate: Number(data.vat_rate) as VatRate,
             save_as_product: data.save_as_product
         }])
     }

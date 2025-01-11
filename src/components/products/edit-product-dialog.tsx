@@ -19,7 +19,7 @@ import {
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert"
 import { useUpdateProduct, useProductUnits, useProductVatRates } from "@/hooks/useProduct"
 import { useFormat } from "@/hooks/useFormat"
-import { IProduct, ProductUnit } from "@/types/Product.interface"
+import { IProduct, ProductUnit, VatRate } from "@/types/Product.interface"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -95,11 +95,10 @@ export function EditProductDialog({ product, isOpen, onClose, onSuccess }: EditP
   const onSubmit = (data: ProductFormData) => {
     setApiErrors([])
     
-    // Formater les données avant l'envoi
     const formattedData = {
       ...data,
       price_excluding_tax: Number(data.price_excluding_tax.toFixed(2)),
-      vat_rate: Number(Number(data.vat_rate).toFixed(2))
+      vat_rate: Number(Number(data.vat_rate).toFixed(2)) as VatRate
     }
 
     updateProduct(formattedData, {
