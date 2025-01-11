@@ -79,3 +79,10 @@ export const useProductUnits = () => {
         queryFn: () => api.get("/products/units"),
     })
 }
+
+export const useProductVatRates = () => {
+    return useQuery({
+        queryKey: ["product-vat-rates"],
+        queryFn: () => api.get("/products/vat-rates"),
+    })
+}

@@ -5,7 +5,8 @@ import * as z from "zod"
 import { useState } from "react"
 import { AxiosError } from "axios"
 
-import { useCreateProduct, useProductUnits } from "@/hooks/useProduct"
+import { useCreateProduct, useProductUnits, useProductVatRates } from "@/hooks/useProduct"
+import { useFormat } from "@/hooks/useFormat"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -28,7 +29,7 @@ import {
 } from "@/components/ui/select"
 
 import { Plus } from "lucide-react"
-import { ProductUnit } from "@/types/Product.interface"
+import { ProductUnit, VatRate } from "@/types/Product.interface"
 
 interface ApiError {
   field?: string;
@@ -43,7 +44,10 @@ const productSchema = z.object({
   name: z.string().min(1, "Le nom est requis").max(100, "Le nom ne peut pas dépasser 100 caractères"),
   description: z.string().max(1000, "La description ne peut pas dépasser 1000 caractères").optional(),
   price_excluding_tax: z.number().min(0, "Le prix doit être positif"),
-  vat_rate: z.number().min(0, "La TVA doit être positive").max(100, "La TVA ne peut pas dépasser 100%"),
+  vat_rate: z.custom<VatRate>((val) => {
+    const validRates: VatRate[] = [0.00, 2.10, 5.50, 10.00, 20.00];
+    return validRates.includes(Number(val) as VatRate);
+  }, "Taux de TVA invalide"),
   unit: z.custom<ProductUnit | undefined>()
 })
 
@@ -53,6 +57,8 @@ type ProductFormData = z.infer<typeof productSchema>
 export function CreateProductDialog() {
   const createProduct = useCreateProduct()
   const { data: units } = useProductUnits()
+  const { data: vatRates } = useProductVatRates()
+  const { formatPercent } = useFormat()
   const [apiErrors, setApiErrors] = useState<ApiError[]>([])
 
   const { register, handleSubmit,setValue, reset, formState: { errors } } = useForm<ProductFormData>({
@@ -61,7 +67,7 @@ export function CreateProductDialog() {
       name: "",
       description: "",
       price_excluding_tax: 0,
-      vat_rate: 5.5,
+      vat_rate: 20.00,
       unit: "unité"
     },
   })
@@ -138,17 +144,18 @@ export function CreateProductDialog() {
           <div className="grid gap-2">
             <Label htmlFor="vat">TVA</Label>
             <Select
-              onValueChange={(value) => setValue('vat_rate', Number(value))} 
-              defaultValue="5.5"
+              onValueChange={(value) => setValue('vat_rate', Number(value) as VatRate)} 
+              defaultValue="20.00"
             >
               <SelectTrigger>
                 <SelectValue placeholder="Sélectionner un taux de TVA" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="0">0%</SelectItem>
-                <SelectItem value="5.5">5.5%</SelectItem>
-                <SelectItem value="10">10%</SelectItem>
-                <SelectItem value="20">20%</SelectItem>
+                {vatRates?.data?.vatRates?.map((rate: VatRate) => (
+                  <SelectItem key={rate} value={rate.toString()}>
+                    {formatPercent(rate)}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
             {errors.vat_rate && (

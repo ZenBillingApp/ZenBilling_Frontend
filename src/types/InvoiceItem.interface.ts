@@ -1,4 +1,4 @@
-import { IProduct, ProductUnit } from "./Product.interface";
+import { IProduct, ProductUnit, VatRate } from "./Product.interface";
 
 export interface IInvoiceItem {
   item_id?: number;
@@ -9,6 +9,6 @@ export interface IInvoiceItem {
   quantity: number;
   unit: ProductUnit;
   unit_price_excluding_tax: number;
-  vat_rate: number;
+  vat_rate: VatRate;
   product?: IProduct;
 } 

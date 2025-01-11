@@ -1,10 +1,10 @@
-import { ProductUnit } from './Product.interface';
+import { ProductUnit, VatRate } from './Product.interface';
 
 export interface ICreateProductRequest {
   name: string;
   description?: string;
   price_excluding_tax: number;
-  vat_rate: number;
+  vat_rate: VatRate;
   unit?: ProductUnit;
 }
 

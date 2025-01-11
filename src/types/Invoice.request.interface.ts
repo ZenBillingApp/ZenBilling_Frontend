@@ -1,3 +1,5 @@
+import { VatRate } from './Product.interface';
+
 export type InvoiceStatus = 'pending' | 'paid' | 'cancelled';
 export type PaymentMethod = 'cash' | 'credit_card' | 'bank_transfer';
 
@@ -21,7 +23,7 @@ export interface IInvoiceItem {
   description?: string;
   quantity: number;
   unit_price_excluding_tax: number;
-  vat_rate: number;
+  vat_rate: VatRate;
   save_as_product?: boolean;
 }
 

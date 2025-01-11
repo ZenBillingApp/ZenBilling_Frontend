@@ -17,7 +17,8 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert"
-import { useUpdateProduct, useProductUnits } from "@/hooks/useProduct"
+import { useUpdateProduct, useProductUnits, useProductVatRates } from "@/hooks/useProduct"
+import { useFormat } from "@/hooks/useFormat"
 import { IProduct, ProductUnit } from "@/types/Product.interface"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -25,14 +26,6 @@ import * as z from "zod"
 import { Textarea } from "@/components/ui/textarea"
 import { useState, useEffect } from "react"
 import { AxiosError } from "axios"
-
-// Constantes
-const VAT_RATES = [
-  { value: "0.00", label: "0%" },
-  { value: "5.50", label: "5.5%" },
-  { value: "10.00", label: "10%" },
-  { value: "20.00", label: "20%" },
-] as const;
 
 interface ApiError {
   field?: string;
@@ -61,8 +54,10 @@ interface EditProductDialogProps {
 }
 
 export function EditProductDialog({ product, isOpen, onClose, onSuccess }: EditProductDialogProps) {
+  const { formatPercent } = useFormat()
   const { mutate: updateProduct, isPending } = useUpdateProduct(product.product_id!)
   const { data: units } = useProductUnits()
+  const { data: vatRates } = useProductVatRates()
   const [apiErrors, setApiErrors] = useState<ApiError[]>([])
   const [vatValue, setVatValue] = useState<string>("")
 
@@ -191,16 +186,16 @@ export function EditProductDialog({ product, isOpen, onClose, onSuccess }: EditP
               value={vatValue}
               onValueChange={(value) => {
                 setVatValue(value)
-                setValue('vat_rate', Number(value))
+                setValue('vat_rate', Number(Number(value).toFixed(2)))
               }}
             >
               <SelectTrigger id="vat" className="text-sm sm:text-base">
                 <SelectValue placeholder="Sélectionner un taux de TVA" />
               </SelectTrigger>
               <SelectContent>
-                {VAT_RATES.map(({ value, label }) => (
-                  <SelectItem key={value} value={value} className="text-sm sm:text-base">
-                    {label}
+                {vatRates?.data?.vatRates?.map((rate: number) => (
+                  <SelectItem key={rate.toFixed(2)} value={rate.toFixed(2)} className="text-sm sm:text-base">
+                    {formatPercent(rate)}
                   </SelectItem>
                 ))}
               </SelectContent>

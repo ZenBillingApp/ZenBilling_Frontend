@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from 'react'
-import { useProducts } from '@/hooks/useProduct'
+import { useProducts, useProductUnits, useProductVatRates } from '@/hooks/useProduct'
 import { useDebounce } from '@/hooks/useDebounce'
 import { useFormat } from '@/hooks/useFormat'
 import { useForm, ControllerRenderProps } from "react-hook-form"
@@ -40,15 +40,6 @@ import {
 import { Search } from 'lucide-react'
 
 import type { IProduct } from '@/types/Product.interface'
-import { useProductUnits } from '@/hooks/useProduct'
-
-const TVA_RATES = [
-    { value: "20", label: "20% - Taux normal" },
-    { value: "10", label: "10% - Taux réduit" },
-    { value: "5.5", label: "5.5% - Taux réduit" },
-    { value: "2.1", label: "2.1% - Taux particulier" },
-    { value: "0", label: "0% - Exonéré" },
-] as const
 
 const newProductSchema = z.object({
     name: z.string().min(1, "Le nom est requis"),
@@ -77,6 +68,7 @@ export function ProductSelectDialog({
     const [search, setSearch] = useState('')
     const { formatCurrency, formatPercent } = useFormat()
     const { data: units } = useProductUnits()
+    const { data: vatRates } = useProductVatRates()
     
     const debouncedSearch = useDebounce(search, 300)
     
@@ -87,7 +79,7 @@ export function ProductSelectDialog({
             description: "",
             price_excluding_tax: "",
             vat_rate: "",
-            unit: undefined,
+            unit: "unité",
             save_as_product: false
         }
     })
@@ -214,7 +206,7 @@ export function ProductSelectDialog({
                                             <FormItem>
                                                 <FormLabel>TVA</FormLabel>
                                                 <Select 
-                                                    onValueChange={field.onChange} 
+                                                    onValueChange={(value) => field.onChange(Number(value).toFixed(2))} 
                                                     defaultValue={field.value}
                                                 >
                                                     <FormControl>
@@ -223,9 +215,9 @@ export function ProductSelectDialog({
                                                         </SelectTrigger>
                                                     </FormControl>
                                                     <SelectContent>
-                                                        {TVA_RATES.map((rate) => (
-                                                            <SelectItem key={rate.value} value={rate.value}>
-                                                                {rate.label}
+                                                        {vatRates?.data?.vatRates?.map((rate: number) => (
+                                                            <SelectItem key={rate} value={rate.toFixed(2)}>
+                                                                {formatPercent(rate)}
                                                             </SelectItem>
                                                         ))}
                                                     </SelectContent>
