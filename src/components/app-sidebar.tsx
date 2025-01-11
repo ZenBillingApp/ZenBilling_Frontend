@@ -18,7 +18,7 @@ import {
   import { Button } from "@/components/ui/button"
 
 
-  import { User2Icon,FileStack,Boxes,LogOut } from "lucide-react"
+  import { User2Icon,FileStack,Boxes,LogOut, FileText } from "lucide-react"
 
   import { cn } from "@/lib/utils"
 
@@ -46,6 +46,14 @@ import {
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                     <SidebarMenuItem>
+                        <SidebarMenuButton asChild variant={pathname === "/quotes" ? "outline" : "default"}>
+                            <Link href="/quotes">
+                                <FileText className="w-4 h-4 mr-2" />
+                                Devis
+                            </Link>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                    <SidebarMenuItem>
                         <SidebarMenuButton asChild variant={pathname === "/products" ? "outline" : "default"}>
                             <Link href="/products" >
                                 <Boxes className="w-4 h-4 mr-2" />
@@ -61,6 +69,7 @@ import {
                             </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
+                    
                 </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
