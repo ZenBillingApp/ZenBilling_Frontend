@@ -49,7 +49,7 @@ export default function CreateQuotePage() {
             quantity: 1,
             unit: product.unit,
             unit_price_excluding_tax: product.price_excluding_tax,
-            vat_rate: parseFloat(product.vat_rate.toFixed(2)) as VatRate
+            vat_rate: product.vat_rate
         }])
     }
 
