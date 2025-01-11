@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useQuotes } from '@/hooks/useQuote'
 import { useFormat } from '@/hooks/useFormat'
+import { useDebounce } from '@/hooks/useDebounce'
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -24,8 +25,6 @@ import {
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Loader2, Plus, Search, FileText } from 'lucide-react'
-
-import { useDebounce } from '@/hooks/useDebounce'
 
 import type { IQuote, QuoteStatus } from '@/types/Quote.interface'
 
@@ -82,7 +81,7 @@ export default function QuotesPage() {
                     <FileText className="w-6 h-6 mr-2" />
                     Devis
                 </h1>
-                <Button onClick={() => router.push('/quotes/create')}>
+                <Button onClick={() => router.push('/quotes/create')} className="w-full sm:w-auto">
                     <Plus className="w-4 h-4 mr-2" />
                     Nouveau devis
                 </Button>
@@ -106,7 +105,6 @@ export default function QuotesPage() {
                         <SelectValue placeholder="Tous les statuts" />
                     </SelectTrigger>
                     <SelectContent>
-
                         <SelectItem value="draft">Brouillon</SelectItem>
                         <SelectItem value="sent">Envoyé</SelectItem>
                         <SelectItem value="accepted">Accepté</SelectItem>
@@ -118,13 +116,13 @@ export default function QuotesPage() {
 
             {isLoading ? (
                 <div className="flex justify-center items-center py-8">
-                    <Loader2 className="h-8 w-8 animate-spin" />
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
                 </div>
             ) : quotesData?.data.quotes.length === 0 ? (
-                <div className="text-center py-8">
-                    <FileText className="mx-auto h-12 w-12 text-gray-400" />
-                    <h3 className="mt-2 text-sm font-semibold text-gray-900">Aucun devis</h3>
-                    <p className="mt-1 text-sm text-gray-500">
+                <div className="text-center py-12">
+                    <FileText className="mx-auto h-12 w-12 text-muted-foreground" />
+                    <h3 className="mt-4 text-lg font-medium">Aucun devis</h3>
+                    <p className="mt-2 text-sm text-muted-foreground">
                         Commencez par créer un nouveau devis.
                     </p>
                     <div className="mt-6">
@@ -135,49 +133,58 @@ export default function QuotesPage() {
                     </div>
                 </div>
             ) : (
-                <div className="overflow-x-auto">
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Numéro</TableHead>
-                                <TableHead>Client</TableHead>
-                                <TableHead>Date</TableHead>
-                                <TableHead>Validité</TableHead>
-                                <TableHead>Montant TTC</TableHead>
-                                <TableHead>Statut</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {quotesData?.data.quotes.map((quote: IQuote) => (
-                                <TableRow
-                                    key={quote.quote_id}
-                                    className="cursor-pointer hover:bg-muted/50"
-                                    onClick={() => router.push(`/quotes/${quote.quote_id}`)}
-                                >
-                                    <TableCell>{quote.quote_number}</TableCell>
-                                    <TableCell>
-                                        {quote.Customer?.type === 'company'
-                                            ? quote.Customer.BusinessCustomer?.name
-                                            : `${quote.Customer?.IndividualCustomer?.first_name} ${quote.Customer?.IndividualCustomer?.last_name}`}
-                                    </TableCell>
-                                    <TableCell>
-                                        {new Date(quote.quote_date).toLocaleDateString()}
-                                    </TableCell>
-                                    <TableCell>
-                                        {new Date(quote.validity_date).toLocaleDateString()}
-                                    </TableCell>
-                                    <TableCell>
-                                        {formatCurrency(quote.amount_including_tax)}
-                                    </TableCell>
-                                    <TableCell>
-                                        <Badge variant={getStatusBadgeVariant(quote.status)}>
-                                            {getStatusLabel(quote.status)}
-                                        </Badge>
-                                    </TableCell>
+                <div className="bg-card">
+                    <div className="overflow-x-auto">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead className="font-medium">Numéro</TableHead>
+                                    <TableHead className="font-medium">Client</TableHead>
+                                    <TableHead className="font-medium hidden md:table-cell">Date</TableHead>
+                                    <TableHead className="font-medium hidden lg:table-cell">Validité</TableHead>
+                                    <TableHead className="font-medium text-right">Montant TTC</TableHead>
+                                    <TableHead className="font-medium">Statut</TableHead>
                                 </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
+                            </TableHeader>
+                            <TableBody>
+                                {quotesData?.data.quotes.map((quote: IQuote) => (
+                                    <TableRow
+                                        key={quote.quote_id}
+                                        className="cursor-pointer hover:bg-muted/50"
+                                        onClick={() => router.push(`/quotes/${quote.quote_id}`)}
+                                    >
+                                        <TableCell className="font-medium">{quote.quote_number}</TableCell>
+                                        <TableCell>
+                                            <div className="flex flex-col">
+                                                <span className="font-medium">
+                                                    {quote.Customer?.type === 'company'
+                                                        ? quote.Customer.BusinessCustomer?.name
+                                                        : `${quote.Customer?.IndividualCustomer?.first_name} ${quote.Customer?.IndividualCustomer?.last_name}`}
+                                                </span>
+                                                <span className="text-sm text-muted-foreground hidden sm:block">
+                                                    {quote.Customer?.email}
+                                                </span>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="hidden md:table-cell">
+                                            {new Date(quote.quote_date).toLocaleDateString()}
+                                        </TableCell>
+                                        <TableCell className="hidden lg:table-cell">
+                                            {new Date(quote.validity_date).toLocaleDateString()}
+                                        </TableCell>
+                                        <TableCell className="text-right font-medium tabular-nums">
+                                            {formatCurrency(quote.amount_including_tax)}
+                                        </TableCell>
+                                        <TableCell>
+                                            <Badge variant={getStatusBadgeVariant(quote.status)} className="w-fit whitespace-nowrap">
+                                                {getStatusLabel(quote.status)}
+                                            </Badge>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </div>
                 </div>
             )}
         </div>
