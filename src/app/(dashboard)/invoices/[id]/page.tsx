@@ -155,7 +155,7 @@ export default function InvoiceDetailsPage() {
                     <Button variant="outline" size="icon" onClick={() => router.back()}>
                         <ArrowLeft className="w-4 h-4" />
                     </Button>
-                    <h1 className="text-xl sm:text-2xl font-bold font-dmSans flex items-center truncate">
+                    <h1 className="text-xl sm:text-2xl font-bold font-dmSans flex items-center">
                         <FileText className="w-5 sm:w-6 h-5 sm:h-6 mr-2 flex-shrink-0" />
                         Facture {invoiceData?.invoice_number}
                     </h1>
