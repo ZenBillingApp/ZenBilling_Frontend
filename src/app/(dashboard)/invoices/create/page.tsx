@@ -21,6 +21,11 @@ import type { ICustomer } from '@/types/Customer.interface'
 import type { IProduct } from '@/types/Product.interface'
 import type { IInvoiceItem } from '@/types/Invoice.request.interface'
 import type { NewProductSchema } from '@/components/products/product-select-dialog'
+import { ProductUnit } from '@/types/Product.interface'
+
+interface InvoiceItemWithUnit extends IInvoiceItem {
+    unit: ProductUnit;
+}
 
 export default function CreateInvoicePage() {
     const router = useRouter()
@@ -28,7 +33,7 @@ export default function CreateInvoicePage() {
     const [isCustomerSheetOpen, setIsCustomerSheetOpen] = useState(false)
     const [isProductDialogOpen, setIsProductDialogOpen] = useState(false)
     const [selectedCustomer, setSelectedCustomer] = useState<ICustomer | null>(null)
-    const [items, setItems] = useState<IInvoiceItem[]>([])
+    const [items, setItems] = useState<InvoiceItemWithUnit[]>([])
     const [conditions, setConditions] = useState('')
     const [latePenalty, setLatePenalty] = useState('')
     const [invoiceDate, setInvoiceDate] = useState<Date>(new Date())
@@ -42,6 +47,7 @@ export default function CreateInvoicePage() {
             name: product.name,
             description: product.description || undefined,
             quantity: 1,
+            unit: product.unit,
             unit_price_excluding_tax: product.price_excluding_tax,
             vat_rate: product.vat_rate
         }])
@@ -52,6 +58,7 @@ export default function CreateInvoicePage() {
             name: data.name,
             description: data.description || undefined,
             quantity: 1,
+            unit: data.unit as ProductUnit,
             unit_price_excluding_tax: Number(data.price_excluding_tax),
             vat_rate: Number(data.vat_rate),
             save_as_product: data.save_as_product
@@ -202,6 +209,7 @@ export default function CreateInvoicePage() {
                                             <TableHead>Prix unitaire HT</TableHead>
                                             <TableHead>TVA</TableHead>
                                             <TableHead>Quantité</TableHead>
+                                            <TableHead>Unité</TableHead>
                                             <TableHead>Total HT</TableHead>
                                             <TableHead>Total TTC</TableHead>
                                             <TableHead></TableHead>
@@ -232,6 +240,11 @@ export default function CreateInvoicePage() {
                                                             min={1}
                                                             className="w-20"
                                                         />
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <Badge variant="outline" className="w-fit">
+                                                            {item.unit}
+                                                        </Badge>
                                                     </TableCell>
                                                     <TableCell>{formatCurrency(totalHT)}</TableCell>
                                                     <TableCell>{formatCurrency(totalTTC)}</TableCell>

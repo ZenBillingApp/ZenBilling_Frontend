@@ -5,7 +5,7 @@ import * as z from "zod"
 import { useState } from "react"
 import { AxiosError } from "axios"
 
-import { useCreateProduct } from "@/hooks/useProduct"
+import { useCreateProduct, useProductUnits } from "@/hooks/useProduct"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/select"
 
 import { Plus } from "lucide-react"
+import { ProductUnit } from "@/types/Product.interface"
 
 interface ApiError {
   field?: string;
@@ -42,7 +43,8 @@ const productSchema = z.object({
   name: z.string().min(1, "Le nom est requis").max(100, "Le nom ne peut pas dépasser 100 caractères"),
   description: z.string().max(1000, "La description ne peut pas dépasser 1000 caractères").optional(),
   price_excluding_tax: z.number().min(0, "Le prix doit être positif"),
-  vat_rate: z.number().min(0, "La TVA doit être positive").max(100, "La TVA ne peut pas dépasser 100%")
+  vat_rate: z.number().min(0, "La TVA doit être positive").max(100, "La TVA ne peut pas dépasser 100%"),
+  unit: z.custom<ProductUnit | undefined>()
 })
 
 type ProductFormData = z.infer<typeof productSchema>
@@ -50,6 +52,7 @@ type ProductFormData = z.infer<typeof productSchema>
 
 export function CreateProductDialog() {
   const createProduct = useCreateProduct()
+  const { data: units } = useProductUnits()
   const [apiErrors, setApiErrors] = useState<ApiError[]>([])
 
   const { register, handleSubmit,setValue, reset, formState: { errors } } = useForm<ProductFormData>({
@@ -59,6 +62,7 @@ export function CreateProductDialog() {
       description: "",
       price_excluding_tax: 0,
       vat_rate: 5.5,
+      unit: "unité"
     },
   })
 
@@ -149,6 +153,27 @@ export function CreateProductDialog() {
             </Select>
             {errors.vat_rate && (
               <p className="text-red-500 italic text-xs">{errors.vat_rate.message}</p>
+            )}
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="unit">Unité</Label>
+            <Select
+              onValueChange={(value) => setValue('unit', value as ProductUnit)}
+              defaultValue="unité"
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Sélectionner une unité" />
+              </SelectTrigger>
+              <SelectContent>
+                {units?.data?.units?.map((unit: string) => (
+                  <SelectItem key={unit} value={unit}>
+                    {unit}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {errors.unit && (
+              <p className="text-red-500 italic text-xs">{errors.unit.message}</p>
             )}
           </div>
           <Button type="submit" disabled={createProduct.isPending}>

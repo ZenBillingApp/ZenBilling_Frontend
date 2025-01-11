@@ -1,14 +1,14 @@
+import { ProductUnit } from './Product.interface';
+
 export interface ICreateProductRequest {
   name: string;
   description?: string;
   price_excluding_tax: number;
   vat_rate: number;
+  unit?: ProductUnit;
 }
 
-export interface IUpdateProductRequest extends Partial<ICreateProductRequest> {
-  // Add at least one member to avoid the interface being equivalent to its supertype
-  id?: number;
-}
+export type IUpdateProductRequest = Partial<ICreateProductRequest>
 
 export interface IProductQueryParams {
   page?: number;

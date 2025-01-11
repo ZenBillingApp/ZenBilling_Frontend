@@ -17,8 +17,8 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert"
-import { useUpdateProduct } from "@/hooks/useProduct"
-import { IProduct } from "@/types/Product.interface"
+import { useUpdateProduct, useProductUnits } from "@/hooks/useProduct"
+import { IProduct, ProductUnit } from "@/types/Product.interface"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -47,7 +47,8 @@ const productSchema = z.object({
   name: z.string().min(1, "Le nom est requis").max(100, "Le nom ne peut pas dépasser 100 caractères"),
   description: z.string().max(1000, "La description ne peut pas dépasser 1000 caractères").optional(),
   price_excluding_tax: z.number().min(0, "Le prix doit être positif").max(1000000, "Le prix ne peut pas dépasser 1 000 000 €"),
-  vat_rate: z.number().min(0, "La TVA doit être positive").max(100, "La TVA ne peut pas dépasser 100%")
+  vat_rate: z.number().min(0, "La TVA doit être positive").max(100, "La TVA ne peut pas dépasser 100%"),
+  unit: z.custom<ProductUnit | undefined>()
 })
 
 type ProductFormData = z.infer<typeof productSchema>
@@ -61,6 +62,7 @@ interface EditProductDialogProps {
 
 export function EditProductDialog({ product, isOpen, onClose, onSuccess }: EditProductDialogProps) {
   const { mutate: updateProduct, isPending } = useUpdateProduct(product.product_id!)
+  const { data: units } = useProductUnits()
   const [apiErrors, setApiErrors] = useState<ApiError[]>([])
   const [vatValue, setVatValue] = useState<string>("")
 
@@ -77,6 +79,7 @@ export function EditProductDialog({ product, isOpen, onClose, onSuccess }: EditP
       description: product.description || "",
       price_excluding_tax: product.price_excluding_tax,
       vat_rate: product.vat_rate,
+      unit: product.unit
     },
   })
 
@@ -204,6 +207,29 @@ export function EditProductDialog({ product, isOpen, onClose, onSuccess }: EditP
             </Select>
             {errors.vat_rate && (
               <p className="text-red-500 text-xs sm:text-sm">{errors.vat_rate.message}</p>
+            )}
+          </div>
+
+          <div className="grid gap-2">
+            <Label htmlFor="unit" className="text-sm sm:text-base">Unité</Label>
+            <Select
+              defaultValue={product.unit}
+              onValueChange={(value) => setValue('unit', value as ProductUnit)}
+            >
+              <SelectTrigger id="unit" className="text-sm sm:text-base">
+                <SelectValue placeholder="Sélectionner une unité" />
+              </SelectTrigger>
+              <SelectContent>
+               
+                {units?.data?.units?.map((unit: ProductUnit) => (
+                  <SelectItem key={unit} value={unit}>
+                    {unit}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {errors.unit && (
+              <p className="text-red-500 text-xs sm:text-sm">{errors.unit.message}</p>
             )}
           </div>
 

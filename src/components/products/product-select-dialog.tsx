@@ -40,6 +40,7 @@ import {
 import { Search } from 'lucide-react'
 
 import type { IProduct } from '@/types/Product.interface'
+import { useProductUnits } from '@/hooks/useProduct'
 
 const TVA_RATES = [
     { value: "20", label: "20% - Taux normal" },
@@ -54,6 +55,7 @@ const newProductSchema = z.object({
     description: z.string().optional(),
     price_excluding_tax: z.string().min(1, "Le prix est requis").regex(/^\d*\.?\d*$/, "Le prix doit être un nombre valide"),
     vat_rate: z.string().min(1, "La TVA est requise"),
+    unit: z.string().min(1, "L'unité est requise"),
     save_as_product: z.boolean().default(false)
 })
 
@@ -74,6 +76,7 @@ export function ProductSelectDialog({
 }: ProductSelectDialogProps) {
     const [search, setSearch] = useState('')
     const { formatCurrency, formatPercent } = useFormat()
+    const { data: units } = useProductUnits()
     
     const debouncedSearch = useDebounce(search, 300)
     
@@ -84,6 +87,7 @@ export function ProductSelectDialog({
             description: "",
             price_excluding_tax: "",
             vat_rate: "",
+            unit: undefined,
             save_as_product: false
         }
     })
@@ -193,7 +197,7 @@ export function ProductSelectDialog({
                                     <FormField
                                         control={form.control}
                                         name="price_excluding_tax"
-                                        render={({ field }: { field: ControllerRenderProps<NewProductSchema, "price_excluding_tax"> }) => (
+                                        render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel>Prix HT</FormLabel>
                                                 <FormControl>
@@ -206,7 +210,7 @@ export function ProductSelectDialog({
                                     <FormField
                                         control={form.control}
                                         name="vat_rate"
-                                        render={({ field }: { field: ControllerRenderProps<NewProductSchema, "vat_rate"> }) => (
+                                        render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel>TVA</FormLabel>
                                                 <Select 
@@ -233,8 +237,35 @@ export function ProductSelectDialog({
                                 </div>
                                 <FormField
                                     control={form.control}
+                                    name="unit"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Unité</FormLabel>
+                                            <Select 
+                                                onValueChange={field.onChange} 
+                                                defaultValue={field.value}
+                                            >
+                                                <FormControl>
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Sélectionner une unité" />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent>
+                                                    {units?.data?.units?.map((unit: string) => (
+                                                        <SelectItem key={unit} value={unit}>
+                                                            {unit}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
                                     name="save_as_product"
-                                    render={({ field }: { field: ControllerRenderProps<NewProductSchema, "save_as_product"> }) => (
+                                    render={({ field }) => (
                                         <FormItem className="flex items-center space-x-2">
                                             <FormControl>
                                                 <Switch

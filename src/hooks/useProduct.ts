@@ -72,3 +72,10 @@ export const useProductDetails = (productId: number) => {
         enabled: !!productId,
     })
 }
+
+export const useProductUnits = () => {
+    return useQuery({
+        queryKey: ["product-units"],
+        queryFn: () => api.get("/products/units"),
+    })
+}

@@ -404,6 +404,7 @@ export default function InvoiceDetailsPage() {
                                         <TableHead className="hidden sm:table-cell">Prix unitaire HT</TableHead>
                                         <TableHead className="hidden sm:table-cell">TVA</TableHead>
                                         <TableHead>Quantité</TableHead>
+                                        <TableHead className="hidden sm:table-cell">Unité</TableHead>
                                         <TableHead className="hidden lg:table-cell">Total HT</TableHead>
                                         <TableHead>Total TTC</TableHead>
                                     </TableRow>
@@ -426,6 +427,11 @@ export default function InvoiceDetailsPage() {
                                                 <TableCell className="hidden sm:table-cell">{formatCurrency(item.unit_price_excluding_tax)}</TableCell>
                                                 <TableCell className="hidden sm:table-cell">{formatPercent(item.vat_rate)}</TableCell>
                                                 <TableCell>{item.quantity}</TableCell>
+                                                <TableCell className="hidden sm:table-cell">
+                                                    <Badge variant="outline" className="w-fit">
+                                                        {item.unit}
+                                                    </Badge>
+                                                </TableCell>
                                                 <TableCell className="hidden lg:table-cell">{formatCurrency(totalHT)}</TableCell>
                                                 <TableCell>{formatCurrency(totalTTC)}</TableCell>
                                             </TableRow>

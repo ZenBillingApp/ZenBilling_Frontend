@@ -79,6 +79,15 @@ export function ProductDetailsDialog({
                     </div>
                   </div>
 
+                  {displayProduct.unit && (
+                    <div className="flex flex-col">
+                      <span className="text-sm text-muted-foreground">Unité</span>
+                      <Badge variant="outline" className="w-fit mt-1">
+                        {displayProduct.unit}
+                      </Badge>
+                    </div>
+                  )}
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div className="flex flex-col">
                       <span className="text-sm text-muted-foreground">Créé le</span>
