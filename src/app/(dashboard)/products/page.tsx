@@ -13,11 +13,12 @@ import {
     PaginationLink,
     PaginationNext,
     PaginationPrevious,
-  } from "@/components/ui/pagination"
+} from "@/components/ui/pagination"
 import { Loader2 } from 'lucide-react'
 import { IProduct } from '@/types/Product.interface'
 import { EditProductDialog } from '@/components/products/edit-product-dialog'
 import { CreateProductDialog } from '@/components/products/create-product-dialog'
+import { ProductDetailsDialog } from '@/components/products/product-details-dialog'
 import { Input } from '@/components/ui/input'
 import debounce from 'lodash/debounce'
 
@@ -27,6 +28,7 @@ export default function ProductsPage() {
   const { data, isLoading } = useProducts({ page, limit: 25, search })
   const { formatCurrency, formatPercent } = useFormat()
   const [selectedProduct, setSelectedProduct] = useState<IProduct | null>(null)
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
 
   const totalPages = data?.data.pagination.totalPages
 
@@ -34,6 +36,16 @@ export default function ProductsPage() {
     setSearch(value)
     setPage(1)
   }, 300)
+
+  const handleEditProduct = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setIsEditDialogOpen(true)
+  }
+
+  const handleEditSuccess = () => {
+
+    setIsEditDialogOpen(false)
+  }
 
   return (
     <div className="container mx-auto px-4 py-6 space-y-6 max-w-7xl">
@@ -174,11 +186,23 @@ export default function ProductsPage() {
         </div>
       )}
 
+      {/* Product Details Dialog */}
+      <ProductDetailsDialog
+        product={selectedProduct}
+        isOpen={!!selectedProduct}
+        onOpenChange={(open) => !open && setSelectedProduct(null)}
+        onEdit={handleEditProduct}
+      />
+
+      {/* Edit Product Dialog */}
       {selectedProduct && (
         <EditProductDialog
           product={selectedProduct}
-          isOpen={!!selectedProduct}
-          onClose={() => setSelectedProduct(null)}
+          isOpen={isEditDialogOpen}
+          onClose={() => {
+            setIsEditDialogOpen(false)
+          }}
+          onSuccess={handleEditSuccess}
         />
       )}
     </div>

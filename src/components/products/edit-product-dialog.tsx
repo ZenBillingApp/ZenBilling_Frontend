@@ -46,7 +46,7 @@ interface ApiErrorResponse {
 const productSchema = z.object({
   name: z.string().min(1, "Le nom est requis").max(100, "Le nom ne peut pas dépasser 100 caractères"),
   description: z.string().max(1000, "La description ne peut pas dépasser 1000 caractères").optional(),
-  price_excluding_tax: z.number().min(0, "Le prix doit être positif"),
+  price_excluding_tax: z.number().min(0, "Le prix doit être positif").max(1000000, "Le prix ne peut pas dépasser 1 000 000 €"),
   vat_rate: z.number().min(0, "La TVA doit être positive").max(100, "La TVA ne peut pas dépasser 100%")
 })
 
@@ -56,9 +56,10 @@ interface EditProductDialogProps {
   product: IProduct
   isOpen: boolean
   onClose: () => void
+  onSuccess?: (updatedProduct: IProduct) => void
 }
 
-export function EditProductDialog({ product, isOpen, onClose }: EditProductDialogProps) {
+export function EditProductDialog({ product, isOpen, onClose, onSuccess }: EditProductDialogProps) {
   const { mutate: updateProduct, isPending } = useUpdateProduct(product.product_id!)
   const [apiErrors, setApiErrors] = useState<ApiError[]>([])
   const [vatValue, setVatValue] = useState<string>("")
@@ -104,7 +105,10 @@ export function EditProductDialog({ product, isOpen, onClose }: EditProductDialo
     }
 
     updateProduct(formattedData, {
-      onSuccess: () => {
+      onSuccess: (response) => {
+        if (onSuccess) {
+          onSuccess(response.data.product)
+        }
         handleClose()
       },
       onError: (error: Error) => {
@@ -118,9 +122,9 @@ export function EditProductDialog({ product, isOpen, onClose }: EditProductDialo
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="w-[90%] max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Modifier le produit</DialogTitle>
+          <DialogTitle className="text-lg sm:text-xl">Modifier le produit</DialogTitle>
         </DialogHeader>
         
         {apiErrors.length > 0 && (
@@ -136,47 +140,50 @@ export function EditProductDialog({ product, isOpen, onClose }: EditProductDialo
           </Alert>
         )}
 
-        <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 py-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="grid gap-3 sm:gap-4 py-2 sm:py-4">
           <div className="grid gap-2">
-            <Label htmlFor="name">Nom</Label>
+            <Label htmlFor="name" className="text-sm sm:text-base">Nom</Label>
             <Input 
               id="name" 
               {...register("name")}
-              placeholder="Nom du produit" 
+              placeholder="Nom du produit"
+              className="text-sm sm:text-base" 
             />
             {errors.name && (
-              <p className="text-red-500 text-xs">{errors.name.message}</p>
+              <p className="text-red-500 text-xs sm:text-sm">{errors.name.message}</p>
             )}
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="description" className="text-sm sm:text-base">Description</Label>
             <Textarea 
               id="description" 
               {...register("description")}
-              placeholder="Description du produit" 
+              placeholder="Description du produit"
+              className="text-sm sm:text-base min-h-[100px]" 
             />
             {errors.description && (
-              <p className="text-red-500 text-xs">{errors.description.message}</p>
+              <p className="text-red-500 text-xs sm:text-sm">{errors.description.message}</p>
             )}
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="price">Prix HT</Label>
+            <Label htmlFor="price" className="text-sm sm:text-base">Prix HT</Label>
             <Input
               id="price"
               type="number"
               step="0.01"
               placeholder="0.00"
+              className="text-sm sm:text-base"
               {...register("price_excluding_tax", { valueAsNumber: true })}
             />
             {errors.price_excluding_tax && (
-              <p className="text-red-500 text-xs">{errors.price_excluding_tax.message}</p>
+              <p className="text-red-500 text-xs sm:text-sm">{errors.price_excluding_tax.message}</p>
             )}
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="vat">TVA</Label>
+            <Label htmlFor="vat" className="text-sm sm:text-base">TVA</Label>
             <Select
               value={vatValue}
               onValueChange={(value) => {
@@ -184,26 +191,26 @@ export function EditProductDialog({ product, isOpen, onClose }: EditProductDialo
                 setValue('vat_rate', Number(value))
               }}
             >
-              <SelectTrigger id="vat">
+              <SelectTrigger id="vat" className="text-sm sm:text-base">
                 <SelectValue placeholder="Sélectionner un taux de TVA" />
               </SelectTrigger>
               <SelectContent>
                 {VAT_RATES.map(({ value, label }) => (
-                  <SelectItem key={value} value={value}>
+                  <SelectItem key={value} value={value} className="text-sm sm:text-base">
                     {label}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
             {errors.vat_rate && (
-              <p className="text-red-500 text-xs">{errors.vat_rate.message}</p>
+              <p className="text-red-500 text-xs sm:text-sm">{errors.vat_rate.message}</p>
             )}
           </div>
 
           <Button 
             type="submit" 
             disabled={isPending}
-            className="w-full mt-2"
+            className="w-full mt-2 text-sm sm:text-base"
           >
             {isPending ? "Modification en cours..." : "Modifier"}
           </Button>

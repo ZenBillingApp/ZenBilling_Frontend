@@ -46,8 +46,8 @@ export const useUpdateProduct = (productId: number) => {
         mutationFn: (data: IUpdateProductRequest) =>
             api.put(`/products/${productId}`, data),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["products", productId] })
             queryClient.invalidateQueries({ queryKey: ["products"] })
+            queryClient.invalidateQueries({ queryKey: ["product-details", productId] })
         },
         
     })
@@ -62,5 +62,13 @@ export const useDeleteProduct = () => {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["products"] })
         },
+    })
+}
+
+export const useProductDetails = (productId: number) => {
+    return useQuery({
+        queryKey: ["product-details", productId],
+        queryFn: () => api.get(`/products/${productId}`),
+        enabled: !!productId,
     })
 }
