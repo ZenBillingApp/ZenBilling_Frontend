@@ -28,11 +28,13 @@ import {
 import NiceModal from '@ebay/nice-modal-react'
 import CreateCustomerDialog from '@/components/customers/create-customer-dialog'
 import EditCustomerDialog from '@/components/customers/edit-customer-dialog'
+import { CustomerDetailsDialog } from '@/components/customers/customer-details-dialog'
 
 export default function CustomersPage() {
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
   const [typeFilter, setTypeFilter] = useState<'all' | 'individual' | 'company'>('all')
+  const [selectedCustomer, setSelectedCustomer] = useState<ICustomer | null>(null)
   const debouncedSearch = useDebounce(search, 300)
   const { data, isLoading } = useCustomers({
     search: debouncedSearch || undefined,
@@ -47,8 +49,10 @@ export default function CustomersPage() {
     NiceModal.show(CreateCustomerDialog)
   }
 
-  const handleEditCustomer = (customer: ICustomer) => {
-    NiceModal.show(EditCustomerDialog, { customer })
+  const handleEditCustomer = () => {
+    if (selectedCustomer) {
+      NiceModal.show(EditCustomerDialog, { customer: selectedCustomer })
+    }
   }
 
   return (
@@ -108,7 +112,7 @@ export default function CustomersPage() {
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                    <TableCell colSpan={6} className="text-center py-8">
                       <div className="flex justify-center items-center h-full w-full">
                         <Loader2 className="w-6 h-6 animate-spin" />
                       </div>
@@ -132,7 +136,7 @@ export default function CustomersPage() {
                     <TableRow 
                       key={customer.customer_id} 
                       className="cursor-pointer transition-colors hover:bg-muted/50"
-                      onClick={() => handleEditCustomer(customer)}
+                      onClick={() => setSelectedCustomer(customer)}
                     >
                       <TableCell>
                         {customer.type === 'company' ? (
@@ -185,6 +189,14 @@ export default function CustomersPage() {
           </div>
         </div>
       </div>
+
+      {/* Customer Details Dialog */}
+      <CustomerDetailsDialog
+        customer={selectedCustomer}
+        isOpen={!!selectedCustomer}
+        onOpenChange={(open) => !open && setSelectedCustomer(null)}
+        onEdit={handleEditCustomer}
+      />
 
       {/* Pagination */}
       {totalPages > 1 && (
