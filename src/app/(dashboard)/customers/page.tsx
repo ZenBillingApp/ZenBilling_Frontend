@@ -54,24 +54,24 @@ export default function CustomersPage() {
   return (
     <div className="container mx-auto px-4 py-6 space-y-6 max-w-7xl">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h1 className="text-2xl font-bold font-dmSans flex items-center">
-          <User2Icon className="w-6 h-6 mr-2" />
+        <h1 className="text-xl sm:text-2xl font-bold font-dmSans flex items-center">
+          <User2Icon className="w-5 sm:w-6 h-5 sm:h-6 mr-2" />
           Clients
         </h1>
-        <Button onClick={handleCreateCustomer} className="flex items-center gap-2">
+        <Button onClick={handleCreateCustomer} className="w-full sm:w-auto flex items-center gap-2">
           <Plus className="w-4 h-4" />
           Nouveau client
         </Button>
       </div>
 
       <div className="flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-1">
+        <div className="relative w-full">
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Rechercher un client..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-8"
+            className="pl-8 w-full"
           />
         </div>
         <div className="w-full sm:w-[200px]">
@@ -79,7 +79,7 @@ export default function CustomersPage() {
             value={typeFilter}
             onValueChange={(value: 'all' | 'individual' | 'company') => setTypeFilter(value)}
           >
-            <SelectTrigger>
+            <SelectTrigger className="w-full">
               <SelectValue placeholder="Type de client" />
             </SelectTrigger>
             <SelectContent>
@@ -91,122 +91,139 @@ export default function CustomersPage() {
         </div>
       </div>
 
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Type</TableHead>
-              <TableHead>Nom</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Téléphone</TableHead>
-              <TableHead>Adresse</TableHead>
-              <TableHead>Ville</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {data?.data?.customers?.map((customer: ICustomer) => (
-              <TableRow 
-                key={customer.customer_id} 
-                className="cursor-pointer transition-colors"
-                onClick={() => handleEditCustomer(customer)}
-              >
-                <TableCell>
-                  {customer.type === 'company' ? (
-                    <Badge variant="outline" className="flex items-center gap-2 w-fit">
-                      <Building className="w-4 h-4" />
-                      Pro
-                    </Badge>
-                  ) : (
-                    <Badge variant="outline" className="flex items-center gap-2 w-fit">
-                      <User className="w-4 h-4" />
-                      Part.
-                    </Badge>
-                  )}
-                </TableCell>
-                <TableCell className="font-medium">
-                  {customer.type === 'company' 
-                    ? customer.BusinessCustomer?.name 
-                    : `${customer.IndividualCustomer?.first_name} ${customer.IndividualCustomer?.last_name}`}
-                </TableCell>
-                <TableCell>
-                  <span className="text-muted-foreground">
-                    {customer.email || "-"}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <span className="text-muted-foreground">
-                    {customer.phone || "-"}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  {customer.address ? (
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                      <MapPin className="w-4 h-4 shrink-0" />
-                      <span className="truncate">{customer.address}</span>
-                    </div>
-                  ) : (
-                    <span className="text-muted-foreground">-</span>
-                  )}
-                </TableCell>
-                <TableCell>
-                  <span className="text-muted-foreground">
-                    {customer.city || "-"}
-                  </span>
-                </TableCell>
-              </TableRow>
-            ))}
-            {
-                isLoading ? (
-                    <TableRow>
-                        <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                        <div className="flex justify-center items-center h-full w-full">
-                      <Loader2 className="w-6 h-6 animate-spin" />
-                    </div>
-                        </TableCell>
+      <div className="overflow-x-auto -mx-4 sm:mx-0">
+        <div className="min-w-full inline-block align-middle">
+          <div className="overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[100px]">Type</TableHead>
+                  <TableHead>Nom</TableHead>
+                  <TableHead className="hidden sm:table-cell">Email</TableHead>
+                  <TableHead className="hidden sm:table-cell">Téléphone</TableHead>
+                  <TableHead className="hidden lg:table-cell">Adresse</TableHead>
+                  <TableHead className="hidden lg:table-cell">Ville</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {isLoading ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                      <div className="flex justify-center items-center h-full w-full">
+                        <Loader2 className="w-6 h-6 animate-spin" />
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ) : !data?.data?.customers?.length ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                      <div className="flex flex-col items-center justify-center text-center">
+                        <p className="text-sm text-muted-foreground">Aucun client trouvé</p>
+                        {search && (
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Essayez de modifier votre recherche
+                          </p>
+                        )}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  data?.data?.customers?.map((customer: ICustomer) => (
+                    <TableRow 
+                      key={customer.customer_id} 
+                      className="cursor-pointer transition-colors hover:bg-muted/50"
+                      onClick={() => handleEditCustomer(customer)}
+                    >
+                      <TableCell>
+                        {customer.type === 'company' ? (
+                          <Badge variant="outline" className="flex items-center gap-2 w-fit">
+                            <Building className="w-4 h-4" />
+                            <span className="hidden sm:inline">Pro</span>
+                          </Badge>
+                        ) : (
+                          <Badge variant="outline" className="flex items-center gap-2 w-fit">
+                            <User className="w-4 h-4" />
+                            <span className="hidden sm:inline">Part.</span>
+                          </Badge>
+                        )}
+                      </TableCell>
+                      <TableCell className="font-medium max-w-[200px] truncate">
+                        {customer.type === 'company' 
+                          ? customer.BusinessCustomer?.name 
+                          : `${customer.IndividualCustomer?.first_name} ${customer.IndividualCustomer?.last_name}`}
+                      </TableCell>
+                      <TableCell className="hidden sm:table-cell text-nowrap">
+                        <span className="text-muted-foreground">
+                          {customer.email || "-"}
+                        </span>
+                      </TableCell>
+                      <TableCell className="hidden sm:table-cell text-nowrap">
+                        <span className="text-muted-foreground">
+                          {customer.phone || "-"}
+                        </span>
+                      </TableCell>
+                      <TableCell className="hidden lg:table-cell text-nowrap">
+                        {customer.address ? (
+                          <div className="flex items-center gap-2 text-muted-foreground">
+                            <MapPin className="w-4 h-4 shrink-0" />
+                            <span className="truncate max-w-[200px]">{customer.address}</span>
+                          </div>
+                        ) : (
+                          <span className="text-muted-foreground">-</span>
+                        )}
+                      </TableCell>
+                      <TableCell className="hidden lg:table-cell text-nowrap">
+                        <span className="text-muted-foreground">
+                          {customer.city || "-"}
+                        </span>
+                      </TableCell>
                     </TableRow>
-                ) : 
-                   
-            !data?.data?.customers?.length && (
-              <TableRow>
-                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                  Aucun client trouvé
-                </TableCell>
-              </TableRow>
-            )
-          }
-
-          </TableBody>
-        </Table>
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex justify-center py-4 border-t">
-            <Pagination>
-              <PaginationContent>
-                <PaginationItem>
-                  <PaginationPrevious className='hidden sm:flex cursor-pointer' onClick={() => setPage(p => Math.max(1, p - 1))} isActive={page !== 1} />
-                </PaginationItem>
-                {[...Array(totalPages)].map((_, i) => {
-                  // Afficher seulement les 3 pages autour de la page courante sur mobile
-                  if (window.innerWidth < 640 && Math.abs(page - (i + 1)) > 1) {
-                    return null;
-                  }
-                  return (
-                    <PaginationItem key={i + 1}>
-                      <PaginationLink
-                        onClick={() => setPage(i + 1)}
-                        isActive={page === i + 1}
-                      >
-                        {i + 1}
-                      </PaginationLink>
-                    </PaginationItem>
-                  );
-                })}
-                <PaginationItem>
-                  <PaginationNext className='hidden sm:flex cursor-pointer' onClick={() => setPage(p => Math.min(totalPages, p + 1))} isActive={page !== totalPages} />
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
+                  ))
+                )}
+              </TableBody>
+            </Table>
           </div>
-        )}
+        </div>
+      </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex justify-center py-4 border-t">
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious 
+                  className='hidden sm:flex cursor-pointer' 
+                  onClick={() => setPage(p => Math.max(1, p - 1))} 
+                  isActive={page !== 1} 
+                />
+              </PaginationItem>
+              {[...Array(totalPages)].map((_, i) => {
+                if (window.innerWidth < 640 && Math.abs(page - (i + 1)) > 1) {
+                  return null;
+                }
+                return (
+                  <PaginationItem key={i + 1}>
+                    <PaginationLink
+                      onClick={() => setPage(i + 1)}
+                      isActive={page === i + 1}
+                    >
+                      {i + 1}
+                    </PaginationLink>
+                  </PaginationItem>
+                );
+              })}
+              <PaginationItem>
+                <PaginationNext 
+                  className='hidden sm:flex cursor-pointer' 
+                  onClick={() => setPage(p => Math.min(totalPages, p + 1))} 
+                  isActive={page !== totalPages} 
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
+      )}
     </div>
   )
 }

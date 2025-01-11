@@ -95,27 +95,27 @@ export default function InvoicesPage() {
     return (
         <div className="container mx-auto px-4 py-6 space-y-6 max-w-7xl">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <h1 className="text-2xl font-bold font-dmSans flex items-center">
-                    <FileStack className="w-6 h-6 mr-2" />
+                <h1 className="text-xl sm:text-2xl font-bold font-dmSans flex items-center">
+                    <FileStack className="w-5 sm:w-6 h-5 sm:h-6 mr-2" />
                     Factures
                 </h1>
-                <Button onClick={handleCreateInvoice} className="flex items-center gap-2">
+                <Button onClick={handleCreateInvoice} className="w-full sm:w-auto flex items-center gap-2">
                     <Plus className="w-4 h-4" />
                     Nouvelle facture
                 </Button>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4">
-                <div className="relative flex-1">
+            <div className="flex flex-col gap-4">
+                <div className="relative w-full">
                     <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input
                         placeholder="Rechercher une facture..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="pl-8"
+                        className="pl-8 w-full"
                     />
                 </div>
-                <div className="w-full sm:w-[200px]">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     <Select
                         value={statusFilter}
                         onValueChange={(value: 'all' | 'pending' | 'paid' | 'cancelled') => setStatusFilter(value)}
@@ -130,21 +130,20 @@ export default function InvoicesPage() {
                             <SelectItem value="cancelled">Annulée</SelectItem>
                         </SelectContent>
                     </Select>
-                </div>
-                <div className="w-full sm:w-[300px]">
                     <DatePickerWithRange date={dateRange} setDate={setDateRange} />
                 </div>
             </div>
 
+            <div className="overflow-x-auto">
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead>Type</TableHead>
+                            <TableHead className="hidden sm:table-cell">Type</TableHead>
                             <TableHead>N° Facture</TableHead>
                             <TableHead>Client</TableHead>
                             <TableHead>Statut</TableHead>
-                            <TableHead>Produits</TableHead>
-                            <TableHead>Dates</TableHead>
+                            <TableHead className="hidden sm:table-cell">Produits</TableHead>
+                            <TableHead className="hidden lg:table-cell">Dates</TableHead>
                             <TableHead>Total TTC</TableHead>
                         </TableRow>
                     </TableHeader>
@@ -166,7 +165,7 @@ export default function InvoicesPage() {
                         ) : (
                             data?.data?.invoices?.map((invoice: IInvoice) => (
                                 <TableRow key={invoice.invoice_id} className="cursor-pointer hover:bg-muted/50" onClick={() => router.push(`/invoices/${invoice.invoice_id}`)}>
-                                    <TableCell>
+                                    <TableCell className="hidden sm:table-cell">
                                         <Badge variant="outline" className="w-fit">
                                             {invoice.Customer?.type === 'company' ? (
                                                 <Building className="w-4 h-4" />
@@ -175,26 +174,26 @@ export default function InvoicesPage() {
                                             )}
                                         </Badge>
                                     </TableCell>
-                                    <TableCell className="font-medium">
+                                    <TableCell className="font-medium text-nowrap">
                                         {invoice.invoice_number}
                                     </TableCell>
-                                    <TableCell>
+                                    <TableCell className="text-nowrap max-w-[150px] truncate">
                                         {invoice.Customer?.type === 'company'
                                             ? invoice.Customer.BusinessCustomer?.name
                                             : `${invoice.Customer?.IndividualCustomer?.first_name} ${invoice.Customer?.IndividualCustomer?.last_name}`}
                                     </TableCell>
-                                    <TableCell>
-                                        <Badge variant={getStatusBadgeVariant(invoice.status)}>
+                                    <TableCell className="text-nowrap">
+                                        <Badge variant={getStatusBadgeVariant(invoice.status)} className="text-nowrap">
                                             {getStatusLabel(invoice.status)}
                                         </Badge>
                                     </TableCell>
-                                    <TableCell className="text-center">
+                                    <TableCell className="hidden sm:table-cell text-center text-nowrap">
                                         <Badge variant="outline" className="flex items-center gap-2 w-fit">
                                             <ShoppingCart className="w-4 h-4" />
                                             {invoice.InvoiceItems?.length || 0}
                                         </Badge>
                                     </TableCell>
-                                    <TableCell>
+                                    <TableCell className="hidden lg:table-cell text-nowrap">
                                         <div className="space-y-1">
                                             <div className="flex items-center gap-2 text-sm">
                                                 <CalendarDays className="w-4 h-4 text-muted-foreground" />
@@ -206,7 +205,7 @@ export default function InvoicesPage() {
                                             </div>
                                         </div>
                                     </TableCell>
-                                    <TableCell className="font-medium">
+                                    <TableCell className="font-medium text-nowrap">
                                         {formatCurrency(invoice.amount_including_tax)}
                                     </TableCell>
                                 </TableRow>
@@ -214,6 +213,7 @@ export default function InvoicesPage() {
                         )}
                     </TableBody>
                 </Table>
+            </div>
 
             {totalPages > 1 && (
                 <div className="flex justify-center">

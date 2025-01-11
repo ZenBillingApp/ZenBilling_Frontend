@@ -151,16 +151,16 @@ export default function InvoiceDetailsPage() {
         <div className="container mx-auto px-4 py-6 space-y-6 max-w-5xl">
             {/* Header */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 w-full sm:w-auto">
                     <Button variant="outline" size="icon" onClick={() => router.back()}>
                         <ArrowLeft className="w-4 h-4" />
                     </Button>
-                    <h1 className="text-2xl font-bold font-dmSans flex items-center">
-                        <FileText className="w-6 h-6 mr-2" />
+                    <h1 className="text-xl sm:text-2xl font-bold font-dmSans flex items-center truncate">
+                        <FileText className="w-5 sm:w-6 h-5 sm:h-6 mr-2 flex-shrink-0" />
                         Facture {invoiceData?.invoice_number}
                     </h1>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2 w-full sm:w-auto">
                     <EditInvoiceDialog
                         open={isEditDialogOpen}
                         onOpenChange={setIsEditDialogOpen}
@@ -184,12 +184,12 @@ export default function InvoiceDetailsPage() {
                         isError={addPayment.isError}
                         error={(addPayment.error as ApiError)?.response?.data}
                     />
-                    <Button variant="outline" onClick={() => setIsEditDialogOpen(true)}>
+                    <Button variant="outline" onClick={() => setIsEditDialogOpen(true)} className="flex-1 sm:flex-none">
                         <Pencil className="w-4 h-4 mr-2" />
                         Modifier
                     </Button>
                     {invoiceData.status === 'pending' && (
-                        <Button variant="outline" onClick={() => setIsAddPaymentDialogOpen(true)}>
+                        <Button variant="outline" onClick={() => setIsAddPaymentDialogOpen(true)} className="flex-1 sm:flex-none">
                             <Plus className="w-4 h-4 mr-2" />
                             Ajouter un paiement
                         </Button>
@@ -198,6 +198,7 @@ export default function InvoiceDetailsPage() {
                         variant="outline" 
                         onClick={() => downloadPdf.mutate(Number(params.id))}
                         disabled={downloadPdf.isPending}
+                        className="flex-1 sm:flex-none"
                     >
                         {downloadPdf.isPending ? (
                             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -214,25 +215,27 @@ export default function InvoiceDetailsPage() {
                 <Card>
                     <CardContent className="pt-6">
                         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                            <div className="flex items-center gap-4">
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full">
                                 <Badge variant={getStatusBadgeVariant(invoiceData.status)} className="px-4 py-1">
                                     <span className="flex items-center gap-2">
                                         {getStatusIcon(invoiceData.status)}
                                         {getStatusLabel(invoiceData.status)}
                                     </span>
                                 </Badge>
-                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                    <CalendarDays className="w-4 h-4" />
-                                    <span>Émise le {new Date(invoiceData.invoice_date).toLocaleDateString()}</span>
-                                </div>
-                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                    <Clock className="w-4 h-4" />
-                                    <span>Échéance le {new Date(invoiceData.due_date).toLocaleDateString()}</span>
+                                <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 text-sm text-muted-foreground w-full">
+                                    <div className="flex items-center gap-2">
+                                        <CalendarDays className="w-4 h-4 flex-shrink-0" />
+                                        <span>Émise le {new Date(invoiceData.invoice_date).toLocaleDateString()}</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <Clock className="w-4 h-4 flex-shrink-0" />
+                                        <span>Échéance le {new Date(invoiceData.due_date).toLocaleDateString()}</span>
+                                    </div>
                                 </div>
                             </div>
-                            <div className="text-right">
+                            <div className="text-right w-full sm:w-auto">
                                 <p className="text-sm text-muted-foreground">Total TTC</p>
-                                <p className="text-2xl font-bold">{formatCurrency(invoiceData.amount_including_tax)}</p>
+                                <p className="text-xl sm:text-2xl font-bold">{formatCurrency(invoiceData.amount_including_tax)}</p>
                             </div>
                         </div>
                     </CardContent>
@@ -393,42 +396,44 @@ export default function InvoiceDetailsPage() {
                         <CardTitle>Produits</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead className="w-[40%]">Produit</TableHead>
-                                    <TableHead>Prix unitaire HT</TableHead>
-                                    <TableHead>TVA</TableHead>
-                                    <TableHead>Quantité</TableHead>
-                                    <TableHead>Total HT</TableHead>
-                                    <TableHead>Total TTC</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {invoiceData.InvoiceItems?.map((item: IInvoiceItem) => {
-                                    const totalHT = item.quantity * item.unit_price_excluding_tax
-                                    const totalTTC = totalHT * (1 + item.vat_rate / 100)
+                        <div className="overflow-x-auto">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead className="w-[40%]">Produit</TableHead>
+                                        <TableHead className="hidden sm:table-cell">Prix unitaire HT</TableHead>
+                                        <TableHead className="hidden sm:table-cell">TVA</TableHead>
+                                        <TableHead>Quantité</TableHead>
+                                        <TableHead className="hidden lg:table-cell">Total HT</TableHead>
+                                        <TableHead>Total TTC</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {invoiceData.InvoiceItems?.map((item: IInvoiceItem) => {
+                                        const totalHT = item.quantity * item.unit_price_excluding_tax
+                                        const totalTTC = totalHT * (1 + item.vat_rate / 100)
 
-                                    return (
-                                        <TableRow key={item.item_id}>
-                                            <TableCell>
-                                                <div>
-                                                    <p className="font-medium">{item.name}</p>
-                                                    {item.description && (
-                                                        <p className="text-sm text-muted-foreground line-clamp-2">{item.description}</p>
-                                                    )}
-                                                </div>
-                                            </TableCell>
-                                            <TableCell>{formatCurrency(item.unit_price_excluding_tax)}</TableCell>
-                                            <TableCell>{formatPercent(item.vat_rate)}</TableCell>
-                                            <TableCell>{item.quantity}</TableCell>
-                                            <TableCell>{formatCurrency(totalHT)}</TableCell>
-                                            <TableCell>{formatCurrency(totalTTC)}</TableCell>
-                                        </TableRow>
-                                    )
-                                })}
-                            </TableBody>
-                        </Table>
+                                        return (
+                                            <TableRow key={item.item_id}>
+                                                <TableCell>
+                                                    <div>
+                                                        <p className="font-medium">{item.name}</p>
+                                                        {item.description && (
+                                                            <p className="text-sm text-muted-foreground line-clamp-2">{item.description}</p>
+                                                        )}
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell className="hidden sm:table-cell">{formatCurrency(item.unit_price_excluding_tax)}</TableCell>
+                                                <TableCell className="hidden sm:table-cell">{formatPercent(item.vat_rate)}</TableCell>
+                                                <TableCell>{item.quantity}</TableCell>
+                                                <TableCell className="hidden lg:table-cell">{formatCurrency(totalHT)}</TableCell>
+                                                <TableCell>{formatCurrency(totalTTC)}</TableCell>
+                                            </TableRow>
+                                        )
+                                    })}
+                                </TableBody>
+                            </Table>
+                        </div>
 
                         <div className="mt-6 space-y-2">
                             <div className="flex justify-between text-sm">
@@ -451,10 +456,10 @@ export default function InvoiceDetailsPage() {
                 {/* Payments Table */}
                 <Card>
                     <CardHeader>
-                        <div className="flex justify-between items-center">
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                             <CardTitle>Paiements</CardTitle>
                             {invoiceData.status === 'pending' && (
-                                <Button variant="outline" onClick={() => setIsAddPaymentDialogOpen(true)}>
+                                <Button variant="outline" onClick={() => setIsAddPaymentDialogOpen(true)} className="w-full sm:w-auto">
                                     <Plus className="w-4 h-4 mr-2" />
                                     Ajouter un paiement
                                 </Button>
@@ -469,38 +474,40 @@ export default function InvoiceDetailsPage() {
                     </CardHeader>
                     <CardContent>
                         {invoiceData.Payments && invoiceData.Payments.length > 0 ? (
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>Date</TableHead>
-                                        <TableHead>Montant</TableHead>
-                                        <TableHead>Méthode</TableHead>
-                                        <TableHead>Description</TableHead>
-                                        <TableHead>Référence</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {invoiceData.Payments.map((payment: IPayment) => (
-                                        <TableRow key={payment.payment_id}>
-                                            <TableCell>
-                                                {new Date(payment.payment_date).toLocaleDateString()}
-                                            </TableCell>
-                                            <TableCell>
-                                                {formatCurrency(payment.amount)}
-                                            </TableCell>
-                                            <TableCell>
-                                                {getPaymentMethodLabel(payment.payment_method)}
-                                            </TableCell>
-                                            <TableCell>
-                                                {payment.description || '-'}
-                                            </TableCell>
-                                            <TableCell>
-                                                {payment.reference || '-'}
-                                            </TableCell>
+                            <div className="overflow-x-auto">
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>Date</TableHead>
+                                            <TableHead>Montant</TableHead>
+                                            <TableHead className="hidden sm:table-cell">Méthode</TableHead>
+                                            <TableHead className="hidden lg:table-cell">Description</TableHead>
+                                            <TableHead className="hidden lg:table-cell">Référence</TableHead>
                                         </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {invoiceData.Payments.map((payment: IPayment) => (
+                                            <TableRow key={payment.payment_id}>
+                                                <TableCell>
+                                                    {new Date(payment.payment_date).toLocaleDateString()}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {formatCurrency(payment.amount)}
+                                                </TableCell>
+                                                <TableCell className="hidden sm:table-cell">
+                                                    {getPaymentMethodLabel(payment.payment_method)}
+                                                </TableCell>
+                                                <TableCell className="hidden lg:table-cell">
+                                                    {payment.description || '-'}
+                                                </TableCell>
+                                                <TableCell className="hidden lg:table-cell">
+                                                    {payment.reference || '-'}
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </div>
                         ) : (
                             <div className="flex flex-col items-center justify-center py-6 text-center text-muted-foreground">
                                 <FileText className="w-12 h-12 mb-4" />
