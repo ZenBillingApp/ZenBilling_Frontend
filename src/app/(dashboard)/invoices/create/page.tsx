@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useFormat } from '@/hooks/useFormat'
 import { useCreateInvoice } from '@/hooks/useInvoice'
+import { format } from 'date-fns'
 
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -171,14 +172,14 @@ export default function CreateInvoicePage() {
                                 <Label>Date de facturation</Label>
                                 <DatePicker
                                     date={invoiceDate}
-                                    setDate={(date) => date && setInvoiceDate(date)}
+                                    setDate={(date) => date && setInvoiceDate(new Date(format(date, 'yyyy-MM-dd')))}
                                 />
                             </div>
                             <div className="space-y-2">
                                 <Label>Date d&apos;échéance</Label>
                                 <DatePicker
                                     date={dueDate}
-                                    setDate={(date) => date && setDueDate(date)}
+                                    setDate={(date) => date && setDueDate(new Date(format(date, 'yyyy-MM-dd')))}
                                 />
                             </div>
                         </div>

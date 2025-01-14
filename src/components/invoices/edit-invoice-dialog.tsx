@@ -5,6 +5,7 @@ import { DatePicker } from "@/components/ui/date-picker"
 import { AlertCircle, Loader2, Pencil } from 'lucide-react'
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { format } from 'date-fns'
 import * as z from "zod"
 import {
     Form,
@@ -67,7 +68,11 @@ export function EditInvoiceDialog({
     })
 
     const handleSubmit = async (data: EditInvoiceSchema) => {
-        await onSubmit(data)
+        await onSubmit({
+            ...data,
+            invoice_date: new Date(format(data.invoice_date, 'yyyy-MM-dd')),
+            due_date: new Date(format(data.due_date, 'yyyy-MM-dd'))
+        })
     }
 
 

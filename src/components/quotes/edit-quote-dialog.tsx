@@ -6,6 +6,7 @@ import { AlertCircle, Loader2, Pencil } from 'lucide-react'
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
+import { format } from 'date-fns'
 import {
     Form,
     FormControl,
@@ -60,15 +61,19 @@ export function EditQuoteDialog({
     const form = useForm<EditQuoteSchema>({
         resolver: zodResolver(editQuoteSchema),
         defaultValues: {
-            quote_date: new Date(defaultValues.quote_date),
-            validity_date: new Date(defaultValues.validity_date),
+            quote_date: new Date(format(defaultValues.quote_date, 'yyyy-MM-dd')),
+            validity_date: new Date(format(defaultValues.validity_date, 'yyyy-MM-dd')),
             conditions: defaultValues.conditions,
             notes: defaultValues.notes,
         }
     })
 
     const handleSubmit = async (data: EditQuoteSchema) => {
-        await onSubmit(data)
+        await onSubmit({
+            ...data,
+            quote_date: new Date(format(data.quote_date, 'yyyy-MM-dd')),
+            validity_date: new Date(format(data.validity_date, 'yyyy-MM-dd'))
+        })
     }
 
     return (

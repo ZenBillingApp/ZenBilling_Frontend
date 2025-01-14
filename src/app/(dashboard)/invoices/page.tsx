@@ -6,6 +6,7 @@ import { useInvoices } from '@/hooks/useInvoice'
 import { useFormat } from '@/hooks/useFormat'
 import { useDebounce } from '@/hooks/useDebounce'
 import { DateRange } from 'react-day-picker'
+import { format } from 'date-fns'
 
 import { FileStack, ShoppingCart, Search, Plus } from 'lucide-react'
 
@@ -54,8 +55,8 @@ export default function InvoicesPage() {
     const { data, isLoading } = useInvoices({
         search: debouncedSearch || undefined,
         status: statusFilter === 'all' ? undefined : statusFilter,
-        start_date: dateRange?.from?.toISOString(),
-        end_date: dateRange?.to?.toISOString(),
+        start_date: dateRange?.from ? format(dateRange.from, 'yyyy-MM-dd') : undefined,
+        end_date: dateRange?.to ? format(dateRange.to, 'yyyy-MM-dd') : undefined,
         limit: 25,
         page: page
     })
