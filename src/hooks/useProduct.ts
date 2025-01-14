@@ -1,7 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { api } from "@/services/api"
+import { api, ApiError } from "@/services/api"
 import type { ICreateProductRequest } from "@/types/Product.request.interface"
 import type { IUpdateProductRequest } from "@/types/Product.request.interface"
+import { useToast } from "@/hooks/use-toast"
 
 interface ProductsQueryParams {
   page?: number;
@@ -29,25 +30,33 @@ export const useProduct = (productId: number) => {
 
 export const useCreateProduct = () => {
     const queryClient = useQueryClient()
-
+    const { toast } = useToast()
     return useMutation({
         mutationFn: (data: ICreateProductRequest) => 
             api.post("/products", data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["products"] })
+            toast({
+                title: "Produit créé avec succès",
+                description: "Le produit a été créé avec succès",
+            })
         },
     })
 }
 
 export const useUpdateProduct = (productId: number) => {
     const queryClient = useQueryClient()
-
+    const { toast } = useToast()
     return useMutation({
         mutationFn: (data: IUpdateProductRequest) =>
             api.put(`/products/${productId}`, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["products"] })
             queryClient.invalidateQueries({ queryKey: ["product-details", productId] })
+            toast({
+                title: "Produit modifié avec succès",
+                description: "Le produit a été modifié avec succès",
+            })
         },
         
     })
@@ -55,12 +64,22 @@ export const useUpdateProduct = (productId: number) => {
 
 export const useDeleteProduct = () => {
     const queryClient = useQueryClient()
-
+    const { toast } = useToast()
     return useMutation({
         mutationFn: (productId: number) =>
             api.delete(`/products/${productId}`),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["products"] })
+            toast({
+                title: "Produit supprimé avec succès",
+                description: "Le produit a été supprimé avec succès",
+            })
+        },
+        onError: (error: ApiError) => {
+            toast({
+                title: "Erreur lors de la suppression du produit",
+                description: error.message,
+            })
         },
     })
 }

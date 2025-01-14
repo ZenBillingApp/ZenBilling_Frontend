@@ -1,6 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { api } from "@/services/api"
+import { api, ApiError } from "@/services/api"
 import type { ICreateQuoteRequest, IUpdateQuoteRequest, IQuoteQueryParams } from "@/types/Quote.request.interface"
+import { useToast } from "@/hooks/use-toast"
+
 
 export const useQuotes = (params: IQuoteQueryParams = {}) => {
     const { page = 1, limit = 10, search = "", status, customer_id, start_date, end_date, sortBy = 'quote_date', sortOrder = 'DESC' } = params;
@@ -30,6 +32,7 @@ export const useQuote = (quoteId: number) => {
 
 export const useCreateQuote = () => {
     const queryClient = useQueryClient()
+    const { toast } = useToast()
 
     return useMutation({
         mutationFn: (data: ICreateQuoteRequest) => 
@@ -38,36 +41,55 @@ export const useCreateQuote = () => {
             queryClient.invalidateQueries({ queryKey: ["quotes"] })
             queryClient.invalidateQueries({ queryKey: ["products"] })
             queryClient.invalidateQueries({ queryKey: ["customers"] })
+            toast({
+                title: "Devis créé avec succès",
+                description: "Le devis a été créé avec succès",
+            })
         },
     })
 }
 
 export const useUpdateQuote = (quoteId: number) => {
     const queryClient = useQueryClient()
-
+    const { toast } = useToast()
     return useMutation({
         mutationFn: (data: IUpdateQuoteRequest) =>
             api.put(`/quotes/${quoteId}`, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["quotes", quoteId] })
             queryClient.invalidateQueries({ queryKey: ["quotes"] })
+            toast({
+                title: "Devis modifié avec succès",
+                description: "Le devis a été modifié avec succès",
+            })
         },
     })
 }
 
 export const useDeleteQuote = () => {
     const queryClient = useQueryClient()
-
+    const { toast } = useToast()
     return useMutation({
         mutationFn: (quoteId: number) =>
             api.delete(`/quotes/${quoteId}`),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["quotes"] })
+            toast({
+                title: "Devis supprimé avec succès",
+                description: "Le devis a été supprimé avec succès",
+            })
+        },
+        onError: (error: ApiError) => {
+            toast({
+                title: "Erreur lors de la suppression du devis",
+                description: error.message,
+            })
         },
     })
 }
 
 export const useDownloadQuotePdf = (quoteNumber: string) => {
+    const { toast } = useToast()
     return useMutation({
         mutationFn: async (quoteId: number) => {
             const response = await api.getBinary(`/quotes/${quoteId}/pdf`)
@@ -88,18 +110,40 @@ export const useDownloadQuotePdf = (quoteNumber: string) => {
             window.URL.revokeObjectURL(url)
             
             return response
-        }
+        },
+        onSuccess: () => {
+            toast({
+                title: "Fichier PDF téléchargé avec succès",
+                description: "Le fichier PDF a été téléchargé avec succès",
+            })
+        },
+        onError: (error: ApiError) => {
+            toast({
+                title: "Erreur lors du téléchargement du fichier PDF",
+                description: error.message,
+            })
+        },
     })
 }
 
 export const useSendQuote = (quoteId: number) => {
     const queryClient = useQueryClient()
-
+    const { toast } = useToast()
     return useMutation({
         mutationFn: () => api.post(`/quotes/${quoteId}/send`),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["quotes", quoteId] })
             queryClient.invalidateQueries({ queryKey: ["quotes"] })
+            toast({
+                title: "Fichier PDF envoyé avec succès",
+                description: "Le fichier PDF a été envoyé avec succès",
+            })
+        },
+        onError: (error: ApiError) => {
+            toast({
+                title: "Erreur lors de l'envoi du fichier PDF",
+                description: error.message,
+            })
         },
     })
 } 

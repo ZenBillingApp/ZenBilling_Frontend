@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { api } from "@/services/api"
+import { api, ApiError } from "@/services/api"
 import type { ICreateCustomerRequest, IUpdateCustomerRequest } from "@/types/Customer.request.interface"
+import {  useToast } from "@/hooks/use-toast"
 
 interface CustomersQueryParams {
     page?: number;
@@ -34,37 +35,55 @@ export const useCustomer = (customerId: number) => {
 
 export const useCreateCustomer = () => {
     const queryClient = useQueryClient()
-
+    const { toast } = useToast()
     return useMutation({
         mutationFn: (data: ICreateCustomerRequest) => 
             api.post("/customers", data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["customers"] })
+            toast({
+                title: "Client créé avec succès",
+                description: "Le client a été créé avec succès",
+            })
         },
     })
 }
 
 export const useUpdateCustomer = (customerId: number | undefined) => {
     const queryClient = useQueryClient()
-
+    const { toast } = useToast()
     return useMutation({
         mutationFn: (data: IUpdateCustomerRequest) =>
             api.put(`/customers/${customerId}`, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["customers", customerId] })
             queryClient.invalidateQueries({ queryKey: ["customers"] })
+            toast({
+                title: "Client modifié avec succès",
+                description: "Le client a été modifié avec succès",
+            })
         },
     })
 }
 
 export const useDeleteCustomer = () => {
     const queryClient = useQueryClient()
-
+    const { toast } = useToast()
     return useMutation({
         mutationFn: (customerId: number) =>
             api.delete(`/customers/${customerId}`),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["customers"] })
+            toast({
+                title: "Client supprimé avec succès",
+                description: "Le client a été supprimé avec succès",
+            })
+        },
+        onError: (error: ApiError) => {
+            toast({
+                title: "Erreur lors de la suppression du client",
+                description: error.message,
+            })
         },
     })
 }

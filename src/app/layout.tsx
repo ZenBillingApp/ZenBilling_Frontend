@@ -4,6 +4,8 @@ import "./globals.css";
 import { QueryProvider } from "@/providers/QueryProvider";
 import { NiceModalProvider } from "@/providers/NiceModalProvider";
 import { ThemeProvider } from "@/components/theme-provider"
+import { Toaster } from "@/components/ui/toaster"
+
 
 
 
@@ -68,6 +70,7 @@ export default function RootLayout({
           >
           <QueryProvider>
             <NiceModalProvider>{children}</NiceModalProvider>
+            <Toaster />
           </QueryProvider>
         </ThemeProvider>
       </body>

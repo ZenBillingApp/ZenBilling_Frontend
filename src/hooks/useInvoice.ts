@@ -1,7 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { api } from "@/services/api"
+import { api, ApiError } from "@/services/api"
 import type { ICreateInvoiceRequest, IUpdateInvoiceRequest, IInvoiceQueryParams } from "@/types/Invoice.request.interface"
 import type { AddPaymentSchema } from "@/components/invoices/add-payment-dialog"
+import { useToast } from "@/hooks/use-toast"
 
 export const useInvoices = (params: IInvoiceQueryParams = {}) => {
     const { page = 1, limit = 10, search = "", status, customer_id, start_date, end_date, sortBy = 'invoice_date', sortOrder = 'DESC' } = params;
@@ -31,7 +32,7 @@ export const useInvoice = (invoiceId: number) => {
 
 export const useCreateInvoice = () => {
     const queryClient = useQueryClient()
-
+    const { toast } = useToast()
     return useMutation({
         mutationFn: (data: ICreateInvoiceRequest) => 
             api.post("/invoices", data),
@@ -39,36 +40,55 @@ export const useCreateInvoice = () => {
             queryClient.invalidateQueries({ queryKey: ["invoices"] })
             queryClient.invalidateQueries({ queryKey: ["products"] })
             queryClient.invalidateQueries({ queryKey: ["customers"] })
+            toast({
+                title: "Facture créée avec succès",
+                description: "La facture a été créée avec succès",
+            })
         },
     })
 }
 
 export const useUpdateInvoice = (invoiceId: number) => {
     const queryClient = useQueryClient()
-
+    const { toast } = useToast()
     return useMutation({
         mutationFn: (data: IUpdateInvoiceRequest) =>
             api.put(`/invoices/${invoiceId}`, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["invoices", invoiceId] })
             queryClient.invalidateQueries({ queryKey: ["invoices"] })
+            toast({
+                title: "Facture modifiée avec succès",
+                description: "La facture a été modifiée avec succès",
+            })
         },
     })
 }
 
 export const useDeleteInvoice = () => {
     const queryClient = useQueryClient()
-
+    const { toast } = useToast()
     return useMutation({
         mutationFn: (invoiceId: number) =>
             api.delete(`/invoices/${invoiceId}`),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["invoices"] })
+            toast({
+                title: "Facture supprimée avec succès",
+                description: "La facture a été supprimée avec succès",
+            })
+        },
+        onError: (error: ApiError) => {
+            toast({
+                title: "Erreur lors de la suppression de la facture",
+                description: error.message,
+            })
         },
     })
 }
 
 export const useDownloadInvoicePdf = (invoiceNumber: string) => {
+    const { toast } = useToast()
     return useMutation({
         mutationFn: async (invoiceId: number) => {
             const response = await api.getBinary(`/invoices/${invoiceId}/pdf`)
@@ -89,13 +109,25 @@ export const useDownloadInvoicePdf = (invoiceNumber: string) => {
             window.URL.revokeObjectURL(url)
             
             return response
-        }
+        },
+        onSuccess: () => {
+            toast({
+                title: "Fichier PDF téléchargé avec succès",
+                description: "Le fichier PDF a été téléchargé avec succès",
+            })
+        },
+        onError: (error: ApiError) => {
+            toast({
+                title: "Erreur lors du téléchargement du fichier PDF",
+                description: error.message,
+            })
+        },
     })
 }
 
 export const useAddPayment = (invoiceId: number) => {
     const queryClient = useQueryClient()
-
+    const { toast } = useToast()
     return useMutation({
         mutationFn: (data: AddPaymentSchema) =>
             api.post(`/invoices/${invoiceId}/payments`, {
@@ -105,18 +137,32 @@ export const useAddPayment = (invoiceId: number) => {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["invoices", invoiceId] })
             queryClient.invalidateQueries({ queryKey: ["invoices"] })
+            toast({
+                title: "Paiement ajouté avec succès",
+                description: "Le paiement a été ajouté avec succès",
+            })
         },
     })
 }
 
 export const useSendInvoice = (invoiceId: number) => {
     const queryClient = useQueryClient()
-
+    const { toast } = useToast()
     return useMutation({
         mutationFn: () => api.post(`/invoices/${invoiceId}/send`),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["invoices", invoiceId] })
             queryClient.invalidateQueries({ queryKey: ["invoices"] })
+            toast({
+                title: "Fichier PDF envoyé avec succès",
+                description: "Le fichier PDF a été envoyé avec succès",
+            })
+        },
+        onError: (error: ApiError) => {
+            toast({
+                title: "Erreur lors de l'envoi du fichier PDF",
+                description: error.message,
+            })
         },
     })
 }
