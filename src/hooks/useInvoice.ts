@@ -109,3 +109,15 @@ export const useAddPayment = (invoiceId: number) => {
     })
 }
 
+export const useSendInvoice = (invoiceId: number) => {
+    const queryClient = useQueryClient()
+
+    return useMutation({
+        mutationFn: () => api.post(`/invoices/${invoiceId}/send`),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["invoices", invoiceId] })
+            queryClient.invalidateQueries({ queryKey: ["invoices"] })
+        },
+    })
+}
+

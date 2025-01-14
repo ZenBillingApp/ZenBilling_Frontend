@@ -1,7 +1,7 @@
 "use client"
 
 import { useParams, useRouter } from 'next/navigation'
-import { useInvoice, useDownloadInvoicePdf, useUpdateInvoice, useAddPayment } from '@/hooks/useInvoice'
+import { useInvoice, useDownloadInvoicePdf, useUpdateInvoice, useAddPayment, useSendInvoice } from '@/hooks/useInvoice'
 import { useFormat } from '@/hooks/useFormat'
 import { useState } from 'react'
 import type { EditInvoiceSchema } from '@/components/invoices/edit-invoice-dialog'
@@ -37,7 +37,8 @@ import {
     AlertCircle,
     Loader2,
     Pencil,
-    Plus
+    Plus,
+    Send
 } from 'lucide-react'
 import { EditInvoiceDialog } from '@/components/invoices/edit-invoice-dialog'
 import { AddPaymentDialog } from '@/components/invoices/add-payment-dialog'
@@ -53,6 +54,7 @@ export default function InvoiceDetailsPage() {
     const downloadPdf = useDownloadInvoicePdf(invoiceData?.invoice_number)
     const updateInvoice = useUpdateInvoice(Number(params.id))
     const addPayment = useAddPayment(Number(params.id))
+    const sendInvoice = useSendInvoice(Number(params.id))
 
     const handleUpdateInvoice = async (data: Partial<EditInvoiceSchema>) => {
         await updateInvoice.mutateAsync(data as IUpdateInvoiceRequest)
@@ -184,29 +186,51 @@ export default function InvoiceDetailsPage() {
                         isError={addPayment.isError}
                         error={(addPayment.error as ApiError)?.response?.data}
                     />
-                    <Button variant="outline" onClick={() => setIsEditDialogOpen(true)} className="flex-1 sm:flex-none">
-                        <Pencil className="w-4 h-4 mr-2" />
-                        Modifier
-                    </Button>
-                    {invoiceData.status === 'pending' && (
-                        <Button variant="outline" onClick={() => setIsAddPaymentDialogOpen(true)} className="flex-1 sm:flex-none">
-                            <Plus className="w-4 h-4 mr-2" />
-                            Ajouter un paiement
+                    <div className="flex flex-wrap gap-2 w-full">
+                        <Button variant="outline" onClick={() => setIsEditDialogOpen(true)} className="flex-1 sm:flex-none">
+                            <Pencil className="w-4 h-4 mr-2" />
+                            <span className="hidden sm:inline">Modifier</span>
                         </Button>
-                    )}
-                    <Button 
-                        variant="outline" 
-                        onClick={() => downloadPdf.mutate(Number(params.id))}
-                        disabled={downloadPdf.isPending}
-                        className="flex-1 sm:flex-none"
-                    >
-                        {downloadPdf.isPending ? (
-                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        ) : (
-                            <Download className="w-4 h-4 mr-2" />
+                        {invoiceData.status === 'pending' && (
+                            <>
+                                <Button variant="outline" onClick={() => setIsAddPaymentDialogOpen(true)} className="flex-1 sm:flex-none">
+                                    <Plus className="w-4 h-4 mr-2" />
+                                    <span className="hidden sm:inline">Ajouter un paiement</span>
+                                </Button>
+                                <Button 
+                                    variant="outline" 
+                                    onClick={() => sendInvoice.mutate()}
+                                    disabled={sendInvoice.isPending}
+                                    className="flex-1 sm:flex-none"
+                                >
+                                    {sendInvoice.isPending ? (
+                                        <>
+                                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                            <span className="hidden sm:inline">Envoi en cours...</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Send className="w-4 h-4 mr-2" />
+                                            <span className="hidden sm:inline">Envoyer au client</span>
+                                        </>
+                                    )}
+                                </Button>
+                            </>
                         )}
-                        Télécharger
-                    </Button>
+                        <Button 
+                            variant="outline" 
+                            onClick={() => downloadPdf.mutate(Number(params.id))}
+                            disabled={downloadPdf.isPending}
+                            className="flex-1 sm:flex-none"
+                        >
+                            {downloadPdf.isPending ? (
+                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            ) : (
+                                <Download className="w-4 h-4 mr-2" />
+                            )}
+                            <span className="hidden sm:inline">Télécharger</span>
+                        </Button>
+                    </div>
                 </div>
             </div>
 
