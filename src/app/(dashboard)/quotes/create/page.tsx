@@ -89,8 +89,8 @@ export default function CreateQuotePage() {
             conditions: conditions || undefined,
             notes: notes || undefined
         }, {
-            onSuccess: () => {
-                router.push('/quotes')
+            onSuccess: (data) => {
+                router.push(`/quotes/${data.quote_id}`)
             }
         })
     }

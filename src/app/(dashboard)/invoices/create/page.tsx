@@ -89,8 +89,8 @@ export default function CreateInvoicePage() {
             conditions: conditions || undefined,
             late_payment_penalty: latePenalty || undefined
         }, {
-            onSuccess: () => {
-                router.push('/invoices')
+            onSuccess: (data) => {
+                router.push(`/invoices/${data.invoice_id}`)
             }
         })
     }
