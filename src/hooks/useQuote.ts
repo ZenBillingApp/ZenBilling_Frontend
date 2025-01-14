@@ -90,4 +90,16 @@ export const useDownloadQuotePdf = (quoteNumber: string) => {
             return response
         }
     })
+}
+
+export const useSendQuote = (quoteId: number) => {
+    const queryClient = useQueryClient()
+
+    return useMutation({
+        mutationFn: () => api.post(`/quotes/${quoteId}/send`),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["quotes", quoteId] })
+            queryClient.invalidateQueries({ queryKey: ["quotes"] })
+        },
+    })
 } 

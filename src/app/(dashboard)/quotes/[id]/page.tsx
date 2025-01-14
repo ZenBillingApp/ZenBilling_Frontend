@@ -1,7 +1,7 @@
 "use client"
 
 import { useParams, useRouter } from 'next/navigation'
-import { useQuote, useDownloadQuotePdf, useUpdateQuote } from '@/hooks/useQuote'
+import { useQuote, useDownloadQuotePdf, useUpdateQuote, useSendQuote } from '@/hooks/useQuote'
 import { useFormat } from '@/hooks/useFormat'
 import { useState } from 'react'
 import type { EditQuoteSchema } from '@/components/quotes/edit-quote-dialog'
@@ -49,6 +49,7 @@ export default function QuoteDetailsPage() {
     const { data: quoteData, isLoading } = useQuote(Number(params.id))
     const downloadPdf = useDownloadQuotePdf(quoteData?.quote_number)
     const updateQuote = useUpdateQuote(Number(params.id))
+    const sendQuote = useSendQuote(Number(params.id))
 
     const handleUpdateQuote = async (data: Partial<EditQuoteSchema>) => {
         const updateData: IUpdateQuoteRequest = {
@@ -181,9 +182,23 @@ export default function QuoteDetailsPage() {
                             <span className="hidden sm:inline">Modifier</span>
                         </Button>
                         {quoteData.data?.status === 'draft' && (
-                            <Button variant="outline" onClick={() => handleUpdateStatus('sent')} className="flex-1 sm:flex-none">
-                                <Send className="w-4 h-4 mr-2" />
-                                <span className="hidden sm:inline">Marquer comme envoyé</span>
+                            <Button 
+                                variant="outline" 
+                                onClick={() => sendQuote.mutate()}
+                                disabled={sendQuote.isPending}
+                                className="flex-1 sm:flex-none"
+                            >
+                                {sendQuote.isPending ? (
+                                    <>
+                                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                        <span className="hidden sm:inline">Envoi en cours...</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Send className="w-4 h-4 mr-2" />
+                                        <span className="hidden sm:inline">Envoyer au client</span>
+                                    </>
+                                )}
                             </Button>
                         )}
                         {quoteData.data?.status === 'sent' && (
