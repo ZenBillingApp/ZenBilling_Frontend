@@ -19,7 +19,7 @@ import {
   import { Button } from "@/components/ui/button"
 
 
-  import { User2Icon,FileStack,Boxes,LogOut, FileText, Settings } from "lucide-react"
+  import { User2Icon,FileStack,Boxes,LogOut, FileText } from "lucide-react"
 
   import { cn } from "@/lib/utils"
 

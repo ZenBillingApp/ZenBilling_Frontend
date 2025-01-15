@@ -31,6 +31,9 @@ export const metadata: Metadata = {
   authors: [{ name: "ZenBilling" }],
   creator: "ZenBilling",
   publisher: "ZenBilling",
+  icons: {
+    icon: "/favicon.ico",
+  },
   robots: {
     index: true,
     follow: true,
@@ -47,11 +50,6 @@ export const metadata: Metadata = {
     title: "ZenBilling - Gestion de Facturation Simplifiée",
     description: "Gérez facilement vos factures, clients et produits avec ZenBilling. Une solution complète de facturation pour les professionnels et entreprises.",
   },
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-  },
-  themeColor: "#ffffff",
 };
 
 export default function RootLayout({
@@ -61,6 +59,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link rel="icon" href="/favicon.png" type="image/png" sizes="32x32" />
+      </head>
       <body className={`${dmSans.variable} ${roboto.variable} antialiased`}>
       <ThemeProvider
             attribute="class"
