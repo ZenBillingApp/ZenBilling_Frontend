@@ -14,11 +14,12 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
+    SidebarGroupLabel,
   } from "@/components/ui/sidebar"
   import { Button } from "@/components/ui/button"
 
 
-  import { User2Icon,FileStack,Boxes,LogOut, FileText } from "lucide-react"
+  import { User2Icon,FileStack,Boxes,LogOut, FileText, Settings } from "lucide-react"
 
   import { cn } from "@/lib/utils"
 
@@ -36,9 +37,10 @@ import {
         <SidebarContent>
           <SidebarGroup>
             <SidebarGroupContent className="mt-4">
+                <SidebarGroupLabel>Gestion</SidebarGroupLabel>
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <SidebarMenuButton asChild variant={pathname === "/invoices" ? "outline" : "default"}>
+                        <SidebarMenuButton asChild isActive={pathname.startsWith("/invoices")}>
                             <Link href="/invoices">
                                 <FileStack className="w-4 h-4 mr-2" />
                                 Factures
@@ -46,32 +48,56 @@ import {
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                     <SidebarMenuItem>
-                        <SidebarMenuButton asChild variant={pathname === "/quotes" ? "outline" : "default"}>
+                        <SidebarMenuButton asChild isActive={pathname.startsWith("/quotes")}>
                             <Link href="/quotes">
                                 <FileText className="w-4 h-4 mr-2" />
                                 Devis
                             </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
+                    
+                    
+                </SidebarMenu>
+            </SidebarGroupContent>
+            <SidebarGroupContent>
+                <SidebarGroupLabel>Produits</SidebarGroupLabel>
+                <SidebarMenu>
                     <SidebarMenuItem>
-                        <SidebarMenuButton asChild variant={pathname === "/products" ? "outline" : "default"}>
-                            <Link href="/products" >
+                        <SidebarMenuButton asChild isActive={pathname.startsWith("/products")}>
+                            <Link href="/products">
                                 <Boxes className="w-4 h-4 mr-2" />
                                 Produits
                             </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
+                </SidebarMenu>
+            </SidebarGroupContent>
+            <SidebarGroupContent>
+                <SidebarGroupLabel>Clients</SidebarGroupLabel>
+                <SidebarMenu>
                     <SidebarMenuItem>
-                        <SidebarMenuButton asChild variant={pathname === "/customers" ? "outline" : "default"}>
+                        <SidebarMenuButton asChild isActive={pathname.startsWith("/customers")}>
                             <Link href="/customers">
                                 <User2Icon className="w-4 h-4 mr-2" />
-                                    Clients
+                                Clients
                             </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
-                    
                 </SidebarMenu>
             </SidebarGroupContent>
+            {/* <SidebarGroupContent>
+                <SidebarGroupLabel>Paramètres</SidebarGroupLabel>
+                <SidebarMenu>
+                    <SidebarMenuItem>
+                        <SidebarMenuButton asChild isActive={pathname.startsWith("/settings")}>
+                            <Link href="/settings">
+                                <Settings className="w-4 h-4 mr-2" />
+                                Paramètres
+                            </Link>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                </SidebarMenu>
+            </SidebarGroupContent> */}
           </SidebarGroup>
         </SidebarContent>
 
