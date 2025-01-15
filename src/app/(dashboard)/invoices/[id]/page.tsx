@@ -152,7 +152,7 @@ export default function InvoiceDetailsPage() {
     return (
         <div className="container mx-auto px-4 py-6 space-y-6 max-w-5xl">
             {/* Header */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div className="flex flex-col justify-between items-start gap-4">
                 <div className="flex items-center gap-2 w-full sm:w-auto">
                     <Button variant="outline" size="icon" onClick={() => router.back()}>
                         <ArrowLeft className="w-4 h-4" />
@@ -187,12 +187,14 @@ export default function InvoiceDetailsPage() {
                         error={(addPayment.error as ApiError)?.response?.data}
                     />
                     <div className="flex flex-wrap gap-2 w-full">
+                    {invoiceData.status === 'pending' && (
+                        <>
                         <Button variant="outline" onClick={() => setIsEditDialogOpen(true)} className="flex-1 sm:flex-none">
                             <Pencil className="w-4 h-4 mr-2" />
                             <span className="hidden sm:inline">Modifier</span>
                         </Button>
-                        {invoiceData.status === 'pending' && (
-                            <>
+                        
+                            
                                 <Button variant="outline" onClick={() => setIsAddPaymentDialogOpen(true)} className="flex-1 sm:flex-none">
                                     <Plus className="w-4 h-4 mr-2" />
                                     <span className="hidden sm:inline">Ajouter un paiement</span>
