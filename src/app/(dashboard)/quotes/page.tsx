@@ -153,26 +153,26 @@ export default function QuotesPage() {
                                         className="cursor-pointer hover:bg-muted/50"
                                         onClick={() => router.push(`/quotes/${quote.quote_id}`)}
                                     >
-                                        <TableCell className="font-medium">{quote.quote_number}</TableCell>
+                                        <TableCell className="font-medium text-nowrap">{quote.quote_number}</TableCell>
                                         <TableCell>
                                             <div className="flex flex-col">
-                                                <span className="font-medium">
+                                                <span className="font-medium text-nowrap">
                                                     {quote.Customer?.type === 'company'
                                                         ? quote.Customer.BusinessCustomer?.name
                                                         : `${quote.Customer?.IndividualCustomer?.first_name} ${quote.Customer?.IndividualCustomer?.last_name}`}
                                                 </span>
-                                                <span className="text-sm text-muted-foreground hidden sm:block">
+                                                <span className="text-sm text-muted-foreground hidden sm:block text-nowrap">
                                                     {quote.Customer?.email}
                                                 </span>
                                             </div>
                                         </TableCell>
-                                        <TableCell className="hidden md:table-cell">
+                                        <TableCell className="hidden md:table-cell text-nowrap">
                                             {new Date(quote.quote_date).toLocaleDateString()}
                                         </TableCell>
-                                        <TableCell className="hidden lg:table-cell">
+                                        <TableCell className="hidden lg:table-cell text-nowrap">
                                             {new Date(quote.validity_date).toLocaleDateString()}
                                         </TableCell>
-                                        <TableCell className="text-right font-medium tabular-nums">
+                                        <TableCell className="text-right font-medium tabular-nums text-nowrap">
                                             {formatCurrency(quote.amount_including_tax)}
                                         </TableCell>
                                         <TableCell>
