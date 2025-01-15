@@ -47,7 +47,7 @@ export default function QuoteDetailsPage() {
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
 
     const { data: quoteData, isLoading } = useQuote(Number(params.id))
-    const downloadPdf = useDownloadQuotePdf(quoteData?.quote_number)
+    const downloadPdf = useDownloadQuotePdf(quoteData?.data?.quote_number)
     const updateQuote = useUpdateQuote(Number(params.id))
     const sendQuote = useSendQuote(Number(params.id))
 
