@@ -30,9 +30,13 @@ import {
     return (
       <Sidebar>
         <SidebarHeader >
-            <h1 className={cn("text-2xl text-center p-2 font-bold font-dmSans")}    > 
-                ZenBilling
+            <div className="flex items-center justify-center flex-col">
+                <h1 className={cn("text-xl text-left pt-4 mx-auto font-arimo")}    > 
+                    <span className="font-extralight">Zen</span>
+                    <span className="font-bold">Billing</span>
             </h1>
+            <p className="text-xs text-left mx-auto font-arimo">Gestion de Facturation Simplifiée</p>
+            </div>
         </SidebarHeader>
         <SidebarContent>
           <SidebarGroup>

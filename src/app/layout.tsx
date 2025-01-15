@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { DM_Sans,Roboto } from "next/font/google";
+import { DM_Sans,Roboto,Arimo } from "next/font/google";
 import "./globals.css";
 import { QueryProvider } from "@/providers/QueryProvider";
 import { NiceModalProvider } from "@/providers/NiceModalProvider";
@@ -7,7 +7,12 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
 
 
-
+const arimo = Arimo({
+  weight: ["400", "500", "700"],
+  style: ["normal", "italic"],
+  variable: "--font-arimo",
+  subsets: ["latin"],
+});
 
 
 const dmSans = DM_Sans({
@@ -62,7 +67,7 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="/favicon.png" type="image/png" sizes="32x32" />
       </head>
-      <body className={`${dmSans.variable} ${roboto.variable} antialiased`}>
+      <body className={`${dmSans.variable} ${roboto.variable} ${arimo.variable} antialiased`}>
       <ThemeProvider
             attribute="class"
             defaultTheme="system"

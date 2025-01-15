@@ -12,6 +12,7 @@ export default {
 		fontFamily: {
 			dmSans: ["var(--font-dm-sans)"],
 			roboto: ["var(--font-roboto)"],
+			arimo: ["var(--font-arimo)"],
 		},
   		colors: {
   			background: 'hsl(var(--background))',
