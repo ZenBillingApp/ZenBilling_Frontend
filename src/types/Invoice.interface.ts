@@ -14,7 +14,7 @@ export interface IInvoice {
   amount_excluding_tax: number;
   tax: number;
   amount_including_tax: number;
-  status: 'pending' | 'paid' | 'cancelled';
+  status: 'pending' | 'sent' | 'paid' | 'cancelled' | 'expired';
   conditions?: string;
   late_payment_penalty?: string;
   

@@ -47,7 +47,7 @@ export default function InvoicesPage() {
     const { formatCurrency } = useFormat()
     const [search, setSearch] = useState('')
     const [page, setPage] = useState(1)
-    const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'paid' | 'cancelled'>('all')
+    const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'sent' | 'paid' | 'cancelled' | 'expired'>('all')
     const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined)
     
     const debouncedSearch = useDebounce(search, 300)
@@ -73,6 +73,10 @@ export default function InvoicesPage() {
                 return 'default'
             case 'pending':
                 return 'secondary'
+            case 'sent':
+                return 'secondary'
+            case 'expired':
+                return 'destructive'
             case 'cancelled':
                 return 'destructive'
             default:
@@ -84,8 +88,12 @@ export default function InvoicesPage() {
         switch (status) {
             case 'pending':
                 return 'En attente'
+            case 'sent':
+                return 'Envoyée'
             case 'paid':
                 return 'Payée'
+            case 'expired':
+                return 'Expirée'
             case 'cancelled':
                 return 'Annulée'
             default:
@@ -119,7 +127,7 @@ export default function InvoicesPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     <Select
                         value={statusFilter}
-                        onValueChange={(value: 'all' | 'pending' | 'paid' | 'cancelled') => setStatusFilter(value)}
+                        onValueChange={(value: 'all' | 'pending' | 'sent' | 'paid' | 'cancelled' | 'expired') => setStatusFilter(value)}
                     >
                         <SelectTrigger>
                             <SelectValue placeholder="Statut" />
@@ -127,7 +135,9 @@ export default function InvoicesPage() {
                         <SelectContent>
                             <SelectItem value="all">Tous</SelectItem>
                             <SelectItem value="pending">En attente</SelectItem>
+                            <SelectItem value="sent">Envoyée</SelectItem>
                             <SelectItem value="paid">Payée</SelectItem>
+                            <SelectItem value="expired">Expirée</SelectItem>
                             <SelectItem value="cancelled">Annulée</SelectItem>
                         </SelectContent>
                     </Select>

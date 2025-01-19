@@ -72,6 +72,10 @@ export default function InvoiceDetailsPage() {
                 return 'default'
             case 'pending':
                 return 'secondary'
+            case 'sent':
+                return 'secondary'
+            case 'expired':
+                return 'destructive'
             case 'cancelled':
                 return 'destructive'
             default:
@@ -83,8 +87,12 @@ export default function InvoiceDetailsPage() {
         switch (status) {
             case 'pending':
                 return 'En attente'
+            case 'sent':
+                return 'Envoyée'
             case 'paid':
                 return 'Payée'
+            case 'expired':
+                return 'Expirée'
             case 'cancelled':
                 return 'Annulée'
             default:
@@ -98,6 +106,10 @@ export default function InvoiceDetailsPage() {
                 return <CheckCircle2 className="w-4 h-4" />
             case 'pending':
                 return <AlertCircle className="w-4 h-4" />
+            case 'sent':
+                return <Send className="w-4 h-4" />
+            case 'expired':
+                return <Ban className="w-4 h-4" />
             case 'cancelled':
                 return <Ban className="w-4 h-4" />
             default:
@@ -187,7 +199,7 @@ export default function InvoiceDetailsPage() {
                         error={(addPayment.error as ApiError)?.response?.data}
                     />
                     <div className="flex flex-wrap gap-2 w-full">
-                    {invoiceData.status === 'pending' && (
+                    {invoiceData.status !== 'cancelled' && invoiceData.status !== 'expired' && invoiceData.status !== 'paid' && (
                         <>
                         <Button variant="outline" onClick={() => setIsEditDialogOpen(true)} className="flex-1 sm:flex-none">
                             <Pencil className="w-4 h-4 mr-2" />
@@ -490,7 +502,7 @@ export default function InvoiceDetailsPage() {
                     <CardHeader>
                         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                             <CardTitle>Paiements</CardTitle>
-                            {invoiceData.status === 'pending' && (
+                            {invoiceData.status !== 'cancelled' && invoiceData.status !== 'expired' && invoiceData.status !== 'paid' && (
                                 <Button variant="outline" onClick={() => setIsAddPaymentDialogOpen(true)} className="w-full sm:w-auto">
                                     <Plus className="w-4 h-4 mr-2" />
                                     Ajouter un paiement
@@ -544,7 +556,7 @@ export default function InvoiceDetailsPage() {
                             <div className="flex flex-col items-center justify-center py-6 text-center text-muted-foreground">
                                 <FileText className="w-12 h-12 mb-4" />
                                 <p>Aucun paiement n&apos;a été enregistré pour cette facture.</p>
-                                {invoiceData.status === 'pending' && (
+                                {invoiceData.status !== 'cancelled' && invoiceData.status !== 'expired' && invoiceData.status !== 'paid' && (
                                     <Button 
                                         variant="link" 
                                         onClick={() => setIsAddPaymentDialogOpen(true)}

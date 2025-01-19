@@ -177,11 +177,13 @@ export default function QuoteDetailsPage() {
                         error={(updateQuote.error as ApiError)?.response?.data}
                     />
                     <div className="flex flex-wrap gap-2 w-full">
-                        <Button variant="outline" onClick={() => setIsEditDialogOpen(true)} className="flex-1 sm:flex-none">
-                            <Pencil className="w-4 h-4 mr-2" />
-                            <span className="hidden sm:inline">Modifier</span>
-                        </Button>
+                            
                         {quoteData.data?.status === 'draft' && (
+                            <>
+                                <Button variant="outline" onClick={() => setIsEditDialogOpen(true)} className="flex-1 sm:flex-none">
+                                    <Pencil className="w-4 h-4 mr-2" />
+                                    <span className="hidden sm:inline">Modifier</span>
+                        </Button>
                             <Button 
                                 variant="outline" 
                                 onClick={() => sendQuote.mutate()}
@@ -200,6 +202,7 @@ export default function QuoteDetailsPage() {
                                     </>
                                 )}
                             </Button>
+                            </>
                         )}
                         {quoteData.data?.status === 'sent' && (
                             <>
