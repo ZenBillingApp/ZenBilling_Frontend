@@ -47,7 +47,7 @@ export default function InvoicesPage() {
     const { formatCurrency } = useFormat()
     const [search, setSearch] = useState('')
     const [page, setPage] = useState(1)
-    const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'sent' | 'paid' | 'cancelled' | 'expired'>('all')
+    const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'sent' | 'paid' | 'cancelled' | 'late'>('all')
     const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined)
     
     const debouncedSearch = useDebounce(search, 300)
@@ -75,7 +75,7 @@ export default function InvoicesPage() {
                 return 'secondary'
             case 'sent':
                 return 'secondary'
-            case 'expired':
+            case 'late':
                 return 'destructive'
             case 'cancelled':
                 return 'destructive'
@@ -92,8 +92,8 @@ export default function InvoicesPage() {
                 return 'Envoyée'
             case 'paid':
                 return 'Payée'
-            case 'expired':
-                return 'Expirée'
+            case 'late':
+                return 'En retard'
             case 'cancelled':
                 return 'Annulée'
             default:
@@ -127,7 +127,7 @@ export default function InvoicesPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     <Select
                         value={statusFilter}
-                        onValueChange={(value: 'all' | 'pending' | 'sent' | 'paid' | 'cancelled' | 'expired') => setStatusFilter(value)}
+                        onValueChange={(value: 'all' | 'pending' | 'sent' | 'paid' | 'cancelled' | 'late') => setStatusFilter(value)}
                     >
                         <SelectTrigger>
                             <SelectValue placeholder="Statut" />
@@ -137,7 +137,7 @@ export default function InvoicesPage() {
                             <SelectItem value="pending">En attente</SelectItem>
                             <SelectItem value="sent">Envoyée</SelectItem>
                             <SelectItem value="paid">Payée</SelectItem>
-                            <SelectItem value="expired">Expirée</SelectItem>
+                            <SelectItem value="late">En retard</SelectItem>
                             <SelectItem value="cancelled">Annulée</SelectItem>
                         </SelectContent>
                     </Select>

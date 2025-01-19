@@ -1,6 +1,6 @@
 import { VatRate } from './Product.interface';
 
-export type InvoiceStatus = 'pending' | 'sent' | 'paid' | 'cancelled' | 'expired';
+export type InvoiceStatus = 'pending' | 'sent' | 'paid' | 'cancelled' | 'late';
 export type PaymentMethod = 'cash' | 'credit_card' | 'bank_transfer';
 
 export interface IInvoiceQueryParams {
