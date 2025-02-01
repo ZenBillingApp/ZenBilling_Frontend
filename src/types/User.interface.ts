@@ -1,10 +1,10 @@
 export interface IUser {
-  user_id: number;
+  user_id: string;
   first_name: string;
   last_name: string;
   email: string;
   password_hash: string;
-  company_id?: number;
+  company_id?: string;
   onboarding_completed: boolean;
   onboarding_step: 'CHOOSING_COMPANY' | 'CONTACT_INFO' | 'FINISH';
   createdAt: Date;
@@ -18,11 +18,11 @@ export interface IUpdateUserRequest {
 }
 
 export interface IUserResponse {
-  user_id: number;
+  user_id: string;
   email: string;
   first_name: string;
   last_name: string;
-  company_id?: number;
+  company_id?: string;
   onboarding_completed: boolean;
   onboarding_step: string;
   createdAt: Date;

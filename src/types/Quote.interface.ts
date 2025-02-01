@@ -4,10 +4,10 @@ import { IQuoteItem } from './QuoteItem.interface';
 export type QuoteStatus = 'draft' | 'sent' | 'accepted' | 'rejected' | 'expired';
 
 export interface IQuote {
-  quote_id?: number;
-  customer_id: number;
-  user_id: number;
-  company_id: number | null;
+  quote_id?: string;
+  customer_id: string;
+  user_id: string;
+  company_id: string | null;
   quote_number: string;
   quote_date: Date;
   validity_date: Date;

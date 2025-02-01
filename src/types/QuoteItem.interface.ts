@@ -1,9 +1,9 @@
 import { IProduct, ProductUnit, VatRate } from "./Product.interface";
 
 export interface IQuoteItem {
-  item_id?: number;
-  quote_id: number;
-  product_id?: number | null;
+  item_id?: string;
+  quote_id: string;
+  product_id?: string | null;
   name: string | null;
   description?: string | null;
   quantity: number;

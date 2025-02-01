@@ -75,7 +75,7 @@ export default function QuotesPage() {
     }
 
     return (
-        <div className="container mx-auto px-4 py-6">
+        <div className="container mx-auto px-4 py-6 space-y-6 max-w-7xl">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                 <h1 className="text-2xl font-bold font-dmSans flex items-center">
                     <FileText className="w-6 h-6 mr-2" />

@@ -1,7 +1,7 @@
 import { IUser } from '@/types/User.interface';
 
 export interface ICompany {
-  company_id: number;
+  company_id: string;
   name: string;
   siret: string;
   tva_intra: string;

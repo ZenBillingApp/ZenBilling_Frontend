@@ -1,5 +1,5 @@
 export interface IBusinessCustomer {
-  customer_id: number;
+  customer_id: string;
   name: string;
   siret: string;
   siren: string;

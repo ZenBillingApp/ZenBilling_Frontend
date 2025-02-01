@@ -20,13 +20,14 @@ export const useProducts = (params: ProductsQueryParams = {}) => {
     })
 }
 
-export const useProduct = (productId: number) => {
+export const useProduct = (productId: string) => {
     return useQuery({
         queryKey: ["products", productId],
         queryFn: () => api.get(`/products/${productId}`),
         enabled: !!productId,
     })
 }
+
 
 export const useCreateProduct = () => {
     const queryClient = useQueryClient()
@@ -44,10 +45,11 @@ export const useCreateProduct = () => {
     })
 }
 
-export const useUpdateProduct = (productId: number) => {
+export const useUpdateProduct = (productId: string) => {
     const queryClient = useQueryClient()
     const { toast } = useToast()
     return useMutation({
+
         mutationFn: (data: IUpdateProductRequest) =>
             api.put(`/products/${productId}`, data),
         onSuccess: () => {
@@ -66,10 +68,11 @@ export const useDeleteProduct = () => {
     const queryClient = useQueryClient()
     const { toast } = useToast()
     return useMutation({
-        mutationFn: (productId: number) =>
+        mutationFn: (productId: string) =>
             api.delete(`/products/${productId}`),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["products"] })
+
             toast({
                 title: "Produit supprimé avec succès",
                 description: "Le produit a été supprimé avec succès",
@@ -84,7 +87,7 @@ export const useDeleteProduct = () => {
     })
 }
 
-export const useProductDetails = (productId: number) => {
+export const useProductDetails = (productId: string) => {
     return useQuery({
         queryKey: ["product-details", productId],
         queryFn: () => api.get(`/products/${productId}`),

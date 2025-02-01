@@ -2,9 +2,9 @@ import { IBusinessCustomer } from './BusinessCustomer.interface';
 import { IIndividualCustomer } from './IndividualCustomer.interface';
 
 export interface ICustomer {
-  customer_id?: number;
-  user_id: number;
-  company_id: number;
+  customer_id?: string;
+  user_id: string;
+  company_id: string;
   type: 'individual' | 'company';
   email: string | null;
   phone: string | null;

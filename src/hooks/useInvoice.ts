@@ -22,7 +22,7 @@ export const useInvoices = (params: IInvoiceQueryParams = {}) => {
     })
 }
 
-export const useInvoice = (invoiceId: number) => {
+export const useInvoice = (invoiceId: string) => {
     return useQuery({
         queryKey: ["invoices", invoiceId],
         queryFn: () => api.get(`/invoices/${invoiceId}`),
@@ -48,10 +48,11 @@ export const useCreateInvoice = () => {
     })
 }
 
-export const useUpdateInvoice = (invoiceId: number) => {
+export const useUpdateInvoice = (invoiceId: string) => {
     const queryClient = useQueryClient()
     const { toast } = useToast()
     return useMutation({
+
         mutationFn: (data: IUpdateInvoiceRequest) =>
             api.put(`/invoices/${invoiceId}`, data),
         onSuccess: () => {
@@ -69,10 +70,11 @@ export const useDeleteInvoice = () => {
     const queryClient = useQueryClient()
     const { toast } = useToast()
     return useMutation({
-        mutationFn: (invoiceId: number) =>
+        mutationFn: (invoiceId: string) =>
             api.delete(`/invoices/${invoiceId}`),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["invoices"] })
+
             toast({
                 title: "Facture supprimée avec succès",
                 description: "La facture a été supprimée avec succès",
@@ -90,9 +92,10 @@ export const useDeleteInvoice = () => {
 export const useDownloadInvoicePdf = (invoiceNumber: string) => {
     const { toast } = useToast()
     return useMutation({
-        mutationFn: async (invoiceId: number) => {
+        mutationFn: async (invoiceId: string) => {
             const response = await api.getBinary(`/invoices/${invoiceId}/pdf`)
             
+
             // Créer un URL pour le blob
             const blob = new Blob([response.data], { type: 'application/pdf' })
             const url = window.URL.createObjectURL(blob)
@@ -125,10 +128,11 @@ export const useDownloadInvoicePdf = (invoiceNumber: string) => {
     })
 }
 
-export const useAddPayment = (invoiceId: number) => {
+export const useAddPayment = (invoiceId: string) => {
     const queryClient = useQueryClient()
     const { toast } = useToast()
     return useMutation({
+
         mutationFn: (data: AddPaymentSchema) =>
             api.post(`/invoices/${invoiceId}/payments`, {
                 ...data,
@@ -145,10 +149,11 @@ export const useAddPayment = (invoiceId: number) => {
     })
 }
 
-export const useSendInvoice = (invoiceId: number) => {
+export const useSendInvoice = (invoiceId: string) => {
     const queryClient = useQueryClient()
     const { toast } = useToast()
     return useMutation({
+
         mutationFn: () => api.post(`/invoices/${invoiceId}/send`),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["invoices", invoiceId] })

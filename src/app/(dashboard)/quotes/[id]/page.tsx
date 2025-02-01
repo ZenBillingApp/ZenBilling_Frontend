@@ -46,10 +46,11 @@ export default function QuoteDetailsPage() {
     const { formatCurrency, formatPercent } = useFormat()
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
 
-    const { data: quoteData, isLoading } = useQuote(Number(params.id))
+    const { data: quoteData, isLoading } = useQuote(params.id as string)
     const downloadPdf = useDownloadQuotePdf(quoteData?.data?.quote_number)
-    const updateQuote = useUpdateQuote(Number(params.id))
-    const sendQuote = useSendQuote(Number(params.id))
+    const updateQuote = useUpdateQuote(params.id as string)
+    const sendQuote = useSendQuote(params.id as string)
+
 
     const handleUpdateQuote = async (data: Partial<EditQuoteSchema>) => {
         const updateData: IUpdateQuoteRequest = {
@@ -218,10 +219,11 @@ export default function QuoteDetailsPage() {
                         )}
                         <Button 
                             variant="outline" 
-                            onClick={() => downloadPdf.mutate(Number(params.id))}
+                            onClick={() => downloadPdf.mutate(params.id as string)}
                             disabled={downloadPdf.isPending}
                             className="flex-1 sm:flex-none"
                         >
+
                             {downloadPdf.isPending ? (
                                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                             ) : (

@@ -50,11 +50,14 @@ export default function InvoiceDetailsPage() {
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
     const [isAddPaymentDialogOpen, setIsAddPaymentDialogOpen] = useState(false)
 
-    const { data: invoiceData, isLoading } = useInvoice(Number(params.id))
+    const { data: invoiceData, isLoading } = useInvoice(params.id as string)
     const downloadPdf = useDownloadInvoicePdf(invoiceData?.invoice_number)
-    const updateInvoice = useUpdateInvoice(Number(params.id))
-    const addPayment = useAddPayment(Number(params.id))
-    const sendInvoice = useSendInvoice(Number(params.id))
+    const updateInvoice = useUpdateInvoice(params.id as string)
+    const addPayment = useAddPayment(params.id as string)
+    const sendInvoice = useSendInvoice(params.id as string)
+
+
+
 
     const handleUpdateInvoice = async (data: Partial<EditInvoiceSchema>) => {
         await updateInvoice.mutateAsync(data as IUpdateInvoiceRequest)
@@ -233,10 +236,11 @@ export default function InvoiceDetailsPage() {
                         )}
                         <Button 
                             variant="outline" 
-                            onClick={() => downloadPdf.mutate(Number(params.id))}
+                            onClick={() => downloadPdf.mutate(params.id as string)}
                             disabled={downloadPdf.isPending}
                             className="flex-1 sm:flex-none"
                         >
+
                             {downloadPdf.isPending ? (
                                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                             ) : (

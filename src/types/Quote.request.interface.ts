@@ -6,7 +6,7 @@ export interface IQuoteQueryParams {
   limit?: number;
   search?: string;
   status?: QuoteStatus;
-  customer_id?: number;
+  customer_id?: string;
   start_date?: string;
   end_date?: string;
   min_amount?: number;
@@ -16,7 +16,7 @@ export interface IQuoteQueryParams {
 }
 
 export interface IQuoteItem {
-  product_id?: number;
+  product_id?: string;
   name?: string;
   description?: string;
   quantity: number;
@@ -27,7 +27,7 @@ export interface IQuoteItem {
 }
 
 export interface ICreateQuoteRequest {
-  customer_id: number;
+  customer_id: string;
   quote_date: Date;
   validity_date: Date;
   items: IQuoteItem[];

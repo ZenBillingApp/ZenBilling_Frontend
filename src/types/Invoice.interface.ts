@@ -4,10 +4,10 @@ import { IPayment } from './Payment.interface';
 import { ICompany } from './Company.interface';
 
 export interface IInvoice {
-  invoice_id?: number;
-  customer_id: number | null;
-  user_id: number;
-  company_id: number | null;
+  invoice_id?: string;
+  customer_id: string | null;
+  user_id: string;
+  company_id: string | null;
   invoice_number: string;
   invoice_date: Date;
   due_date: Date;

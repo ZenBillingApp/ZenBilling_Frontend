@@ -25,7 +25,7 @@ export const useCustomers = (params: CustomersQueryParams = {}) => {
     })
 }
 
-export const useCustomer = (customerId: number) => {
+export const useCustomer = (customerId: string) => {
     return useQuery({
         queryKey: ["customers", customerId],
         queryFn: () => api.get(`/customers/${customerId}`),
@@ -49,10 +49,11 @@ export const useCreateCustomer = () => {
     })
 }
 
-export const useUpdateCustomer = (customerId: number | undefined) => {
+export const useUpdateCustomer = (customerId: string | undefined) => {
     const queryClient = useQueryClient()
     const { toast } = useToast()
     return useMutation({
+
         mutationFn: (data: IUpdateCustomerRequest) =>
             api.put(`/customers/${customerId}`, data),
         onSuccess: () => {
@@ -70,10 +71,11 @@ export const useDeleteCustomer = () => {
     const queryClient = useQueryClient()
     const { toast } = useToast()
     return useMutation({
-        mutationFn: (customerId: number) =>
+        mutationFn: (customerId: string) =>
             api.delete(`/customers/${customerId}`),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["customers"] })
+
             toast({
                 title: "Client supprimé avec succès",
                 description: "Le client a été supprimé avec succès",

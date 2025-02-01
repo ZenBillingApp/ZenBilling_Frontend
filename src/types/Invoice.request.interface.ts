@@ -8,7 +8,7 @@ export interface IInvoiceQueryParams {
   limit?: number;
   search?: string;
   status?: InvoiceStatus;
-  customer_id?: number;
+  customer_id?: string;
   start_date?: string;
   end_date?: string;
   min_amount?: number;
@@ -18,7 +18,7 @@ export interface IInvoiceQueryParams {
 }
 
 export interface IInvoiceItem {
-  product_id?: number;
+  product_id?: string;
   name?: string;
   description?: string;
   quantity: number;
@@ -28,7 +28,7 @@ export interface IInvoiceItem {
 }
 
 export interface ICreateInvoiceRequest {
-  customer_id: number;
+  customer_id: string;
   invoice_date: Date;
   due_date: Date;
   items: IInvoiceItem[];

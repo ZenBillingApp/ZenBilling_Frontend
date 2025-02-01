@@ -1,9 +1,9 @@
 import { IProduct, ProductUnit, VatRate } from "./Product.interface";
 
 export interface IInvoiceItem {
-  item_id?: number;
-  invoice_id: number;
-  product_id: number;
+  item_id?: string;
+  invoice_id: string;
+  product_id: string;
   name: string;
   description?: string;
   quantity: number;

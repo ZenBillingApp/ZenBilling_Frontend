@@ -22,13 +22,14 @@ export const useQuotes = (params: IQuoteQueryParams = {}) => {
     })
 }
 
-export const useQuote = (quoteId: number) => {
+export const useQuote = (quoteId: string) => {
     return useQuery({
         queryKey: ["quotes", quoteId],
         queryFn: () => api.get(`/quotes/${quoteId}`),
         enabled: !!quoteId,
     })
 }
+
 
 export const useCreateQuote = () => {
     const queryClient = useQueryClient()
@@ -49,10 +50,11 @@ export const useCreateQuote = () => {
     })
 }
 
-export const useUpdateQuote = (quoteId: number) => {
+export const useUpdateQuote = (quoteId: string) => {
     const queryClient = useQueryClient()
     const { toast } = useToast()
     return useMutation({
+
         mutationFn: (data: IUpdateQuoteRequest) =>
             api.put(`/quotes/${quoteId}`, data),
         onSuccess: () => {
@@ -70,10 +72,11 @@ export const useDeleteQuote = () => {
     const queryClient = useQueryClient()
     const { toast } = useToast()
     return useMutation({
-        mutationFn: (quoteId: number) =>
+        mutationFn: (quoteId: string) =>
             api.delete(`/quotes/${quoteId}`),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["quotes"] })
+
             toast({
                 title: "Devis supprimé avec succès",
                 description: "Le devis a été supprimé avec succès",
@@ -91,9 +94,10 @@ export const useDeleteQuote = () => {
 export const useDownloadQuotePdf = (quoteNumber: string) => {
     const { toast } = useToast()
     return useMutation({
-        mutationFn: async (quoteId: number) => {
+        mutationFn: async (quoteId: string) => {
             const response = await api.getBinary(`/quotes/${quoteId}/pdf`)
             
+
             // Créer un URL pour le blob
             const blob = new Blob([response.data], { type: 'application/pdf' })
             const url = window.URL.createObjectURL(blob)
@@ -126,7 +130,7 @@ export const useDownloadQuotePdf = (quoteNumber: string) => {
     })
 }
 
-export const useSendQuote = (quoteId: number) => {
+export const useSendQuote = (quoteId: string) => {
     const queryClient = useQueryClient()
     const { toast } = useToast()
     return useMutation({

@@ -17,8 +17,8 @@ export type ProductUnit =
 export type VatRate = 0.00 | 2.10 | 5.50 | 10.00 | 20.00;
 
 export interface IProduct {
-  product_id?: number;
-  company_id: number;
+  product_id?: string;
+  company_id: string;
   name: string;
   description: string | null;
   price_excluding_tax: number;

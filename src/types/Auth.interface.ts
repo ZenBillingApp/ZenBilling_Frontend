@@ -11,11 +11,11 @@ export interface IRegisterRequest extends ILoginRequest {
 export interface IAuthResponse {
   token: string;
   user: {
-    user_id: number;
+    user_id: string;
     email: string;
     first_name: string;
     last_name: string;
-    company_id?: number;
+    company_id?: string;
     onboarding_completed: boolean;
     onboarding_step: string;
   };
