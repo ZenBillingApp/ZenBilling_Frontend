@@ -26,7 +26,7 @@ export function CustomerDetailsDialog({
   onOpenChange,
   onEdit 
 }: CustomerDetailsDialogProps) {
-  const { data: customerDetails, isLoading } = useCustomer(customer?.customer_id || 0)
+  const { data: customerDetails, isLoading } = useCustomer(customer?.customer_id as string)
 
   if (!customer) return null
 

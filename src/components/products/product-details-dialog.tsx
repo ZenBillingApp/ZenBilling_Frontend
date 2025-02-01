@@ -28,7 +28,7 @@ export function ProductDetailsDialog({
   onEdit 
 }: ProductDetailsDialogProps) {
   const { formatCurrency, formatPercent } = useFormat()
-  const { data: productDetails, isLoading } = useProductDetails(product?.product_id || 0)
+  const { data: productDetails, isLoading } = useProductDetails(product?.product_id as string)
 
   if (!product) return null
 
