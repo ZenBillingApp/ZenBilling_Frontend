@@ -1,59 +1,69 @@
-"use client"
+"use client";
 
-import React, { useState } from 'react'
-import { useCustomers } from '@/hooks/useCustomer'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Loader2, MapPin, Plus, Search } from 'lucide-react'
-import { ICustomer } from '@/types/Customer.interface'
-import { User, Building, User2Icon } from 'lucide-react'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { useDebounce } from '@/hooks/useDebounce'
+import React, { useState } from "react";
+import { useCustomers } from "@/hooks/useCustomer";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Loader2, MapPin, Plus, Search } from "lucide-react";
+import { ICustomer } from "@/types/Customer.interface";
+import { User, Building, User2Icon } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useDebounce } from "@/hooks/useDebounce";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 import {
-    Pagination,
-    PaginationContent,
-    PaginationItem,
-    PaginationLink,
-    PaginationNext,
-    PaginationPrevious,
-  } from "@/components/ui/pagination"
-import NiceModal from '@ebay/nice-modal-react'
-import CreateCustomerDialog from '@/components/customers/create-customer-dialog'
-import EditCustomerDialog from '@/components/customers/edit-customer-dialog'
-import { CustomerDetailsDialog } from '@/components/customers/customer-details-dialog'
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import NiceModal from "@ebay/nice-modal-react";
+import CreateCustomerDialog from "@/components/customers/create-customer-dialog";
+import EditCustomerDialog from "@/components/customers/edit-customer-dialog";
+import { CustomerDetailsDialog } from "@/components/customers/customer-details-dialog";
 
 export default function CustomersPage() {
-  const [search, setSearch] = useState('')
-  const [page, setPage] = useState(1)
-  const [typeFilter, setTypeFilter] = useState<'all' | 'individual' | 'company'>('all')
-  const [selectedCustomer, setSelectedCustomer] = useState<ICustomer | null>(null)
-  const debouncedSearch = useDebounce(search, 300)
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [typeFilter, setTypeFilter] = useState<
+    "all" | "individual" | "company"
+  >("all");
+  const [selectedCustomer, setSelectedCustomer] = useState<ICustomer | null>(
+    null
+  );
+  const debouncedSearch = useDebounce(search, 300);
   const { data, isLoading } = useCustomers({
     search: debouncedSearch || undefined,
-    type: typeFilter === 'all' ? undefined : typeFilter,
+    type: typeFilter === "all" ? undefined : typeFilter,
     limit: 25,
-    page: page
-  })
-  const totalPages = data?.data.pagination.totalPages
-
+    page: page,
+  });
+  const totalPages = data?.data.pagination.totalPages;
 
   const handleCreateCustomer = () => {
-    NiceModal.show(CreateCustomerDialog)
-  }
+    NiceModal.show(CreateCustomerDialog);
+  };
 
   const handleEditCustomer = () => {
     if (selectedCustomer) {
-      NiceModal.show(EditCustomerDialog, { customer: selectedCustomer })
+      NiceModal.show(EditCustomerDialog, { customer: selectedCustomer });
     }
-  }
+  };
 
   return (
     <div className="container mx-auto px-4 py-6 space-y-6 max-w-7xl">
@@ -62,7 +72,10 @@ export default function CustomersPage() {
           <User2Icon className="w-5 sm:w-6 h-5 sm:h-6 mr-2" />
           Clients
         </h1>
-        <Button onClick={handleCreateCustomer} className="w-full sm:w-auto flex items-center gap-2">
+        <Button
+          onClick={handleCreateCustomer}
+          className="w-full sm:w-auto flex items-center gap-2"
+        >
           <Plus className="w-4 h-4" />
           Nouveau client
         </Button>
@@ -81,7 +94,9 @@ export default function CustomersPage() {
         <div className="w-full sm:w-[200px]">
           <Select
             value={typeFilter}
-            onValueChange={(value: 'all' | 'individual' | 'company') => setTypeFilter(value)}
+            onValueChange={(value: "all" | "individual" | "company") =>
+              setTypeFilter(value)
+            }
           >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Type de client" />
@@ -104,8 +119,12 @@ export default function CustomersPage() {
                   <TableHead className="w-[100px]">Type</TableHead>
                   <TableHead>Nom</TableHead>
                   <TableHead className="hidden sm:table-cell">Email</TableHead>
-                  <TableHead className="hidden sm:table-cell">Téléphone</TableHead>
-                  <TableHead className="hidden lg:table-cell">Adresse</TableHead>
+                  <TableHead className="hidden sm:table-cell">
+                    Téléphone
+                  </TableHead>
+                  <TableHead className="hidden lg:table-cell">
+                    Adresse
+                  </TableHead>
                   <TableHead className="hidden lg:table-cell">Ville</TableHead>
                 </TableRow>
               </TableHeader>
@@ -120,9 +139,14 @@ export default function CustomersPage() {
                   </TableRow>
                 ) : !data?.data?.customers?.length ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                    <TableCell
+                      colSpan={6}
+                      className="text-center py-8 text-muted-foreground"
+                    >
                       <div className="flex flex-col items-center justify-center text-center">
-                        <p className="text-sm text-muted-foreground">Aucun client trouvé</p>
+                        <p className="text-sm text-muted-foreground">
+                          Aucun client trouvé
+                        </p>
                         {search && (
                           <p className="text-xs text-muted-foreground mt-1">
                             Essayez de modifier votre recherche
@@ -133,28 +157,34 @@ export default function CustomersPage() {
                   </TableRow>
                 ) : (
                   data?.data?.customers?.map((customer: ICustomer) => (
-                    <TableRow 
-                      key={customer.customer_id} 
+                    <TableRow
+                      key={customer.customer_id}
                       className="cursor-pointer transition-colors hover:bg-muted/50"
                       onClick={() => setSelectedCustomer(customer)}
                     >
                       <TableCell>
-                        {customer.type === 'company' ? (
-                          <Badge variant="outline" className="flex items-center gap-2 w-fit">
+                        {customer.type === "company" ? (
+                          <Badge
+                            variant="outline"
+                            className="flex items-center gap-2 w-fit"
+                          >
                             <Building className="w-4 h-4" />
                             <span className="hidden sm:inline">Pro</span>
                           </Badge>
                         ) : (
-                          <Badge variant="outline" className="flex items-center gap-2 w-fit">
+                          <Badge
+                            variant="outline"
+                            className="flex items-center gap-2 w-fit"
+                          >
                             <User className="w-4 h-4" />
                             <span className="hidden sm:inline">Part.</span>
                           </Badge>
                         )}
                       </TableCell>
                       <TableCell className="font-medium max-w-[200px] truncate">
-                        {customer.type === 'company' 
-                          ? customer.BusinessCustomer?.name 
-                          : `${customer.IndividualCustomer?.first_name} ${customer.IndividualCustomer?.last_name}`}
+                        {customer.type === "company"
+                          ? customer.business?.name
+                          : `${customer.individual?.first_name} ${customer.individual?.last_name}`}
                       </TableCell>
                       <TableCell className="hidden sm:table-cell text-nowrap">
                         <span className="text-muted-foreground">
@@ -170,7 +200,9 @@ export default function CustomersPage() {
                         {customer.address ? (
                           <div className="flex items-center gap-2 text-muted-foreground">
                             <MapPin className="w-4 h-4 shrink-0" />
-                            <span className="truncate max-w-[200px]">{customer.address}</span>
+                            <span className="truncate max-w-[200px]">
+                              {customer.address}
+                            </span>
                           </div>
                         ) : (
                           <span className="text-muted-foreground">-</span>
@@ -204,10 +236,10 @@ export default function CustomersPage() {
           <Pagination>
             <PaginationContent>
               <PaginationItem>
-                <PaginationPrevious 
-                  className='hidden sm:flex cursor-pointer' 
-                  onClick={() => setPage(p => Math.max(1, p - 1))} 
-                  isActive={page !== 1} 
+                <PaginationPrevious
+                  className="hidden sm:flex cursor-pointer"
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  isActive={page !== 1}
                 />
               </PaginationItem>
               {[...Array(totalPages)].map((_, i) => {
@@ -226,10 +258,10 @@ export default function CustomersPage() {
                 );
               })}
               <PaginationItem>
-                <PaginationNext 
-                  className='hidden sm:flex cursor-pointer' 
-                  onClick={() => setPage(p => Math.min(totalPages, p + 1))} 
-                  isActive={page !== totalPages} 
+                <PaginationNext
+                  className="hidden sm:flex cursor-pointer"
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  isActive={page !== totalPages}
                 />
               </PaginationItem>
             </PaginationContent>
@@ -237,5 +269,5 @@ export default function CustomersPage() {
         </div>
       )}
     </div>
-  )
+  );
 }

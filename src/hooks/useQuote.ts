@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { api, ApiError } from "@/services/api"
 import type { ICreateQuoteRequest, IUpdateQuoteRequest, IQuoteQueryParams } from "@/types/Quote.request.interface"
 import { useToast } from "@/hooks/use-toast"
+import { IQuote } from "@/types/Quote.interface"
 
 
 export const useQuotes = (params: IQuoteQueryParams = {}) => {
@@ -23,9 +24,10 @@ export const useQuotes = (params: IQuoteQueryParams = {}) => {
 }
 
 export const useQuote = (quoteId: string) => {
-    return useQuery({
+    return useQuery<IQuote>({
         queryKey: ["quotes", quoteId],
         queryFn: () => api.get(`/quotes/${quoteId}`),
+        
         enabled: !!quoteId,
     })
 }
@@ -35,7 +37,7 @@ export const useCreateQuote = () => {
     const queryClient = useQueryClient()
     const { toast } = useToast()
 
-    return useMutation({
+    return useMutation<IQuote, ApiError, ICreateQuoteRequest>({
         mutationFn: (data: ICreateQuoteRequest) => 
             api.post("/quotes", data),
         onSuccess: () => {
@@ -53,7 +55,7 @@ export const useCreateQuote = () => {
 export const useUpdateQuote = (quoteId: string) => {
     const queryClient = useQueryClient()
     const { toast } = useToast()
-    return useMutation({
+    return useMutation<IQuote, ApiError, IUpdateQuoteRequest>({
 
         mutationFn: (data: IUpdateQuoteRequest) =>
             api.put(`/quotes/${quoteId}`, data),
@@ -71,7 +73,7 @@ export const useUpdateQuote = (quoteId: string) => {
 export const useDeleteQuote = () => {
     const queryClient = useQueryClient()
     const { toast } = useToast()
-    return useMutation({
+    return useMutation<IQuote, ApiError, string>({
         mutationFn: (quoteId: string) =>
             api.delete(`/quotes/${quoteId}`),
         onSuccess: () => {

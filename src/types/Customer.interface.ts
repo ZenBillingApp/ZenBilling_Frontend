@@ -14,7 +14,8 @@ export interface ICustomer {
   country: string;
   createdAt: Date;
   updatedAt: Date;
-  BusinessCustomer?: IBusinessCustomer;
-  IndividualCustomer?: IIndividualCustomer;
+  business?: IBusinessCustomer;
+  individual?: IIndividualCustomer;
 } 
+
 

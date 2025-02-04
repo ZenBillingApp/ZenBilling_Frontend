@@ -19,8 +19,8 @@ export interface IInvoice {
   late_payment_penalty?: string;
   
   // Relations
-  Customer?: ICustomer;
-  InvoiceItems?: IInvoiceItem[];
-  Payments?: IPayment[];
-  Company?: ICompany;
+  customer?: ICustomer;
+  items?: IInvoiceItem[];
+  payments?: IPayment[];
+  company?: ICompany;
 } 

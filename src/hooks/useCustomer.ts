@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { api, ApiError } from "@/services/api"
 import type { ICreateCustomerRequest, IUpdateCustomerRequest } from "@/types/Customer.request.interface"
 import {  useToast } from "@/hooks/use-toast"
+import { ICustomer } from "@/types/Customer.interface"
 
 interface CustomersQueryParams {
     page?: number;
@@ -26,8 +27,8 @@ export const useCustomers = (params: CustomersQueryParams = {}) => {
 }
 
 export const useCustomer = (customerId: string) => {
-    return useQuery({
-        queryKey: ["customers", customerId],
+        return useQuery<{ data: ICustomer }>({
+            queryKey: ["customers", customerId],
         queryFn: () => api.get(`/customers/${customerId}`),
         enabled: !!customerId,
     })

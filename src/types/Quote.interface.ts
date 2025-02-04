@@ -19,6 +19,6 @@ export interface IQuote {
   notes?: string;
   
   // Relations
-  Customer?: ICustomer;
-  QuoteItems?: IQuoteItem[];
+  customer?: ICustomer;
+  items?: IQuoteItem[];
 } 

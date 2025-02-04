@@ -1,43 +1,55 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Pencil, Loader2, Building, User, Mail, Phone, MapPin } from "lucide-react"
-import { ICustomer } from "@/types/Customer.interface"
-import { useCustomer } from "@/hooks/useCustomer"
+} from "@/components/ui/dialog";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  Pencil,
+  Loader2,
+  Building,
+  User,
+  Mail,
+  Phone,
+  MapPin,
+} from "lucide-react";
+import { ICustomer } from "@/types/Customer.interface";
+import { useCustomer } from "@/hooks/useCustomer";
 
 interface CustomerDetailsDialogProps {
-  customer: ICustomer | null
-  isOpen: boolean
-  onOpenChange: (open: boolean) => void
-  onEdit: () => void
+  customer: ICustomer | null;
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+  onEdit: () => void;
 }
 
-export function CustomerDetailsDialog({ 
-  customer, 
-  isOpen, 
+export function CustomerDetailsDialog({
+  customer,
+  isOpen,
   onOpenChange,
-  onEdit 
+  onEdit,
 }: CustomerDetailsDialogProps) {
-  const { data: customerDetails, isLoading } = useCustomer(customer?.customer_id as string)
+  const { data: customerDetails, isLoading } = useCustomer(
+    customer?.customer_id as string
+  );
 
-  if (!customer) return null
+  if (!customer) return null;
 
-  const displayCustomer = customerDetails?.data || customer
+  const displayCustomer = customerDetails?.data || customer;
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="w-[90%] max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader className="pt-4 sm:pt-6">
           <div className="flex justify-between items-center">
-            <DialogTitle className="text-lg sm:text-xl">Détails du client</DialogTitle>
+            <DialogTitle className="text-lg sm:text-xl">
+              Détails du client
+            </DialogTitle>
             <Button variant="outline" size="icon" onClick={onEdit}>
               <Pencil className="h-4 w-4" />
             </Button>
@@ -56,7 +68,7 @@ export function CustomerDetailsDialog({
                   {/* Type de client et informations principales */}
                   <div className="flex items-start gap-3">
                     <Badge variant="outline" className="mt-1">
-                      {displayCustomer.type === 'company' ? (
+                      {displayCustomer.type === "company" ? (
                         <Building className="w-4 h-4" />
                       ) : (
                         <User className="w-4 h-4" />
@@ -64,22 +76,27 @@ export function CustomerDetailsDialog({
                     </Badge>
                     <div className="flex-1">
                       <h3 className="font-medium">
-                        {displayCustomer.type === 'company'
-                          ? displayCustomer.BusinessCustomer?.name
-                          : `${displayCustomer.IndividualCustomer?.first_name} ${displayCustomer.IndividualCustomer?.last_name}`}
+                        {displayCustomer.type === "company"
+                          ? displayCustomer.business?.name
+                          : `${displayCustomer.individual?.first_name} ${displayCustomer.individual?.last_name}`}
                       </h3>
-                      {displayCustomer.type === 'company' && (
+                      {displayCustomer.type === "company" && (
                         <div className="mt-2 space-y-1 text-sm text-muted-foreground">
-                          {displayCustomer.BusinessCustomer?.siret && (
-                            <p>SIRET : {displayCustomer.BusinessCustomer.siret}</p>
+                          {displayCustomer.business?.siret && (
+                            <p>SIRET : {displayCustomer.business.siret}</p>
                           )}
-                          {displayCustomer.BusinessCustomer?.siren && (
-                            <p>SIREN : {displayCustomer.BusinessCustomer.siren}</p>
+                          {displayCustomer.business?.siren && (
+                            <p>SIREN : {displayCustomer.business.siren}</p>
                           )}
-                          {displayCustomer.BusinessCustomer?.tva_intra && (
-                            <p>N° TVA : {displayCustomer.BusinessCustomer.tva_intra}</p>
+                          {displayCustomer.business?.tva_intra && (
+                            <p>N° TVA : {displayCustomer.business.tva_intra}</p>
                           )}
-                          <p>TVA Applicable : {displayCustomer.BusinessCustomer?.tva_applicable ? 'Oui' : 'Non'}</p>
+                          <p>
+                            TVA Applicable :{" "}
+                            {displayCustomer.business?.tva_applicable
+                              ? "Oui"
+                              : "Non"}
+                          </p>
                         </div>
                       )}
                     </div>
@@ -105,17 +122,23 @@ export function CustomerDetailsDialog({
                   </div>
 
                   {/* Adresse */}
-                  {(displayCustomer.address || displayCustomer.city || displayCustomer.postal_code) && (
+                  {(displayCustomer.address ||
+                    displayCustomer.city ||
+                    displayCustomer.postal_code) && (
                     <div className="space-y-3">
                       <h4 className="text-sm font-medium">Adresse</h4>
                       <div className="flex items-start gap-2 text-sm text-muted-foreground">
                         <MapPin className="w-4 h-4 shrink-0 mt-0.5" />
                         <div>
-                          {displayCustomer.address && <p>{displayCustomer.address}</p>}
+                          {displayCustomer.address && (
+                            <p>{displayCustomer.address}</p>
+                          )}
                           <p>
                             {displayCustomer.postal_code} {displayCustomer.city}
                           </p>
-                          {displayCustomer.country && <p>{displayCustomer.country}</p>}
+                          {displayCustomer.country && (
+                            <p>{displayCustomer.country}</p>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -124,15 +147,23 @@ export function CustomerDetailsDialog({
                   {/* Dates */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
                     <div className="flex flex-col">
-                      <span className="text-sm text-muted-foreground">Créé le</span>
+                      <span className="text-sm text-muted-foreground">
+                        Créé le
+                      </span>
                       <span className="font-medium">
-                        {new Date(displayCustomer.createdAt).toLocaleDateString()}
+                        {new Date(
+                          displayCustomer.createdAt
+                        ).toLocaleDateString()}
                       </span>
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-sm text-muted-foreground">Dernière modification</span>
+                      <span className="text-sm text-muted-foreground">
+                        Dernière modification
+                      </span>
                       <span className="font-medium">
-                        {new Date(displayCustomer.updatedAt).toLocaleDateString()}
+                        {new Date(
+                          displayCustomer.updatedAt
+                        ).toLocaleDateString()}
                       </span>
                     </div>
                   </div>
@@ -143,5 +174,5 @@ export function CustomerDetailsDialog({
         )}
       </DialogContent>
     </Dialog>
-  )
-} 
+  );
+}

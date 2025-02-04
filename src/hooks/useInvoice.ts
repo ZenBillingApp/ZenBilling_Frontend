@@ -3,6 +3,7 @@ import { api, ApiError } from "@/services/api"
 import type { ICreateInvoiceRequest, IUpdateInvoiceRequest, IInvoiceQueryParams } from "@/types/Invoice.request.interface"
 import type { AddPaymentSchema } from "@/components/invoices/add-payment-dialog"
 import { useToast } from "@/hooks/use-toast"
+import { IInvoice } from "@/types/Invoice.interface"
 
 export const useInvoices = (params: IInvoiceQueryParams = {}) => {
     const { page = 1, limit = 10, search = "", status, customer_id, start_date, end_date, sortBy = 'invoice_date', sortOrder = 'DESC' } = params;
@@ -23,7 +24,7 @@ export const useInvoices = (params: IInvoiceQueryParams = {}) => {
 }
 
 export const useInvoice = (invoiceId: string) => {
-    return useQuery({
+    return useQuery<IInvoice>({
         queryKey: ["invoices", invoiceId],
         queryFn: () => api.get(`/invoices/${invoiceId}`),
         enabled: !!invoiceId,
@@ -33,7 +34,7 @@ export const useInvoice = (invoiceId: string) => {
 export const useCreateInvoice = () => {
     const queryClient = useQueryClient()
     const { toast } = useToast()
-    return useMutation({
+    return useMutation<IInvoice, ApiError, ICreateInvoiceRequest>({
         mutationFn: (data: ICreateInvoiceRequest) => 
             api.post("/invoices", data),
         onSuccess: () => {
@@ -51,7 +52,7 @@ export const useCreateInvoice = () => {
 export const useUpdateInvoice = (invoiceId: string) => {
     const queryClient = useQueryClient()
     const { toast } = useToast()
-    return useMutation({
+    return useMutation<IInvoice, ApiError, IUpdateInvoiceRequest>({
 
         mutationFn: (data: IUpdateInvoiceRequest) =>
             api.put(`/invoices/${invoiceId}`, data),
@@ -131,7 +132,7 @@ export const useDownloadInvoicePdf = (invoiceNumber: string) => {
 export const useAddPayment = (invoiceId: string) => {
     const queryClient = useQueryClient()
     const { toast } = useToast()
-    return useMutation({
+    return useMutation<IInvoice, ApiError, AddPaymentSchema>({
 
         mutationFn: (data: AddPaymentSchema) =>
             api.post(`/invoices/${invoiceId}/payments`, {
