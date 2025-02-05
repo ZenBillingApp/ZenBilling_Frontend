@@ -1,45 +1,51 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
+import { vatRateToNumber } from "@/types/Product.interface";
+
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Pencil, Loader2 } from "lucide-react"
-import { IProduct } from "@/types/Product.interface"
-import { useFormat } from "@/hooks/useFormat"
-import { useProductDetails } from "@/hooks/useProduct"
+} from "@/components/ui/dialog";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Pencil, Loader2 } from "lucide-react";
+import { IProduct } from "@/types/Product.interface";
+import { useFormat } from "@/hooks/useFormat";
+import { useProductDetails } from "@/hooks/useProduct";
 
 interface ProductDetailsDialogProps {
-  product: IProduct | null
-  isOpen: boolean
-  onOpenChange: (open: boolean) => void
-  onEdit: (e: React.MouseEvent) => void
+  product: IProduct | null;
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+  onEdit: (e: React.MouseEvent) => void;
 }
 
-export function ProductDetailsDialog({ 
-  product, 
-  isOpen, 
+export function ProductDetailsDialog({
+  product,
+  isOpen,
   onOpenChange,
-  onEdit 
+  onEdit,
 }: ProductDetailsDialogProps) {
-  const { formatCurrency, formatPercent } = useFormat()
-  const { data: productDetails, isLoading } = useProductDetails(product?.product_id as string)
+  const { formatCurrency, formatPercent } = useFormat();
+  const { data: productDetails, isLoading } = useProductDetails(
+    product?.product_id as string
+  );
 
-  if (!product) return null
+  if (!product) return null;
 
-  const displayProduct = productDetails?.data || product
+  const displayProduct = productDetails?.data || product;
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="w-[90%] max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader className="pt-4 sm:pt-6">
           <div className="flex justify-between items-center">
-            <DialogTitle className="text-lg sm:text-xl">Détails du produit</DialogTitle>
+            <DialogTitle className="text-lg sm:text-xl">
+              Détails du produit
+            </DialogTitle>
             <Button variant="outline" size="icon" onClick={onEdit}>
               <Pencil className="h-4 w-4" />
             </Button>
@@ -57,31 +63,45 @@ export function ProductDetailsDialog({
                 <div className="grid gap-3 sm:gap-4">
                   <div className="flex flex-col">
                     <span className="text-sm text-muted-foreground">Nom</span>
-                    <span className="font-medium break-words">{displayProduct.name}</span>
+                    <span className="font-medium break-words">
+                      {displayProduct.name}
+                    </span>
                   </div>
 
                   <div className="flex flex-col">
-                    <span className="text-sm text-muted-foreground">Description</span>
-                    <span className="font-medium break-words">{displayProduct.description || "Aucune description"}</span>
+                    <span className="text-sm text-muted-foreground">
+                      Description
+                    </span>
+                    <span className="font-medium break-words">
+                      {displayProduct.description || "Aucune description"}
+                    </span>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div className="flex flex-col">
-                      <span className="text-sm text-muted-foreground">Prix HT</span>
-                      <span className="font-medium">{formatCurrency(displayProduct.price_excluding_tax)}</span>
+                      <span className="text-sm text-muted-foreground">
+                        Prix HT
+                      </span>
+                      <span className="font-medium">
+                        {formatCurrency(displayProduct.price_excluding_tax)}
+                      </span>
                     </div>
 
                     <div className="flex flex-col">
                       <span className="text-sm text-muted-foreground">TVA</span>
                       <Badge variant="outline" className="w-fit mt-1">
-                        {formatPercent(displayProduct.vat_rate)}
+                        {formatPercent(
+                          vatRateToNumber(displayProduct.vat_rate)
+                        )}
                       </Badge>
                     </div>
                   </div>
 
                   {displayProduct.unit && (
                     <div className="flex flex-col">
-                      <span className="text-sm text-muted-foreground">Unité</span>
+                      <span className="text-sm text-muted-foreground">
+                        Unité
+                      </span>
                       <Badge variant="outline" className="w-fit mt-1">
                         {displayProduct.unit}
                       </Badge>
@@ -90,16 +110,28 @@ export function ProductDetailsDialog({
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div className="flex flex-col">
-                      <span className="text-sm text-muted-foreground">Créé le</span>
+                      <span className="text-sm text-muted-foreground">
+                        Créé le
+                      </span>
                       <span className="font-medium">
-                        {displayProduct?.createdAt ? new Date(displayProduct.createdAt).toLocaleDateString() : "N/A"}
+                        {displayProduct?.created_at
+                          ? new Date(
+                              displayProduct.created_at
+                            ).toLocaleDateString()
+                          : "N/A"}
                       </span>
                     </div>
 
                     <div className="flex flex-col">
-                      <span className="text-sm text-muted-foreground">Dernière modification</span>
+                      <span className="text-sm text-muted-foreground">
+                        Dernière modification
+                      </span>
                       <span className="font-medium">
-                        {displayProduct?.updatedAt ? new Date(displayProduct.updatedAt).toLocaleDateString() : "N/A"}
+                        {displayProduct?.updated_at
+                          ? new Date(
+                              displayProduct.updated_at
+                            ).toLocaleDateString()
+                          : "N/A"}
                       </span>
                     </div>
                   </div>
@@ -110,5 +142,5 @@ export function ProductDetailsDialog({
         )}
       </DialogContent>
     </Dialog>
-  )
-} 
+  );
+}

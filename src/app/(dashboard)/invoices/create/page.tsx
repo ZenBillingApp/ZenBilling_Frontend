@@ -32,7 +32,7 @@ import { ProductSelectDialog } from "@/components/products/product-select-dialog
 import { Building, User, Plus, X, FileText, ArrowLeft } from "lucide-react";
 
 import type { ICustomer } from "@/types/Customer.interface";
-import type { IProduct, VatRate } from "@/types/Product.interface";
+import { IProduct, vatRateToNumber } from "@/types/Product.interface";
 import type { IInvoiceItem } from "@/types/Invoice.request.interface";
 import type { NewProductSchema } from "@/components/products/product-select-dialog";
 import { ProductUnit } from "@/types/Product.interface";
@@ -83,7 +83,7 @@ export default function CreateInvoicePage() {
         quantity: 1,
         unit: data.unit as ProductUnit,
         unit_price_excluding_tax: Number(data.price_excluding_tax),
-        vat_rate: Number(data.vat_rate) as VatRate,
+        vat_rate: data.vat_rate,
         save_as_product: data.save_as_product,
       },
     ]);
@@ -127,7 +127,7 @@ export default function CreateInvoicePage() {
   const calculateTotal = () => {
     return items.reduce((total, item) => {
       const itemTotal = item.quantity * item.unit_price_excluding_tax;
-      const vatAmount = itemTotal * (item.vat_rate / 100);
+      const vatAmount = itemTotal * (vatRateToNumber(item.vat_rate) / 100);
       return total + itemTotal + vatAmount;
     }, 0);
   };
@@ -263,7 +263,8 @@ export default function CreateInvoicePage() {
                     {items.map((item, index) => {
                       const totalHT =
                         item.quantity * item.unit_price_excluding_tax;
-                      const totalTTC = totalHT * (1 + item.vat_rate / 100);
+                      const totalTTC =
+                        totalHT * (1 + vatRateToNumber(item.vat_rate) / 100);
 
                       return (
                         <TableRow key={index}>
@@ -280,7 +281,9 @@ export default function CreateInvoicePage() {
                           <TableCell>
                             {formatCurrency(item.unit_price_excluding_tax)}
                           </TableCell>
-                          <TableCell>{formatPercent(item.vat_rate)}</TableCell>
+                          <TableCell>
+                            {formatPercent(vatRateToNumber(item.vat_rate))}
+                          </TableCell>
                           <TableCell>
                             <Input
                               type="number"

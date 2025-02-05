@@ -152,7 +152,7 @@ export function CustomerDetailsDialog({
                       </span>
                       <span className="font-medium">
                         {new Date(
-                          displayCustomer.createdAt
+                          displayCustomer.created_at
                         ).toLocaleDateString()}
                       </span>
                     </div>
@@ -162,7 +162,7 @@ export function CustomerDetailsDialog({
                       </span>
                       <span className="font-medium">
                         {new Date(
-                          displayCustomer.updatedAt
+                          displayCustomer.updated_at
                         ).toLocaleDateString()}
                       </span>
                     </div>

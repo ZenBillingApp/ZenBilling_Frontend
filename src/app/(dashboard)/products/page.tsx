@@ -1,51 +1,61 @@
-"use client"
+"use client";
 
-import React, { useState } from 'react'
-import { useProducts } from '@/hooks/useProduct'
-import { useFormat } from '@/hooks/useFormat'
-import { ShoppingCart, Search } from 'lucide-react'
-import { Badge } from "@/components/ui/badge"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import React, { useState } from "react";
+
+import { useProducts } from "@/hooks/useProduct";
+import { useFormat } from "@/hooks/useFormat";
+
+import { vatRateToNumber, IProduct } from "@/types/Product.interface";
+
+import { Badge } from "@/components/ui/badge";
 import {
-    Pagination,
-    PaginationContent,
-    PaginationItem,
-    PaginationLink,
-    PaginationNext,
-    PaginationPrevious,
-} from "@/components/ui/pagination"
-import { Loader2 } from 'lucide-react'
-import { IProduct } from '@/types/Product.interface'
-import { EditProductDialog } from '@/components/products/edit-product-dialog'
-import { CreateProductDialog } from '@/components/products/create-product-dialog'
-import { ProductDetailsDialog } from '@/components/products/product-details-dialog'
-import { Input } from '@/components/ui/input'
-import debounce from 'lodash/debounce'
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import { EditProductDialog } from "@/components/products/edit-product-dialog";
+import { CreateProductDialog } from "@/components/products/create-product-dialog";
+import { ProductDetailsDialog } from "@/components/products/product-details-dialog";
+import { Input } from "@/components/ui/input";
+
+import debounce from "lodash/debounce";
+import { ShoppingCart, Search, Loader2 } from "lucide-react";
 
 export default function ProductsPage() {
-  const [page, setPage] = useState(1)
-  const [search, setSearch] = useState("")
-  const { data, isLoading } = useProducts({ page, limit: 25, search })
-  const { formatCurrency, formatPercent } = useFormat()
-  const [selectedProduct, setSelectedProduct] = useState<IProduct | null>(null)
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+  const [page, setPage] = useState(1);
+  const [search, setSearch] = useState("");
+  const { data, isLoading } = useProducts({ page, limit: 25, search });
+  const { formatCurrency, formatPercent } = useFormat();
+  const [selectedProduct, setSelectedProduct] = useState<IProduct | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
-  const totalPages = data?.data.pagination.totalPages
+  const totalPages = data?.data.pagination.totalPages;
 
   const debouncedSearch = debounce((value: string) => {
-    setSearch(value)
-    setPage(1)
-  }, 300)
+    setSearch(value);
+    setPage(1);
+  }, 300);
 
   const handleEditProduct = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    setIsEditDialogOpen(true)
-  }
+    e.stopPropagation();
+    setIsEditDialogOpen(true);
+  };
 
   const handleEditSuccess = () => {
-
-    setIsEditDialogOpen(false)
-  }
+    setIsEditDialogOpen(false);
+  };
 
   return (
     <div className="container mx-auto px-4 py-6 space-y-6 max-w-7xl">
@@ -56,7 +66,10 @@ export default function ProductsPage() {
           Produits
         </h1>
         <div className="w-full sm:w-auto">
-          <CreateProductDialog />
+          <CreateProductDialog
+            open={isCreateDialogOpen}
+            onOpenChange={setIsCreateDialogOpen}
+          />
         </div>
       </div>
 
@@ -80,23 +93,26 @@ export default function ProductsPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-[200px] min-w-[150px]">
-                    <p className='text-sm font-medium'>Nom</p>
+                    <p className="text-sm font-medium">Nom</p>
                   </TableHead>
                   <TableHead className="hidden sm:table-cell w-full min-w-[200px]">
-                    <p className='text-sm font-medium'>Description</p>
+                    <p className="text-sm font-medium">Description</p>
                   </TableHead>
                   <TableHead className="w-[80px] min-w-[80px]">
-                    <p className='text-sm font-medium'>TVA</p>
+                    <p className="text-sm font-medium">TVA</p>
                   </TableHead>
                   <TableHead className="w-[100px] min-w-[100px]">
-                    <p className='text-sm font-medium'>Prix HT</p>
+                    <p className="text-sm font-medium">Prix HT</p>
                   </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
+                    <TableCell
+                      colSpan={4}
+                      className="text-center py-8 text-muted-foreground"
+                    >
                       <div className="flex justify-center items-center h-full w-full">
                         <Loader2 className="w-6 h-6 animate-spin" />
                       </div>
@@ -104,9 +120,14 @@ export default function ProductsPage() {
                   </TableRow>
                 ) : data?.data.products.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
+                    <TableCell
+                      colSpan={4}
+                      className="text-center py-8 text-muted-foreground"
+                    >
                       <div className="flex flex-col items-center justify-center text-center">
-                        <p className="text-sm text-muted-foreground">Aucun produit trouvé</p>
+                        <p className="text-sm text-muted-foreground">
+                          Aucun produit trouvé
+                        </p>
                         {search && (
                           <p className="text-xs text-muted-foreground mt-1">
                             Essayez de modifier votre recherche
@@ -117,20 +138,25 @@ export default function ProductsPage() {
                   </TableRow>
                 ) : (
                   data?.data.products.map((product: IProduct) => (
-                    <TableRow 
-                      key={product.product_id} 
+                    <TableRow
+                      key={product.product_id}
                       className="cursor-pointer transition-colors hover:bg-muted/50"
                       onClick={() => setSelectedProduct(product)}
                     >
-                      <TableCell className="font-medium">{product.name}</TableCell>
+                      <TableCell className="font-medium">
+                        {product.name}
+                      </TableCell>
                       <TableCell className="hidden sm:table-cell">
-                        <p className='text-sm text-muted-foreground line-clamp-2'>
+                        <p className="text-sm text-muted-foreground line-clamp-2">
                           {product.description || "Aucune description"}
                         </p>
                       </TableCell>
                       <TableCell>
-                        <Badge variant="outline" className="flex items-center justify-center w-fit">
-                          {formatPercent(Number(product.vat_rate))}
+                        <Badge
+                          variant="outline"
+                          className="flex items-center justify-center w-fit"
+                        >
+                          {formatPercent(vatRateToNumber(product.vat_rate))}
                         </Badge>
                       </TableCell>
                       <TableCell>
@@ -153,10 +179,10 @@ export default function ProductsPage() {
           <Pagination>
             <PaginationContent>
               <PaginationItem>
-                <PaginationPrevious 
-                  className='hidden sm:flex cursor-pointer' 
-                  onClick={() => setPage(p => Math.max(1, p - 1))} 
-                  isActive={page !== 1} 
+                <PaginationPrevious
+                  className="hidden sm:flex cursor-pointer"
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  isActive={page !== 1}
                 />
               </PaginationItem>
               {[...Array(totalPages)].map((_, i) => {
@@ -175,10 +201,10 @@ export default function ProductsPage() {
                 );
               })}
               <PaginationItem>
-                <PaginationNext 
-                  className='hidden sm:flex cursor-pointer' 
-                  onClick={() => setPage(p => Math.min(totalPages, p + 1))} 
-                  isActive={page !== totalPages} 
+                <PaginationNext
+                  className="hidden sm:flex cursor-pointer"
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  isActive={page !== totalPages}
                 />
               </PaginationItem>
             </PaginationContent>
@@ -200,11 +226,11 @@ export default function ProductsPage() {
           product={selectedProduct}
           isOpen={isEditDialogOpen}
           onClose={() => {
-            setIsEditDialogOpen(false)
+            setIsEditDialogOpen(false);
           }}
           onSuccess={handleEditSuccess}
         />
       )}
     </div>
-  )
+  );
 }

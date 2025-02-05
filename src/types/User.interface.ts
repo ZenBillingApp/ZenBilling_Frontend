@@ -7,8 +7,8 @@ export interface IUser {
   company_id?: string;
   onboarding_completed: boolean;
   onboarding_step: 'CHOOSING_COMPANY' | 'CONTACT_INFO' | 'FINISH';
-  createdAt: Date;
-  updatedAt: Date;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface IUpdateUserRequest {
@@ -25,6 +25,6 @@ export interface IUserResponse {
   company_id?: string;
   onboarding_completed: boolean;
   onboarding_step: string;
-  createdAt: Date;
-  updatedAt: Date;
+  created_at: string;
+  updated_at: string;
 } 

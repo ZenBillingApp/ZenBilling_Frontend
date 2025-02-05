@@ -16,7 +16,8 @@ import type { ApiError } from "@/services/api";
 import type { IPayment } from "@/types/Payment.interface";
 
 import type { IUpdateInvoiceRequest } from "@/types/Invoice.request.interface";
-import { IInvoiceItem } from "@/types/InvoiceItem.interface";
+import type { IInvoiceItem } from "@/types/InvoiceItem.interface";
+import { vatRateToNumber } from "@/types/Product.interface";
 
 import {
   Card,
@@ -515,7 +516,8 @@ export default function InvoiceDetailsPage() {
                   {invoiceData.items?.map((item: IInvoiceItem) => {
                     const totalHT =
                       item.quantity * item.unit_price_excluding_tax;
-                    const totalTTC = totalHT * (1 + item.vat_rate / 100);
+                    const totalTTC =
+                      totalHT * (1 + vatRateToNumber(item.vat_rate) / 100);
 
                     return (
                       <TableRow key={item.item_id}>
@@ -533,7 +535,7 @@ export default function InvoiceDetailsPage() {
                           {formatCurrency(item.unit_price_excluding_tax)}
                         </TableCell>
                         <TableCell className="hidden sm:table-cell">
-                          {formatPercent(item.vat_rate)}
+                          {formatPercent(vatRateToNumber(item.vat_rate))}
                         </TableCell>
                         <TableCell>{item.quantity}</TableCell>
                         <TableCell className="hidden sm:table-cell">

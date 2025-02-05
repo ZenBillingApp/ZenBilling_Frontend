@@ -37,7 +37,7 @@ export const useCreateQuote = () => {
     const queryClient = useQueryClient()
     const { toast } = useToast()
 
-    return useMutation<IQuote, ApiError, ICreateQuoteRequest>({
+    return useMutation({
         mutationFn: (data: ICreateQuoteRequest) => 
             api.post("/quotes", data),
         onSuccess: () => {

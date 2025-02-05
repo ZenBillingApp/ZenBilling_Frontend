@@ -13,6 +13,7 @@ import type { EditQuoteSchema } from "@/components/quotes/edit-quote-dialog";
 import type { ApiError } from "@/services/api";
 import type { IQuoteItem } from "@/types/QuoteItem.interface";
 import type { IUpdateQuoteRequest } from "@/types/Quote.request.interface";
+import { vatRateToNumber } from "@/types/Product.interface";
 
 import {
   Card,
@@ -455,7 +456,8 @@ export default function QuoteDetailsPage() {
                       {quoteData.items?.map((item: IQuoteItem) => {
                         const totalHT =
                           item.quantity * item.unit_price_excluding_tax;
-                        const totalTTC = totalHT * (1 + item.vat_rate / 100);
+                        const totalTTC =
+                          totalHT * (1 + vatRateToNumber(item.vat_rate) / 100);
 
                         return (
                           <TableRow key={item.item_id}>
@@ -473,7 +475,7 @@ export default function QuoteDetailsPage() {
                               {formatCurrency(item.unit_price_excluding_tax)}
                             </TableCell>
                             <TableCell className="hidden sm:table-cell">
-                              {formatPercent(item.vat_rate)}
+                              {formatPercent(vatRateToNumber(item.vat_rate))}
                             </TableCell>
                             <TableCell className="tabular-nums">
                               {item.quantity}

@@ -3,7 +3,7 @@ import { ProductUnit, VatRate } from './Product.interface';
 export interface ICreateProductRequest {
   name: string;
   description?: string;
-  price_excluding_tax: number;
+  price_excluding_tax: number | null;
   vat_rate: VatRate;
   unit?: ProductUnit;
 }
