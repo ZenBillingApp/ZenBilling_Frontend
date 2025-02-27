@@ -14,9 +14,6 @@ COPY . .
 
 ENV NEXT_PUBLIC_API_URL=https://zenbillingapi.dynamicwebforge.fr/api
 
-# Générer Prisma Client
-RUN npx prisma generate
-
 # Construire l'application
 RUN npm run build
 
