@@ -18,7 +18,6 @@ ENV NEXT_PUBLIC_API_URL=https://zenbillingapi.dynamicwebforge.fr/api
 RUN npm run build
 
 
-
 # Exposer le port (le port par défaut de Next.js est 3000)
 EXPOSE 3000
 
