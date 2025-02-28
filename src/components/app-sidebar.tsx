@@ -1,7 +1,7 @@
 "use client"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { useAuth } from "@/hooks/useAuth"
+
 
 
 import {
@@ -16,17 +16,16 @@ import {
     SidebarMenuItem,
     SidebarGroupLabel,
   } from "@/components/ui/sidebar"
-  import { Button } from "@/components/ui/button"
+  import { NavUser } from "@/components/nav-user"
 
 
-  import { User2Icon,FileStack,Boxes,LogOut, FileText } from "lucide-react"
+  import { User2Icon,FileStack,Boxes, FileText } from "lucide-react"
 
   import { cn } from "@/lib/utils"
 
   
   export function AppSidebar() {
     const pathname = usePathname()
-    const { logout } = useAuth()
     return (
       <Sidebar>
         <SidebarHeader >
@@ -106,11 +105,8 @@ import {
         </SidebarContent>
 
         <SidebarFooter >
-            <Button variant={"outline"} className="w-full" onClick={logout}>
-                <LogOut className="w-4 h-4 mr-2" />
-                Déconnexion
-
-            </Button>
+            <NavUser />
+            
         </SidebarFooter>
       </Sidebar>
     )
