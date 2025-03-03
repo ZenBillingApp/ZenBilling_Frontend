@@ -4,6 +4,7 @@ services:
   nextjs:
     image: hvssvn78/zenbilling:latest
     container_name: zenbilling_frontend
+    restart: always
     ports:
       - "3000:3000"
     environment:
@@ -13,4 +14,4 @@ services:
 
 networks:
   app-network:
-    external: true
+    external: true 

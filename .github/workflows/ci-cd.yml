@@ -45,13 +45,13 @@ jobs:
               with:
                   ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-            - name: Transfer stack.yml to server
+            - name: Transfer docker-compose.yml to server
               run: |
-                  scp -o StrictHostKeyChecking=no zenbilling_front.yml ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/zenbilling/zenbilling_front.yml
+                  scp -o StrictHostKeyChecking=no docker-compose.yml ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/zenbilling/docker-compose.yml
 
-            - name: Deploy to Docker Swarm
+            - name: Deploy with Docker Compose
               run: |
-                  ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "docker stack deploy --compose-file /zenbilling/zenbilling_front.yml zenBilling"
+                  ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd /zenbilling && docker-compose pull && docker-compose up -d"
 
             - name: Clean up remote dangling Docker images
               run: |
