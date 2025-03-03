@@ -51,7 +51,7 @@ jobs:
 
             - name: Deploy with Docker Compose
               run: |
-                  ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd /zenbilling/zenbilling_frontend && docker-compose pull && docker-compose up -d"
+                  ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd /zenbilling/zenbilling_frontend && docker-compose down && docker-compose pull && docker-compose up -d"
 
             - name: Clean up remote dangling Docker images
               run: |
