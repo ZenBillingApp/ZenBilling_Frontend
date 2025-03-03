@@ -11,7 +11,9 @@ services:
       - NEXT_PUBLIC_API_URL=https://zenbillingapi.dynamicwebforge.fr/api
     networks:
       - app-network
+    volumes: []
 
 networks:
   app-network:
+    name: app-network
     external: true 
