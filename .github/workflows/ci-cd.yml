@@ -51,8 +51,19 @@ jobs:
 
             - name: Deploy with Docker Compose
               run: |
-                  ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd /zenbilling && docker-compose pull && docker-compose up -d --remove-orphans"
+                  ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} '
+                    cd /zenbilling && \
+                    docker-compose down --remove-orphans && \
+                    docker system prune -f && \
+                    docker network create app-network || true && \
+                    docker-compose pull && \
+                    COMPOSE_HTTP_TIMEOUT=300 docker-compose up -d --force-recreate
+                  '
 
-            - name: Clean up remote dangling Docker images
+            - name: Verify deployment
               run: |
-                  ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "docker image prune -f"
+                  ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} '
+                    cd /zenbilling && \
+                    docker-compose ps && \
+                    docker-compose logs --tail=50
+                  '
