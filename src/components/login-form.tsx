@@ -1,45 +1,40 @@
 "use client";
-
-import { GalleryVerticalEnd } from "lucide-react"
-
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-
-import { useLogin } from "@/hooks/useAuth";
-import { z } from "zod"
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 
-import { ILoginRequest } from "@/types/Auth.interface"
+import { ILoginRequest } from "@/types/Auth.interface";
 
+import { useLogin } from "@/hooks/useAuth";
+
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+
+import { GalleryVerticalEnd } from "lucide-react";
 
 const loginSchema = z.object({
-  email: z.string().email("email invalide").min(1, "email est requis"),
-  password: z.string().min(8, "mot de passe doit contenir au moins 8 caractères").min(1, "mot de passe est requis"),
+    email: z.string().email("email invalide").min(1, "email est requis"),
+    password: z.string().min(8, "mot de passe doit contenir au moins 8 caractères").min(1, "mot de passe est requis"),
 });
 
 
 
-
 export function LoginForm() {
-    const login = useLogin();
+    const handleLogin = useLogin();
 
     const { register, handleSubmit, formState: { errors } } = useForm<ILoginRequest>({
         resolver: zodResolver(loginSchema),
     });
 
     const onSubmit = (data: ILoginRequest) => {
-        login.mutate(data);
+       handleLogin.mutate(data);
     }
 
-
-
-  return (
-    <div className="flex flex-col gap-6">
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="flex flex-col gap-6">
-          <div className="flex flex-col items-center gap-2">
+    return (
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <div className="flex flex-col gap-6">
+            <div className="flex flex-col items-center gap-2">
             <a
               href="#"
               className="flex flex-col items-center gap-2 font-medium"
@@ -61,37 +56,22 @@ export function LoginForm() {
               </a>
             </div>
           </div>
-          <div className="flex flex-col gap-6">
-            <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                {...register("email", { required: "email est requis" })}
-                id="email"
-                type="email"
-                placeholder="m@example.com"
-              />
-               {errors.email && <p className="text-red-500 text-xs italic">{errors.email.message}</p>}
+                
+                <div className="flex flex-col items-start gap-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input type="email" id="email" {...register("email")} />
+                    {errors.email && <p className="text-red-500 text-xs italic">{errors.email.message}</p>}
+                </div>
+                <div className="flex flex-col items-start gap-2">
+                    <Label htmlFor="password">Mot de passe</Label>
+                    <Input type="password" id="password" {...register("password")} />
+                    {errors.password && <p className="text-red-500 text-xs italic">{errors.password.message}</p>}
+                </div>
+               
+                <Button type="submit" disabled={handleLogin.isPending}>{handleLogin.isPending ? "Connexion en cours..." : "Connexion"}</Button>
             </div>
-           
-            <div className="grid gap-2">
-                <Label htmlFor="password">Mot de passe</Label>
-                <Input
-                    {...register("password", { required: "mot de passe est requis" })}
-                    id="password"
-                    type="password"
-                    placeholder="********"
-                />
-                {errors.password && <p className="text-red-500 text-xs italic">{errors.password.message}</p>}
-            </div>
-            
+        </form>
+    )
 
-            <Button type="submit" className="w-full" disabled={login.isPending} >
-              {login.isPending ? "Connexion en cours..." : "Connexion"}
-            </Button>
-          </div>
-          
-        </div>
-      </form>
-    </div>
-  )
 }
+
