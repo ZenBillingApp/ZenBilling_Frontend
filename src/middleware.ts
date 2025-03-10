@@ -1,13 +1,18 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
+
+const publicRoutes = ['/login', '/register']
+
+
+
 export default function middleware(request: NextRequest) {
   // Récupérer le token depuis le localStorage
   const token = request.cookies.get('token')?.value
 
   // Vérifier si l'utilisateur tente d'accéder à une route protégée
   
-    if (!token && request.nextUrl.pathname !== '/login') {
+    if (!token && !publicRoutes.includes(request.nextUrl.pathname)) {
       // Rediriger vers la page de connexion si pas de token
       return NextResponse.redirect(new URL('/login', request.url))
     }
@@ -28,6 +33,7 @@ export const config = {
     '/invoices/:path*',
     '/products/:path*',
     '/customers/:path*',
-    '/login'
+    '/login',
+    '/register'
   ]
 } 

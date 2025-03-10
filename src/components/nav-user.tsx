@@ -8,7 +8,7 @@ import {
 } from "lucide-react"
 
 import { useAuthStore } from "@/stores/authStores"
-import { useAuth } from "@/hooks/useAuth"
+import { useLogout } from "@/hooks/useAuth"
 
 import {
   Avatar,
@@ -34,7 +34,7 @@ import {
 export function NavUser() {
   const { isMobile } = useSidebar()
   const { user } = useAuthStore()
-  const { logout } = useAuth()
+  const logout = useLogout()
 
   return (
     <SidebarMenu>
@@ -103,7 +103,7 @@ export function NavUser() {
               </DropdownMenuItem> */}
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={logout}>
+            <DropdownMenuItem onClick={() => logout.mutate()}>
               <LogOut />
               Log out
             </DropdownMenuItem>

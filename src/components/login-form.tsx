@@ -2,13 +2,12 @@
 
 import { GalleryVerticalEnd } from "lucide-react"
 
-import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
+import { useLogin } from "@/hooks/useAuth";
 import { z } from "zod"
-import { useAuth } from "@/hooks/useAuth";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -23,11 +22,8 @@ const loginSchema = z.object({
 
 
 
-export function LoginForm({
-  className,
-  ...props
-}: React.ComponentPropsWithoutRef<"div">) {
-    const {login } = useAuth();
+export function LoginForm() {
+    const login = useLogin();
 
     const { register, handleSubmit, formState: { errors } } = useForm<ILoginRequest>({
         resolver: zodResolver(loginSchema),
@@ -40,7 +36,7 @@ export function LoginForm({
 
 
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
+    <div className="flex flex-col gap-6">
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="flex flex-col gap-6">
           <div className="flex flex-col items-center gap-2">
@@ -56,14 +52,14 @@ export function LoginForm({
               </span>
             </a>
             <h1 className="text-xl font-bold">
-                Connexion à ZenBilling
+                Connexion
             </h1>
-            {/* <div className="text-center text-sm">
+            <div className="text-center text-sm">
               Vous n&apos;avez pas de compte?{" "}
-              <a href="#" className="underline underline-offset-4">
+              <a href="/register" className="underline underline-offset-4">
                 Créer un compte
               </a>
-            </div> */}
+            </div>
           </div>
           <div className="flex flex-col gap-6">
             <div className="grid gap-2">
@@ -74,7 +70,7 @@ export function LoginForm({
                 type="email"
                 placeholder="m@example.com"
               />
-               {errors.email && <p className="text-red-500 text-xs">{errors.email.message}</p>}
+               {errors.email && <p className="text-red-500 text-xs italic">{errors.email.message}</p>}
             </div>
            
             <div className="grid gap-2">
@@ -85,12 +81,12 @@ export function LoginForm({
                     type="password"
                     placeholder="********"
                 />
-                {errors.password && <p className="text-red-500 text-xs">{errors.password.message}</p>}
+                {errors.password && <p className="text-red-500 text-xs italic">{errors.password.message}</p>}
             </div>
             
 
-            <Button type="submit" className="w-full" disabled={login.isLoading} >
-              Login
+            <Button type="submit" className="w-full" disabled={login.isPending} >
+              {login.isPending ? "Connexion en cours..." : "Connexion"}
             </Button>
           </div>
           

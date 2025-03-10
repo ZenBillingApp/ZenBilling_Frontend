@@ -4,49 +4,67 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/services/api';
 import { useAuthStore } from '@/stores/authStores';
 import { useRouter } from 'next/navigation';
-import { ILoginRequest } from '@/types/Auth.interface';
+import { ILoginRequest, IRegisterRequest } from '@/types/Auth.interface';
+import { AxiosError } from 'axios';
+import { IApiErrorResponse, IApiSuccessResponse } from '@/types/api.types';
+import { useToast } from '@/hooks/use-toast';
 
-interface UseAuthReturn {
-  login: {
-    mutate: (credentials: ILoginRequest) => void;
-    isLoading: boolean;
-    error: Error | null;
-  };
-  logout: () => void;
-}
 
-export function useAuth(): UseAuthReturn {
-  const clearAuth = useAuthStore((state) => state.clearAuth);
+
+export const useLogin = () => {
   const setAuth = useAuthStore((state) => state.setAuth);
-  const queryClient = useQueryClient();
   const router = useRouter();
-  const loginMutation = useMutation({
+  const { toast } = useToast();
+  return useMutation({
     mutationFn: (credentials: ILoginRequest) => api.post('/users/login', credentials),
-  
 
     onSuccess: (data) => {
       setAuth(data.data)
       router.push('/invoices');
-      queryClient.invalidateQueries({ queryKey: ['user'] });
     },
-    onError: (error) => {
-      console.error('Erreur de connexion:', error);
-      clearAuth();
+    onError: (error: AxiosError<IApiErrorResponse>) => {
+      toast({
+        title: "Erreur de connexion",
+        description: error.response?.data.message,
+      });
     }
   });
 
-  const logout = () => {
-    clearAuth();
-    queryClient.clear();
-    router.push('/login');
-  };
+} 
 
-  return {
-    login: {
-      mutate: loginMutation.mutate,
-      isLoading: loginMutation.isPending,
-      error: loginMutation.error
-    },
-    logout
-  };
+export const useLogout = () => {
+  const clearAuth = useAuthStore((state) => state.clearAuth);
+  const queryClient = useQueryClient();
+  const router = useRouter()
+
+  return useMutation({
+    mutationFn: () => api.post('/users/logout'),
+    onSuccess: () => {
+      clearAuth();
+      queryClient.clear();
+      router.push('/login');
+    }
+  });
 }
+
+export const useRegister = () => {
+  const { toast } = useToast();
+  const router = useRouter();
+  return useMutation({
+      mutationFn: (data: IRegisterRequest) => api.post('/users/register', data),
+      onSuccess: (data: IApiSuccessResponse<void>) => {
+          toast({
+              title: "Compte créé avec succès",
+              description: data.message,
+          });
+          router.push('/login');
+      },
+      onError: (error: AxiosError<IApiErrorResponse>) => {
+          toast({
+              variant: "destructive",
+              title: "Erreur lors de la création du compte",
+              description: error.response?.data.message,
+          });
+      }
+  });
+};
