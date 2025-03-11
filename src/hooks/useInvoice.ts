@@ -1,9 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { api, ApiError } from "@/services/api"
+import { api } from "@/services/api"
 import type { ICreateInvoiceRequest, IUpdateInvoiceRequest, IInvoiceQueryParams } from "@/types/Invoice.request.interface"
 import type { AddPaymentSchema } from "@/components/invoices/add-payment-dialog"
 import { useToast } from "@/hooks/use-toast"
 import { IInvoice } from "@/types/Invoice.interface"
+import type { IApiErrorResponse } from "@/types/api.types"
 
 export const useInvoices = (params: IInvoiceQueryParams = {}) => {
     const { page = 1, limit = 10, search = "", status, customer_id, start_date, end_date, sortBy = 'invoice_date', sortOrder = 'DESC' } = params;
@@ -34,7 +35,7 @@ export const useInvoice = (invoiceId: string) => {
 export const useCreateInvoice = () => {
     const queryClient = useQueryClient()
     const { toast } = useToast()
-    return useMutation<IInvoice, ApiError, ICreateInvoiceRequest>({
+    return useMutation<IInvoice, IApiErrorResponse, ICreateInvoiceRequest>({
         mutationFn: (data: ICreateInvoiceRequest) => 
             api.post("/invoices", data),
         onSuccess: () => {
@@ -52,7 +53,7 @@ export const useCreateInvoice = () => {
 export const useUpdateInvoice = (invoiceId: string) => {
     const queryClient = useQueryClient()
     const { toast } = useToast()
-    return useMutation<IInvoice, ApiError, IUpdateInvoiceRequest>({
+    return useMutation<IInvoice, IApiErrorResponse, IUpdateInvoiceRequest>({
 
         mutationFn: (data: IUpdateInvoiceRequest) =>
             api.put(`/invoices/${invoiceId}`, data),
@@ -81,7 +82,7 @@ export const useDeleteInvoice = () => {
                 description: "La facture a été supprimée avec succès",
             })
         },
-        onError: (error: ApiError) => {
+        onError: (error: IApiErrorResponse) => {
             toast({
                 title: "Erreur lors de la suppression de la facture",
                 description: error.message,
@@ -120,7 +121,7 @@ export const useDownloadInvoicePdf = (invoiceNumber: string) => {
                 description: "Le fichier PDF a été téléchargé avec succès",
             })
         },
-        onError: (error: ApiError) => {
+        onError: (error: IApiErrorResponse) => {
             toast({
                 title: "Erreur lors du téléchargement du fichier PDF",
                 description: error.message,
@@ -132,7 +133,7 @@ export const useDownloadInvoicePdf = (invoiceNumber: string) => {
 export const useAddPayment = (invoiceId: string) => {
     const queryClient = useQueryClient()
     const { toast } = useToast()
-    return useMutation<IInvoice, ApiError, AddPaymentSchema>({
+    return useMutation<IInvoice, IApiErrorResponse, AddPaymentSchema>({
 
         mutationFn: (data: AddPaymentSchema) =>
             api.post(`/invoices/${invoiceId}/payments`, {
@@ -164,7 +165,7 @@ export const useSendInvoice = (invoiceId: string) => {
                 description: "Le fichier PDF a été envoyé avec succès",
             })
         },
-        onError: (error: ApiError) => {
+        onError: (error: IApiErrorResponse) => {
             toast({
                 title: "Erreur lors de l'envoi du fichier PDF",
                 description: error.message,

@@ -1,9 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { api, ApiError } from "@/services/api"
+import { api } from "@/services/api"
 import type { ICreateQuoteRequest, IUpdateQuoteRequest, IQuoteQueryParams } from "@/types/Quote.request.interface"
 import { useToast } from "@/hooks/use-toast"
 import { IQuote } from "@/types/Quote.interface"
-
+import type { IApiErrorResponse } from "@/types/api.types"
 
 export const useQuotes = (params: IQuoteQueryParams = {}) => {
     const { page = 1, limit = 10, search = "", status, customer_id, start_date, end_date, sortBy = 'quote_date', sortOrder = 'DESC' } = params;
@@ -55,7 +55,7 @@ export const useCreateQuote = () => {
 export const useUpdateQuote = (quoteId: string) => {
     const queryClient = useQueryClient()
     const { toast } = useToast()
-    return useMutation<IQuote, ApiError, IUpdateQuoteRequest>({
+    return useMutation<IQuote, IApiErrorResponse, IUpdateQuoteRequest>({
 
         mutationFn: (data: IUpdateQuoteRequest) =>
             api.put(`/quotes/${quoteId}`, data),
@@ -73,7 +73,7 @@ export const useUpdateQuote = (quoteId: string) => {
 export const useDeleteQuote = () => {
     const queryClient = useQueryClient()
     const { toast } = useToast()
-    return useMutation<IQuote, ApiError, string>({
+    return useMutation<IQuote, IApiErrorResponse, string>({
         mutationFn: (quoteId: string) =>
             api.delete(`/quotes/${quoteId}`),
         onSuccess: () => {
@@ -84,7 +84,7 @@ export const useDeleteQuote = () => {
                 description: "Le devis a été supprimé avec succès",
             })
         },
-        onError: (error: ApiError) => {
+        onError: (error: IApiErrorResponse) => {
             toast({
                 title: "Erreur lors de la suppression du devis",
                 description: error.message,
@@ -123,7 +123,7 @@ export const useDownloadQuotePdf = (quoteNumber: string) => {
                 description: "Le fichier PDF a été téléchargé avec succès",
             })
         },
-        onError: (error: ApiError) => {
+        onError: (error: IApiErrorResponse) => {
             toast({
                 title: "Erreur lors du téléchargement du fichier PDF",
                 description: error.message,
@@ -145,7 +145,7 @@ export const useSendQuote = (quoteId: string) => {
                 description: "Le fichier PDF a été envoyé avec succès",
             })
         },
-        onError: (error: ApiError) => {
+        onError: (error: IApiErrorResponse) => {
             toast({
                 title: "Erreur lors de l'envoi du fichier PDF",
                 description: error.message,

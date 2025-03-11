@@ -1,9 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { api, ApiError } from "@/services/api"
+import { api } from "@/services/api"
 import type { ICreateProductRequest } from "@/types/Product.request.interface"
 import type { IUpdateProductRequest } from "@/types/Product.request.interface"
 import { useToast } from "@/hooks/use-toast"
-
+import type { IApiErrorResponse } from "@/types/api.types"
 interface ProductsQueryParams {
   page?: number;
   limit?: number;
@@ -78,7 +78,7 @@ export const useDeleteProduct = () => {
                 description: "Le produit a été supprimé avec succès",
             })
         },
-        onError: (error: ApiError) => {
+        onError: (error: IApiErrorResponse  ) => {
             toast({
                 title: "Erreur lors de la suppression du produit",
                 description: error.message,

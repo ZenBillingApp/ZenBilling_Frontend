@@ -10,7 +10,7 @@ import {
 import { useFormat } from "@/hooks/useFormat";
 import { useState } from "react";
 import type { EditQuoteSchema } from "@/components/quotes/edit-quote-dialog";
-import type { ApiError } from "@/services/api";
+import type { IApiErrorResponse } from "@/types/api.types";
 import type { IQuoteItem } from "@/types/QuoteItem.interface";
 import type { IUpdateQuoteRequest } from "@/types/Quote.request.interface";
 import { vatRateToNumber } from "@/types/Product.interface";
@@ -190,7 +190,7 @@ export default function QuoteDetailsPage() {
             }}
             isLoading={updateQuote.isPending}
             isError={updateQuote.isError}
-            error={(updateQuote.error as ApiError)?.response?.data}
+            error={{message:(updateQuote.error as IApiErrorResponse)?.message, errors:(updateQuote.error as IApiErrorResponse)?.errors}}
           />
           <div className="flex flex-wrap gap-2 w-full">
             {quoteData.status === "draft" && (

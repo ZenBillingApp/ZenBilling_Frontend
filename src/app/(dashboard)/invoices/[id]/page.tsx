@@ -12,7 +12,7 @@ import { useFormat } from "@/hooks/useFormat";
 import { useState } from "react";
 import type { EditInvoiceSchema } from "@/components/invoices/edit-invoice-dialog";
 import type { AddPaymentSchema } from "@/components/invoices/add-payment-dialog";
-import type { ApiError } from "@/services/api";
+import type { IApiErrorResponse } from "@/types/api.types";
 import type { IPayment } from "@/types/Payment.interface";
 
 import type { IUpdateInvoiceRequest } from "@/types/Invoice.request.interface";
@@ -204,7 +204,7 @@ export default function InvoiceDetailsPage() {
             }}
             isLoading={updateInvoice.isPending}
             isError={updateInvoice.isError}
-            error={(updateInvoice.error as ApiError)?.response?.data}
+            error={{message:(updateInvoice.error as IApiErrorResponse)?.message, errors:(updateInvoice.error as IApiErrorResponse)?.errors}}
           />
           <AddPaymentDialog
             open={isAddPaymentDialogOpen}
@@ -213,7 +213,7 @@ export default function InvoiceDetailsPage() {
             invoiceAmount={invoiceData.amount_including_tax}
             isLoading={addPayment.isPending}
             isError={addPayment.isError}
-            error={(addPayment.error as ApiError)?.response?.data}
+            error={{message:(addPayment.error as IApiErrorResponse)?.message, errors:(addPayment.error as IApiErrorResponse)?.errors}}
           />
           <div className="flex flex-wrap gap-2 w-full">
             {invoiceData.status !== "cancelled" &&
