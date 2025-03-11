@@ -49,9 +49,9 @@ function handleUserAccess(request: NextRequest, user: IUser | undefined, path: s
           return redirectTo(request, onboardingRedirectPath);
       }
   } 
-  // else if (path.startsWith("/onboarding")) {
-  //     return redirectTo(request, "/invoices");
-  // }
+  else if (path.startsWith("/onboarding")) {
+      return redirectTo(request, "/invoices");
+  }
 
   return NextResponse.next();
 }
