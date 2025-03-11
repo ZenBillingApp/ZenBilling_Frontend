@@ -60,11 +60,13 @@ export const useRegister = () => {
           router.push('/login');
       },
       onError: (error: AxiosError<IApiErrorResponse>) => {
+        if (error.response?.data.message) {
           toast({
               variant: "destructive",
               title: "Erreur lors de la création du compte",
               description: error.response?.data.message,
           });
+        }
       }
   });
 

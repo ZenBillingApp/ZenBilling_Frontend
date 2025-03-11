@@ -2,7 +2,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-
+import Image from "next/image";
 import { IRegisterRequest } from "@/types/Auth.interface";
 
 import { useRegister } from "@/hooks/useAuth";
@@ -10,8 +10,11 @@ import { useRegister } from "@/hooks/useAuth";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
-import { GalleryVerticalEnd } from "lucide-react";
+import { AlertCircle } from "lucide-react";
+
+import logo from "@/assets/logo.png";
 
 const registerSchema = z.object({
     email: z.string().email("email invalide").min(1, "email est requis"),
@@ -42,7 +45,7 @@ export function RegisterForm() {
               className="flex flex-col items-center gap-2 font-medium"
             >
               <div className="flex h-8 w-8 items-center justify-center rounded-md">
-                <GalleryVerticalEnd className="size-6" />
+                <Image src={logo} alt="zenbilling logo" width={32} height={32} />
               </div>
               <span className="sr-only">
                 ZenBilling  
@@ -58,6 +61,19 @@ export function RegisterForm() {
               </a>
             </div>
           </div>
+          {handleRegister.error && handleRegister.error.response?.data.errors && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Une erreur est survenue lors de la création du compte</AlertTitle>
+              <AlertDescription>
+                <ul className="list-disc pl-5">
+                  {handleRegister.error.response?.data.errors.map((error) => (
+                    <li key={error.field}>{error.message}</li>
+                  ))}
+                </ul>
+              </AlertDescription>
+            </Alert>
+          )}
                 <div className="flex gap-2">
                     <div className="flex flex-col w-1/2 items-start gap-2">
                         <Label htmlFor="first_name">Prénom</Label>

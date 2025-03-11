@@ -2,6 +2,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import Image from "next/image";
 
 import { ILoginRequest } from "@/types/Auth.interface";
 
@@ -11,7 +12,8 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
-import { GalleryVerticalEnd } from "lucide-react";
+import logo from "@/assets/logo.png";
+
 
 const loginSchema = z.object({
     email: z.string().email("email invalide").min(1, "email est requis"),
@@ -40,7 +42,7 @@ export function LoginForm() {
               className="flex flex-col items-center gap-2 font-medium"
             >
               <div className="flex h-8 w-8 items-center justify-center rounded-md">
-                <GalleryVerticalEnd className="size-6" />
+                <Image src={logo} alt="zenbilling logo" width={32} height={32} />
               </div>
               <span className="sr-only">
                 ZenBilling  
