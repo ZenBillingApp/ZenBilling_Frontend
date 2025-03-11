@@ -36,7 +36,7 @@ export const useAuthStore = create<IAuthState & IAuthActions>()(
             last_name: data.user.last_name,
             company_id: data.user.company_id,
             onboarding_completed: data.user.onboarding_completed,
-            onboarding_step: data.user.onboarding_step as "CHOOSING_COMPANY" | "CONTACT_INFO" | "FINISH"
+            onboarding_step: data.user.onboarding_step as "CHOOSING_COMPANY" | "FINISH"
           },
           isAuthenticated: true,
         });

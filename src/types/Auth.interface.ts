@@ -1,3 +1,5 @@
+import { IOnboardingStep } from "./User.interface";
+
 export interface ILoginRequest {
   email: string;
   password: string;
@@ -17,7 +19,7 @@ export interface IAuthResponse {
     last_name: string;
     company_id?: string;
     onboarding_completed: boolean;
-    onboarding_step: string;
+    onboarding_step: IOnboardingStep;
     created_at: string;
     updated_at: string;
   };

@@ -1,3 +1,5 @@
+export type IOnboardingStep = 'CHOOSING_COMPANY' | 'FINISH';
+
 export interface IUser {
   user_id: string;
   first_name: string;
@@ -6,7 +8,7 @@ export interface IUser {
   password_hash: string;
   company_id?: string;
   onboarding_completed: boolean;
-  onboarding_step: 'CHOOSING_COMPANY' | 'CONTACT_INFO' | 'FINISH';
+  onboarding_step: IOnboardingStep;
   created_at: string;
   updated_at: string;
 }
@@ -24,7 +26,7 @@ export interface IUserResponse {
   last_name: string;
   company_id?: string;
   onboarding_completed: boolean;
-  onboarding_step: string;
+  onboarding_step: IOnboardingStep;
   created_at: string;
   updated_at: string;
 } 

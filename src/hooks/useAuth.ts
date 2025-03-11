@@ -1,6 +1,6 @@
 "use client"
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/services/api';
 import { useAuthStore } from '@/stores/authStores';
 import { useRouter } from 'next/navigation';
@@ -66,5 +66,31 @@ export const useRegister = () => {
               description: error.response?.data.message,
           });
       }
+  });
+
+
+};
+
+export const useProfile = () => {
+  return useQuery({
+    queryKey: ['user'],
+    queryFn: () => api.get('/users/profile'),
+  });
+};
+
+export const useOnboardingFinish = () => {
+  const { toast } = useToast();
+  const router = useRouter();
+  return useMutation({
+    mutationFn: () => api.post('/users/onboarding-finish'),
+    onSuccess: () => {
+      router.push('/invoices');
+    },
+    onError: (error: AxiosError<IApiErrorResponse>) => {
+      toast({
+        title: "Erreur lors de la fin du onboarding",
+        description: error.response?.data.message,
+      });
+    }
   });
 };

@@ -1,8 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { api, ApiError } from "@/services/api"
+import { api } from "@/services/api"
 import type { ICreateCustomerRequest, IUpdateCustomerRequest } from "@/types/Customer.request.interface"
 import {  useToast } from "@/hooks/use-toast"
 import { ICustomer } from "@/types/Customer.interface"
+import { IApiErrorResponse } from "@/types/api.types"
 
 interface CustomersQueryParams {
     page?: number;
@@ -82,7 +83,7 @@ export const useDeleteCustomer = () => {
                 description: "Le client a été supprimé avec succès",
             })
         },
-        onError: (error: ApiError) => {
+        onError: (error: IApiErrorResponse) => {
             toast({
                 title: "Erreur lors de la suppression du client",
                 description: error.message,

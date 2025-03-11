@@ -1,14 +1,16 @@
+import { ICompanyLegalForm } from "./Company.interface";
+
 export interface ICreateCompanyRequest {
   company_id?: string;
   name: string;
   siret: string;
-  tva_intra?: string;
+  tva_intra?: string | null;
   tva_applicable: boolean;
   RCS_number: string;
   RCS_city: string;
   capital?: number;
   siren: string;
-  legal_form: 'SAS' | 'SARL' | 'SA' | 'SASU' | 'EURL' | 'SNC' | 'SOCIETE_CIVILE' | 'ENTREPRISE_INDIVIDUELLE';
+  legal_form: ICompanyLegalForm;
   // Informations d'adresse
   address: string;
   postal_code: string;
