@@ -72,9 +72,9 @@ export default function OnboardingFinish() {
           </CardFooter>
         </Card>
 
-        <p className="mt-6 text-center text-sm text-muted-foreground">
+        {/* <p className="mt-6 text-center text-sm text-muted-foreground">
           Besoin d&apos;aide ? <a href="#" className="font-medium text-primary hover:underline">Contactez notre support</a>
-        </p>
+        </p> */}
       </div>
     </div>
   );

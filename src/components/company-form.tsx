@@ -11,7 +11,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { GalleryVerticalEnd } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { GalleryVerticalEnd, AlertCircle } from "lucide-react";
 import { ICompanyLegalForm } from "@/types/Company.interface";
 
 const companySchema = z.object({
@@ -43,6 +44,7 @@ export function CompanyForm() {
         defaultValues: {
             tva_applicable: false,
             tva_intra: undefined,
+            website: undefined,
         },
     });
 
@@ -68,6 +70,19 @@ export function CompanyForm() {
                     </a>
                     <h1 className="text-xl font-bold text-center">Informations de votre entreprise</h1>
                 </div>
+                {handleCreateCompany.error && handleCreateCompany.error.response?.data.errors && (
+                        <Alert variant="destructive">
+                            <AlertCircle className="h-4 w-4" />
+                            <AlertTitle>Une erreur est survenue lors de la création de l&apos;entreprise</AlertTitle>
+                            <AlertDescription>
+                                <ul className="list-disc pl-5">
+                                    {handleCreateCompany.error.response?.data.errors?.map((error) => (
+                                        <li key={error.field}>{error.message}</li>
+                                    ))}
+                                </ul>
+                            </AlertDescription>
+                        </Alert>
+                )}
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="flex flex-col items-start gap-2">
@@ -131,7 +146,7 @@ export function CompanyForm() {
                     </div>
 
                     <div className="flex items-center gap-2">
-                        <Checkbox id="tva_applicable" {...register("tva_applicable")} />
+                        <Checkbox id="tva_applicable" checked={watch("tva_applicable")} onCheckedChange={(checked) => setValue("tva_applicable", checked as boolean)} />
                         <Label htmlFor="tva_applicable">TVA Applicable</Label>
                     </div>
 
