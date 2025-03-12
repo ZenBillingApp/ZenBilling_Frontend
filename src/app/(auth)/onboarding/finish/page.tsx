@@ -1,9 +1,15 @@
 "use client";
 
+
+import Image from "next/image";
+
 import { Button } from "@/components/ui/button";
-import { GalleryVerticalEnd, CheckCircle, ArrowRight } from "lucide-react";
+
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useOnboardingFinish } from "@/hooks/useAuth";
+
+import logo from "@/assets/logo.png";
+import { CheckCircle, ArrowRight } from "lucide-react";
 
 
 
@@ -19,7 +25,7 @@ export default function OnboardingFinish() {
         <div className="flex flex-col items-center gap-2 mb-6">
           <a href="#" className="flex flex-col items-center gap-2 font-medium">
             <div className="flex h-10 w-10 items-center justify-center rounded-md ">
-              <GalleryVerticalEnd className="size-6" />
+              <Image src={logo} alt="zenbilling logo" width={32} height={32} />
             </div>
             <span className="text-xl font-bold">ZenBilling</span>
           </a>

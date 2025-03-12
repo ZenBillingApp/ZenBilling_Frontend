@@ -2,9 +2,11 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import Image from "next/image";
 
 import { ICreateCompanyRequest } from "@/types/Company.request.interface";
 import { useCreateCompany } from "@/hooks/useCompany";
+import { ICompanyLegalForm } from "@/types/Company.interface";
 
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -12,8 +14,11 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { GalleryVerticalEnd, AlertCircle } from "lucide-react";
-import { ICompanyLegalForm } from "@/types/Company.interface";
+
+import {  AlertCircle } from "lucide-react";
+import logo from "@/assets/logo.png";
+
+
 
 const companySchema = z.object({
     name: z.string().min(1, "Le nom est requis"),
@@ -64,7 +69,7 @@ export function CompanyForm() {
                 <div className="flex flex-col items-center gap-2 mb-2">
                     <a href="#" className="flex flex-col items-center gap-2 font-medium">
                         <div className="flex h-8 w-8 items-center justify-center rounded-md">
-                            <GalleryVerticalEnd className="size-6" />
+                            <Image src={logo} alt="zenbilling logo" width={32} height={32} />
                         </div>
                         <span className="sr-only">ZenBilling</span>
                     </a>

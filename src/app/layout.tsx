@@ -37,7 +37,7 @@ export const metadata: Metadata = {
   creator: "ZenBilling",
   publisher: "ZenBilling",
   icons: {
-    icon: "/favicon.ico",
+    icon: "/favicon.png",
   },
   robots: {
     index: true,
