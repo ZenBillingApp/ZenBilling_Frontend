@@ -153,10 +153,28 @@ export default function InvoicesPage() {
           <DatePickerWithRange date={dateRange} setDate={setDateRange} />
         </div>
       </div>
-
-      <div className="overflow-x-auto">
-        <Table>
-          <TableHeader>
+      {isLoading ? (
+        <div className="flex justify-center items-center py-8">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      ) : data?.data.invoices.length === 0 ? (
+        <div className="text-center py-12">
+          <FileStack className="mx-auto h-12 w-12 text-muted-foreground" />
+          <h3 className="mt-4 text-lg font-medium">Aucune facture</h3>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Commencez par créer une nouvelle facture.
+          </p>
+          <div className="mt-6">
+            <Button onClick={() => router.push("/invoices/create")}>
+              <Plus className="w-4 h-4 mr-2" />
+              Nouvelle facture
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
             <TableRow>
               <TableHead className="hidden sm:table-cell">Type</TableHead>
               <TableHead>N° Facture</TableHead>
@@ -168,24 +186,7 @@ export default function InvoicesPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {isLoading ? (
-              <TableRow>
-                <TableCell colSpan={7} className="text-center py-8">
-                  <div className="flex justify-center items-center h-full w-full">
-                    <Loader2 className="w-6 h-6 animate-spin" />
-                  </div>
-                </TableCell>
-              </TableRow>
-            ) : !data?.data?.invoices?.length ? (
-              <TableRow>
-                <TableCell
-                  colSpan={7}
-                  className="text-center py-8 text-muted-foreground"
-                >
-                  Aucune facture trouvée
-                </TableCell>
-              </TableRow>
-            ) : (
+            {
               data?.data?.invoices?.map((invoice: IInvoice) => (
                 <TableRow
                   key={invoice.invoice_id}
@@ -246,11 +247,11 @@ export default function InvoicesPage() {
                     {formatCurrency(invoice.amount_including_tax)}
                   </TableCell>
                 </TableRow>
-              ))
-            )}
+            ))}
           </TableBody>
         </Table>
-      </div>
+        </div>
+      )}
 
       {totalPages > 1 && (
         <div className="flex justify-center">

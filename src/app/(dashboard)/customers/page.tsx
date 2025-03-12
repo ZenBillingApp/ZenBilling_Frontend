@@ -110,9 +110,28 @@ export default function CustomersPage() {
         </div>
       </div>
 
-      <div className="overflow-x-auto -mx-4 sm:mx-0">
-        <div className="min-w-full inline-block align-middle">
-          <div className="overflow-hidden">
+      {isLoading ? (
+        <div className="flex justify-center items-center py-8">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      ) : data?.data.customers.length === 0 ? (
+        <div className="text-center py-12">
+          <User2Icon className="mx-auto h-12 w-12 text-muted-foreground" />
+          <h3 className="mt-4 text-lg font-medium">Aucun client</h3>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Commencez par créer un nouveau client.
+          </p>
+          <div className="mt-6">
+            <Button onClick={handleCreateCustomer}>
+              <Plus className="w-4 h-4 mr-2" />
+              Nouveau client
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <div className="overflow-x-auto -mx-4 sm:mx-0">
+          <div className="min-w-full inline-block align-middle">
+            <div className="overflow-hidden">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -220,7 +239,8 @@ export default function CustomersPage() {
             </Table>
           </div>
         </div>
-      </div>
+        </div>
+      )}
 
       {/* Customer Details Dialog */}
       <CustomerDetailsDialog
@@ -269,5 +289,7 @@ export default function CustomersPage() {
         </div>
       )}
     </div>
+    
   );
+
 }

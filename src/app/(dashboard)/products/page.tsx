@@ -8,6 +8,7 @@ import { useFormat } from "@/hooks/useFormat";
 import { vatRateToNumber, IProduct } from "@/types/Product.interface";
 
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -30,7 +31,7 @@ import { ProductDetailsDialog } from "@/components/products/product-details-dial
 import { Input } from "@/components/ui/input";
 
 import debounce from "lodash/debounce";
-import { ShoppingCart, Search, Loader2 } from "lucide-react";
+import { ShoppingCart, Search, Loader2, Plus } from "lucide-react";
 
 export default function ProductsPage() {
   const [page, setPage] = useState(1);
@@ -84,9 +85,27 @@ export default function ProductsPage() {
           />
         </div>
       </div>
+      {isLoading ? (
+        <div className="flex justify-center items-center py-8">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      ) : data?.data.products.length === 0 ? (
+        <div className="text-center py-12">
+          <ShoppingCart className="mx-auto h-12 w-12 text-muted-foreground" />
+          <h3 className="mt-4 text-lg font-medium">Aucun produit</h3>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Commencez par créer un nouveau produit.
+          </p>
+          <div className="mt-6">
+            <Button onClick={() => setIsCreateDialogOpen(true)}>
+              <Plus className="w-4 h-4 mr-2" />
+              Nouveau produit
+            </Button>
+          </div>
+        </div>
 
-      {/* Table Card */}
-      <div className="overflow-x-auto -mx-4 sm:mx-0">
+      ) : (
+        <div className="overflow-x-auto -mx-4 sm:mx-0">
         <div className="min-w-full inline-block align-middle">
           <div className="overflow-hidden">
             <Table>
@@ -172,6 +191,7 @@ export default function ProductsPage() {
           </div>
         </div>
       </div>
+      )}
 
       {/* Pagination */}
       {totalPages > 1 && (
