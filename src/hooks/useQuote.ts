@@ -153,3 +153,22 @@ export const useSendQuote = (quoteId: string) => {
         },
     })
 } 
+
+
+export const useViewQuote = () => {
+    const { toast } = useToast()
+    return useMutation({
+        mutationFn: (quoteId: string) => api.getBinary(`/quotes/${quoteId}/pdf`),
+        onSuccess: (data) => {
+            const blob = new Blob([data.data], { type: 'application/pdf' })
+            const url = window.URL.createObjectURL(blob)
+            window.open(url, "_blank")
+        },
+        onError: (error: IApiErrorResponse) => {
+            toast({
+                title: "Erreur lors de la visualisation du devis",
+                description: error.message,
+            })
+        },
+    })
+}
