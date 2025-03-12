@@ -6,6 +6,7 @@ import { useToast } from "@/hooks/use-toast"
 import { IInvoice } from "@/types/Invoice.interface"
 import type { IApiErrorResponse } from "@/types/api.types"
 
+
 export const useInvoices = (params: IInvoiceQueryParams = {}) => {
     const { page = 1, limit = 10, search = "", status, customer_id, start_date, end_date, sortBy = 'invoice_date', sortOrder = 'DESC' } = params;
 
@@ -168,6 +169,24 @@ export const useSendInvoice = (invoiceId: string) => {
         onError: (error: IApiErrorResponse) => {
             toast({
                 title: "Erreur lors de l'envoi du fichier PDF",
+                description: error.message,
+            })
+        },
+    })
+}
+
+export const useViewInvoice = () => {
+    const { toast } = useToast()
+    return useMutation({
+        mutationFn: (invoiceId: string) => api.getBinary(`/invoices/${invoiceId}/pdf`),
+        onSuccess: (data) => {
+            const blob = new Blob([data.data], { type: 'application/pdf' })
+            const url = window.URL.createObjectURL(blob)
+            window.open(url, "_blank")
+        },
+        onError: (error: IApiErrorResponse) => {
+            toast({
+                title: "Erreur lors de la visualisation de la facture",
                 description: error.message,
             })
         },

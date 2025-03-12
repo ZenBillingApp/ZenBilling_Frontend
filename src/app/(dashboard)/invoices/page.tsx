@@ -2,13 +2,13 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useInvoices } from "@/hooks/useInvoice";
+import { useInvoices, useViewInvoice } from "@/hooks/useInvoice";
 import { useFormat } from "@/hooks/useFormat";
 import { useDebounce } from "@/hooks/useDebounce";
 import { DateRange } from "react-day-picker";
 import { format } from "date-fns";
 
-import { FileStack, ShoppingCart, Search, Plus } from "lucide-react";
+import { FileStack, ShoppingCart, Search, Plus, Eye } from "lucide-react";
 
 import {
   Table,
@@ -64,6 +64,8 @@ export default function InvoicesPage() {
     limit: 25,
     page: page,
   });
+
+  const { mutate: viewInvoice } = useViewInvoice();
 
   const totalPages = data?.data.pagination.totalPages;
 
@@ -183,6 +185,7 @@ export default function InvoicesPage() {
               <TableHead className="hidden sm:table-cell">Produits</TableHead>
               <TableHead className="hidden lg:table-cell">Dates</TableHead>
               <TableHead>Total TTC</TableHead>
+              <TableHead className="hidden sm:table-cell">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -245,6 +248,16 @@ export default function InvoicesPage() {
                   </TableCell>
                   <TableCell className="font-medium text-nowrap">
                     {formatCurrency(invoice.amount_including_tax)}
+                  </TableCell>
+                  <TableCell className="hidden sm:table-cell text-center text-nowrap">
+                      <Button variant="ghost" size="icon" onClick={(e) => {
+                        e.stopPropagation()
+                        if (invoice.invoice_id) {
+                          viewInvoice(invoice.invoice_id)
+                        }
+                      }}>
+                      <Eye className="w-4 h-4" />
+                    </Button>
                   </TableCell>
                 </TableRow>
             ))}
