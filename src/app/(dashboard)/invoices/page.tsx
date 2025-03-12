@@ -108,7 +108,7 @@ export default function InvoicesPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-6 space-y-6 max-w-7xl">
+    <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-6 space-y-4 sm:space-y-6 max-w-7xl">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h1 className="text-xl sm:text-2xl font-bold font-dmSans flex items-center">
           <FileStack className="w-5 sm:w-6 h-5 sm:h-6 mr-2" />
@@ -133,7 +133,7 @@ export default function InvoicesPage() {
             className="pl-8 w-full"
           />
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
           <Select
             value={statusFilter}
             onValueChange={(
@@ -152,7 +152,8 @@ export default function InvoicesPage() {
               <SelectItem value="cancelled">Annulée</SelectItem>
             </SelectContent>
           </Select>
-          <DatePickerWithRange date={dateRange} setDate={setDateRange} />
+          <DatePickerWithRange date={dateRange} setDate={setDateRange} className="w-full" />
+          <div className="hidden sm:block lg:hidden"></div>
         </div>
       </div>
       {isLoading ? (
@@ -160,13 +161,13 @@ export default function InvoicesPage() {
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
       ) : data?.data.invoices.length === 0 ? (
-        <div className="text-center py-12">
-          <FileStack className="mx-auto h-12 w-12 text-muted-foreground" />
-          <h3 className="mt-4 text-lg font-medium">Aucune facture</h3>
-          <p className="mt-2 text-sm text-muted-foreground">
+        <div className="text-center py-8 sm:py-12">
+          <FileStack className="mx-auto h-10 sm:h-12 w-10 sm:w-12 text-muted-foreground" />
+          <h3 className="mt-3 sm:mt-4 text-base sm:text-lg font-medium">Aucune facture</h3>
+          <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-muted-foreground">
             Commencez par créer une nouvelle facture.
           </p>
-          <div className="mt-6">
+          <div className="mt-4 sm:mt-6">
             <Button onClick={() => router.push("/invoices/create")}>
               <Plus className="w-4 h-4 mr-2" />
               Nouvelle facture
@@ -174,111 +175,195 @@ export default function InvoicesPage() {
           </div>
         </div>
       ) : (
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-            <TableRow>
-              <TableHead className="hidden sm:table-cell">Type</TableHead>
-              <TableHead>N° Facture</TableHead>
-              <TableHead>Client</TableHead>
-              <TableHead>Statut</TableHead>
-              <TableHead className="hidden sm:table-cell">Produits</TableHead>
-              <TableHead className="hidden lg:table-cell">Dates</TableHead>
-              <TableHead>Total TTC</TableHead>
-              <TableHead className="hidden sm:table-cell">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {
-              data?.data?.invoices?.map((invoice: IInvoice) => (
-                <TableRow
-                  key={invoice.invoice_id}
-                  className="cursor-pointer hover:bg-muted/50"
-                  onClick={() => router.push(`/invoices/${invoice.invoice_id}`)}
-                >
-                  <TableCell className="hidden sm:table-cell">
-                    <Badge variant="outline" className="w-fit">
-                      {invoice.customer?.type === "company" ? (
-                        <Building className="w-4 h-4" />
-                      ) : (
-                        <User className="w-4 h-4" />
-                      )}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="font-medium text-nowrap">
-                    {invoice.invoice_number}
-                  </TableCell>
-                  <TableCell className="text-nowrap max-w-[150px] truncate">
-                    {invoice.customer?.type === "company"
-                      ? invoice.customer.business?.name
-                      : `${invoice.customer?.individual?.first_name} ${invoice.customer?.individual?.last_name}`}
-                  </TableCell>
-                  <TableCell className="text-nowrap">
-                    <Badge
-                      variant={getStatusBadgeVariant(invoice.status)}
-                      className="text-nowrap"
-                    >
-                      {getStatusLabel(invoice.status)}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="hidden sm:table-cell text-center text-nowrap">
-                    <Badge
-                      variant="outline"
-                      className="flex items-center gap-2 w-fit"
-                    >
-                      <ShoppingCart className="w-4 h-4" />
-                      {invoice.items?.length || 0}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="hidden lg:table-cell text-nowrap">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2 text-sm">
-                        <CalendarDays className="w-4 h-4 text-muted-foreground" />
-                        <span>
-                          {new Date(invoice.invoice_date).toLocaleDateString()}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm">
-                        <Clock className="w-4 h-4 text-muted-foreground" />
-                        <span>
-                          {new Date(invoice.due_date).toLocaleDateString()}
-                        </span>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell className="font-medium text-nowrap">
+        <>
+          {/* Vue mobile (uniquement sur xs) */}
+          <div className="block sm:hidden space-y-4">
+            {data?.data?.invoices?.map((invoice: IInvoice) => (
+              <div 
+                key={invoice.invoice_id}
+                className="border rounded-lg p-3 cursor-pointer hover:bg-muted/50"
+                onClick={() => router.push(`/invoices/${invoice.invoice_id}`)}
+              >
+                <div className="flex justify-between items-start mb-2">
+                  <div>
+                    <p className="font-medium text-sm">{invoice.invoice_number}</p>
+                    <p className="text-xs text-muted-foreground truncate max-w-[180px]">
+                      {invoice.customer?.type === "company"
+                        ? invoice.customer.business?.name
+                        : `${invoice.customer?.individual?.first_name} ${invoice.customer?.individual?.last_name}`}
+                    </p>
+                  </div>
+                  <Badge
+                    variant={getStatusBadgeVariant(invoice.status)}
+                    className="text-nowrap text-xs"
+                  >
+                    {getStatusLabel(invoice.status)}
+                  </Badge>
+                </div>
+                
+                <div className="flex justify-between items-center text-sm">
+                  <div className="flex items-center gap-1">
+                    <CalendarDays className="w-3 h-3 text-muted-foreground" />
+                    <span className="text-xs">
+                      {new Date(invoice.due_date).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <p className="font-medium">
                     {formatCurrency(invoice.amount_including_tax)}
-                  </TableCell>
-                  <TableCell className="hidden sm:table-cell text-center text-nowrap">
+                  </p>
+                </div>
+                
+                <div className="flex justify-between items-center mt-2 pt-2 border-t">
+                  <div className="flex items-center gap-1">
+                    <ShoppingCart className="w-3 h-3 text-muted-foreground" />
+                    <span className="text-xs text-muted-foreground">
+                      {invoice.items?.length || 0} produits
+                    </span>
+                  </div>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="h-7 px-2"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (invoice.invoice_id) {
+                        viewInvoice(invoice.invoice_id);
+                      }
+                    }}
+                  >
+                    <Eye className="w-3 h-3 mr-1" />
+                    <span className="text-xs">Voir</span>
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          {/* Vue desktop (à partir de sm) */}
+          <div className="hidden sm:block overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="hidden sm:table-cell">Type</TableHead>
+                  <TableHead>N° Facture</TableHead>
+                  <TableHead>Client</TableHead>
+                  <TableHead>Statut</TableHead>
+                  <TableHead className="hidden sm:table-cell">Produits</TableHead>
+                  <TableHead className="hidden lg:table-cell">Dates</TableHead>
+                  <TableHead>Total TTC</TableHead>
+                  <TableHead className="hidden sm:table-cell">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {data?.data?.invoices?.map((invoice: IInvoice) => (
+                  <TableRow
+                    key={invoice.invoice_id}
+                    className="cursor-pointer hover:bg-muted/50"
+                    onClick={() => router.push(`/invoices/${invoice.invoice_id}`)}
+                  >
+                    <TableCell className="hidden sm:table-cell">
+                      <Badge variant="outline" className="w-fit">
+                        {invoice.customer?.type === "company" ? (
+                          <Building className="w-4 h-4" />
+                        ) : (
+                          <User className="w-4 h-4" />
+                        )}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="font-medium text-nowrap">
+                      {invoice.invoice_number}
+                    </TableCell>
+                    <TableCell className="text-nowrap max-w-[150px] truncate">
+                      {invoice.customer?.type === "company"
+                        ? invoice.customer.business?.name
+                        : `${invoice.customer?.individual?.first_name} ${invoice.customer?.individual?.last_name}`}
+                    </TableCell>
+                    <TableCell className="text-nowrap">
+                      <Badge
+                        variant={getStatusBadgeVariant(invoice.status)}
+                        className="text-nowrap"
+                      >
+                        {getStatusLabel(invoice.status)}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="hidden sm:table-cell text-center text-nowrap">
+                      <Badge
+                        variant="outline"
+                        className="flex items-center gap-2 w-fit"
+                      >
+                        <ShoppingCart className="w-4 h-4" />
+                        {invoice.items?.length || 0}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="hidden lg:table-cell text-nowrap">
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2 text-sm">
+                          <CalendarDays className="w-4 h-4 text-muted-foreground" />
+                          <span>
+                            {new Date(invoice.invoice_date).toLocaleDateString()}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm">
+                          <Clock className="w-4 h-4 text-muted-foreground" />
+                          <span>
+                            {new Date(invoice.due_date).toLocaleDateString()}
+                          </span>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="font-medium text-nowrap">
+                      {formatCurrency(invoice.amount_including_tax)}
+                    </TableCell>
+                    <TableCell className="hidden sm:table-cell text-center text-nowrap">
                       <Button variant="ghost" size="icon" onClick={(e) => {
                         e.stopPropagation()
                         if (invoice.invoice_id) {
                           viewInvoice(invoice.invoice_id)
                         }
                       }}>
-                      <Eye className="w-4 h-4" />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-        </div>
+                        <Eye className="w-4 h-4" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </>
       )}
 
       {totalPages > 1 && (
-        <div className="flex justify-center">
+        <div className="flex justify-center mt-4 sm:mt-6">
           <Pagination>
             <PaginationContent>
               <PaginationItem>
                 <PaginationPrevious
-                  className="hidden sm:flex cursor-pointer"
+                  className="cursor-pointer"
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   isActive={page !== 1}
                 />
               </PaginationItem>
               {[...Array(totalPages)].map((_, i) => {
-                if (window.innerWidth < 640 && Math.abs(page - (i + 1)) > 1) {
+                // Sur mobile, n'afficher que la page actuelle et les pages adjacentes
+                if (
+                  (window.innerWidth < 640 && Math.abs(page - (i + 1)) > 1) ||
+                  (totalPages > 7 && i > 0 && i < totalPages - 1 && Math.abs(page - (i + 1)) > 2)
+                ) {
+                  // Afficher des points de suspension au milieu
+                  if (i === 1 && page > 3) {
+                    return (
+                      <PaginationItem key="ellipsis-start" className="flex items-center justify-center h-10 w-10">
+                        <span>...</span>
+                      </PaginationItem>
+                    );
+                  }
+                  if (i === totalPages - 2 && page < totalPages - 2) {
+                    return (
+                      <PaginationItem key="ellipsis-end" className="flex items-center justify-center h-10 w-10">
+                        <span>...</span>
+                      </PaginationItem>
+                    );
+                  }
                   return null;
                 }
                 return (
@@ -294,7 +379,7 @@ export default function InvoicesPage() {
               })}
               <PaginationItem>
                 <PaginationNext
-                  className="hidden sm:flex cursor-pointer"
+                  className="cursor-pointer"
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                   isActive={page !== totalPages}
                 />
