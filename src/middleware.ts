@@ -43,14 +43,21 @@ function handleUserAccess(request: NextRequest, user: IUser | undefined, path: s
   console.log("onboarding completed", user?.onboarding_completed)
   console.log("onboarding redirect path", onboardingRedirectPath)
   console.log("path", path)
+  
+  // Vérifier si l'utilisateur a terminé l'onboarding
   if (!user?.onboarding_completed) {
+    // Si l'utilisateur est sur la page "finish" de l'onboarding, le laisser continuer
+    if (path === "/onboarding/finish") {
+      return NextResponse.next();
+    }
     
-      if (!path.startsWith("/onboarding") || path !== onboardingRedirectPath) {
-          return redirectTo(request, onboardingRedirectPath);
-      }
+    // Sinon, rediriger vers l'étape appropriée de l'onboarding
+    if (!path.startsWith("/onboarding") || path !== onboardingRedirectPath) {
+      return redirectTo(request, onboardingRedirectPath);
+    }
   } 
   else if (path.startsWith("/onboarding")) {
-      return redirectTo(request, "/invoices");
+    return redirectTo(request, "/invoices");
   }
 
   return NextResponse.next();
