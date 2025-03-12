@@ -32,7 +32,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import { Plus } from "lucide-react";
 import {
   ProductUnit,
   VatRate,
@@ -76,11 +75,13 @@ type ProductFormData = z.infer<typeof productSchema>;
 interface CreateProductDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  trigger: React.ReactNode;
 }
 
 export function CreateProductDialog({
   open,
   onOpenChange,
+  trigger,
 }: CreateProductDialogProps) {
   const createProduct = useCreateProduct();
   const { data: units } = useProductUnits();
@@ -124,10 +125,7 @@ export function CreateProductDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
-        <Button>
-          <Plus className="w-4 h-4 mr-2" />
-          Nouveau produit
-        </Button>
+        {trigger}
       </DialogTrigger>
       <DialogContent className="w-[90%] max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>

@@ -71,6 +71,13 @@ export default function ProductsPage() {
         <CreateProductDialog
           open={isCreateDialogOpen}
           onOpenChange={setIsCreateDialogOpen}
+          trigger={<Button
+            onClick={() => setIsCreateDialogOpen(true)}
+            className="w-full sm:w-auto flex items-center gap-2"
+          >
+            <Plus className="w-4 h-4" />
+            Nouveau produit
+          </Button>}
         />
       </div>
 

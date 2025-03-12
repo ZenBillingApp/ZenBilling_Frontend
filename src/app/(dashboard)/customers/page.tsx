@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Loader2, MapPin, Plus, Search } from "lucide-react";
+import { Loader2, MapPin, Plus, Search, Mail, Phone } from "lucide-react";
 import { ICustomer } from "@/types/Customer.interface";
 import { User, Building, User2Icon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -53,7 +53,7 @@ export default function CustomersPage() {
     limit: 25,
     page: page,
   });
-  const totalPages = data?.data.pagination.totalPages;
+  const totalPages = data?.data.pagination.totalPages || 1;
 
   const handleCreateCustomer = () => {
     NiceModal.show(CreateCustomerDialog);
@@ -66,7 +66,7 @@ export default function CustomersPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-6 space-y-6 max-w-7xl">
+    <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-6 space-y-4 sm:space-y-6 max-w-7xl">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h1 className="text-xl sm:text-2xl font-bold font-dmSans flex items-center">
           <User2Icon className="w-5 sm:w-6 h-5 sm:h-6 mr-2" />
@@ -81,7 +81,7 @@ export default function CustomersPage() {
         </Button>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-4">
+      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
         <div className="relative w-full">
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
@@ -115,13 +115,13 @@ export default function CustomersPage() {
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
       ) : data?.data.customers.length === 0 ? (
-        <div className="text-center py-12">
-          <User2Icon className="mx-auto h-12 w-12 text-muted-foreground" />
-          <h3 className="mt-4 text-lg font-medium">Aucun client</h3>
-          <p className="mt-2 text-sm text-muted-foreground">
+        <div className="text-center py-8 sm:py-12">
+          <User2Icon className="mx-auto h-10 sm:h-12 w-10 sm:w-12 text-muted-foreground" />
+          <h3 className="mt-3 sm:mt-4 text-base sm:text-lg font-medium">Aucun client</h3>
+          <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-muted-foreground">
             Commencez par créer un nouveau client.
           </p>
-          <div className="mt-6">
+          <div className="mt-4 sm:mt-6">
             <Button onClick={handleCreateCustomer}>
               <Plus className="w-4 h-4 mr-2" />
               Nouveau client
@@ -129,9 +129,71 @@ export default function CustomersPage() {
           </div>
         </div>
       ) : (
-        <div className="overflow-x-auto -mx-4 sm:mx-0">
-          <div className="min-w-full inline-block align-middle">
-            <div className="overflow-hidden">
+        <>
+          {/* Vue mobile (uniquement sur xs) */}
+          <div className="block sm:hidden space-y-4">
+            {data?.data?.customers?.map((customer: ICustomer) => (
+              <div 
+                key={customer.customer_id}
+                className="border rounded-lg p-3 cursor-pointer hover:bg-muted/50"
+                onClick={() => setSelectedCustomer(customer)}
+              >
+                <div className="flex justify-between items-start mb-2">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <Badge
+                        variant="outline"
+                        className="flex items-center gap-1 h-5"
+                      >
+                        {customer.type === "company" ? (
+                          <Building className="w-3 h-3" />
+                        ) : (
+                          <User className="w-3 h-3" />
+                        )}
+                      </Badge>
+                      <p className="font-medium text-sm">
+                        {customer.type === "company"
+                          ? customer.business?.name
+                          : `${customer.individual?.first_name} ${customer.individual?.last_name}`}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="space-y-1 mt-2">
+                  {customer.email && (
+                    <div className="flex items-center gap-2">
+                      <Mail className="w-3 h-3 text-muted-foreground" />
+                      <span className="text-xs text-muted-foreground truncate">
+                        {customer.email}
+                      </span>
+                    </div>
+                  )}
+                  
+                  {customer.phone && (
+                    <div className="flex items-center gap-2">
+                      <Phone className="w-3 h-3 text-muted-foreground" />
+                      <span className="text-xs text-muted-foreground">
+                        {customer.phone}
+                      </span>
+                    </div>
+                  )}
+                  
+                  {customer.address && (
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-3 h-3 text-muted-foreground" />
+                      <span className="text-xs text-muted-foreground truncate">
+                        {customer.address}{customer.city ? `, ${customer.city}` : ''}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          {/* Vue desktop (à partir de sm) */}
+          <div className="hidden sm:block overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -148,122 +210,104 @@ export default function CustomersPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {isLoading ? (
-                  <TableRow>
-                    <TableCell colSpan={6} className="text-center py-8">
-                      <div className="flex justify-center items-center h-full w-full">
-                        <Loader2 className="w-6 h-6 animate-spin" />
-                      </div>
+                {data?.data?.customers?.map((customer: ICustomer) => (
+                  <TableRow
+                    key={customer.customer_id}
+                    className="cursor-pointer transition-colors hover:bg-muted/50"
+                    onClick={() => setSelectedCustomer(customer)}
+                  >
+                    <TableCell>
+                      {customer.type === "company" ? (
+                        <Badge
+                          variant="outline"
+                          className="flex items-center gap-2 w-fit"
+                        >
+                          <Building className="w-4 h-4" />
+                          <span className="hidden sm:inline">Pro</span>
+                        </Badge>
+                      ) : (
+                        <Badge
+                          variant="outline"
+                          className="flex items-center gap-2 w-fit"
+                        >
+                          <User className="w-4 h-4" />
+                          <span className="hidden sm:inline">Part.</span>
+                        </Badge>
+                      )}
+                    </TableCell>
+                    <TableCell className="font-medium max-w-[200px] truncate">
+                      {customer.type === "company"
+                        ? customer.business?.name
+                        : `${customer.individual?.first_name} ${customer.individual?.last_name}`}
+                    </TableCell>
+                    <TableCell className="hidden sm:table-cell text-nowrap">
+                      <span className="text-muted-foreground">
+                        {customer.email || "-"}
+                      </span>
+                    </TableCell>
+                    <TableCell className="hidden sm:table-cell text-nowrap">
+                      <span className="text-muted-foreground">
+                        {customer.phone || "-"}
+                      </span>
+                    </TableCell>
+                    <TableCell className="hidden lg:table-cell text-nowrap">
+                      {customer.address ? (
+                        <div className="flex items-center gap-2 text-muted-foreground">
+                          <MapPin className="w-4 h-4 shrink-0" />
+                          <span className="truncate max-w-[200px]">
+                            {customer.address}
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="text-muted-foreground">-</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="hidden lg:table-cell text-nowrap">
+                      <span className="text-muted-foreground">
+                        {customer.city || "-"}
+                      </span>
                     </TableCell>
                   </TableRow>
-                ) : !data?.data?.customers?.length ? (
-                  <TableRow>
-                    <TableCell
-                      colSpan={6}
-                      className="text-center py-8 text-muted-foreground"
-                    >
-                      <div className="flex flex-col items-center justify-center text-center">
-                        <p className="text-sm text-muted-foreground">
-                          Aucun client trouvé
-                        </p>
-                        {search && (
-                          <p className="text-xs text-muted-foreground mt-1">
-                            Essayez de modifier votre recherche
-                          </p>
-                        )}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  data?.data?.customers?.map((customer: ICustomer) => (
-                    <TableRow
-                      key={customer.customer_id}
-                      className="cursor-pointer transition-colors hover:bg-muted/50"
-                      onClick={() => setSelectedCustomer(customer)}
-                    >
-                      <TableCell>
-                        {customer.type === "company" ? (
-                          <Badge
-                            variant="outline"
-                            className="flex items-center gap-2 w-fit"
-                          >
-                            <Building className="w-4 h-4" />
-                            <span className="hidden sm:inline">Pro</span>
-                          </Badge>
-                        ) : (
-                          <Badge
-                            variant="outline"
-                            className="flex items-center gap-2 w-fit"
-                          >
-                            <User className="w-4 h-4" />
-                            <span className="hidden sm:inline">Part.</span>
-                          </Badge>
-                        )}
-                      </TableCell>
-                      <TableCell className="font-medium max-w-[200px] truncate">
-                        {customer.type === "company"
-                          ? customer.business?.name
-                          : `${customer.individual?.first_name} ${customer.individual?.last_name}`}
-                      </TableCell>
-                      <TableCell className="hidden sm:table-cell text-nowrap">
-                        <span className="text-muted-foreground">
-                          {customer.email || "-"}
-                        </span>
-                      </TableCell>
-                      <TableCell className="hidden sm:table-cell text-nowrap">
-                        <span className="text-muted-foreground">
-                          {customer.phone || "-"}
-                        </span>
-                      </TableCell>
-                      <TableCell className="hidden lg:table-cell text-nowrap">
-                        {customer.address ? (
-                          <div className="flex items-center gap-2 text-muted-foreground">
-                            <MapPin className="w-4 h-4 shrink-0" />
-                            <span className="truncate max-w-[200px]">
-                              {customer.address}
-                            </span>
-                          </div>
-                        ) : (
-                          <span className="text-muted-foreground">-</span>
-                        )}
-                      </TableCell>
-                      <TableCell className="hidden lg:table-cell text-nowrap">
-                        <span className="text-muted-foreground">
-                          {customer.city || "-"}
-                        </span>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
+                ))}
               </TableBody>
             </Table>
           </div>
-        </div>
-        </div>
+        </>
       )}
-
-      {/* Customer Details Dialog */}
-      <CustomerDetailsDialog
-        customer={selectedCustomer}
-        isOpen={!!selectedCustomer}
-        onOpenChange={(open) => !open && setSelectedCustomer(null)}
-        onEdit={handleEditCustomer}
-      />
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex justify-center py-4 border-t">
+        <div className="flex justify-center mt-4 sm:mt-6">
           <Pagination>
             <PaginationContent>
               <PaginationItem>
                 <PaginationPrevious
-                  className="hidden sm:flex cursor-pointer"
+                  className="cursor-pointer"
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   isActive={page !== 1}
                 />
               </PaginationItem>
               {[...Array(totalPages)].map((_, i) => {
-                if (window.innerWidth < 640 && Math.abs(page - (i + 1)) > 1) {
+                // Sur mobile, n'afficher que la page actuelle et les pages adjacentes
+                if (
+                  (window.innerWidth < 640 && Math.abs(page - (i + 1)) > 1) ||
+                  (totalPages > 7 && i > 0 && i < totalPages - 1 && Math.abs(page - (i + 1)) > 2)
+                ) {
+                  // Afficher des points de suspension au milieu
+                  if (i === 1 && page > 3) {
+                    return (
+                      <PaginationItem key="ellipsis-start" className="flex items-center justify-center h-10 w-10">
+                        <span>...</span>
+                      </PaginationItem>
+                    );
+                  }
+                  if (i === totalPages - 2 && page < totalPages - 2) {
+                    return (
+                      <PaginationItem key="ellipsis-end" className="flex items-center justify-center h-10 w-10">
+                        <span>...</span>
+                      </PaginationItem>
+                    );
+                  }
                   return null;
                 }
                 return (
@@ -279,7 +323,7 @@ export default function CustomersPage() {
               })}
               <PaginationItem>
                 <PaginationNext
-                  className="hidden sm:flex cursor-pointer"
+                  className="cursor-pointer"
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                   isActive={page !== totalPages}
                 />
@@ -288,8 +332,14 @@ export default function CustomersPage() {
           </Pagination>
         </div>
       )}
-    </div>
-    
-  );
 
+      {/* Customer Details Dialog */}
+      <CustomerDetailsDialog
+        customer={selectedCustomer}
+        isOpen={!!selectedCustomer}
+        onOpenChange={(open) => !open && setSelectedCustomer(null)}
+        onEdit={handleEditCustomer}
+      />
+    </div>
+  );
 }
