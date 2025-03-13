@@ -67,7 +67,7 @@ export default function QuotesPage() {
     page: page,
   });
 
-  const { mutate: viewQuote } = useViewQuote();
+  const { mutate: viewQuote, isPending: isViewQuotePending } = useViewQuote();
   
   const totalPages = quotesData?.data.pagination?.totalPages || 1;
 
@@ -227,7 +227,11 @@ export default function QuotesPage() {
                       }
                     }}
                   >
-                    <Eye className="w-3 h-3 mr-1" />
+                    {isViewQuotePending ? (
+                      <Loader2 className="w-3 h-3 animate-spin" />
+                    ) : (
+                      <Eye className="w-3 h-3 mr-1" />
+                    )}
                     <span className="text-xs">Voir</span>
                   </Button>
                 </div>
@@ -301,7 +305,11 @@ export default function QuotesPage() {
                           viewQuote(quote.quote_id)
                         }
                       }}>
-                        <Eye className="w-4 h-4" />
+                        {isViewQuotePending ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Eye className="w-4 h-4" />
+                        )}
                       </Button>
                     </TableCell>
                   </TableRow>

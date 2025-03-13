@@ -65,7 +65,7 @@ export default function InvoicesPage() {
     page: page,
   });
 
-  const { mutate: viewInvoice } = useViewInvoice();
+  const { mutate: viewInvoice, isPending: isViewInvoicePending } = useViewInvoice();
 
   const totalPages = data?.data.pagination.totalPages;
 
@@ -231,7 +231,11 @@ export default function InvoicesPage() {
                       }
                     }}
                   >
-                    <Eye className="w-3 h-3 mr-1" />
+                    {isViewInvoicePending ? (
+                      <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                    ) : (
+                      <Eye className="w-3 h-3 mr-1" />
+                    )}
                     <span className="text-xs">Voir</span>
                   </Button>
                 </div>
@@ -321,7 +325,11 @@ export default function InvoicesPage() {
                           viewInvoice(invoice.invoice_id)
                         }
                       }}>
-                        <Eye className="w-4 h-4" />
+                        {isViewInvoicePending ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Eye className="w-4 h-4" />
+                        )}
                       </Button>
                     </TableCell>
                   </TableRow>
