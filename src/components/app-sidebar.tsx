@@ -15,7 +15,9 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
     SidebarGroupLabel,
+    useSidebar,
   } from "@/components/ui/sidebar"
+
   import { NavUser } from "@/components/nav-user"
 
 
@@ -26,6 +28,7 @@ import {
   
   export function AppSidebar() {
     const pathname = usePathname()
+    const { setOpenMobile } = useSidebar()
     return (
       <Sidebar>
         <SidebarHeader >
@@ -43,7 +46,7 @@ import {
                 <SidebarGroupLabel>Gestion</SidebarGroupLabel>
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <SidebarMenuButton asChild isActive={pathname.startsWith("/invoices")}>
+                        <SidebarMenuButton asChild isActive={pathname.startsWith("/invoices")} onClick={() => setOpenMobile(false)}>
                             <Link href="/invoices">
                                 <FileStack className="w-4 h-4 mr-2" />
                                 Factures
@@ -51,7 +54,7 @@ import {
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                     <SidebarMenuItem>
-                        <SidebarMenuButton asChild isActive={pathname.startsWith("/quotes")}>
+                        <SidebarMenuButton asChild isActive={pathname.startsWith("/quotes")} onClick={() => setOpenMobile(false)}>
                             <Link href="/quotes">
                                 <FileText className="w-4 h-4 mr-2" />
                                 Devis
@@ -66,7 +69,7 @@ import {
                 <SidebarGroupLabel>Produits</SidebarGroupLabel>
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <SidebarMenuButton asChild isActive={pathname.startsWith("/products")}>
+                        <SidebarMenuButton asChild isActive={pathname.startsWith("/products")} onClick={() => setOpenMobile(false)}>
                             <Link href="/products">
                                 <Boxes className="w-4 h-4 mr-2" />
                                 Produits
@@ -79,7 +82,7 @@ import {
                 <SidebarGroupLabel>Clients</SidebarGroupLabel>
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <SidebarMenuButton asChild isActive={pathname.startsWith("/customers")}>
+                        <SidebarMenuButton asChild isActive={pathname.startsWith("/customers")} onClick={() => setOpenMobile(false)}>
                             <Link href="/customers">
                                 <User2Icon className="w-4 h-4 mr-2" />
                                 Clients
@@ -92,7 +95,7 @@ import {
                 <SidebarGroupLabel>Paramètres</SidebarGroupLabel>
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <SidebarMenuButton asChild isActive={pathname.startsWith("/settings")}>
+                        <SidebarMenuButton asChild isActive={pathname.startsWith("/settings")} onClick={() => setOpenMobile(false)}>
                             <Link href="/settings">
                                 <Settings className="w-4 h-4 mr-2" />
                                 Paramètres

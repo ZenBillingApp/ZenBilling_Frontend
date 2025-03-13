@@ -1,9 +1,7 @@
 "use client"
 
 import {
-  BadgeCheck,
   ChevronsUpDown,
-  CreditCard,
   LogOut,
 } from "lucide-react"
 
@@ -18,7 +16,6 @@ import {
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -88,7 +85,7 @@ export function NavUser() {
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator /> */}
-            <DropdownMenuGroup>
+            {/* <DropdownMenuGroup>
               <DropdownMenuItem>
                 <BadgeCheck />
                 Account
@@ -100,8 +97,8 @@ export function NavUser() {
               {/* <DropdownMenuItem>
                 <Bell />
                 Notifications
-              </DropdownMenuItem> */}
-            </DropdownMenuGroup>
+              </DropdownMenuItem> 
+            </DropdownMenuGroup> */}
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => logout.mutate()}>
               <LogOut />
