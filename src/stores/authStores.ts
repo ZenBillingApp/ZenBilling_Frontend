@@ -2,10 +2,8 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { IAuthResponse } from "@/types/Auth.interface";
 import type { IUser } from "@/types/User.interface";
-import Cookies from 'js-cookie';
 
 interface IAuthState {
-  token: string | null;
   user: Partial<IUser> | null;
   isAuthenticated: boolean;
 }
@@ -20,15 +18,12 @@ export const useAuthStore = create<IAuthState & IAuthActions>()(
   persist(
     (set) => ({
       // État initial
-      token: null,
       user: null,
       isAuthenticated: false,
 
       // Actions
       setAuth: (data: IAuthResponse) => {
-        Cookies.set('token', data.token);
         set({
-          token: data.token,
           user: {
             user_id: data.user.user_id,
             email: data.user.email,
@@ -43,9 +38,7 @@ export const useAuthStore = create<IAuthState & IAuthActions>()(
       },
 
       clearAuth: () => {
-        Cookies.remove('token');
         set({
-          token: null,
           user: null,
           isAuthenticated: false,
         });

@@ -10,14 +10,13 @@ import { IApiErrorResponse, IApiSuccessResponse } from '@/types/api.types';
 import { useToast } from '@/hooks/use-toast';
 
 
-
+// Hook de connexion
 export const useLogin = () => {
   const setAuth = useAuthStore((state) => state.setAuth);
   const router = useRouter();
   const { toast } = useToast();
   return useMutation({
     mutationFn: (credentials: ILoginRequest) => api.post('/users/login', credentials),
-
     onSuccess: (data) => {
       setAuth(data.data)
       router.push('/invoices');
@@ -32,6 +31,7 @@ export const useLogin = () => {
 
 } 
 
+// Hook de déconnexion
 export const useLogout = () => {
   const clearAuth = useAuthStore((state) => state.clearAuth);
   const queryClient = useQueryClient();
@@ -42,7 +42,7 @@ export const useLogout = () => {
     onSuccess: () => {
       clearAuth();
       queryClient.clear();
-      router.push('/login');
+      router.replace('/login');
     }
   });
 }
@@ -86,7 +86,7 @@ export const useOnboardingFinish = () => {
   return useMutation({
     mutationFn: () => api.post('/users/onboarding-finish'),
     onSuccess: () => {
-      router.push('/invoices');
+      router.replace('/invoices');
     },
     onError: (error: AxiosError<IApiErrorResponse>) => {
       toast({

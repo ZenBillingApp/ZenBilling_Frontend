@@ -1,6 +1,4 @@
-"use client"
 import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'axios';
-import Cookies from 'js-cookie';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
 
@@ -11,16 +9,35 @@ const axiosInstance: AxiosInstance = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-
+  // Permettre l'envoi des cookies avec les requêtes
+  withCredentials: true,
 });
+
+// Variable pour suivre si un rafraîchissement de token est en cours
+let isRefreshing = false;
+// File d'attente pour les requêtes en attente pendant le rafraîchissement
+let failedQueue: Array<{
+  resolve: (value: unknown) => void;
+  reject: (reason?: unknown) => void;
+  config: InternalAxiosRequestConfig;
+}> = [];
+
+// Fonction pour traiter la file d'attente
+const processQueue = (error: AxiosError | null) => {
+  failedQueue.forEach(promise => {
+    if (error) {
+      promise.reject(error);
+    } else {
+      promise.resolve(promise.config);
+    }
+  });
+  
+  failedQueue = [];
+};
 
 // Intercepteur pour les requêtes
 axiosInstance.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const token = Cookies.get('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
     return config;
   },
   (error: AxiosError) => {
@@ -31,15 +48,46 @@ axiosInstance.interceptors.request.use(
 // Intercepteur pour les réponses
 axiosInstance.interceptors.response.use(
   (response) => response,
-  (error: AxiosError) => {
+  async (error: AxiosError) => {
+    const originalRequest = error.config as InternalAxiosRequestConfig;
+    
+    // Vérifier si c'est une erreur 401 (non autorisé) et que la requête n'est pas déjà en cours de rafraîchissement
+    if (error.response?.status === 401 && !originalRequest.headers['X-Retry']) {
+      if (isRefreshing) {
+        // Si un rafraîchissement est déjà en cours, mettre la requête en file d'attente
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject, config: originalRequest });
+        });
+      }
+
+      isRefreshing = true;
+      originalRequest.headers['X-Retry'] = 'true';
+
+      try {
+        // Tenter de rafraîchir le token
+        await axios.post(`${BASE_URL}/users/refresh-token`, {}, {
+          withCredentials: true // Important pour envoyer le refresh_token cookie
+        });
+        
+        // Si le rafraîchissement réussit, traiter la file d'attente et réessayer la requête originale
+        processQueue(null);
+        isRefreshing = false;
+        return axiosInstance(originalRequest);
+      } catch (refreshError) {
+        // Si le rafraîchissement échoue, traiter la file d'attente avec l'erreur et rediriger vers la page de connexion
+        processQueue(refreshError as AxiosError);
+        isRefreshing = false;
+        window.location.href = '/login';
+        return Promise.reject(refreshError);
+      }
+    }
+
     if (error.response) {
       // La requête a été faite et le serveur a répondu avec un code d'erreur
       switch (error.response.status) {
         case 401:
-          // Gérer l'expiration du token ou l'authentification invalide
-            Cookies.remove('token');
-           window.location.href = '/login';
-          
+          // Si nous arrivons ici, c'est que le rafraîchissement a échoué ou que la requête est déjà marquée comme réessayée
+          window.location.href = '/login';
           break;
         case 403:
           console.error('Accès interdit');
@@ -64,8 +112,6 @@ axiosInstance.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
-
 
 // Service API
 export const api = {
