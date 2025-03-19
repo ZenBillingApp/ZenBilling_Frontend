@@ -8,7 +8,7 @@ import { ILoginRequest, IRegisterRequest } from '@/types/Auth.interface';
 import { AxiosError } from 'axios';
 import { IApiErrorResponse, IApiSuccessResponse } from '@/types/api.types';
 import { useToast } from '@/hooks/use-toast';
-
+import { setAuthCookies, deleteAuthCookies } from '@/lib/cookie';
 
 // Hook de connexion
 export const useLogin = () => {
@@ -17,7 +17,8 @@ export const useLogin = () => {
   const { toast } = useToast();
   return useMutation({
     mutationFn: (credentials: ILoginRequest) => api.post('/users/login', credentials),
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
+      await setAuthCookies(data.data.token, data.data.refreshToken, data.data.expiresIn)
       setAuth(data.data)
       router.push('/invoices');
     },
@@ -39,7 +40,8 @@ export const useLogout = () => {
 
   return useMutation({
     mutationFn: () => api.post('/users/logout'),
-    onSuccess: () => {
+    onSuccess: async () => {
+      await deleteAuthCookies();
       clearAuth();
       queryClient.clear();
       router.replace('/login');

@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'axios';
-
+import { getCookie, setAuthCookies, deleteAuthCookies } from '@/lib/cookie';
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
 
 // Création de l'instance Axios
@@ -9,8 +9,6 @@ const axiosInstance: AxiosInstance = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  // Permettre l'envoi des cookies avec les requêtes
-  withCredentials: true,
 });
 
 // Variable pour suivre si un rafraîchissement de token est en cours
@@ -37,7 +35,11 @@ const processQueue = (error: AxiosError | null) => {
 
 // Intercepteur pour les requêtes
 axiosInstance.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => {
+  async (config: InternalAxiosRequestConfig) => {
+    const accessToken = await getCookie('access_token');
+    if (accessToken) {
+      config.headers['Authorization'] = `Bearer ${accessToken}`;
+    }
     return config;
   },
   (error: AxiosError) => {
@@ -65,9 +67,18 @@ axiosInstance.interceptors.response.use(
 
       try {
         // Tenter de rafraîchir le token
-        await axios.post(`${BASE_URL}/users/refresh-token`, {}, {
-          withCredentials: true // Important pour envoyer le refresh_token cookie
+        const response = await axios.post(`${BASE_URL}/users/refresh-token`, {
+            refreshToken: await getCookie('refresh_token')
+        }, {
+          headers: {
+            'Content-Type': 'application/json'
+          }
         });
+
+
+        await setAuthCookies(response.data.data.token, response.data.data.refreshToken, response.data.data.expiresIn)
+
+
         
         // Si le rafraîchissement réussit, traiter la file d'attente et réessayer la requête originale
         processQueue(null);
@@ -77,6 +88,7 @@ axiosInstance.interceptors.response.use(
         // Si le rafraîchissement échoue, traiter la file d'attente avec l'erreur et rediriger vers la page de connexion
         processQueue(refreshError as AxiosError);
         isRefreshing = false;
+        await deleteAuthCookies();
         window.location.href = '/login';
         return Promise.reject(refreshError);
       }
@@ -87,6 +99,7 @@ axiosInstance.interceptors.response.use(
       switch (error.response.status) {
         case 401:
           // Si nous arrivons ici, c'est que le rafraîchissement a échoué ou que la requête est déjà marquée comme réessayée
+          await deleteAuthCookies();
           window.location.href = '/login';
           break;
         case 403:
@@ -108,6 +121,8 @@ axiosInstance.interceptors.response.use(
       // Une erreur s'est produite lors de la configuration de la requête
       console.error('Erreur de configuration de la requête:', error.message);
     }
+
+
 
     return Promise.reject(error);
   }
