@@ -32,6 +32,10 @@ const PUBLIC_ROUTES = ['/login', '/register']
 //   return NextResponse.next();
 // }
 
+function isPublicRoute(path: string): boolean {
+  return PUBLIC_ROUTES.some(route => path.startsWith(route))
+}
+
 /**
  * Fonction utilitaire pour les redirections
  */
@@ -45,20 +49,27 @@ function redirectTo(request: NextRequest, path: string): NextResponse {
 export default async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
 
-  const hasAuthCookies = request.cookies.has('access_token');
-
+  // Vérification des tokens d'authentification
+  const hasAuthToken = request.cookies.has('access_token');
+  const hasRefreshToken = request.cookies.has('refresh_token');
+  const isAuthenticated = hasAuthToken || hasRefreshToken;
 
   // Gestion des routes publiques
-  if (PUBLIC_ROUTES.includes(path) && hasAuthCookies) {
-    return redirectTo(request, "/invoices");
+  if (isPublicRoute(path)) {
+    if (isAuthenticated) {
+      return redirectTo(request, '/invoices');
+    }
+    return NextResponse.next();
   }
 
-  if (!hasAuthCookies && !PUBLIC_ROUTES.includes(path)) {
-    return redirectTo(request, "/login");
+  // Protection des routes privées
+  if (!isAuthenticated) {
+    const loginUrl = new URL('/login', request.url);
+    loginUrl.searchParams.set('from', path);
+    return redirectTo(request, loginUrl.toString());
   }
 
   return NextResponse.next();
-
 }
 
 /**

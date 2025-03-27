@@ -28,14 +28,14 @@ export const deleteCookie = async (name: string) => {
 export const setAuthCookies = async (token: string, refreshToken: string, expiresIn: number) => {
   await setCookie('access_token', token, {
     httpOnly: true,
-    secure: false,
+    // secure: false,
     sameSite: 'none',
     path: '/',
     maxAge: expiresIn,
   })
   await setCookie('refresh_token', refreshToken, {
     httpOnly: true,
-    secure: false,
+    // secure: false,
     sameSite: 'none',
     path: '/',
     maxAge: 60 * 60 * 24, // 1 days
