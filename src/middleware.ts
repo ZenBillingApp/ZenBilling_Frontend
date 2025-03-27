@@ -32,10 +32,6 @@ const PUBLIC_ROUTES = ['/login', '/register']
 //   return NextResponse.next();
 // }
 
-function isPublicRoute(path: string): boolean {
-  return PUBLIC_ROUTES.some(route => path.startsWith(route))
-}
-
 /**
  * Fonction utilitaire pour les redirections
  */
@@ -47,27 +43,34 @@ function redirectTo(request: NextRequest, path: string): NextResponse {
  * Middleware principal
  */
 export default async function middleware(request: NextRequest) {
-  const path = request.nextUrl.pathname;
+
 
   // Vérification des tokens d'authentification
   const hasAuthToken = request.cookies.has('access_token');
   const hasRefreshToken = request.cookies.has('refresh_token');
-  const isAuthenticated = hasAuthToken || hasRefreshToken;
+  const isPublicRoute = PUBLIC_ROUTES.some(route => request.nextUrl.pathname.startsWith(route));
 
-  // Gestion des routes publiques
-  if (isPublicRoute(path)) {
-    if (isAuthenticated) {
-      return redirectTo(request, '/invoices');
-    }
+  if (isPublicRoute && (hasAuthToken || hasRefreshToken)) {
+    return redirectTo(request, '/invoices');
+  }
+
+  if (!isPublicRoute && !hasAuthToken) {
+    const loginUrl = new URL('/login', request.url);
+    loginUrl.searchParams.set('from', request.nextUrl.pathname);
+    return redirectTo(request, loginUrl.toString());
+  }
+
+  if (!isPublicRoute && hasAuthToken) {
     return NextResponse.next();
   }
 
-  // Protection des routes privées
-  if (!isAuthenticated) {
+  if (!isPublicRoute && !hasAuthToken) {
     const loginUrl = new URL('/login', request.url);
-    loginUrl.searchParams.set('from', path);
+    loginUrl.searchParams.set('from', request.nextUrl.pathname);
     return redirectTo(request, loginUrl.toString());
   }
+  
+
 
   return NextResponse.next();
 }
@@ -84,8 +87,6 @@ export const config = {
     '/quotes/:path*',
     '/login',
     '/register',
-    '/forgot-password',
-    '/reset-password',
     '/onboarding/:path*'
   ]
 }
