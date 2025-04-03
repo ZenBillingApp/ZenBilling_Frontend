@@ -8,6 +8,7 @@ import type { NextRequest } from 'next/server'
 //   FINISH: "/onboarding/finish",
 // } as const
 
+// Routes publiques qui ne nécessitent pas d'authentification
 const PUBLIC_ROUTES = ['/login', '/register']
 
 
@@ -40,38 +41,25 @@ function redirectTo(request: NextRequest, path: string): NextResponse {
 }
 
 /**
- * Middleware principal
+ * Middleware principal pour la gestion de l'authentification
  */
 export default async function middleware(request: NextRequest) {
-
-
-  // Vérification des tokens d'authentification
-  const hasAuthToken = request.cookies.has('access_token');
   const hasRefreshToken = request.cookies.has('refresh_token');
   const isPublicRoute = PUBLIC_ROUTES.some(route => request.nextUrl.pathname.startsWith(route));
 
-  if (isPublicRoute && (hasAuthToken || hasRefreshToken)) {
+  // Si l'utilisateur est sur une route publique et a un token, rediriger vers /invoices
+  if (isPublicRoute && hasRefreshToken) {
     return redirectTo(request, '/invoices');
   }
 
-  if (!isPublicRoute && !hasAuthToken) {
+  // Si l'utilisateur n'est pas sur une route publique et n'a pas de token, rediriger vers login
+  if (!isPublicRoute && !hasRefreshToken) {
     const loginUrl = new URL('/login', request.url);
     loginUrl.searchParams.set('from', request.nextUrl.pathname);
     return redirectTo(request, loginUrl.toString());
   }
 
-  if (!isPublicRoute && hasAuthToken) {
-    return NextResponse.next();
-  }
-
-  if (!isPublicRoute && !hasAuthToken) {
-    const loginUrl = new URL('/login', request.url);
-    loginUrl.searchParams.set('from', request.nextUrl.pathname);
-    return redirectTo(request, loginUrl.toString());
-  }
-  
-
-
+  // Dans tous les autres cas, continuer normalement
   return NextResponse.next();
 }
 
