@@ -1,5 +1,6 @@
 import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'axios';
 // import { getCookie, setAuthCookies, deleteAuthCookies } from '@/lib/cookie';
+import { getCookie } from '@/lib/cookie';
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
 
 // Création de l'instance Axios
@@ -53,9 +54,11 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
     const originalRequest = error.config as InternalAxiosRequestConfig;
+
+    const refreshToken = await getCookie('refresh_token');
     
     // Vérifier si c'est une erreur 401 (non autorisé) et que la requête n'est pas déjà en cours de rafraîchissement
-    if (error.response?.status === 401 && !originalRequest.headers['X-Retry']) {
+    if (error.response?.status === 401 && !originalRequest.headers['X-Retry'] && refreshToken) {
       if (isRefreshing) {
         // Si un rafraîchissement est déjà en cours, mettre la requête en file d'attente
         return new Promise((resolve, reject) => {
