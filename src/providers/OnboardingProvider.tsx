@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useAuthStore } from "@/stores/authStores";
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname,redirect } from "next/navigation";
 import { IOnboardingStep } from "@/types/User.interface";
 import { useProfile } from "@/hooks/useAuth";
 
@@ -13,7 +13,6 @@ const ONBOARDING_STEPS: Record<IOnboardingStep, string> = {
 
 export const OnboardingProvider = ({ children }: { children: React.ReactNode }) => {
   const { user } = useAuthStore();
-  const router = useRouter();
   const pathname = usePathname();
   const { data: profileData } = useProfile();
 
@@ -27,7 +26,7 @@ export const OnboardingProvider = ({ children }: { children: React.ReactNode }) 
     // Si l'onboarding est complété, on redirige vers le dashboard
     if (currentUser.onboarding_completed) {
       if (pathname.startsWith("/onboarding")) {
-        router.replace("/invoices");
+        redirect("/invoices");
       }
       return;
     }
@@ -39,9 +38,9 @@ export const OnboardingProvider = ({ children }: { children: React.ReactNode }) 
     const expectedPath = ONBOARDING_STEPS[currentStep];
 
     if (pathname !== expectedPath) {
-      router.replace(expectedPath);
+      redirect(expectedPath);
     }
-  }, [router, user, pathname, profileData]);
+  }, [user, pathname, profileData]);
 
   return <>{children}</>;
 };
