@@ -1,17 +1,13 @@
 "use client";
 
-
 import Image from "next/image";
-
 import { Button } from "@/components/ui/button";
-
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useOnboardingFinish } from "@/hooks/useAuth";
+import { LogoutButton } from "@/components/logout-button";
 
 import logo from "@/assets/logo.png";
 import { CheckCircle, ArrowRight } from "lucide-react";
-
-
 
 export default function OnboardingFinish() {
   const { mutate: onboardingFinish } = useOnboardingFinish();
@@ -21,6 +17,9 @@ export default function OnboardingFinish() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center p-4">
+      <div className="absolute top-4 right-4">
+        <LogoutButton />
+      </div>
       <div className="w-full max-w-md">
         <div className="flex flex-col items-center gap-2 mb-6">
           <a href="#" className="flex flex-col items-center gap-2 font-medium">
