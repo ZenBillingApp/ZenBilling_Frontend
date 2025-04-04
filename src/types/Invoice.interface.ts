@@ -3,6 +3,8 @@ import { IInvoiceItem } from './InvoiceItem.interface';
 import { IPayment } from './Payment.interface';
 import { ICompany } from './Company.interface';
 
+export type InvoiceStatus = 'pending' | 'sent' | 'paid' | 'cancelled' | 'late';
+
 export interface IInvoice {
   invoice_id?: string;
   customer_id: string | null;
@@ -14,7 +16,7 @@ export interface IInvoice {
   amount_excluding_tax: number;
   tax: number;
   amount_including_tax: number;
-  status: 'pending' | 'sent' | 'paid' | 'cancelled' | 'late';
+  status: InvoiceStatus;
   conditions?: string;
   late_payment_penalty?: string;
   

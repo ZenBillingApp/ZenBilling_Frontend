@@ -25,7 +25,7 @@ export const OnboardingProvider = ({ children }: { children: React.ReactNode }) 
     // Si l'onboarding est complété, on redirige vers le dashboard
     if (currentUser.onboarding_completed) {
       if (pathname.startsWith("/onboarding")) {
-        redirect("/invoices");
+        redirect("/dashboard");
       }
       return;
     }

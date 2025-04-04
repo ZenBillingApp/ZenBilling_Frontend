@@ -21,7 +21,7 @@ import {
   import { NavUser } from "@/components/nav-user"
 
 
-  import { User2Icon,FileStack,Boxes, FileText } from "lucide-react"
+  import { User2Icon,FileStack,Boxes, FileText, Home } from "lucide-react"
 
   import { cn } from "@/lib/utils"
 
@@ -45,6 +45,14 @@ import {
             <SidebarGroupContent className="mt-4">
                 <SidebarGroupLabel>Gestion</SidebarGroupLabel>
                 <SidebarMenu>
+                    <SidebarMenuItem>
+                        <SidebarMenuButton asChild isActive={pathname.startsWith("/dashboard")} onClick={() => setOpenMobile(false)}>
+                            <Link href="/dashboard">
+                                <Home className="w-4 h-4 mr-2" />
+                                Dashboard
+                            </Link>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
                     <SidebarMenuItem>
                         <SidebarMenuButton asChild isActive={pathname.startsWith("/invoices")} onClick={() => setOpenMobile(false)}>
                             <Link href="/invoices">

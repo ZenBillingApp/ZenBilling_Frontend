@@ -49,7 +49,7 @@ export default async function middleware(request: NextRequest) {
 
   // Si l'utilisateur est sur une route publique et a un token, rediriger vers /invoices
   if (isPublicRoute && hasRefreshToken) {
-    return redirectTo(request, '/invoices');
+    return redirectTo(request, '/dashboard');
   }
 
   // Si l'utilisateur n'est pas sur une route publique et n'a pas de token, rediriger vers login
@@ -69,6 +69,7 @@ export default async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    '/dashboard/:path*',
     '/invoices/:path*',
     '/products/:path*',
     '/customers/:path*',

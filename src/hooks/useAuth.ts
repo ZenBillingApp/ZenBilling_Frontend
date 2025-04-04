@@ -23,7 +23,7 @@ export const useLogin = () => {
       
       // Vérifier si l'utilisateur a terminé l'onboarding
       if (data?.data?.user?.onboarding_completed) {
-        router.push('/invoices');
+        router.push('/dashboard');
       } else {
         // Rediriger vers l'étape d'onboarding appropriée
         const onboardingStep = data?.data?.user?.onboarding_step;
@@ -94,6 +94,7 @@ export const useProfile = () => {
   return useQuery({
     queryKey: ['user'],
     queryFn: () => api.get('/users/profile'),
+    
   });
 };
 
@@ -105,7 +106,7 @@ export const useOnboardingFinish = () => {
     mutationFn: () => api.post('/users/onboarding-finish'),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user'] });
-      router.replace('/invoices');
+      router.replace('/dashboard');
     },
     onError: (error: AxiosError<IApiErrorResponse>) => {
       toast({
