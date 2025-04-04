@@ -86,9 +86,11 @@ export const useProfile = () => {
 export const useOnboardingFinish = () => {
   const { toast } = useToast();
   const router = useRouter();
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: () => api.post('/users/onboarding-finish'),
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user'] });
       router.replace('/invoices');
     },
     onError: (error: AxiosError<IApiErrorResponse>) => {

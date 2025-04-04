@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect } from "react";
-import { useAuthStore } from "@/stores/authStores";
 import { usePathname,redirect } from "next/navigation";
 import { IOnboardingStep } from "@/types/User.interface";
 import { useProfile } from "@/hooks/useAuth";
@@ -11,17 +10,17 @@ const ONBOARDING_STEPS: Record<IOnboardingStep, string> = {
   FINISH: "/onboarding/finish",
 } as const;
 
-export const OnboardingProvider = ({ children }: { children: React.ReactNode }) => {
-  const { user } = useAuthStore();
+export const OnboardingProvider = ({ children }: { children: React.ReactNode }) => {  
   const pathname = usePathname();
   const { data: profileData } = useProfile();
 
   useEffect(() => {
     // Si l'utilisateur n'est pas connecté, on ne fait rien
-    if (!user) return;
+    if (!profileData) return;
 
+    console.log(profileData?.data);
     // Utiliser les données du profil pour une vérification plus précise
-    const currentUser = profileData?.data || user;
+    const currentUser = profileData?.data;
 
     // Si l'onboarding est complété, on redirige vers le dashboard
     if (currentUser.onboarding_completed) {
@@ -40,7 +39,7 @@ export const OnboardingProvider = ({ children }: { children: React.ReactNode }) 
     if (pathname !== expectedPath) {
       redirect(expectedPath);
     }
-  }, [user, pathname, profileData]);
+  }, [pathname, profileData]);
 
   return <>{children}</>;
 };
