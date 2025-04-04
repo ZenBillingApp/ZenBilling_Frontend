@@ -63,12 +63,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="icon" href="/favicon.png" type="image/png" sizes="32x32" />
         <script defer src="https://cloud.umami.is/script.js" data-website-id="593cad2b-493c-48ad-acd4-4fbdc5aebe54"></script>
       </head>
-      <body className={`${dmSans.variable} ${roboto.variable} ${arimo.variable} antialiased`}>
+      <body suppressHydrationWarning className={`${dmSans.variable} ${roboto.variable} ${arimo.variable} antialiased`}>
       <ThemeProvider
             attribute="class"
             defaultTheme="system"
