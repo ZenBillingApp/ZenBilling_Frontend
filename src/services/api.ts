@@ -94,8 +94,6 @@ axiosInstance.interceptors.response.use(
         // Si le rafraîchissement échoue, traiter la file d'attente avec l'erreur et rediriger vers la page de connexion
         processQueue(refreshError as AxiosError);
         isRefreshing = false;
-        // await deleteAuthCookies();
-        window.location.href = '/login';
         return Promise.reject(refreshError);
       }
     }
@@ -106,7 +104,6 @@ axiosInstance.interceptors.response.use(
         case 401:
           // Si nous arrivons ici, c'est que le rafraîchissement a échoué ou que la requête est déjà marquée comme réessayée
           // await deleteAuthCookies();
-          window.location.href = '/login';
           break;
         case 403:
           console.error('Accès interdit');

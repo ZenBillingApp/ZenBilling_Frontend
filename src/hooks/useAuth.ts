@@ -24,6 +24,7 @@ export const useLogin = () => {
     },
     onError: (error: AxiosError<IApiErrorResponse>) => {
       toast({
+        variant: "destructive",
         title: "Erreur de connexion",
         description: error.response?.data.message,
       });
