@@ -22,11 +22,11 @@ export const useLogin = () => {
       setAuth(data.data)
       
       // Vérifier si l'utilisateur a terminé l'onboarding
-      if (data.data.onboarding_completed) {
+      if (data?.data?.user?.onboarding_completed) {
         router.push('/invoices');
       } else {
         // Rediriger vers l'étape d'onboarding appropriée
-        const onboardingStep = data.data.onboarding_step;
+        const onboardingStep = data?.data?.user?.onboarding_step;
         if (onboardingStep === 'CHOOSING_COMPANY') {
           router.push('/onboarding/company');
         } else if (onboardingStep === 'FINISH') {
