@@ -21,13 +21,14 @@ import {
 import {
   FileText,
   ShoppingCart,
-  Users,
   TrendingUp,
   AlertCircle,
   CheckCircle2,
   Clock,
   Ban,
   Mail,
+  Building2,
+  User,
 } from "lucide-react";
 import type { InvoiceStatusCount, TopCustomer } from "@/types/Dashboard.interface";
 
@@ -201,8 +202,12 @@ export default function DashboardPage() {
                   >
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <Users className="h-4 w-4 text-muted-foreground" />
-                        <span>Client {customer.customer_id}</span>
+                        {customer.type === "company" ? (
+                          <Building2 className="h-4 w-4 text-muted-foreground" />
+                        ) : (
+                          <User className="h-4 w-4 text-muted-foreground" />
+                        )}
+                        <span>{customer.name}</span>
                       </div>
                     </TableCell>
                     <TableCell className="text-right">{customer._count.invoices}</TableCell>

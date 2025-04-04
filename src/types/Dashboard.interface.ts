@@ -3,6 +3,8 @@ import { QuoteStatus } from "@/types/Quote.interface";
 
 export interface TopCustomer {
     customer_id: string;
+    name: string;
+    type: "individual" | "company";
     _count: {
         invoices: number;
         quotes: number;
