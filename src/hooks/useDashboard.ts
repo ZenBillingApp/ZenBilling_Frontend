@@ -9,5 +9,8 @@ export const useDashboardMetrics = () => {
       const response = await api.get("/dashboard/metrics");
       return response;
     },
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
+    staleTime: 0
   });
 }; 
