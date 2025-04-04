@@ -20,7 +20,22 @@ export const useLogin = () => {
     onSuccess: async (data) => {
       // await setAuthCookies(data.data.token, data.data.refreshToken, data.data.expiresIn)
       setAuth(data.data)
-      router.push('/invoices');
+      
+      // Vérifier si l'utilisateur a terminé l'onboarding
+      if (data.data.onboarding_completed) {
+        router.push('/invoices');
+      } else {
+        // Rediriger vers l'étape d'onboarding appropriée
+        const onboardingStep = data.data.onboarding_step;
+        if (onboardingStep === 'CHOOSING_COMPANY') {
+          router.push('/onboarding/company');
+        } else if (onboardingStep === 'FINISH') {
+          router.push('/onboarding/finish');
+        } else {
+          // Par défaut, rediriger vers la première étape
+          router.push('/onboarding/company');
+        }
+      }
     },
     onError: (error: AxiosError<IApiErrorResponse>) => {
       toast({
@@ -30,7 +45,6 @@ export const useLogin = () => {
       });
     }
   });
-
 } 
 
 // Hook de déconnexion
