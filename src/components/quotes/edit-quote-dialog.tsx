@@ -56,7 +56,6 @@ export function EditQuoteDialog({
     isError,
     error
 }: EditQuoteDialogProps) {
-    console.log(defaultValues)
 
     const form = useForm<EditQuoteSchema>({
         resolver: zodResolver(editQuoteSchema),
