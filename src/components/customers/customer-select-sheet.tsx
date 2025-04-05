@@ -90,12 +90,12 @@ export function CustomerSelectSheet({
                   <p className="text-sm text-center text-muted-foreground">
                     Chargement des clients...
                   </p>
-                ) : customersData?.data.customers.length === 0 ? (
+                ) : customersData?.data?.customers.length === 0 ? (
                   <p className="text-sm text-center text-muted-foreground">
                     Aucun client trouvé
                   </p>
                 ) : (
-                  customersData?.data.customers.map((customer: ICustomer) => (
+                  customersData?.data?.customers.map((customer: ICustomer) => (
                     <div
                       key={customer.customer_id}
                       className="flex items-center justify-between p-4 rounded-lg border cursor-pointer hover:bg-muted"

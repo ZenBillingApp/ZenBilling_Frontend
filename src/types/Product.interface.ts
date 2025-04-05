@@ -1,3 +1,5 @@
+import { IPagination } from "./pagination.interface";
+
 export type ProductUnit = 
   | 'unite' 
   | 'kg' 
@@ -43,3 +45,16 @@ export interface IProduct {
   created_at: string;
   updated_at: string;
 } 
+
+export interface IProductPagination {
+  products: IProduct[];
+  pagination: IPagination;
+}
+
+export interface IProductVatRate {
+  vatRates: VatRate[];
+}
+
+export interface IProductUnit {
+  units: ProductUnit[];
+}

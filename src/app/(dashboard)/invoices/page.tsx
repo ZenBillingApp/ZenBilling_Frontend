@@ -54,7 +54,7 @@ export default function InvoicesPage() {
 
   const debouncedSearch = useDebounce(search, 300);
 
-  const { data, isLoading } = useInvoices({
+  const { data: invoices, isLoading } = useInvoices({
     search: debouncedSearch || undefined,
     status: statusFilter === "all" ? undefined : statusFilter,
     start_date: dateRange?.from
@@ -67,7 +67,7 @@ export default function InvoicesPage() {
 
   const { mutate: viewInvoice, isPending: isViewInvoicePending } = useViewInvoice();
 
-  const totalPages = data?.data.pagination.totalPages;
+  const totalPages = invoices?.data?.pagination?.totalPages || 0;
 
   const handleCreateInvoice = () => {
     router.push("/invoices/create");
@@ -160,7 +160,7 @@ export default function InvoicesPage() {
         <div className="flex justify-center items-center py-8">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
-      ) : data?.data.invoices.length === 0 ? (
+      ) : invoices?.data?.invoices?.length === 0 ? (
         <div className="text-center py-8 sm:py-12">
           <FileStack className="mx-auto h-10 sm:h-12 w-10 sm:w-12 text-muted-foreground" />
           <h3 className="mt-3 sm:mt-4 text-base sm:text-lg font-medium">Aucune facture</h3>
@@ -178,7 +178,7 @@ export default function InvoicesPage() {
         <>
           {/* Vue mobile (uniquement sur xs) */}
           <div className="block sm:hidden space-y-4">
-            {data?.data?.invoices?.map((invoice: IInvoice) => (
+            {invoices?.data?.invoices?.map((invoice: IInvoice) => (
               <div 
                 key={invoice.invoice_id}
                 className="border rounded-lg p-3 cursor-pointer hover:bg-muted/50"
@@ -259,7 +259,7 @@ export default function InvoicesPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {data?.data?.invoices?.map((invoice: IInvoice) => (
+                {invoices?.data?.invoices?.map((invoice: IInvoice) => (
                   <TableRow
                     key={invoice.invoice_id}
                     className="cursor-pointer hover:bg-muted/50"

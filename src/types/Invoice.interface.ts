@@ -2,7 +2,7 @@ import { ICustomer } from './Customer.interface';
 import { IInvoiceItem } from './InvoiceItem.interface';
 import { IPayment } from './Payment.interface';
 import { ICompany } from './Company.interface';
-
+import { IPagination } from './pagination.interface';
 export type InvoiceStatus = 'pending' | 'sent' | 'paid' | 'cancelled' | 'late';
 
 export interface IInvoice {
@@ -26,3 +26,9 @@ export interface IInvoice {
   payments?: IPayment[];
   company?: ICompany;
 } 
+
+
+export interface IInvoicePagination {
+  invoices: IInvoice[];
+  pagination: IPagination;
+}

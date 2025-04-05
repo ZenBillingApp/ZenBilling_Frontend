@@ -118,7 +118,7 @@ export default function CreateInvoicePage() {
       },
       {
         onSuccess: (data) => {
-          router.push(`/invoices/${data.invoice_id}`);
+          router.push(`/invoices/${data.data?.invoice_id}`);
         },
       }
     );

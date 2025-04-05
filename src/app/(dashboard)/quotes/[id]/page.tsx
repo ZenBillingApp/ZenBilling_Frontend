@@ -51,7 +51,7 @@ import {
   ThumbsDown,
 } from "lucide-react";
 import { EditQuoteDialog } from "@/components/quotes/edit-quote-dialog";
-
+import { AxiosError } from "axios";
 export default function QuoteDetailsPage() {
   const params = useParams();
   const router = useRouter();
@@ -59,7 +59,7 @@ export default function QuoteDetailsPage() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   const { data: quoteData, isLoading } = useQuote(params.id as string);
-  const downloadPdf = useDownloadQuotePdf(quoteData?.quote_number as string);
+  const downloadPdf = useDownloadQuotePdf(quoteData?.data?.quote_number as string);
   const updateQuote = useUpdateQuote(params.id as string);
   const sendQuote = useSendQuote(params.id as string);
 
@@ -174,7 +174,7 @@ export default function QuoteDetailsPage() {
           </Button>
           <h1 className="text-2xl font-bold font-dmSans flex items-center">
             <FileText className="w-6 h-6 mr-2 flex-shrink-0" />
-            Devis {quoteData?.quote_number}
+            Devis {quoteData?.data?.quote_number}
           </h1>
         </div>
         <div className="flex flex-wrap gap-2 w-full sm:w-auto">
@@ -183,17 +183,17 @@ export default function QuoteDetailsPage() {
             onOpenChange={setIsEditDialogOpen}
             onSubmit={handleUpdateQuote}
             defaultValues={{
-              quote_date: quoteData.quote_date,
-              validity_date: quoteData.validity_date,
-              conditions: quoteData.conditions,
-              notes: quoteData.notes,
+              quote_date: quoteData.data?.quote_date || new Date(),
+              validity_date: quoteData.data?.validity_date || new Date(),
+              conditions: quoteData.data?.conditions,
+              notes: quoteData.data?.notes,
             }}
             isLoading={updateQuote.isPending}
             isError={updateQuote.isError}
-            error={{message:(updateQuote.error as IApiErrorResponse)?.message, errors:(updateQuote.error as IApiErrorResponse)?.errors}}
+            error={{message:(updateQuote.error as AxiosError<IApiErrorResponse>)?.response?.data?.message, errors:(updateQuote.error as AxiosError<IApiErrorResponse>)?.response?.data?.errors}}
           />
           <div className="flex flex-wrap gap-2 w-full">
-            {quoteData.status === "draft" && (
+            {quoteData.data?.status === "draft" && (
               <>
                 <Button
                   variant="outline"
@@ -227,7 +227,7 @@ export default function QuoteDetailsPage() {
                 </Button>
               </>
             )}
-            {quoteData.status === "sent" && (
+            {quoteData.data?.status === "sent" && (
               <>
                 <Button
                   variant="outline"
@@ -273,12 +273,12 @@ export default function QuoteDetailsPage() {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full">
                 <Badge
-                  variant={getStatusBadgeVariant(quoteData.status)}
+                  variant={getStatusBadgeVariant(quoteData.data?.status || "")}
                   className="px-4 py-1.5 text-sm w-fit"
                 >
                   <span className="flex items-center gap-2">
-                    {getStatusIcon(quoteData.status)}
-                    {getStatusLabel(quoteData.status)}
+                    {getStatusIcon(quoteData.data?.status || "")}
+                    {getStatusLabel(quoteData.data?.status || "")}
                   </span>
                 </Badge>
                 <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 text-sm text-muted-foreground w-full">
@@ -286,14 +286,14 @@ export default function QuoteDetailsPage() {
                     <CalendarDays className="w-4 h-4 flex-shrink-0" />
                     <span>
                       Émis le{" "}
-                      {new Date(quoteData.quote_date).toLocaleDateString()}
+                      {new Date(quoteData.data?.quote_date || "").toLocaleDateString()}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Clock className="w-4 h-4 flex-shrink-0" />
                     <span>
                       Valide jusqu&apos;au{" "}
-                      {new Date(quoteData.validity_date).toLocaleDateString()}
+                      {new Date(quoteData.data?.validity_date || "").toLocaleDateString()}
                     </span>
                   </div>
                 </div>
@@ -301,7 +301,7 @@ export default function QuoteDetailsPage() {
               <div className="text-right w-full sm:w-auto">
                 <p className="text-sm text-muted-foreground">Total TTC</p>
                 <p className="text-2xl font-bold tabular-nums">
-                  {formatCurrency(quoteData.amount_including_tax)}
+                  {formatCurrency(quoteData.data?.amount_including_tax || 0)}
                 </p>
               </div>
             </div>
@@ -318,7 +318,7 @@ export default function QuoteDetailsPage() {
               <div className="space-y-6">
                 <div className="flex items-start gap-4">
                   <Badge variant="outline" className="mt-1 px-2 py-1">
-                    {quoteData.customer?.type === "company" ? (
+                    {quoteData.data?.customer?.type === "company" ? (
                       <Building className="w-4 h-4" />
                     ) : (
                       <User className="w-4 h-4" />
@@ -326,63 +326,63 @@ export default function QuoteDetailsPage() {
                   </Badge>
                   <div>
                     <p className="font-medium">
-                      {quoteData.customer?.type === "company"
-                        ? quoteData.customer.business?.name
-                        : `${quoteData.customer?.individual?.first_name} ${quoteData.customer?.individual?.last_name}`}
+                      {quoteData.data?.customer?.type === "company"
+                        ? quoteData.data?.customer?.business?.name
+                        : `${quoteData.data?.customer?.individual?.first_name} ${quoteData.data?.customer?.individual?.last_name}`}
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      {quoteData.customer?.email || "-"}
+                      {quoteData.data?.customer?.email || "-"}
                     </p>
                   </div>
                 </div>
 
                 <div className="grid gap-4">
-                  {quoteData.customer?.type === "company" && (
+                  {quoteData.data?.customer?.type === "company" && (
                     <>
                       <div className="space-y-2">
                         <h3 className="text-sm font-medium">
                           Informations entreprise
                         </h3>
                         <div className="space-y-1 text-sm text-muted-foreground">
-                          {quoteData.customer?.business?.tva_applicable && (
+                          {quoteData.data?.customer?.business?.tva_applicable && (
                             <p>
-                              N° TVA : {quoteData.customer?.business.tva_intra}
+                              N° TVA : {quoteData.data?.customer?.business.tva_intra}
                             </p>
                           )}
-                          {quoteData.customer?.business?.siret && (
-                            <p>SIRET : {quoteData.customer?.business.siret}</p>
+                          {quoteData.data?.customer?.business?.siret && (
+                            <p>SIRET : {quoteData.data?.customer?.business.siret}</p>
                           )}
                         </div>
                       </div>
                     </>
                   )}
 
-                  {(quoteData.customer?.address ||
-                    quoteData.customer?.postal_code ||
-                    quoteData.customer?.city ||
-                    quoteData.customer?.country) && (
+                  {(quoteData.data?.customer?.address ||
+                    quoteData.data?.customer?.postal_code ||
+                    quoteData.data?.customer?.city ||
+                    quoteData.data?.customer?.country) && (
                     <div className="space-y-2">
                       <h3 className="text-sm font-medium">Adresse</h3>
                       <div className="space-y-1 text-sm text-muted-foreground">
-                        {quoteData.customer?.address && (
-                          <p>{quoteData.customer?.address}</p>
+                        {quoteData.data?.customer?.address && (
+                          <p>{quoteData.data?.customer?.address}</p>
                         )}
                         <p>
-                          {quoteData.customer?.postal_code}{" "}
-                          {quoteData.customer?.city}
+                          {quoteData.data?.customer?.postal_code}{" "}
+                          {quoteData.data?.customer?.city}
                         </p>
-                        {quoteData.customer?.country && (
-                          <p>{quoteData.customer?.country}</p>
+                        {quoteData.data?.customer?.country && (
+                          <p>{quoteData.data?.customer?.country}</p>
                         )}
                       </div>
                     </div>
                   )}
 
-                  {quoteData.customer?.phone && (
+                  {quoteData.data?.customer?.phone && (
                     <div className="space-y-2">
                       <h3 className="text-sm font-medium">Contact</h3>
                       <p className="text-sm text-muted-foreground">
-                        {quoteData.customer?.phone}
+                        {quoteData.data?.customer?.phone}
                       </p>
                     </div>
                   )}
@@ -392,7 +392,7 @@ export default function QuoteDetailsPage() {
           </Card>
 
           {/* Additional Information */}
-          {(quoteData.conditions || quoteData.notes) && (
+          {(quoteData.data?.conditions || quoteData.data?.notes) && (
             <Card className="bg-card">
               <CardHeader>
                 <CardTitle className="text-lg">
@@ -400,19 +400,19 @@ export default function QuoteDetailsPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {quoteData.conditions && (
+                {quoteData.data?.conditions && (
                   <div className="space-y-2">
                     <h3 className="text-sm font-medium">Conditions</h3>
                     <p className="text-sm text-muted-foreground">
-                      {quoteData.conditions}
+                      {quoteData.data?.conditions}
                     </p>
                   </div>
                 )}
-                {quoteData.notes && (
+                {quoteData.data?.notes && (
                   <div className="space-y-2">
                     <h3 className="text-sm font-medium">Notes</h3>
                     <p className="text-sm text-muted-foreground">
-                      {quoteData.notes}
+                      {quoteData.data?.notes}
                     </p>
                   </div>
                 )}
@@ -453,7 +453,7 @@ export default function QuoteDetailsPage() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {quoteData.items?.map((item: IQuoteItem) => {
+                      {quoteData.data?.items?.map((item: IQuoteItem) => {
                         const totalHT =
                           item.quantity * item.unit_price_excluding_tax;
                         const totalTTC =
@@ -504,20 +504,20 @@ export default function QuoteDetailsPage() {
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Total HT</span>
                 <span className="font-medium tabular-nums">
-                  {formatCurrency(quoteData.amount_excluding_tax)}
+                  {formatCurrency(quoteData.data?.amount_excluding_tax || 0)}
                 </span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">TVA</span>
                 <span className="font-medium tabular-nums">
-                  {formatCurrency(quoteData.tax)}
+                  {formatCurrency(quoteData.data?.tax || 0)}
                 </span>
               </div>
               <Separator />
               <div className="flex justify-between font-medium">
                 <span>Total TTC</span>
                 <span className="tabular-nums">
-                  {formatCurrency(quoteData.amount_including_tax)}
+                  {formatCurrency(quoteData.data?.amount_including_tax || 0)}
                 </span>
               </div>
             </div>

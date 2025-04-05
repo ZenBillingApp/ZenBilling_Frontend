@@ -49,7 +49,7 @@ export default function ProductsPage() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
-  const totalPages = data?.data.pagination.totalPages || 1;
+  const totalPages = data?.data?.pagination.totalPages || 1;
 
   const handleEditProduct = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -96,7 +96,7 @@ export default function ProductsPage() {
         <div className="flex justify-center items-center py-8">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
-      ) : data?.data.products.length === 0 ? (
+      ) : data?.data?.products.length === 0 ? (
         <div className="text-center py-8 sm:py-12">
           <ShoppingCart className="mx-auto h-10 sm:h-12 w-10 sm:w-12 text-muted-foreground" />
           <h3 className="mt-3 sm:mt-4 text-base sm:text-lg font-medium">Aucun produit</h3>
@@ -114,7 +114,7 @@ export default function ProductsPage() {
         <>
           {/* Vue mobile (uniquement sur xs) */}
           <div className="block sm:hidden space-y-4">
-            {data?.data.products.map((product: IProduct) => (
+            {data?.data?.products.map((product: IProduct) => (
               <div 
                 key={product.product_id}
                 className="border rounded-lg p-3 cursor-pointer hover:bg-muted/50"
@@ -178,7 +178,7 @@ export default function ProductsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {data?.data.products.map((product: IProduct) => (
+                {data?.data?.products.map((product: IProduct) => (
                   <TableRow
                     key={product.product_id}
                     className="cursor-pointer transition-colors hover:bg-muted/50"

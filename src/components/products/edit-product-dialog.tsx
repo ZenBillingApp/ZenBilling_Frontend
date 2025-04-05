@@ -126,7 +126,7 @@ export function EditProductDialog({
     updateProduct(formattedData, {
       onSuccess: (response) => {
         if (onSuccess) {
-          onSuccess(response.data.product);
+          onSuccess(response.data as IProduct);
         }
         handleClose();
       },

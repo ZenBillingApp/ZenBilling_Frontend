@@ -141,12 +141,12 @@ export function ProductSelectDialog({
                       <p className="text-sm text-center text-muted-foreground">
                         Chargement des produits...
                       </p>
-                    ) : productsData?.data.products.length === 0 ? (
+                    ) : productsData?.data?.products.length === 0 ? (
                       <p className="text-sm text-center text-muted-foreground">
                         Aucun produit trouvé
                       </p>
                     ) : (
-                      productsData?.data.products.map((product: IProduct) => (
+                      productsData?.data?.products.map((product: IProduct) => (
                         <div
                           key={product.product_id}
                           className="flex items-center justify-between p-4 rounded-lg border cursor-pointer hover:bg-muted"

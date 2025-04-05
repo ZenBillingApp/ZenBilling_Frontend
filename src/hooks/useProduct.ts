@@ -1,29 +1,29 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { api } from "@/services/api"
-import type { ICreateProductRequest } from "@/types/Product.request.interface"
-import type { IUpdateProductRequest } from "@/types/Product.request.interface"
+import type { ICreateProductRequest, IUpdateProductRequest, IProductQueryParams } from "@/types/Product.request.interface"
 import { useToast } from "@/hooks/use-toast"
-import type { IApiErrorResponse } from "@/types/api.types"
-interface ProductsQueryParams {
-  page?: number;
-  limit?: number;
-  search?: string;
-}
+import type { IApiErrorResponse,IApiSuccessResponse } from "@/types/api.types"
+import { AxiosError } from "axios"
+import { IProduct, IProductPagination, IProductUnit, IProductVatRate } from "@/types/Product.interface"
 
-export const useProducts = (params: ProductsQueryParams = {}) => {
+export const useProducts = (params: IProductQueryParams = {}) => {
     const { page = 1, limit = 10, search = "" } = params;
     
     return useQuery({
         queryKey: ["products", { page, limit, search }],
-        queryFn: () => api.get(`/products?page=${page}&limit=${limit}${search ? `&search=${search}` : ""}`),
+        queryFn: () => {
+            let url = `/products?page=${page}&limit=${limit}`;
+            if (search) url += `&search=${search}`;
+            return api.get<IApiSuccessResponse<IProductPagination>>(url);
+        },
         staleTime: 1000 * 60 * 5, // 5 minutes
     })
 }
 
 export const useProduct = (productId: string) => {
-    return useQuery({
+    return useQuery<IApiSuccessResponse<IProduct>>({
         queryKey: ["products", productId],
-        queryFn: () => api.get(`/products/${productId}`),
+        queryFn: () => api.get<IApiSuccessResponse<IProduct>>(`/products/${productId}`),
         enabled: !!productId,
     })
 }
@@ -32,7 +32,7 @@ export const useProduct = (productId: string) => {
 export const useCreateProduct = () => {
     const queryClient = useQueryClient()
     const { toast } = useToast()
-    return useMutation({
+    return useMutation<IApiSuccessResponse<IProduct>, AxiosError<IApiErrorResponse>, ICreateProductRequest>({
         mutationFn: (data: ICreateProductRequest) => 
             api.post("/products", data),
         onSuccess: () => {
@@ -48,7 +48,7 @@ export const useCreateProduct = () => {
 export const useUpdateProduct = (productId: string) => {
     const queryClient = useQueryClient()
     const { toast } = useToast()
-    return useMutation({
+    return useMutation<IApiSuccessResponse<IProduct>, AxiosError<IApiErrorResponse>, IUpdateProductRequest>({
 
         mutationFn: (data: IUpdateProductRequest) =>
             api.put(`/products/${productId}`, data),
@@ -67,7 +67,7 @@ export const useUpdateProduct = (productId: string) => {
 export const useDeleteProduct = () => {
     const queryClient = useQueryClient()
     const { toast } = useToast()
-    return useMutation({
+    return useMutation<IApiSuccessResponse<IProduct>, AxiosError<IApiErrorResponse>, string>({
         mutationFn: (productId: string) =>
             api.delete(`/products/${productId}`),
         onSuccess: () => {
@@ -78,33 +78,33 @@ export const useDeleteProduct = () => {
                 description: "Le produit a été supprimé avec succès",
             })
         },
-        onError: (error: IApiErrorResponse  ) => {
+        onError: (error: AxiosError<IApiErrorResponse>) => {
             toast({
                 title: "Erreur lors de la suppression du produit",
-                description: error.message,
+                description: error.response?.data?.message,
             })
         },
     })
 }
 
 export const useProductDetails = (productId: string) => {
-    return useQuery({
+    return useQuery<IApiSuccessResponse<IProduct>>({
         queryKey: ["product-details", productId],
-        queryFn: () => api.get(`/products/${productId}`),
+        queryFn: () => api.get<IApiSuccessResponse<IProduct>>(`/products/${productId}`),
         enabled: !!productId,
     })
 }
 
 export const useProductUnits = () => {
-    return useQuery({
+    return useQuery<IApiSuccessResponse<IProductUnit>>({
         queryKey: ["product-units"],
-        queryFn: () => api.get("/products/units"),
+        queryFn: () => api.get<IApiSuccessResponse<IProductUnit>>("/products/units"),
     })
 }
 
 export const useProductVatRates = () => {
-    return useQuery({
+        return useQuery<IApiSuccessResponse<IProductVatRate>>({
         queryKey: ["product-vat-rates"],
-        queryFn: () => api.get("/products/vat-rates"),
+        queryFn: () => api.get<IApiSuccessResponse<IProductVatRate>>("/products/vat-rates"),
     })
 }

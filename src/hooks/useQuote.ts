@@ -2,8 +2,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { api } from "@/services/api"
 import type { ICreateQuoteRequest, IUpdateQuoteRequest, IQuoteQueryParams } from "@/types/Quote.request.interface"
 import { useToast } from "@/hooks/use-toast"
-import { IQuote } from "@/types/Quote.interface"
-import type { IApiErrorResponse } from "@/types/api.types"
+import { IQuote,IQuotePagination } from "@/types/Quote.interface"
+import type { IApiErrorResponse,IApiSuccessResponse } from "@/types/api.types"
+import { AxiosError } from "axios"
 
 export const useQuotes = (params: IQuoteQueryParams = {}) => {
     const { page = 1, limit = 10, search = "", status, customer_id, start_date, end_date, sortBy = 'quote_date', sortOrder = 'DESC' } = params;
@@ -17,16 +18,16 @@ export const useQuotes = (params: IQuoteQueryParams = {}) => {
             if (customer_id) url += `&customer_id=${customer_id}`;
             if (start_date) url += `&start_date=${start_date}`;
             if (end_date) url += `&end_date=${end_date}`;
-            return api.get(url);
+            return api.get<IApiSuccessResponse<IQuotePagination>>(url);
         },
         staleTime: 1000 * 60 * 5, // 5 minutes
     })
 }
 
 export const useQuote = (quoteId: string) => {
-    return useQuery<IQuote>({
+    return useQuery<IApiSuccessResponse<IQuote>>({
         queryKey: ["quotes", quoteId],
-        queryFn: () => api.get(`/quotes/${quoteId}`),
+        queryFn: () => api.get<IApiSuccessResponse<IQuote>>(`/quotes/${quoteId}`),
         
         enabled: !!quoteId,
     })
@@ -37,7 +38,7 @@ export const useCreateQuote = () => {
     const queryClient = useQueryClient()
     const { toast } = useToast()
 
-    return useMutation({
+    return useMutation<IApiSuccessResponse<IQuote>, AxiosError<IApiErrorResponse>, ICreateQuoteRequest>({
         mutationFn: (data: ICreateQuoteRequest) => 
             api.post("/quotes", data),
         onSuccess: () => {
@@ -55,7 +56,7 @@ export const useCreateQuote = () => {
 export const useUpdateQuote = (quoteId: string) => {
     const queryClient = useQueryClient()
     const { toast } = useToast()
-    return useMutation<IQuote, IApiErrorResponse, IUpdateQuoteRequest>({
+    return useMutation<IApiSuccessResponse<IQuote>, AxiosError<IApiErrorResponse>, IUpdateQuoteRequest>({
 
         mutationFn: (data: IUpdateQuoteRequest) =>
             api.put(`/quotes/${quoteId}`, data),
@@ -67,13 +68,19 @@ export const useUpdateQuote = (quoteId: string) => {
                 description: "Le devis a été modifié avec succès",
             })
         },
+        onError: (error: AxiosError<IApiErrorResponse>) => {
+            toast({
+                title: "Erreur lors de la modification du devis",
+                description: error.response?.data?.message,
+            })
+        },
     })
 }
 
 export const useDeleteQuote = () => {
     const queryClient = useQueryClient()
     const { toast } = useToast()
-    return useMutation<IQuote, IApiErrorResponse, string>({
+    return useMutation<IApiSuccessResponse<IQuote>, AxiosError<IApiErrorResponse>, string>({
         mutationFn: (quoteId: string) =>
             api.delete(`/quotes/${quoteId}`),
         onSuccess: () => {
@@ -84,10 +91,10 @@ export const useDeleteQuote = () => {
                 description: "Le devis a été supprimé avec succès",
             })
         },
-        onError: (error: IApiErrorResponse) => {
+        onError: (error: AxiosError<IApiErrorResponse>) => {
             toast({
                 title: "Erreur lors de la suppression du devis",
-                description: error.message,
+                description: error.response?.data?.message,
             })
         },
     })
@@ -123,10 +130,10 @@ export const useDownloadQuotePdf = (quoteNumber: string) => {
                 description: "Le fichier PDF a été téléchargé avec succès",
             })
         },
-        onError: (error: IApiErrorResponse) => {
+        onError: (error: AxiosError<IApiErrorResponse>) => {
             toast({
                 title: "Erreur lors du téléchargement du fichier PDF",
-                description: error.message,
+                description: error.response?.data?.message,
             })
         },
     })
@@ -145,10 +152,10 @@ export const useSendQuote = (quoteId: string) => {
                 description: "Le fichier PDF a été envoyé avec succès",
             })
         },
-        onError: (error: IApiErrorResponse) => {
+        onError: (error: AxiosError<IApiErrorResponse>) => {
             toast({
                 title: "Erreur lors de l'envoi du fichier PDF",
-                description: error.message,
+                description: error.response?.data?.message,
             })
         },
     })
@@ -164,10 +171,10 @@ export const useViewQuote = () => {
             const url = window.URL.createObjectURL(blob)
             window.open(url, "_blank")
         },
-        onError: (error: IApiErrorResponse) => {
+        onError: (error: AxiosError<IApiErrorResponse>) => {
             toast({
                 title: "Erreur lors de la visualisation du devis",
-                description: error.message,
+                description: error.response?.data?.message,
             })
         },
     })

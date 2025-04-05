@@ -53,7 +53,7 @@ export default function CustomersPage() {
     limit: 25,
     page: page,
   });
-  const totalPages = data?.data.pagination.totalPages || 1;
+  const totalPages = data?.data?.pagination.totalPages || 1;
 
   const handleCreateCustomer = () => {
     NiceModal.show(CreateCustomerDialog);
@@ -114,7 +114,7 @@ export default function CustomersPage() {
         <div className="flex justify-center items-center py-8">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
-      ) : data?.data.customers.length === 0 ? (
+      ) : data?.data?.customers.length === 0 ? (
         <div className="text-center py-8 sm:py-12">
           <User2Icon className="mx-auto h-10 sm:h-12 w-10 sm:w-12 text-muted-foreground" />
           <h3 className="mt-3 sm:mt-4 text-base sm:text-lg font-medium">Aucun client</h3>

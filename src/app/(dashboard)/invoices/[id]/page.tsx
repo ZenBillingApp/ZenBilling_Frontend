@@ -55,6 +55,8 @@ import {
 } from "lucide-react";
 import { EditInvoiceDialog } from "@/components/invoices/edit-invoice-dialog";
 import { AddPaymentDialog } from "@/components/invoices/add-payment-dialog";
+import { AxiosError } from "axios";
+
 
 export default function InvoiceDetailsPage() {
   const params = useParams();
@@ -65,7 +67,7 @@ export default function InvoiceDetailsPage() {
 
   const { data: invoiceData, isLoading } = useInvoice(params.id as string);
   const downloadPdf = useDownloadInvoicePdf(
-    invoiceData?.invoice_number as string
+    invoiceData?.data?.invoice_number as string
   );
   const updateInvoice = useUpdateInvoice(params.id as string);
   const addPayment = useAddPayment(params.id as string);
@@ -188,7 +190,7 @@ export default function InvoiceDetailsPage() {
           </Button>
           <h1 className="text-xl sm:text-2xl font-bold font-dmSans flex items-center">
             <FileText className="w-5 sm:w-6 h-5 sm:h-6 mr-2 flex-shrink-0" />
-            Facture {invoiceData?.invoice_number}
+            Facture {invoiceData?.data?.invoice_number}
           </h1>
         </div>
         <div className="flex flex-wrap gap-2 w-full sm:w-auto">
@@ -197,27 +199,27 @@ export default function InvoiceDetailsPage() {
             onOpenChange={setIsEditDialogOpen}
             onSubmit={handleUpdateInvoice}
             defaultValues={{
-              invoice_date: invoiceData.invoice_date,
-              due_date: invoiceData.due_date,
-              conditions: invoiceData.conditions,
-              late_payment_penalty: invoiceData.late_payment_penalty,
+              invoice_date: invoiceData.data?.invoice_date || new Date(),
+              due_date: invoiceData.data?.due_date || new Date(),
+              conditions: invoiceData.data?.conditions,
+              late_payment_penalty: invoiceData.data?.late_payment_penalty,
             }}
             isLoading={updateInvoice.isPending}
             isError={updateInvoice.isError}
-            error={{message:(updateInvoice.error as IApiErrorResponse)?.message, errors:(updateInvoice.error as IApiErrorResponse)?.errors}}
+            error={{message:(updateInvoice.error as AxiosError<IApiErrorResponse>)?.response?.data?.message, errors:(updateInvoice.error as AxiosError<IApiErrorResponse>)?.response?.data?.errors}}
           />
           <AddPaymentDialog
             open={isAddPaymentDialogOpen}
             onOpenChange={setIsAddPaymentDialogOpen}
             onSubmit={handleAddPayment}
-            invoiceAmount={invoiceData.amount_including_tax}
+            invoiceAmount={invoiceData.data?.amount_including_tax || 0}
             isLoading={addPayment.isPending}
             isError={addPayment.isError}
             error={{message:(addPayment.error as IApiErrorResponse)?.message, errors:(addPayment.error as IApiErrorResponse)?.errors}}
           />
           <div className="flex flex-wrap gap-2 w-full">
-            {invoiceData.status !== "cancelled" &&
-              invoiceData.status !== "paid" && (
+            {invoiceData.data?.status !== "cancelled" &&
+              invoiceData.data?.status !== "paid" && (
                 <>
                   <Button
                     variant="outline"
@@ -240,7 +242,7 @@ export default function InvoiceDetailsPage() {
                   </Button>
                   <Button
                     variant="outline"
-                    onClick={() => sendInvoice.mutate()}
+                    onClick={() => sendInvoice.mutate(invoiceData.data?.invoice_id || "")}
                     disabled={sendInvoice.isPending}
                     className="flex-1 sm:flex-none"
                   >
@@ -286,12 +288,12 @@ export default function InvoiceDetailsPage() {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full">
                 <Badge
-                  variant={getStatusBadgeVariant(invoiceData.status)}
+                  variant={getStatusBadgeVariant(invoiceData.data?.status || "")}
                   className="px-4 py-1"
                 >
                   <span className="flex items-center gap-2">
-                    {getStatusIcon(invoiceData.status)}
-                    {getStatusLabel(invoiceData.status)}
+                    {getStatusIcon(invoiceData.data?.status || "")}
+                    {getStatusLabel(invoiceData.data?.status || "")}
                   </span>
                 </Badge>
                 <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 text-sm text-muted-foreground w-full">
@@ -299,14 +301,14 @@ export default function InvoiceDetailsPage() {
                     <CalendarDays className="w-4 h-4 flex-shrink-0" />
                     <span>
                       Émise le{" "}
-                      {new Date(invoiceData.invoice_date).toLocaleDateString()}
+                      {new Date(invoiceData.data?.invoice_date || "").toLocaleDateString()}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Clock className="w-4 h-4 flex-shrink-0" />
                     <span>
                       Échéance le{" "}
-                      {new Date(invoiceData.due_date).toLocaleDateString()}
+                      {new Date(invoiceData.data?.due_date || "").toLocaleDateString()}
                     </span>
                   </div>
                 </div>
@@ -314,7 +316,7 @@ export default function InvoiceDetailsPage() {
               <div className="text-right w-full sm:w-auto">
                 <p className="text-sm text-muted-foreground">Total TTC</p>
                 <p className="text-xl sm:text-2xl font-bold">
-                  {formatCurrency(invoiceData.amount_including_tax)}
+                  {formatCurrency(invoiceData.data?.amount_including_tax || 0)}
                 </p>
               </div>
             </div>
@@ -331,7 +333,7 @@ export default function InvoiceDetailsPage() {
               <div className="space-y-6">
                 <div className="flex items-start gap-4">
                   <Badge variant="outline" className="mt-1">
-                    {invoiceData.customer?.type === "company" ? (
+                    {invoiceData.data?.customer?.type === "company" ? (
                       <Building className="w-4 h-4" />
                     ) : (
                       <User className="w-4 h-4" />
@@ -339,18 +341,18 @@ export default function InvoiceDetailsPage() {
                   </Badge>
                   <div>
                     <p className="font-medium">
-                      {invoiceData.customer?.type === "company"
-                        ? invoiceData.customer.business?.name
-                        : `${invoiceData.customer?.individual?.first_name} ${invoiceData.customer?.individual?.last_name}`}
+                      {invoiceData.data?.customer?.type === "company"
+                        ? invoiceData.data?.customer?.business?.name
+                        : `${invoiceData.data?.customer?.individual?.first_name} ${invoiceData.data?.customer?.individual?.last_name}`}
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      {invoiceData.customer?.email || "-"}
+                      {invoiceData.data?.customer?.email || "-"}
                     </p>
                   </div>
                 </div>
 
                 <div className="grid gap-4">
-                  {invoiceData.customer?.type === "company" && (
+                  {invoiceData.data?.customer?.type === "company" && (
                     <>
                       {/* Informations entreprise */}
                       <div className="space-y-2">
@@ -358,13 +360,13 @@ export default function InvoiceDetailsPage() {
                           Informations entreprise
                         </h3>
                         <div className="space-y-1 text-sm text-muted-foreground">
-                          {invoiceData.customer?.business?.tva_applicable && (
+                          {invoiceData.data?.customer?.business?.tva_applicable && (
                             <p>
-                              N° TVA : {invoiceData.customer.business.tva_intra}
+                              N° TVA : {invoiceData.data?.customer?.business?.tva_intra}
                             </p>
                           )}
-                          {invoiceData.customer?.business?.siret && (
-                            <p>SIRET : {invoiceData.customer.business.siret}</p>
+                          {invoiceData.data?.customer?.business?.siret && (
+                            <p>SIRET : {invoiceData.data?.customer?.business?.siret}</p>
                           )}
                         </div>
                       </div>
@@ -372,36 +374,36 @@ export default function InvoiceDetailsPage() {
                   )}
 
                   {/* Adresse de facturation */}
-                  {(invoiceData.customer?.address ||
-                    invoiceData.customer?.postal_code ||
-                    invoiceData.customer?.city ||
-                    invoiceData.customer?.country) && (
+                  {(invoiceData.data?.customer?.address ||
+                    invoiceData.data?.customer?.postal_code ||
+                    invoiceData.data?.customer?.city ||
+                    invoiceData.data?.customer?.country) && (
                     <div className="space-y-2">
                       <h3 className="text-sm font-medium">
                         Adresse de facturation
                       </h3>
                       <div className="space-y-1 text-sm text-muted-foreground">
-                        {invoiceData.customer?.address && (
-                          <p>{invoiceData.customer.address}</p>
+                        {invoiceData.data?.customer?.address && (
+                          <p>{invoiceData.data?.customer?.address}</p>
                         )}
 
                         <p>
-                          {invoiceData.customer?.postal_code}{" "}
-                          {invoiceData.customer?.city}
+                          {invoiceData.data?.customer?.postal_code}{" "}
+                          {invoiceData.data?.customer?.city}
                         </p>
-                        {invoiceData.customer?.country && (
-                          <p>{invoiceData.customer.country}</p>
+                        {invoiceData.data?.customer?.country && (
+                          <p>{invoiceData.data?.customer?.country}</p>
                         )}
                       </div>
                     </div>
                   )}
 
                   {/* Informations de contact */}
-                  {invoiceData.customer?.phone && (
+                  {invoiceData.data?.customer?.phone && (
                     <div className="space-y-2">
                       <h3 className="text-sm font-medium">Contact</h3>
                       <p className="text-sm text-muted-foreground">
-                        {invoiceData.customer.phone}
+                        {invoiceData.data?.customer?.phone}
                       </p>
                     </div>
                   )}
@@ -421,9 +423,9 @@ export default function InvoiceDetailsPage() {
                     <Building className="w-4 h-4" />
                   </Badge>
                   <div>
-                    <p className="font-medium">{invoiceData.company?.name}</p>
+                    <p className="font-medium">{invoiceData.data?.company?.name}</p>
                     <p className="text-sm text-muted-foreground">
-                      {invoiceData.company?.email}
+                      {invoiceData.data?.company?.email}
                     </p>
                   </div>
                 </div>
@@ -435,48 +437,48 @@ export default function InvoiceDetailsPage() {
                       Informations légales
                     </h3>
                     <div className="space-y-1 text-sm text-muted-foreground">
-                      {invoiceData.company?.tva_applicable && (
-                        <p>N° TVA : {invoiceData.company.tva_intra}</p>
+                      {invoiceData.data?.company?.tva_applicable && (
+                        <p>N° TVA : {invoiceData.data?.company?.tva_intra}</p>
                       )}
-                      {invoiceData.company?.siret && (
-                        <p>SIRET : {invoiceData.company.siret}</p>
+                      {invoiceData.data?.company?.siret && (
+                        <p>SIRET : {invoiceData.data?.company?.siret}</p>
                       )}
                     </div>
                   </div>
 
                   {/* Adresse */}
-                  {(invoiceData.company?.address ||
-                    invoiceData.company?.postal_code ||
-                    invoiceData.company?.city ||
-                    invoiceData.company?.country) && (
+                  {(invoiceData.data?.company?.address ||
+                    invoiceData.data?.company?.postal_code ||
+                    invoiceData.data?.company?.city ||
+                    invoiceData.data?.company?.country) && (
                     <div className="space-y-2">
                       <h3 className="text-sm font-medium">Adresse</h3>
                       <div className="space-y-1 text-sm text-muted-foreground">
-                        {invoiceData.company?.address && (
-                          <p>{invoiceData.company.address}</p>
+                        {invoiceData.data?.company?.address && (
+                          <p>{invoiceData.data?.company?.address}</p>
                         )}
                         <p>
-                          {invoiceData.company?.postal_code}{" "}
-                          {invoiceData.company?.city}
+                          {invoiceData.data?.company?.postal_code}{" "}
+                          {invoiceData.data?.company?.city}
                         </p>
-                        {invoiceData.company?.country && (
-                          <p>{invoiceData.company.country}</p>
+                        {invoiceData.data?.company?.country && (
+                          <p>{invoiceData.data?.company?.country}</p>
                         )}
                       </div>
                     </div>
                   )}
 
                   {/* Contact */}
-                  {(invoiceData.company?.phone ||
-                    invoiceData.company?.website) && (
+                  {(invoiceData.data?.company?.phone ||
+                    invoiceData.data?.company?.website) && (
                     <div className="space-y-2">
                       <h3 className="text-sm font-medium">Contact</h3>
                       <div className="space-y-1 text-sm text-muted-foreground">
-                        {invoiceData.company?.phone && (
-                          <p>{invoiceData.company.phone}</p>
+                        {invoiceData.data?.company?.phone && (
+                          <p>{invoiceData.data?.company?.phone}</p>
                         )}
-                        {invoiceData.company?.website && (
-                          <p>{invoiceData.company.website}</p>
+                        {invoiceData.data?.company?.website && (
+                          <p>{invoiceData.data?.company?.website}</p>
                         )}
                       </div>
                     </div>
@@ -513,7 +515,7 @@ export default function InvoiceDetailsPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {invoiceData.items?.map((item: IInvoiceItem) => {
+                  {invoiceData.data?.items?.map((item: IInvoiceItem) => {
                     const totalHT =
                       item.quantity * item.unit_price_excluding_tax;
                     const totalTTC =
@@ -557,16 +559,16 @@ export default function InvoiceDetailsPage() {
             <div className="mt-6 space-y-2">
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Total HT</span>
-                <span>{formatCurrency(invoiceData.amount_excluding_tax)}</span>
+                <span>{formatCurrency(invoiceData.data?.amount_excluding_tax || 0)}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">TVA</span>
-                <span>{formatCurrency(invoiceData.tax)}</span>
+                <span>{formatCurrency(invoiceData.data?.tax || 0)}</span>
               </div>
               <Separator />
               <div className="flex justify-between font-medium">
                 <span>Total TTC</span>
-                <span>{formatCurrency(invoiceData.amount_including_tax)}</span>
+                <span>{formatCurrency(invoiceData.data?.amount_including_tax || 0)}</span>
               </div>
             </div>
           </CardContent>
@@ -577,8 +579,8 @@ export default function InvoiceDetailsPage() {
           <CardHeader>
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <CardTitle>Paiements</CardTitle>
-              {invoiceData.status !== "cancelled" &&
-                invoiceData.status !== "paid" && (
+              {invoiceData.data?.status !== "cancelled" &&
+                invoiceData.data?.status !== "paid" && (
                   <Button
                     variant="outline"
                     onClick={() => setIsAddPaymentDialogOpen(true)}
@@ -590,15 +592,15 @@ export default function InvoiceDetailsPage() {
                 )}
             </div>
             <CardDescription>
-              {invoiceData.payments?.length
-                ? `${invoiceData.payments.length} paiement${
-                    invoiceData.payments.length > 1 ? "s" : ""
-                  } enregistré${invoiceData.payments.length > 1 ? "s" : ""}`
+              {invoiceData.data?.payments?.length
+                ? `${invoiceData.data?.payments.length} paiement${
+                    invoiceData.data?.payments.length > 1 ? "s" : ""
+                  } enregistré${invoiceData.data?.payments.length > 1 ? "s" : ""}`
                 : "Aucun paiement enregistré"}
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {invoiceData.payments && invoiceData.payments.length > 0 ? (
+            {invoiceData.data?.payments && invoiceData.data?.payments.length > 0 ? (
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
@@ -617,7 +619,7 @@ export default function InvoiceDetailsPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {invoiceData.payments.map((payment: IPayment) => (
+                    {invoiceData.data?.payments.map((payment: IPayment) => (
                       <TableRow key={payment.payment_id}>
                         <TableCell>
                           {new Date(payment.payment_date).toLocaleDateString()}
@@ -643,8 +645,8 @@ export default function InvoiceDetailsPage() {
                 <p>
                   Aucun paiement n&apos;a été enregistré pour cette facture.
                 </p>
-                {invoiceData.status !== "cancelled" &&
-                  invoiceData.status !== "paid" && (
+                {invoiceData.data?.status !== "cancelled" &&
+                  invoiceData.data?.status !== "paid" && (
                     <Button
                       variant="link"
                       onClick={() => setIsAddPaymentDialogOpen(true)}
@@ -659,25 +661,25 @@ export default function InvoiceDetailsPage() {
         </Card>
 
         {/* Additional Information */}
-        {(invoiceData.conditions || invoiceData.late_payment_penalty) && (
+        {(invoiceData.data?.conditions || invoiceData.data?.late_payment_penalty) && (
           <Card>
             <CardHeader>
               <CardTitle>Informations complémentaires</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {invoiceData.conditions && (
+              {invoiceData.data?.conditions && (
                 <div className="space-y-2">
                   <h3 className="font-medium">Conditions de paiement</h3>
                   <p className="text-sm text-muted-foreground">
-                    {invoiceData.conditions}
+                    {invoiceData.data?.conditions}
                   </p>
                 </div>
               )}
-              {invoiceData.late_payment_penalty && (
+              {invoiceData.data?.late_payment_penalty && (
                 <div className="space-y-2">
                   <h3 className="font-medium">Pénalités de retard</h3>
                   <p className="text-sm text-muted-foreground">
-                    {invoiceData.late_payment_penalty}
+                    {invoiceData.data?.late_payment_penalty}
                   </p>
                 </div>
               )}

@@ -87,7 +87,7 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {formatCurrency(dashboardData?.data.monthlyRevenue || 0)}
+              {formatCurrency(dashboardData?.data?.monthlyRevenue || 0)}
             </div>
             <p className="text-xs text-muted-foreground">
               Sur les 30 derniers jours
@@ -102,7 +102,7 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {dashboardData?.data.pendingInvoices || 0}
+                {dashboardData?.data?.pendingInvoices || 0}
             </div>
             <p className="text-xs text-muted-foreground">
               Factures à traiter
@@ -117,7 +117,7 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {dashboardData?.data.monthlyQuotes || 0}
+              {dashboardData?.data?.monthlyQuotes || 0}
             </div>
             <p className="text-xs text-muted-foreground">
               Sur les 30 derniers jours
@@ -132,7 +132,7 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {formatPercent(dashboardData?.data.quoteToInvoiceRatio || 0)}
+              {formatPercent(dashboardData?.data?.quoteToInvoiceRatio || 0)}
             </div>
             <p className="text-xs text-muted-foreground">
               Devis convertis en factures
@@ -160,7 +160,7 @@ export default function DashboardPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {dashboardData?.data.invoiceStatusDistribution.map((status: InvoiceStatusCount) => (
+                {dashboardData?.data?.invoiceStatusDistribution.map((status: InvoiceStatusCount) => (
                   <TableRow key={status.status}>
                     <TableCell>
                       <div className="flex items-center gap-2">
@@ -194,7 +194,7 @@ export default function DashboardPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {dashboardData?.data.topCustomers.map((customer: TopCustomer) => (
+                {dashboardData?.data?.topCustomers.map((customer: TopCustomer) => (
                   <TableRow 
                     key={customer.customer_id}
                     className="cursor-pointer hover:bg-muted/50"

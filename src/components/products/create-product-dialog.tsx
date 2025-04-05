@@ -208,7 +208,7 @@ export function CreateProductDialog({
                 <SelectValue placeholder="Sélectionner une unité" />
               </SelectTrigger>
               <SelectContent>
-                {units?.data?.units?.map((unit: ProductUnit) => (
+                  {units?.data?.units?.map((unit: ProductUnit) => (
                   <SelectItem key={unit} value={unit}>
                     {unit}
                   </SelectItem>

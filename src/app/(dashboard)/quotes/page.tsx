@@ -69,7 +69,7 @@ export default function QuotesPage() {
 
   const { mutate: viewQuote, isPending: isViewQuotePending } = useViewQuote();
   
-  const totalPages = quotesData?.data.pagination?.totalPages || 1;
+  const totalPages = quotesData?.data?.pagination?.totalPages || 1;
 
   const getStatusBadgeVariant = (status: QuoteStatus) => {
     switch (status) {
@@ -156,7 +156,7 @@ export default function QuotesPage() {
         <div className="flex justify-center items-center py-8">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
-      ) : quotesData?.data.quotes.length === 0 ? (
+      ) : quotesData?.data?.quotes.length === 0 ? (
         <div className="text-center py-8 sm:py-12">
           <FileText className="mx-auto h-10 sm:h-12 w-10 sm:w-12 text-muted-foreground" />
           <h3 className="mt-3 sm:mt-4 text-base sm:text-lg font-medium">Aucun devis</h3>
@@ -174,7 +174,7 @@ export default function QuotesPage() {
         <>
           {/* Vue mobile (uniquement sur xs) */}
           <div className="block sm:hidden space-y-4">
-            {quotesData?.data.quotes.map((quote: IQuote) => (
+            {quotesData?.data?.quotes.map((quote: IQuote) => (
               <div 
                 key={quote.quote_id}
                 className="border rounded-lg p-3 cursor-pointer hover:bg-muted/50"
@@ -260,7 +260,7 @@ export default function QuotesPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {quotesData?.data.quotes.map((quote: IQuote) => (
+                {quotesData?.data?.quotes.map((quote: IQuote) => (
                   <TableRow
                     key={quote.quote_id}
                     className="cursor-pointer hover:bg-muted/50"

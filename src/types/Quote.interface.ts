@@ -1,6 +1,6 @@
 import { ICustomer } from './Customer.interface';
 import { IQuoteItem } from './QuoteItem.interface';
-
+import { IPagination } from './pagination.interface';
 export type QuoteStatus = 'draft' | 'sent' | 'accepted' | 'rejected' | 'expired';
 
 export interface IQuote {
@@ -22,3 +22,8 @@ export interface IQuote {
   customer?: ICustomer;
   items?: IQuoteItem[];
 } 
+
+export interface IQuotePagination {
+  quotes: IQuote[];
+  pagination: IPagination;
+}

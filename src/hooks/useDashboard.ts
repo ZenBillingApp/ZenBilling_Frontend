@@ -1,14 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/services/api";
-import type { DashboardResponse } from "@/types/Dashboard.interface";
+import type { IApiSuccessResponse } from "@/types/api.types";
+import type { DashboardMetrics } from "@/types/Dashboard.interface";
 
 export const useDashboardMetrics = () => {
-  return useQuery<DashboardResponse>({
+  return useQuery<IApiSuccessResponse<DashboardMetrics>>({
     queryKey: ["dashboard", "metrics"],
-    queryFn: async () => {
-      const response = await api.get("/dashboard/metrics");
-      return response;
-    },
+    queryFn: async () =>  api.get("/dashboard/metrics"),
     refetchOnMount: true,
     refetchOnWindowFocus: true,
     staleTime: 0
