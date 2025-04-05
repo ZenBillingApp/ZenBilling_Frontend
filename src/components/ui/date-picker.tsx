@@ -59,13 +59,16 @@ export function DatePicker({
     }
   }, [date, form])
 
-  const onSubmit = (data: z.infer<typeof DatePickerSchema>) => {
-    setDate(data.date)
-  }
+  const handleSelect = (date: Date | undefined) => {
+    if (date) {
+      form.setValue("date", date);
+      setDate(date);
+    }
+  };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
+      <form className="space-y-2">
         <FormField
           control={form.control}
           name="date"
@@ -76,6 +79,7 @@ export function DatePicker({
                 <PopoverTrigger asChild>
                   <FormControl>
                     <Button
+                      type="button"
                       variant={"outline"}
                       className={cn(
                         "w-full pl-3 text-left font-normal",
@@ -96,7 +100,7 @@ export function DatePicker({
                   <Calendar
                     mode="single"
                     selected={field.value}
-                    onSelect={field.onChange}
+                    onSelect={handleSelect}
                     disabled={(date) => date > new Date()}
                     initialFocus
                     locale={fr}
