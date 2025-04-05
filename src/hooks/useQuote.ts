@@ -9,7 +9,7 @@ import { AxiosError } from "axios"
 export const useQuotes = (params: IQuoteQueryParams = {}) => {
     const { page = 1, limit = 10, search = "", status, customer_id, start_date, end_date, sortBy = 'quote_date', sortOrder = 'DESC' } = params;
 
-    return useQuery({
+    return useQuery<IApiSuccessResponse<IQuotePagination>>({
         queryKey: ["quotes", { page, limit, search, status, customer_id, start_date, end_date, sortBy, sortOrder }],
         queryFn: () => {
             let url = `/quotes?page=${page}&limit=${limit}&sortBy=${sortBy}&sortOrder=${sortOrder}`;

@@ -2,8 +2,9 @@ import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
 import { ICreateCompanyRequest } from "@/types/Company.request.interface";
+import { ICompany } from "@/types/Company.interface";
 import { AxiosError } from "axios";
-import type { IApiErrorResponse } from "@/types/api.types";
+import type { IApiErrorResponse, IApiSuccessResponse } from "@/types/api.types";
 
 import { useToast } from "@/hooks/use-toast";
 
@@ -12,7 +13,7 @@ import { api } from "@/services/api";
 export const useCreateCompany = () => {
     const { toast } = useToast();
     const router = useRouter();
-    return useMutation({
+    return useMutation<IApiSuccessResponse<ICompany>, AxiosError<IApiErrorResponse>, ICreateCompanyRequest>({
         mutationFn: (data: ICreateCompanyRequest) => api.post("/companies", data),
         onSuccess: () => {
             router.push("/onboarding/finish");

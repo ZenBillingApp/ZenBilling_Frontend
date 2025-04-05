@@ -5,6 +5,7 @@ import { api } from '@/services/api';
 import { useAuthStore } from '@/stores/authStores';
 import { useRouter } from 'next/navigation';
 import { ILoginRequest, IRegisterRequest, IAuthResponse } from '@/types/Auth.interface';
+import { IUser } from '@/types/User.interface';
 import { AxiosError } from 'axios';
 import { IApiErrorResponse, IApiSuccessResponse } from '@/types/api.types';
 import { useToast } from '@/hooks/use-toast';
@@ -89,9 +90,9 @@ export const useRegister = () => {
 };
 
 export const useProfile = () => {
-  return useQuery({
+  return useQuery<IApiSuccessResponse<IUser>>({
     queryKey: ['user'],
-    queryFn: () => api.get<IApiSuccessResponse<IAuthResponse>>('/users/profile'),
+    queryFn: () => api.get<IApiSuccessResponse<IUser>>('/users/profile'),
   });
 };
 
