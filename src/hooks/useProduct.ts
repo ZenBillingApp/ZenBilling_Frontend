@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { api } from "@/services/api"
+import { api } from "@/lib/api"
 import type { ICreateProductRequest, IUpdateProductRequest, IProductQueryParams } from "@/types/Product.request.interface"
 import { useToast } from "@/hooks/use-toast"
 import type { IApiErrorResponse,IApiSuccessResponse } from "@/types/api.types"

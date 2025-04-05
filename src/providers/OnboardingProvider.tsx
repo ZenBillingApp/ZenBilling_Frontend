@@ -21,7 +21,7 @@ export const OnboardingProvider = ({ children }: { children: React.ReactNode }) 
     const currentUser = profileData?.data;
 
     // Si l'onboarding est complété, on redirige vers le dashboard
-    if (currentUser?.user?.onboarding_completed) {
+    if (currentUser?.onboarding_completed) {
       if (pathname.startsWith("/onboarding")) {
         redirect("/dashboard");
       }
@@ -29,7 +29,7 @@ export const OnboardingProvider = ({ children }: { children: React.ReactNode }) 
     }
 
     // Si l'onboarding n'est pas complété, on vérifie si l'utilisateur est sur la bonne étape
-    const currentStep = currentUser?.user?.onboarding_step as IOnboardingStep;
+    const currentStep = currentUser?.onboarding_step as IOnboardingStep;
     if (!currentStep) return;
 
     const expectedPath = ONBOARDING_STEPS[currentStep];

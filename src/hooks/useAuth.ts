@@ -1,7 +1,7 @@
 "use client"
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { api } from '@/services/api';
+import { api } from '@/lib/api';
 import { useAuthStore } from '@/stores/authStores';
 import { useRouter } from 'next/navigation';
 import { ILoginRequest, IRegisterRequest, IAuthResponse } from '@/types/Auth.interface';

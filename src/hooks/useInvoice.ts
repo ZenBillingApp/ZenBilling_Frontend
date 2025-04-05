@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { api } from "@/services/api"
+import { api } from "@/lib/api"
 import type { ICreateInvoiceRequest, IUpdateInvoiceRequest, IInvoiceQueryParams } from "@/types/Invoice.request.interface"
 import type { AddPaymentSchema } from "@/components/invoices/add-payment-dialog"
 import { useToast } from "@/hooks/use-toast"

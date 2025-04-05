@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { api } from "@/services/api";
+import { api } from "@/lib/api";
 import type { IApiSuccessResponse } from "@/types/api.types";
 import type { DashboardMetrics } from "@/types/Dashboard.interface";
 

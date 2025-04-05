@@ -8,7 +8,7 @@ import type { IApiErrorResponse, IApiSuccessResponse } from "@/types/api.types";
 
 import { useToast } from "@/hooks/use-toast";
 
-import { api } from "@/services/api";
+import { api } from "@/lib/api";
 
 export const useCreateCompany = () => {
     const { toast } = useToast();

@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { api } from "@/services/api"
+import { api } from "@/lib/api"
 import type { ICreateQuoteRequest, IUpdateQuoteRequest, IQuoteQueryParams } from "@/types/Quote.request.interface"
 import { useToast } from "@/hooks/use-toast"
 import { IQuote,IQuotePagination } from "@/types/Quote.interface"
