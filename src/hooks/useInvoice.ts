@@ -134,7 +134,7 @@ export const useDownloadInvoicePdf = (invoiceNumber: string) => {
 export const useAddPayment = (invoiceId: string) => {
     const queryClient = useQueryClient()
     const { toast } = useToast()
-    return useMutation<IApiSuccessResponse<IInvoice>, IApiErrorResponse, AddPaymentSchema>({
+    return useMutation<IApiSuccessResponse<IInvoice>, AxiosError<IApiErrorResponse>, AddPaymentSchema>({
 
         mutationFn: (data: AddPaymentSchema) =>
             api.post(`/invoices/${invoiceId}/payments`, {

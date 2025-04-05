@@ -215,7 +215,7 @@ export default function InvoiceDetailsPage() {
             invoiceAmount={invoiceData.data?.amount_including_tax || 0}
             isLoading={addPayment.isPending}
             isError={addPayment.isError}
-            error={{message:(addPayment.error as IApiErrorResponse)?.message, errors:(addPayment.error as IApiErrorResponse)?.errors}}
+            error={{message:(addPayment.error as AxiosError<IApiErrorResponse>)?.response?.data?.message, errors:(addPayment.error as AxiosError<IApiErrorResponse>)?.response?.data?.errors}}
           />
           <div className="flex flex-wrap gap-2 w-full">
             {invoiceData.data?.status !== "cancelled" &&
@@ -405,82 +405,6 @@ export default function InvoiceDetailsPage() {
                       <p className="text-sm text-muted-foreground">
                         {invoiceData.data?.customer?.phone}
                       </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Votre entreprise</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
-                <div className="flex items-start gap-4">
-                  <Badge variant="outline" className="mt-1">
-                    <Building className="w-4 h-4" />
-                  </Badge>
-                  <div>
-                    <p className="font-medium">{invoiceData.data?.company?.name}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {invoiceData.data?.company?.email}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="grid gap-4">
-                  {/* Informations légales */}
-                  <div className="space-y-2">
-                    <h3 className="text-sm font-medium">
-                      Informations légales
-                    </h3>
-                    <div className="space-y-1 text-sm text-muted-foreground">
-                      {invoiceData.data?.company?.tva_applicable && (
-                        <p>N° TVA : {invoiceData.data?.company?.tva_intra}</p>
-                      )}
-                      {invoiceData.data?.company?.siret && (
-                        <p>SIRET : {invoiceData.data?.company?.siret}</p>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Adresse */}
-                  {(invoiceData.data?.company?.address ||
-                    invoiceData.data?.company?.postal_code ||
-                    invoiceData.data?.company?.city ||
-                    invoiceData.data?.company?.country) && (
-                    <div className="space-y-2">
-                      <h3 className="text-sm font-medium">Adresse</h3>
-                      <div className="space-y-1 text-sm text-muted-foreground">
-                        {invoiceData.data?.company?.address && (
-                          <p>{invoiceData.data?.company?.address}</p>
-                        )}
-                        <p>
-                          {invoiceData.data?.company?.postal_code}{" "}
-                          {invoiceData.data?.company?.city}
-                        </p>
-                        {invoiceData.data?.company?.country && (
-                          <p>{invoiceData.data?.company?.country}</p>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Contact */}
-                  {(invoiceData.data?.company?.phone ||
-                    invoiceData.data?.company?.website) && (
-                    <div className="space-y-2">
-                      <h3 className="text-sm font-medium">Contact</h3>
-                      <div className="space-y-1 text-sm text-muted-foreground">
-                        {invoiceData.data?.company?.phone && (
-                          <p>{invoiceData.data?.company?.phone}</p>
-                        )}
-                        {invoiceData.data?.company?.website && (
-                          <p>{invoiceData.data?.company?.website}</p>
-                        )}
-                      </div>
                     </div>
                   )}
                 </div>

@@ -57,7 +57,7 @@ axiosInstance.interceptors.response.use(
           break;
         default:
           const responseData = error.response.data as Record<string, unknown> | undefined;
-          message = `Erreur ${error.response.status}: ${
+          message = `${
             typeof responseData?.message === 'string' 
               ? responseData.message 
               : 'Erreur inattendue'
