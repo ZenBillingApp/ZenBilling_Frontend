@@ -4,11 +4,10 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/services/api';
 import { useAuthStore } from '@/stores/authStores';
 import { useRouter } from 'next/navigation';
-import { ILoginRequest, IRegisterRequest } from '@/types/Auth.interface';
+import { ILoginRequest, IRegisterRequest, IAuthResponse } from '@/types/Auth.interface';
 import { AxiosError } from 'axios';
 import { IApiErrorResponse, IApiSuccessResponse } from '@/types/api.types';
 import { useToast } from '@/hooks/use-toast';
-// import { setAuthCookies, deleteAuthCookies } from '@/lib/cookie';
 
 // Hook de connexion
 export const useLogin = () => {
@@ -16,10 +15,9 @@ export const useLogin = () => {
   const router = useRouter();
   const { toast } = useToast();
   return useMutation({
-    mutationFn: (credentials: ILoginRequest) => api.post('/users/login', credentials),
-    onSuccess: async (data) => {
-      // await setAuthCookies(data.data.token, data.data.refreshToken, data.data.expiresIn)
-      setAuth(data.data)
+    mutationFn: (credentials: ILoginRequest) => api.post<IApiSuccessResponse<IAuthResponse>>('/users/login', credentials),
+    onSuccess: async (data: IApiSuccessResponse<IAuthResponse>) => {
+      setAuth(data.data as IAuthResponse)
       
       // Vérifier si l'utilisateur a terminé l'onboarding
       if (data?.data?.user?.onboarding_completed) {
@@ -68,10 +66,10 @@ export const useRegister = () => {
   const { toast } = useToast();
   const router = useRouter();
   return useMutation({
-      mutationFn: (data: IRegisterRequest) => api.post('/users/register', data),
-      onSuccess: (data: IApiSuccessResponse<void>) => {
+      mutationFn: (data: IRegisterRequest) => api.post<IApiSuccessResponse<IRegisterRequest>>('/users/register', data),
+      onSuccess: (data: IApiSuccessResponse<IRegisterRequest>) => {
           toast({
-              title: "Compte créé avec succès",
+              title: "Compte créé avec succès", 
               description: data.message,
           });
           router.push('/login');
@@ -93,17 +91,17 @@ export const useRegister = () => {
 export const useProfile = () => {
   return useQuery({
     queryKey: ['user'],
-    queryFn: () => api.get('/users/profile'),
-    
+    queryFn: () => api.get<IApiSuccessResponse<IAuthResponse>>('/users/profile'),
   });
 };
+
 
 export const useOnboardingFinish = () => {
   const { toast } = useToast();
   const router = useRouter();
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: () => api.post('/users/onboarding-finish'),
+    mutationFn: () => api.post<IApiSuccessResponse<void>>('/users/onboarding-finish'),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user'] });
       router.replace('/dashboard');

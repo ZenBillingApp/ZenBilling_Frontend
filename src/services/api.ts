@@ -1,50 +1,28 @@
-import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'axios';
-// import { getCookie, setAuthCookies, deleteAuthCookies } from '@/lib/cookie';
-import { getCookie } from '@/lib/cookie';
+"use client"
+import axios, { AxiosInstance, AxiosError, AxiosRequestConfig } from 'axios';
+import { toast } from '@/hooks/use-toast';
+
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
 
 // Création de l'instance Axios
 const axiosInstance: AxiosInstance = axios.create({
   baseURL: BASE_URL,
-  timeout: 10000, // Timeout de 10 secondes
+  timeout: 15000, // Augmentation du timeout à 15 secondes
   headers: {
     'Content-Type': 'application/json',
+    'Accept': 'application/json',
   },
-  withCredentials: true,
+  withCredentials: true, // Permet l'envoi des cookies avec les requêtes cross-origin
 });
 
-// Variable pour suivre si un rafraîchissement de token est en cours
-let isRefreshing = false;
-// File d'attente pour les requêtes en attente pendant le rafraîchissement
-let failedQueue: Array<{
-  resolve: (value: unknown) => void;
-  reject: (reason?: unknown) => void;
-  config: InternalAxiosRequestConfig;
-}> = [];
-
-// Fonction pour traiter la file d'attente
-const processQueue = (error: AxiosError | null) => {
-  failedQueue.forEach(promise => {
-    if (error) {
-      promise.reject(error);
-    } else {
-      promise.resolve(promise.config);
-    }
-  });
-  
-  failedQueue = [];
-};
 
 // Intercepteur pour les requêtes
 axiosInstance.interceptors.request.use(
-  async (config: InternalAxiosRequestConfig) => {
-    // const accessToken = await getCookie('access_token');
-    // if (accessToken) {
-    //   config.headers['Authorization'] = `Bearer ${accessToken}`;
-    // }
+  (config) => {
+    // Vous pouvez ajouter des headers spécifiques ici si nécessaire
     return config;
   },
-  (error: AxiosError) => {
+  (error) => {
     return Promise.reject(error);
   }
 );
@@ -53,139 +31,116 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
-    const originalRequest = error.config as InternalAxiosRequestConfig;
-
-    const refreshToken = await getCookie('refresh_token');
+    let message = 'Une erreur est survenue';
     
-    // Vérifier si c'est une erreur 401 (non autorisé) et que la requête n'est pas déjà en cours de rafraîchissement
-    if (error.response?.status === 401 && !originalRequest.headers['X-Retry'] && refreshToken) {
-      if (isRefreshing) {
-        // Si un rafraîchissement est déjà en cours, mettre la requête en file d'attente
-        return new Promise((resolve, reject) => {
-          failedQueue.push({ resolve, reject, config: originalRequest });
-        });
-      }
-
-      isRefreshing = true;
-      originalRequest.headers['X-Retry'] = 'true';
-
-      try {
-        // Tenter de rafraîchir le token
-         await axios.post(`${BASE_URL}/users/refresh-token`, {
-            // refreshToken: await getCookie('refresh_token')
-
-        }, {
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          withCredentials: true
-        });
-
-
-        // await setAuthCookies(response.data.data.token, response.data.data.refreshToken, response.data.data.expiresIn)
-
-
-        
-        // Si le rafraîchissement réussit, traiter la file d'attente et réessayer la requête originale
-        processQueue(null);
-        isRefreshing = false;
-        return axiosInstance(originalRequest);
-      } catch (refreshError) {
-        // Si le rafraîchissement échoue, traiter la file d'attente avec l'erreur et rediriger vers la page de connexion
-        processQueue(refreshError as AxiosError);
-        isRefreshing = false;
-        return Promise.reject(refreshError);
-      }
-    }
-
     if (error.response) {
       // La requête a été faite et le serveur a répondu avec un code d'erreur
       switch (error.response.status) {
         case 401:
-          // Si nous arrivons ici, c'est que le rafraîchissement a échoué ou que la requête est déjà marquée comme réessayée
-          // await deleteAuthCookies();
+          message = 'Session expirée. Veuillez vous reconnecter.';
+          console.error('Session expirée');
+          // Rediriger vers la page de connexion
+          window.location.href = '/login';
           break;
         case 403:
+          message = 'Accès interdit. Vous n\'avez pas les droits nécessaires.';
           console.error('Accès interdit');
+          // Possibilité de rediriger vers une page d'erreur ou de connexion
           break;
         case 404:
+          message = 'Ressource non trouvée.';
           console.error('Ressource non trouvée');
           break;
         case 500:
+          message = 'Erreur serveur. Veuillez réessayer plus tard.';
           console.error('Erreur serveur');
           break;
         default:
+          const responseData = error.response.data as Record<string, unknown> | undefined;
+          message = `Erreur ${error.response.status}: ${
+            typeof responseData?.message === 'string' 
+              ? responseData.message 
+              : 'Erreur inattendue'
+          }`;
           console.error(`Erreur HTTP : ${error.response.status}`);
       }
     } else if (error.request) {
       // La requête a été faite mais aucune réponse n'a été reçue
+      message = 'Aucune réponse reçue du serveur. Vérifiez votre connexion.';
       console.error('Aucune réponse reçue du serveur');
     } else {
       // Une erreur s'est produite lors de la configuration de la requête
+      message = `Erreur de configuration: ${error.message}`;
       console.error('Erreur de configuration de la requête:', error.message);
     }
-
-
-
+    
+    // Afficher le toast d'erreur
+    toast({
+      title: "Erreur",
+      description: message,
+      variant: "destructive",
+    });
+    
     return Promise.reject(error);
   }
 );
 
 // Service API
 export const api = {
-  get: async (endpoint: string) => {
+  get: async <T>(endpoint: string, config?: AxiosRequestConfig): Promise<T> => {
     try {
-      const response = await axiosInstance.get(endpoint);
-      return response.data
+      const response = await axiosInstance.get<T>(endpoint, config);
+      return response.data;
     } catch (error) {
       throw error;
     }
   },
 
-  getBinary: async (endpoint: string) => {
+  getBinary: async (endpoint: string, config?: AxiosRequestConfig) => {
     try {
-      const response = await axiosInstance.get(endpoint, {
-        responseType: 'blob'
-      });
-      return response;
+      const mergedConfig: AxiosRequestConfig = {
+        responseType: 'blob',
+        ...config
+      };
+      return await axiosInstance.get(endpoint, mergedConfig);
     } catch (error) {
       throw error;
     }
   },
 
-  post: async (endpoint: string, data?: unknown) => {
+  post: async <T>(endpoint: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> => {
     try {
-      const response = await axiosInstance.post(endpoint, data);
-      return response.data
+      const response = await axiosInstance.post<T>(endpoint, data, config);
+      return response.data;
     } catch (error) {
       throw error;
     }
   },
 
-  put: async (endpoint: string, data: unknown) => {
+  put: async <T>(endpoint: string, data: unknown, config?: AxiosRequestConfig): Promise<T> => {
     try {
-      const response = await axiosInstance.put(endpoint, data);
-      return response.data
+      const response = await axiosInstance.put<T>(endpoint, data, config);
+      return response.data;
     } catch (error) {
       throw error;
     }
   },
 
-  delete: async (endpoint: string) => {
+  delete: async <T>(endpoint: string, config?: AxiosRequestConfig): Promise<T> => {
     try {
-      const response = await axiosInstance.delete(endpoint);
-      return response.data
+      const response = await axiosInstance.delete<T>(endpoint, config);
+      return response.data;
     } catch (error) {
       throw error;
     }
   },
 
-  patch: async (endpoint: string, data: unknown) => {
+  patch: async <T>(endpoint: string, data: unknown, config?: AxiosRequestConfig): Promise<T> => {
     try {
-      const response = await axiosInstance.patch(endpoint, data);
-      return response.data
+      const response = await axiosInstance.patch<T>(endpoint, data, config);
+      return response.data;
     } catch (error) {
-        throw error;
+      throw error;
     }
   },
 };

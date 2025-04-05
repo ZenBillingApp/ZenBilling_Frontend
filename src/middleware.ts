@@ -1,37 +1,9 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-// import { IUser } from '@/types/User.interface'
 
-// // Constantes
-// const ONBOARDING_STEPS = {
-//   CHOOSING_COMPANY: "/onboarding/company",
-//   FINISH: "/onboarding/finish",
-// } as const
 
 // Routes publiques qui ne nécessitent pas d'authentification
 const PUBLIC_ROUTES = ['/login', '/register']
-
-
-
-// /**
-//  * Gère l'accès utilisateur en fonction de son état d'onboarding
-//  */
-// function handleUserAccess(request: NextRequest, user: IUser, path: string): NextResponse {
-//   // Gestion de l'onboarding
-//   if (!user.onboarding_completed) {
-//     const onboardingRedirectPath = ONBOARDING_STEPS[user.onboarding_step ?? "CHOOSING_COMPANY"];
-    
-//     if (!path.startsWith("/onboarding") || path !== onboardingRedirectPath) {
-//       return redirectTo(request, onboardingRedirectPath);
-//     }
-//   } 
-//   // Redirection des utilisateurs qui ont complété l'onboarding mais accèdent aux pages d'onboarding
-//   else if (path.startsWith("/onboarding")) {
-//     return redirectTo(request, "/invoices");
-//   }
-  
-//   return NextResponse.next();
-// }
 
 /**
  * Fonction utilitaire pour les redirections
