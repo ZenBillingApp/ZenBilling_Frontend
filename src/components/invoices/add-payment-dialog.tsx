@@ -172,6 +172,7 @@ export function AddPaymentDialog({
                                                             type="button"
                                                             onClick={setFullAmount}
                                                             className="h-6 px-2 text-xs"
+                                                            tabIndex={-1}
                                                         >
                                                             Montant total
                                                         </Button>
