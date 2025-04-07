@@ -30,7 +30,7 @@ export function DatePicker({
 }: DatePickerProps) {
   return (
     <div className={cn("grid gap-2", className)}>
-      <Popover>
+      <Popover modal>
         <PopoverTrigger asChild>
           <Button
             variant={"outline"}
