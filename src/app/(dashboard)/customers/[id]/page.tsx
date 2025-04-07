@@ -1,34 +1,34 @@
 "use client";
 
 import React, { useState } from "react";
-import { IInvoice } from "@/types/Invoice.interface";
-import { IQuote } from "@/types/Quote.interface";
-import { getInvoiceStatusBadgeVariant, getInvoiceStatusLabel } from "@/utils/invoiceStatus";  
-import { getQuoteStatusBadgeVariant, getQuoteStatusLabel } from "@/utils/quoteStatus";
-import { useFormat } from "@/hooks/useFormat";
-import { useCustomer, useDeleteCustomer } from "@/hooks/useCustomer";
-import { useCustomerInvoices } from "@/hooks/useInvoice";
-import { useCustomerQuotes } from "@/hooks/useQuote";
 import { useParams, useRouter } from "next/navigation";
-import { 
-  Building, 
-  User, 
-  Mail, 
-  Phone, 
-  MapPin, 
-  Calendar, 
-  Edit, 
-  Trash2, 
-  ArrowLeft, 
-  Loader2,
-  FileText,
-  CreditCard,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { useCustomer, useDeleteCustomer } from "@/hooks/useCustomer";
+import { useCustomerInvoices,useViewInvoice } from "@/hooks/useInvoice";
+import { useCustomerQuotes,useViewQuote } from "@/hooks/useQuote";
+import { useFormat } from "@/hooks/useFormat";
+import { useDebounce } from "@/hooks/useDebounce";
+import { DateRange } from "react-day-picker";
+import { format } from "date-fns";
+import { getInvoiceStatusBadgeVariant, getInvoiceStatusLabel } from "@/utils/invoiceStatus";
+import { getQuoteStatusBadgeVariant, getQuoteStatusLabel } from "@/utils/quoteStatus";
+
+import { ShoppingCart, Search, Eye, CalendarDays, Clock, User, Building, Loader2, ArrowLeft, Calendar, Edit, Trash2, Mail, Phone, MapPin } from "lucide-react";
+
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { DatePickerWithRange } from "@/components/ui/date-range-picker";
+import { DataTable, StatusBadge, Column } from "@/components/ui/data-table";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -39,58 +39,94 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { useToast } from "@/hooks/use-toast";
-import NiceModal from "@ebay/nice-modal-react";
-import EditCustomerDialog from "@/components/customers/edit-customer-dialog";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { DataTable, StatusBadge } from "@/components/ui/data-table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+
+import type { IInvoice, InvoiceStatus } from "@/types/Invoice.interface";
+import type { IQuote, QuoteStatus } from "@/types/Quote.interface";
 
 export default function CustomerDetailsPage() {
   const params = useParams();
   const router = useRouter();
-  const { toast } = useToast();
-  const customerId = params.id as string;
   const { formatCurrency } = useFormat();
-  const { data, isLoading, isError } = useCustomer(customerId);
-  const { data: invoicesData, isLoading: isLoadingInvoices } = useCustomerInvoices(customerId);
-  const { data: quotesData, isLoading: isLoadingQuotes } = useCustomerQuotes(customerId);
   const deleteCustomerMutation = useDeleteCustomer();
-  
+  const { mutate: viewInvoice } = useViewInvoice();
+  const { mutate: viewQuote } = useViewQuote();
+
   const [isDeleting, setIsDeleting] = useState(false);
   const [activeTab, setActiveTab] = useState("info");
-  
-  const customer = data?.data;
-  
+  const [invoiceSearch, setInvoiceSearch] = useState("");
+  const [quoteSearch, setQuoteSearch] = useState("");
+  const [invoiceStatusFilter, setInvoiceStatusFilter] = useState<"all" | InvoiceStatus>("all");
+  const [quoteStatusFilter, setQuoteStatusFilter] = useState<"all" | QuoteStatus>("all");
+  const [invoiceDateRange, setInvoiceDateRange] = useState<DateRange | undefined>(undefined);
+  const [quoteDateRange, setQuoteDateRange] = useState<DateRange | undefined>(undefined);
+  const [loadingInvoiceId, setLoadingInvoiceId] = useState<string | null>(null);
+  const [loadingQuoteId, setLoadingQuoteId] = useState<string | null>(null);
+
+  const debouncedInvoiceSearch = useDebounce(invoiceSearch, 300);
+  const debouncedQuoteSearch = useDebounce(quoteSearch, 300);
+
+  const { data: customerData, isLoading: isLoadingCustomer } = useCustomer(params.id as string);
+  const { data: invoicesData, isLoading: isLoadingInvoices } = useCustomerInvoices(params.id as string, {
+    search: debouncedInvoiceSearch || undefined,
+    status: invoiceStatusFilter === "all" ? undefined : invoiceStatusFilter,
+    start_date: invoiceDateRange?.from ? format(invoiceDateRange.from, "yyyy-MM-dd") : undefined,
+    end_date: invoiceDateRange?.to ? format(invoiceDateRange.to, "yyyy-MM-dd") : undefined,
+    limit: 25,
+    page: 1,
+  });
+  const { data: quotesData, isLoading: isLoadingQuotes } = useCustomerQuotes(params.id as string, {
+    search: debouncedQuoteSearch || undefined,
+    status: quoteStatusFilter === "all" ? undefined : quoteStatusFilter,
+    start_date: quoteDateRange?.from ? format(quoteDateRange.from, "yyyy-MM-dd") : undefined,
+    end_date: quoteDateRange?.to ? format(quoteDateRange.to, "yyyy-MM-dd") : undefined,
+    limit: 25,
+    page: 1,
+  });
+
+  const customer = customerData?.data;
+  const customerName = customer?.type === "company" 
+    ? customer.business?.name 
+    : `${customer?.individual?.first_name} ${customer?.individual?.last_name}`;
+
+  const handleViewInvoice = (invoiceId: string) => {
+    setLoadingInvoiceId(invoiceId);
+    viewInvoice(invoiceId, {
+      onSettled: () => {
+        setLoadingInvoiceId(null);
+      }
+    });
+  };
+
+  const handleViewQuote = (quoteId: string) => {
+    setLoadingQuoteId(quoteId);
+    viewQuote(quoteId, {
+      onSettled: () => {
+        setLoadingQuoteId(null);
+      }
+    });
+  };
+
   const handleDelete = async () => {
     setIsDeleting(true);
     try {
-      await deleteCustomerMutation.mutateAsync(customerId);
-      toast({
-        title: "Client supprimé",
-        description: "Le client a été supprimé avec succès",
-      });
+      await deleteCustomerMutation.mutateAsync(params.id as string);
       router.push("/customers");
     } catch (error) {
       console.error("Erreur lors de la suppression du client:", error);
-      toast({
-        title: "Erreur",
-        description: "Une erreur est survenue lors de la suppression du client",
-        variant: "destructive",
-      });
     } finally {
       setIsDeleting(false);
     }
   };
   
-  
   const handleEdit = () => {
     if (customer) {
-      NiceModal.show(EditCustomerDialog, { customer });
+      // Implement edit logic here
     }
   };
   
-  if (isLoading) {
+  if (isLoadingCustomer) {
     return (
       <div className="container mx-auto px-4 py-6 space-y-6">
         <div className="flex items-center space-x-4 mb-6">
@@ -111,7 +147,7 @@ export default function CustomerDetailsPage() {
     );
   }
   
-  if (isError || !customer) {
+  if (!customer) {
     return (
       <div className="flex flex-col items-center justify-center h-[80vh] space-y-6">
         <div className="bg-destructive/10 p-4 rounded-full">
@@ -137,11 +173,168 @@ export default function CustomerDetailsPage() {
     });
   };
 
-  
-  const customerName = customer.type === "company" 
-    ? customer.business?.name 
-    : `${customer.individual?.first_name} ${customer.individual?.last_name}`;
-  
+  const invoiceColumns: Column<IInvoice>[] = [
+    {
+      header: "N° Facture",
+      accessorKey: (invoice: IInvoice) => invoice.invoice_number,
+      className: "font-medium text-nowrap",
+    },
+    {
+      header: "Statut",
+      accessorKey: (invoice: IInvoice) => (
+        <StatusBadge
+          status={getInvoiceStatusLabel(invoice.status)}
+          variant={getInvoiceStatusBadgeVariant(invoice.status)}
+        />
+      ),
+    },
+    {
+      header: "Produits",
+      accessorKey: (invoice: IInvoice) => (
+        <div className="flex items-center gap-1">
+          <ShoppingCart className="w-3 h-3 text-muted-foreground" />
+          <span className="text-xs text-muted-foreground">
+            {invoice.items?.length || 0} produits
+          </span>
+        </div>
+      ),
+      className: "hidden sm:table-cell",
+    },
+    {
+      header: "Dates",
+      accessorKey: (invoice: IInvoice) => (
+        <div className="space-y-1">
+          <div className="flex items-center gap-2 text-sm">
+            <CalendarDays className="w-4 h-4 text-muted-foreground" />
+            <span>
+              {new Date(invoice.invoice_date).toLocaleDateString()}
+            </span>
+          </div>
+          <div className="flex items-center gap-2 text-sm">
+            <Clock className="w-4 h-4 text-muted-foreground" />
+            <span>
+              {new Date(invoice.due_date).toLocaleDateString()}
+            </span>
+          </div>
+        </div>
+      ),
+      className: "hidden lg:table-cell",
+    },
+    {
+      header: "Total TTC",
+      accessorKey: (invoice: IInvoice) => (
+        <span className="font-medium">
+          {formatCurrency(invoice.amount_including_tax)}
+        </span>
+      ),
+    },
+    {
+      header: "Actions",
+      accessorKey: (invoice: IInvoice) => (
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="h-7 px-2"
+          onClick={(e) => {
+            e.stopPropagation();
+            if (invoice.invoice_id) {
+              handleViewInvoice(invoice.invoice_id);
+            }
+          }}
+        >
+          {loadingInvoiceId === invoice.invoice_id ? (
+            <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+          ) : (
+            <Eye className="w-3 h-3 mr-1" />
+          )}
+          <span className="text-xs">Voir</span>
+        </Button>
+      ),
+      className: "hidden sm:table-cell",
+    },
+  ];
+
+  const quoteColumns: Column<IQuote>[] = [
+    {
+      header: "N° Devis",
+      accessorKey: (quote: IQuote) => quote.quote_number,
+      className: "font-medium text-nowrap",
+    },
+    {
+      header: "Statut",
+      accessorKey: (quote: IQuote) => (
+        <StatusBadge
+          status={getQuoteStatusLabel(quote.status)}
+          variant={getQuoteStatusBadgeVariant(quote.status)}
+        />
+      ),
+    },
+    {
+      header: "Produits",
+      accessorKey: (quote: IQuote) => (
+        <div className="flex items-center gap-1">
+          <ShoppingCart className="w-3 h-3 text-muted-foreground" />
+          <span className="text-xs text-muted-foreground">
+            {quote.items?.length || 0} produits
+          </span>
+        </div>
+      ),
+      className: "hidden sm:table-cell",
+    },
+    {
+      header: "Dates",
+      accessorKey: (quote: IQuote) => (
+        <div className="space-y-1">
+          <div className="flex items-center gap-2 text-sm">
+            <CalendarDays className="w-4 h-4 text-muted-foreground" />
+            <span>
+              {new Date(quote.quote_date).toLocaleDateString()}
+            </span>
+          </div>
+          <div className="flex items-center gap-2 text-sm">
+            <Clock className="w-4 h-4 text-muted-foreground" />
+            <span>
+              {new Date(quote.validity_date).toLocaleDateString()}
+            </span>
+          </div>
+        </div>
+      ),
+      className: "hidden lg:table-cell",
+    },
+    {
+      header: "Total TTC",
+      accessorKey: (quote: IQuote) => (
+        <span className="font-medium">
+          {formatCurrency(quote.amount_including_tax)}
+        </span>
+      ),
+    },
+    {
+      header: "Actions",
+      accessorKey: (quote: IQuote) => (
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="h-7 px-2"
+          onClick={(e) => {
+            e.stopPropagation();
+            if (quote.quote_id) {
+              handleViewQuote(quote.quote_id);
+            }
+          }}
+        >
+          {loadingQuoteId === quote.quote_id ? (
+            <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+          ) : (
+            <Eye className="w-3 h-3 mr-1" />
+          )}
+          <span className="text-xs">Voir</span>
+        </Button>
+      ),
+      className: "hidden sm:table-cell",
+    },
+  ];
+
   return (
     <div className="container mx-auto px-4 py-6 space-y-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-card rounded-lg p-4 shadow-sm border">
@@ -394,148 +587,89 @@ export default function CustomerDetailsPage() {
           </div>
         </TabsContent>
         
-        <TabsContent value="invoices" className="mt-6">
-          <div>
-            <Card className="overflow-hidden border shadow-sm hover:shadow-md transition-shadow">
-              <CardHeader className="bg-muted/50">
-                <CardTitle className="flex items-center gap-2">
-                  <CreditCard className="h-5 w-5 text-primary" />
-                  Factures
-                </CardTitle>
-                <CardDescription>Liste des factures associées à ce client</CardDescription>
-              </CardHeader>
-              <CardContent className="py-8">
-                {isLoadingInvoices ? (
-                  <div className="flex flex-col items-center justify-center text-center">
-                    <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
-                    <p className="text-sm text-muted-foreground">Chargement des factures...</p>
-                  </div>
-                ) : invoicesData?.data?.invoices?.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center text-center">
-                    <div className="bg-primary/10 p-4 rounded-full mb-4">
-                      <CreditCard className="h-12 w-12 text-primary" />
-                    </div>
-                    <h3 className="text-lg font-medium">Aucune facture</h3>
-                    <p className="text-sm text-muted-foreground mt-1 max-w-md">
-                      Ce client n&apos;a pas encore de factures.
-                    </p>
-                  </div>
-                ) : (
-                  <DataTable
-                    data={invoicesData?.data?.invoices || []}
-                    columns={[
-                      {
-                        header: "Numéro",
-                        accessorKey: (invoice: IInvoice) => (
-                          <div className="flex items-center gap-2">
-                            <CreditCard className="h-4 w-4 text-muted-foreground" />
-                            <span className="font-medium">#{invoice.invoice_number}</span>
-                          </div>
-                        ),
-                      },
-                      {
-                        header: "Date",
-                        accessorKey: (invoice: IInvoice) => formatDate(new Date(invoice.invoice_date).toISOString()),
-                        className: "hidden sm:table-cell",
-                      },
-                      {
-                        header: "Échéance",
-                        accessorKey: (invoice: IInvoice) => formatDate(new Date(invoice.due_date).toISOString()),
-                        className: "hidden sm:table-cell",
-                      },
-                      {
-                        header: "Montant",
-                            accessorKey: (invoice: IInvoice) => formatCurrency(invoice.amount_including_tax),
-                        className: "tabular-nums",
-                      },
-                      {
-                        header: "Statut",
-                        accessorKey: (invoice: IInvoice) => (
-                          <StatusBadge
-                            status={getInvoiceStatusLabel(invoice.status)}
-                            variant={getInvoiceStatusBadgeVariant(invoice.status)}
-                          />
-                        ),
-                      },
-                    ]}
-                    onRowClick={(invoice: IInvoice) => router.push(`/invoices/${invoice.invoice_id}`)}
-                  />
-                )}
-              </CardContent>
-            </Card>
+        <TabsContent value="invoices" className="space-y-4">
+          <div className="flex flex-col gap-4">
+            <div className="relative w-full">
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Rechercher une facture..."
+                value={invoiceSearch}
+                onChange={(e) => setInvoiceSearch(e.target.value)}
+                className="pl-8 w-full"
+              />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <Select
+                value={invoiceStatusFilter}
+                onValueChange={(
+                  value: "all" | "sent" | "paid" | "late" | "cancelled"
+                ) => setInvoiceStatusFilter(value as InvoiceStatus)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Statut" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tous</SelectItem>
+                  <SelectItem value="sent">Envoyée</SelectItem>
+                  <SelectItem value="paid">Payée</SelectItem>
+                  <SelectItem value="late">En retard</SelectItem>
+                  <SelectItem value="cancelled">Annulée</SelectItem>
+                </SelectContent>
+              </Select>
+              <DatePickerWithRange date={invoiceDateRange} setDate={setInvoiceDateRange} className="w-full" />
+            </div>
           </div>
+
+          <DataTable
+            data={invoicesData?.data?.invoices || []}
+            columns={invoiceColumns}
+            isLoading={isLoadingInvoices}
+            emptyMessage="Aucune facture trouvée"
+            onRowClick={(invoice: IInvoice) => router.push(`/invoices/${invoice.invoice_id}`)}
+          />
         </TabsContent>
         
-        <TabsContent value="quotes" className="mt-6">
-          <div>
-            <Card className="overflow-hidden border shadow-sm hover:shadow-md transition-shadow">
-              <CardHeader className="bg-muted/50">
-                <CardTitle className="flex items-center gap-2">
-                  <FileText className="h-5 w-5 text-primary" />
-                  Devis
-                </CardTitle>
-                <CardDescription>Liste des devis associés à ce client</CardDescription>
-              </CardHeader>
-              <CardContent className="py-8">
-                {isLoadingQuotes ? (
-                  <div className="flex flex-col items-center justify-center text-center">
-                    <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
-                    <p className="text-sm text-muted-foreground">Chargement des devis...</p>
-                  </div>
-                ) : quotesData?.data?.quotes?.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center text-center">
-                    <div className="bg-primary/10 p-4 rounded-full mb-4">
-                      <FileText className="h-12 w-12 text-primary" />
-                    </div>
-                    <h3 className="text-lg font-medium">Aucun devis</h3>
-                    <p className="text-sm text-muted-foreground mt-1 max-w-md">
-                      Ce client n&apos;a pas encore de devis.
-                    </p>
-                  </div>
-                ) : (
-                  <DataTable
-                    data={quotesData?.data?.quotes || []}
-                    columns={[
-                      {
-                        header: "Numéro",
-                        accessorKey: (quote: IQuote) => (
-                          <div className="flex items-center gap-2">
-                            <FileText className="h-4 w-4 text-muted-foreground" />
-                            <span className="font-medium">#{quote.quote_number}</span>
-                          </div>
-                        ),
-                      },
-                      {
-                        header: "Date",
-                        accessorKey: (quote: IQuote) => formatDate(new Date(quote.quote_date).toISOString()),
-                        className: "hidden sm:table-cell",
-                      },
-                      {
-                        header: "Validité",
-                        accessorKey: (quote: IQuote) => formatDate(new Date(quote.validity_date).toISOString()),
-                        className: "hidden sm:table-cell",
-                      },
-                      {
-                        header: "Montant",
-                        accessorKey: (quote: IQuote) => formatCurrency(quote.amount_including_tax),
-                        className: "tabular-nums",
-                      },
-                      {
-                        header: "Statut",
-                        accessorKey: (quote: IQuote) => (
-                          <StatusBadge
-                            status={getQuoteStatusLabel(quote.status)}
-                            variant={getQuoteStatusBadgeVariant(quote.status)}
-                          />
-                        ),
-                      },
-                    ]}
-                    onRowClick={(quote: IQuote) => router.push(`/quotes/${quote.quote_id}`)}
-                  />
-                )}
-              </CardContent>
-            </Card>
+        <TabsContent value="quotes" className="space-y-4">
+          <div className="flex flex-col gap-4">
+            <div className="relative w-full">
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Rechercher un devis..."
+                value={quoteSearch}
+                onChange={(e) => setQuoteSearch(e.target.value)}
+                className="pl-8 w-full"
+              />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <Select
+                value={quoteStatusFilter}
+                onValueChange={(
+                  value: "all" | "draft" | "sent" | "accepted" | "rejected" | "expired"
+                ) => setQuoteStatusFilter(value as QuoteStatus)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Statut" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tous</SelectItem>
+                  <SelectItem value="draft">Brouillon</SelectItem>
+                  <SelectItem value="sent">Envoyé</SelectItem>
+                  <SelectItem value="accepted">Accepté</SelectItem>
+                  <SelectItem value="rejected">Refusé</SelectItem>
+                  <SelectItem value="expired">Expiré</SelectItem>
+                </SelectContent>
+              </Select>
+              <DatePickerWithRange date={quoteDateRange} setDate={setQuoteDateRange} className="w-full" />
+            </div>
           </div>
+
+          <DataTable
+            data={quotesData?.data?.quotes || []}
+            columns={quoteColumns}
+            isLoading={isLoadingQuotes}
+            emptyMessage="Aucun devis trouvé"
+            onRowClick={(quote: IQuote) => router.push(`/quotes/${quote.quote_id}`)}
+          />
         </TabsContent>
       </Tabs>
     </div>
