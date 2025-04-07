@@ -79,7 +79,7 @@ export function AddPaymentDialog({
     const form = useForm<AddPaymentSchema>({
         resolver: zodResolver(addPaymentSchema),
         defaultValues: {
-            amount: undefined,
+            amount: "",
             payment_date: new Date(),
             payment_method: "credit_card",
             description: "",
@@ -91,7 +91,7 @@ export function AddPaymentDialog({
     useEffect(() => {
         if (!open) {
             form.reset({
-                amount: undefined,
+                amount: "",
                 payment_date: new Date(),
                 payment_method: "credit_card",
                 description: "",
