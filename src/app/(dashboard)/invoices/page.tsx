@@ -7,6 +7,7 @@ import { useFormat } from "@/hooks/useFormat";
 import { useDebounce } from "@/hooks/useDebounce";
 import { DateRange } from "react-day-picker";
 import { format } from "date-fns";
+import { getInvoiceStatusBadgeVariant, getInvoiceStatusLabel } from "@/utils/invoiceStatus";
 
 import { FileStack, ShoppingCart, Search, Plus, Eye } from "lucide-react";
 
@@ -83,39 +84,7 @@ export default function InvoicesPage() {
     router.push("/invoices/create");
   };
 
-  const getStatusBadgeVariant = (status: string) => {
-    switch (status) {
-      case "paid":
-        return "default";
-      case "pending":
-        return "secondary";
-      case "sent":
-        return "secondary";
-      case "late":
-        return "destructive";
-      case "cancelled":
-        return "destructive";
-      default:
-        return "secondary";
-    }
-  };
 
-  const getStatusLabel = (status: string) => {
-    switch (status) {
-      case "pending":
-        return "En attente";
-      case "sent":
-        return "Envoyée";
-      case "paid":
-        return "Payée";
-      case "late":
-        return "En retard";
-      case "cancelled":
-        return "Annulée";
-      default:
-        return status;
-    }
-  };
 
   return (
     <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-6 space-y-4 sm:space-y-6 max-w-7xl">
@@ -204,10 +173,10 @@ export default function InvoicesPage() {
                     </p>
                   </div>
                   <Badge
-                    variant={getStatusBadgeVariant(invoice.status)}
+                    variant={getInvoiceStatusBadgeVariant(invoice.status)}
                     className="text-nowrap text-xs"
                   >
-                    {getStatusLabel(invoice.status)}
+                    {getInvoiceStatusLabel(invoice.status)}
                   </Badge>
                 </div>
                 
@@ -294,10 +263,10 @@ export default function InvoicesPage() {
                     </TableCell>
                     <TableCell className="text-nowrap">
                       <Badge
-                        variant={getStatusBadgeVariant(invoice.status)}
+                        variant={getInvoiceStatusBadgeVariant(invoice.status)}
                         className="text-nowrap"
                       >
-                        {getStatusLabel(invoice.status)}
+                        {getInvoiceStatusLabel(invoice.status)}
                       </Badge>
                     </TableCell>
                     <TableCell className="hidden sm:table-cell text-center text-nowrap">

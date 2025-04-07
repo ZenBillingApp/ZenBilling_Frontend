@@ -36,6 +36,7 @@ import NiceModal from "@ebay/nice-modal-react";
 import CreateCustomerDialog from "@/components/customers/create-customer-dialog";
 import EditCustomerDialog from "@/components/customers/edit-customer-dialog";
 import { CustomerDetailsDialog } from "@/components/customers/customer-details-dialog";
+import { useRouter } from "next/navigation";
 
 export default function CustomersPage() {
   const [search, setSearch] = useState("");
@@ -46,6 +47,7 @@ export default function CustomersPage() {
   const [selectedCustomer, setSelectedCustomer] = useState<ICustomer | null>(
     null
   );
+  const router = useRouter();
   const debouncedSearch = useDebounce(search, 300);
   const { data, isLoading } = useCustomers({
     search: debouncedSearch || undefined,
@@ -62,6 +64,12 @@ export default function CustomersPage() {
   const handleEditCustomer = () => {
     if (selectedCustomer) {
       NiceModal.show(EditCustomerDialog, { customer: selectedCustomer });
+    }
+  };
+
+  const handleCustomerClick = (customer: ICustomer) => {
+    if (customer.customer_id) {
+      router.push(`/customers/${customer.customer_id}`);
     }
   };
 
@@ -136,7 +144,7 @@ export default function CustomersPage() {
               <div 
                 key={customer.customer_id}
                 className="border rounded-lg p-3 cursor-pointer hover:bg-muted/50"
-                onClick={() => setSelectedCustomer(customer)}
+                onClick={() => handleCustomerClick(customer)}
               >
                 <div className="flex justify-between items-start mb-2">
                   <div>
@@ -214,7 +222,7 @@ export default function CustomersPage() {
                   <TableRow
                     key={customer.customer_id}
                     className="cursor-pointer transition-colors hover:bg-muted/50"
-                    onClick={() => setSelectedCustomer(customer)}
+                    onClick={() => handleCustomerClick(customer)}
                   >
                     <TableCell>
                       {customer.type === "company" ? (

@@ -7,7 +7,7 @@ import { useFormat } from "@/hooks/useFormat";
 import { useDebounce } from "@/hooks/useDebounce";
 import { DateRange } from "react-day-picker";
 import { format } from "date-fns";
-
+import { getQuoteStatusBadgeVariant, getQuoteStatusLabel } from "@/utils/quoteStatus";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -81,39 +81,6 @@ export default function QuotesPage() {
 
   const totalPages = quotesData?.data?.pagination?.totalPages || 1;
 
-  const getStatusBadgeVariant = (status: QuoteStatus) => {
-    switch (status) {
-      case "accepted":
-        return "default";
-      case "sent":
-        return "secondary";
-      case "draft":
-        return "outline";
-      case "rejected":
-        return "destructive";
-      case "expired":
-        return "destructive";
-      default:
-        return "secondary";
-    }
-  };
-
-  const getStatusLabel = (status: QuoteStatus) => {
-    switch (status) {
-      case "draft":
-        return "Brouillon";
-      case "sent":
-        return "Envoyé";
-      case "accepted":
-        return "Accepté";
-      case "rejected":
-        return "Refusé";
-      case "expired":
-        return "Expiré";
-      default:
-        return status;
-    }
-  };
 
   return (
     <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-6 space-y-4 sm:space-y-6 max-w-7xl">
@@ -201,10 +168,10 @@ export default function QuotesPage() {
                     </p>
                   </div>
                   <Badge
-                    variant={getStatusBadgeVariant(quote.status)}
+                    variant={getQuoteStatusBadgeVariant(quote.status)}
                     className="text-nowrap text-xs"
                   >
-                    {getStatusLabel(quote.status)}
+                    {getQuoteStatusLabel(quote.status)}
                   </Badge>
                 </div>
                 
@@ -303,10 +270,10 @@ export default function QuotesPage() {
                     </TableCell>
                     <TableCell>
                       <Badge
-                        variant={getStatusBadgeVariant(quote.status)}
+                        variant={getQuoteStatusBadgeVariant(quote.status)}
                         className="w-fit whitespace-nowrap"
                       >
-                        {getStatusLabel(quote.status)}
+                        {getQuoteStatusLabel(quote.status)}
                       </Badge>
                     </TableCell>
                     <TableCell className="hidden sm:table-cell">

@@ -179,3 +179,21 @@ export const useViewQuote = () => {
         },
     })
 }
+
+export const useCustomerQuotes = (customerId: string, params: IQuoteQueryParams = {}) => {
+    const { page = 1, limit = 10, search = "", status, customer_id, start_date, end_date, sortBy = 'quote_date', sortOrder = 'DESC' } = params;
+
+    return useQuery<IApiSuccessResponse<IQuotePagination>, AxiosError<IApiErrorResponse>>({
+        queryKey: [`customer-quotes-${customerId}`, { page, limit, search, status, customer_id, start_date, end_date, sortBy, sortOrder }],
+        queryFn: () => {
+            let url = `/quotes/customer/${customerId}?page=${page}&limit=${limit}&sortBy=${sortBy}&sortOrder=${sortOrder}`;
+            if (search) url += `&search=${search}`;
+            if (status) url += `&status=${status}`;
+            if (customer_id) url += `&customer_id=${customer_id}`;
+            if (start_date) url += `&start_date=${start_date}`;
+            if (end_date) url += `&end_date=${end_date}`;
+            return api.get<IApiSuccessResponse<IQuotePagination>>(url);
+        },
+        staleTime: 1000 * 60 * 5, // 5 minutes
+    })
+}

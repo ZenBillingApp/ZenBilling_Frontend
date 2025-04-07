@@ -194,3 +194,20 @@ export const useViewInvoice = () => {
     })
 }
 
+export const useCustomerInvoices = (customerId: string, params: IInvoiceQueryParams = {}) => {
+    const { page = 1, limit = 10, search = "", status, customer_id, start_date, end_date, sortBy = 'invoice_date', sortOrder = 'DESC' } = params;
+
+    return useQuery<IApiSuccessResponse<IInvoicePagination>, AxiosError<IApiErrorResponse>> ({
+        queryKey: [`customer-invoices-${customerId}`, { page, limit, search, status, customer_id, start_date, end_date, sortBy, sortOrder }],
+        queryFn: () => {
+            let url = `/invoices/customer/${customerId}?page=${page}&limit=${limit}&sortBy=${sortBy}&sortOrder=${sortOrder}`;
+            if (search) url += `&search=${search}`;
+            if (status) url += `&status=${status}`;
+            if (customer_id) url += `&customer_id=${customer_id}`;
+            if (start_date) url += `&start_date=${start_date}`;
+            if (end_date) url += `&end_date=${end_date}`;
+            return api.get<IApiSuccessResponse<IInvoicePagination>>(url);
+        },
+        staleTime: 1000 * 60 * 5, // 5 minutes
+    })
+}
