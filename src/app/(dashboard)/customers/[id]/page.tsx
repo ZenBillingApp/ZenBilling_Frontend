@@ -12,7 +12,7 @@ import { format } from "date-fns";
 import { getInvoiceStatusBadgeVariant, getInvoiceStatusLabel } from "@/utils/invoiceStatus";
 import { getQuoteStatusBadgeVariant, getQuoteStatusLabel } from "@/utils/quoteStatus";
 
-import { ShoppingCart, Search, Eye, CalendarDays, Clock, User, Building, Loader2, ArrowLeft, Calendar, Edit, Trash2, Mail, Phone, MapPin } from "lucide-react";
+import { ShoppingCart, Search, Eye, CalendarDays, Clock, User, Building, Loader2, ArrowLeft, Calendar, Edit, Trash2, Mail, Phone, MapPin, FileText } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -588,88 +588,110 @@ export default function CustomerDetailsPage() {
         </TabsContent>
         
         <TabsContent value="invoices" className="space-y-4">
-          <div className="flex flex-col gap-4">
-            <div className="relative w-full">
-              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Rechercher une facture..."
-                value={invoiceSearch}
-                onChange={(e) => setInvoiceSearch(e.target.value)}
-                className="pl-8 w-full"
-              />
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-              <Select
-                value={invoiceStatusFilter}
-                onValueChange={(
-                  value: "all" | "sent" | "paid" | "late" | "cancelled"
-                ) => setInvoiceStatusFilter(value as InvoiceStatus)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Statut" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Tous</SelectItem>
-                  <SelectItem value="sent">Envoyée</SelectItem>
-                  <SelectItem value="paid">Payée</SelectItem>
-                  <SelectItem value="late">En retard</SelectItem>
-                  <SelectItem value="cancelled">Annulée</SelectItem>
-                </SelectContent>
-              </Select>
-              <DatePickerWithRange date={invoiceDateRange} setDate={setInvoiceDateRange} className="w-full" />
-            </div>
-          </div>
+          <Card className="overflow-hidden border shadow-sm hover:shadow-md transition-shadow">
+            <CardHeader className="bg-muted/50">
+              <CardTitle className="flex items-center gap-2">
+                <ShoppingCart className="h-5 w-5 text-primary" />
+                Factures
+              </CardTitle>
+              <CardDescription>Liste des factures du client</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4 pt-6">
+              <div className="flex flex-col gap-4">
+                <div className="relative w-full">
+                  <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Rechercher une facture..."
+                    value={invoiceSearch}
+                    onChange={(e) => setInvoiceSearch(e.target.value)}
+                    className="pl-8 w-full"
+                  />
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                  <Select
+                    value={invoiceStatusFilter}
+                    onValueChange={(
+                      value: "all" | "sent" | "paid" | "late" | "cancelled"
+                    ) => setInvoiceStatusFilter(value as InvoiceStatus)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Statut" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Tous</SelectItem>
+                      <SelectItem value="sent">Envoyée</SelectItem>
+                      <SelectItem value="paid">Payée</SelectItem>
+                      <SelectItem value="late">En retard</SelectItem>
+                      <SelectItem value="cancelled">Annulée</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <DatePickerWithRange date={invoiceDateRange} setDate={setInvoiceDateRange} className="w-full" />
+                </div>
+              </div>
 
-          <DataTable
-            data={invoicesData?.data?.invoices || []}
-            columns={invoiceColumns}
-            isLoading={isLoadingInvoices}
-            emptyMessage="Aucune facture trouvée"
-            onRowClick={(invoice: IInvoice) => router.push(`/invoices/${invoice.invoice_id}`)}
-          />
+              <DataTable
+                data={invoicesData?.data?.invoices || []}
+                columns={invoiceColumns}
+                isLoading={isLoadingInvoices}
+                emptyMessage="Aucune facture trouvée"
+                onRowClick={(invoice: IInvoice) => router.push(`/invoices/${invoice.invoice_id}`)}
+              />
+            </CardContent>
+          </Card>
         </TabsContent>
         
         <TabsContent value="quotes" className="space-y-4">
-          <div className="flex flex-col gap-4">
-            <div className="relative w-full">
-              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Rechercher un devis..."
-                value={quoteSearch}
-                onChange={(e) => setQuoteSearch(e.target.value)}
-                className="pl-8 w-full"
-              />
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-              <Select
-                value={quoteStatusFilter}
-                onValueChange={(
-                  value: "all" | "draft" | "sent" | "accepted" | "rejected" | "expired"
-                ) => setQuoteStatusFilter(value as QuoteStatus)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Statut" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Tous</SelectItem>
-                  <SelectItem value="draft">Brouillon</SelectItem>
-                  <SelectItem value="sent">Envoyé</SelectItem>
-                  <SelectItem value="accepted">Accepté</SelectItem>
-                  <SelectItem value="rejected">Refusé</SelectItem>
-                  <SelectItem value="expired">Expiré</SelectItem>
-                </SelectContent>
-              </Select>
-              <DatePickerWithRange date={quoteDateRange} setDate={setQuoteDateRange} className="w-full" />
-            </div>
-          </div>
+          <Card className="overflow-hidden border shadow-sm hover:shadow-md transition-shadow">
+            <CardHeader className="bg-muted/50">
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="h-5 w-5 text-primary" />
+                Devis
+              </CardTitle>
+              <CardDescription>Liste des devis du client</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4 pt-6">
+              <div className="flex flex-col gap-4">
+                <div className="relative w-full">
+                  <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Rechercher un devis..."
+                    value={quoteSearch}
+                    onChange={(e) => setQuoteSearch(e.target.value)}
+                    className="pl-8 w-full"
+                  />
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                  <Select
+                    value={quoteStatusFilter}
+                    onValueChange={(
+                      value: "all" | "draft" | "sent" | "accepted" | "rejected" | "expired"
+                    ) => setQuoteStatusFilter(value as QuoteStatus)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Statut" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Tous</SelectItem>
+                      <SelectItem value="draft">Brouillon</SelectItem>
+                      <SelectItem value="sent">Envoyé</SelectItem>
+                      <SelectItem value="accepted">Accepté</SelectItem>
+                      <SelectItem value="rejected">Refusé</SelectItem>
+                      <SelectItem value="expired">Expiré</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <DatePickerWithRange date={quoteDateRange} setDate={setQuoteDateRange} className="w-full" />
+                </div>
+              </div>
 
-          <DataTable
-            data={quotesData?.data?.quotes || []}
-            columns={quoteColumns}
-            isLoading={isLoadingQuotes}
-            emptyMessage="Aucun devis trouvé"
-            onRowClick={(quote: IQuote) => router.push(`/quotes/${quote.quote_id}`)}
-          />
+              <DataTable
+                data={quotesData?.data?.quotes || []}
+                columns={quoteColumns}
+                isLoading={isLoadingQuotes}
+                emptyMessage="Aucun devis trouvé"
+                onRowClick={(quote: IQuote) => router.push(`/quotes/${quote.quote_id}`)}
+              />
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>
