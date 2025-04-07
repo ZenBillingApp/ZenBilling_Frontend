@@ -27,6 +27,7 @@ import { DataTable, StatusBadge, Column } from "@/components/ui/data-table";
 import { Loader2 } from "lucide-react";
 import { IInvoice } from "@/types/Invoice.interface";
 import { User, Building } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function InvoicesPage() {
   const router = useRouter();
@@ -186,47 +187,58 @@ export default function InvoicesPage() {
         </Button>
       </div>
 
-      <div className="flex flex-col gap-4">
-        <div className="relative w-full">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Rechercher une facture..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-8 w-full"
-          />
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-          <Select
-            value={statusFilter}
-            onValueChange={(
-              value: "all" | "pending" | "sent" | "paid" | "cancelled" | "late"
-            ) => setStatusFilter(value)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Statut" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Tous</SelectItem>
-              <SelectItem value="pending">En attente</SelectItem>
-              <SelectItem value="sent">Envoyée</SelectItem>
-              <SelectItem value="paid">Payée</SelectItem>
-              <SelectItem value="late">En retard</SelectItem>
-              <SelectItem value="cancelled">Annulée</SelectItem>
-            </SelectContent>
-          </Select>
-          <DatePickerWithRange date={dateRange} setDate={setDateRange} className="w-full" />
-          <div className="hidden sm:block lg:hidden"></div>
-        </div>
-      </div>
+      <Card className="overflow-hidden border shadow-sm hover:shadow-md transition-shadow">
+        <CardHeader className="bg-muted/50">
+          <CardTitle className="flex items-center gap-2">
+            <FileStack className="h-5 w-5 text-primary" />
+            Liste des factures
+          </CardTitle>
+          <CardDescription>Gérez et consultez toutes vos factures</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4 pt-6">
+          <div className="flex flex-col gap-4">
+            <div className="relative w-full">
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Rechercher une facture..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-8 w-full"
+              />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+              <Select
+                value={statusFilter}
+                onValueChange={(
+                  value: "all" | "pending" | "sent" | "paid" | "cancelled" | "late"
+                ) => setStatusFilter(value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Statut" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tous</SelectItem>
+                  <SelectItem value="pending">En attente</SelectItem>
+                  <SelectItem value="sent">Envoyée</SelectItem>
+                  <SelectItem value="paid">Payée</SelectItem>
+                  <SelectItem value="late">En retard</SelectItem>
+                  <SelectItem value="cancelled">Annulée</SelectItem>
+                </SelectContent>
+              </Select>
+              <DatePickerWithRange date={dateRange} setDate={setDateRange} className="w-full" />
+              <div className="hidden sm:block lg:hidden"></div>
+            </div>
+          </div>
 
-      <DataTable
-        data={invoices?.data?.invoices || []}
-        columns={columns}
-        isLoading={isLoading}
-        emptyMessage="Aucune facture trouvée"
-        onRowClick={(invoice: IInvoice) => router.push(`/invoices/${invoice.invoice_id}`)}
-      />
+          <DataTable
+            data={invoices?.data?.invoices || []}
+            columns={columns}
+            isLoading={isLoading}
+            emptyMessage="Aucune facture trouvée"
+            onRowClick={(invoice: IInvoice) => router.push(`/invoices/${invoice.invoice_id}`)}
+          />
+        </CardContent>
+      </Card>
     </div>
   );
 }

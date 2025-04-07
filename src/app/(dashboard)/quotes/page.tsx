@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/select";
 import { DatePickerWithRange } from "@/components/ui/date-range-picker";
 import { DataTable, StatusBadge, Column } from "@/components/ui/data-table";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 import type { IQuote } from "@/types/Quote.interface";
 
@@ -184,47 +185,58 @@ export default function QuotesPage() {
         </Button>
       </div>
 
-      <div className="flex flex-col gap-4">
-        <div className="relative w-full">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Rechercher un devis..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-8 w-full"
-          />
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-          <Select
-            value={statusFilter}
-            onValueChange={(
-              value: "all" | "draft" | "sent" | "accepted" | "rejected" | "expired"
-            ) => setStatusFilter(value)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Statut" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Tous</SelectItem>
-              <SelectItem value="draft">Brouillon</SelectItem>
-              <SelectItem value="sent">Envoyé</SelectItem>
-              <SelectItem value="accepted">Accepté</SelectItem>
-              <SelectItem value="rejected">Refusé</SelectItem>
-              <SelectItem value="expired">Expiré</SelectItem>
-            </SelectContent>
-          </Select>
-          <DatePickerWithRange date={dateRange} setDate={setDateRange} className="w-full" />
-          <div className="hidden sm:block lg:hidden"></div>
-        </div>
-      </div>
+      <Card className="overflow-hidden border shadow-sm hover:shadow-md transition-shadow">
+        <CardHeader className="bg-muted/50">
+          <CardTitle className="flex items-center gap-2">
+            <FileText className="h-5 w-5 text-primary" />
+            Liste des devis
+          </CardTitle>
+          <CardDescription>Gérez et consultez tous vos devis</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4 pt-6">
+          <div className="flex flex-col gap-4">
+            <div className="relative w-full">
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Rechercher un devis..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-8 w-full"
+              />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+              <Select
+                value={statusFilter}
+                onValueChange={(
+                  value: "all" | "draft" | "sent" | "accepted" | "rejected" | "expired"
+                ) => setStatusFilter(value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Statut" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tous</SelectItem>
+                  <SelectItem value="draft">Brouillon</SelectItem>
+                  <SelectItem value="sent">Envoyé</SelectItem>
+                  <SelectItem value="accepted">Accepté</SelectItem>
+                  <SelectItem value="rejected">Refusé</SelectItem>
+                  <SelectItem value="expired">Expiré</SelectItem>
+                </SelectContent>
+              </Select>
+              <DatePickerWithRange date={dateRange} setDate={setDateRange} className="w-full" />
+              <div className="hidden sm:block lg:hidden"></div>
+            </div>
+          </div>
 
-      <DataTable
-        data={quotes?.data?.quotes || []}
-        columns={columns}
-        isLoading={isLoading}
-        emptyMessage="Aucun devis trouvé"
-        onRowClick={(quote: IQuote) => router.push(`/quotes/${quote.quote_id}`)}
-      />
+          <DataTable
+            data={quotes?.data?.quotes || []}
+            columns={columns}
+            isLoading={isLoading}
+            emptyMessage="Aucun devis trouvé"
+            onRowClick={(quote: IQuote) => router.push(`/quotes/${quote.quote_id}`)}
+          />
+        </CardContent>
+      </Card>
     </div>
   );
 }
