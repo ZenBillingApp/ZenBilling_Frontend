@@ -51,6 +51,7 @@ export default function InvoicesPage() {
     "all" | "pending" | "sent" | "paid" | "cancelled" | "late"
   >("all");
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
+  const [loadingInvoiceId, setLoadingInvoiceId] = useState<string | null>(null);
 
   const debouncedSearch = useDebounce(search, 300);
 
@@ -65,7 +66,16 @@ export default function InvoicesPage() {
     page: page,
   });
 
-  const { mutate: viewInvoice, isPending: isViewInvoicePending } = useViewInvoice();
+  const { mutate: viewInvoice } = useViewInvoice();
+
+  const handleViewInvoice = (invoiceId: string) => {
+    setLoadingInvoiceId(invoiceId);
+    viewInvoice(invoiceId, {
+      onSettled: () => {
+        setLoadingInvoiceId(null);
+      }
+    });
+  };
 
   const totalPages = invoices?.data?.pagination?.totalPages || 0;
 
@@ -227,11 +237,11 @@ export default function InvoicesPage() {
                     onClick={(e) => {
                       e.stopPropagation();
                       if (invoice.invoice_id) {
-                        viewInvoice(invoice.invoice_id);
+                        handleViewInvoice(invoice.invoice_id);
                       }
                     }}
                   >
-                    {isViewInvoicePending ? (
+                    {loadingInvoiceId === invoice.invoice_id ? (
                       <Loader2 className="w-3 h-3 mr-1 animate-spin" />
                     ) : (
                       <Eye className="w-3 h-3 mr-1" />
@@ -322,10 +332,10 @@ export default function InvoicesPage() {
                       <Button variant="ghost" size="icon" onClick={(e) => {
                         e.stopPropagation()
                         if (invoice.invoice_id) {
-                          viewInvoice(invoice.invoice_id)
+                          handleViewInvoice(invoice.invoice_id)
                         }
                       }}>
-                        {isViewInvoicePending ? (
+                        {loadingInvoiceId === invoice.invoice_id ? (
                           <Loader2 className="w-4 h-4 animate-spin" />
                         ) : (
                           <Eye className="w-4 h-4" />
