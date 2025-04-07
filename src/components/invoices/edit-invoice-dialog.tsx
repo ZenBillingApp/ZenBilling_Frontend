@@ -176,7 +176,6 @@ export function EditInvoiceDialog({
                                                     }
                                                 }}
                                                 placeholder="Date de facturation"
-                                                portal={false}
                                             />
                                         </FormControl>
                                         <FormMessage />
@@ -221,7 +220,6 @@ export function EditInvoiceDialog({
                                                     }
                                                 }}
                                                 placeholder="Date d'échéance"
-                                                portal={false}
                                             />
                                         </FormControl>
                                         <FormMessage />

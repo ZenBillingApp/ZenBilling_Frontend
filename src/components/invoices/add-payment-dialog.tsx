@@ -216,7 +216,6 @@ export function AddPaymentDialog({
                                                         setHasChanged(true);
                                                     }
                                                 }}
-                                                portal={false}
                                             />
                                         </FormControl>
                                         <FormDescription>
