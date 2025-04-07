@@ -20,6 +20,7 @@ interface DatePickerProps {
   placeholder?: string
   className?: string
   label?: string
+  portal?: boolean
 }
 
 export function DatePicker({
@@ -27,6 +28,7 @@ export function DatePicker({
   setDate,
   placeholder = "Sélectionner une date",
   className,
+  portal = true,
 }: DatePickerProps) {
   return (
     <div className={cn("grid gap-2", className)}>
@@ -48,7 +50,7 @@ export function DatePicker({
             <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-0" align="start">
+        <PopoverContent className="w-auto p-0" align="start" portal={portal}>
           <Calendar
             mode="single"
             selected={date}
