@@ -9,6 +9,7 @@ import { useFormat } from "@/hooks/useFormat";
 import { useDebounce } from "@/hooks/useDebounce";
 import { DateRange } from "react-day-picker";
 import { format } from "date-fns";
+import NiceModal from "@ebay/nice-modal-react";
 import { getInvoiceStatusBadgeVariant, getInvoiceStatusLabel } from "@/utils/invoiceStatus";
 import { getQuoteStatusBadgeVariant, getQuoteStatusLabel } from "@/utils/quoteStatus";
 
@@ -41,9 +42,13 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import EditCustomerDialog from "@/components/customers/edit-customer-dialog";
 
 import type { IInvoice, InvoiceStatus } from "@/types/Invoice.interface";
 import type { IQuote, QuoteStatus } from "@/types/Quote.interface";
+
+
+
 
 export default function CustomerDetailsPage() {
   const params = useParams();
@@ -122,7 +127,7 @@ export default function CustomerDetailsPage() {
   
   const handleEdit = () => {
     if (customer) {
-      // Implement edit logic here
+      NiceModal.show(EditCustomerDialog, { customer });
     }
   };
   
