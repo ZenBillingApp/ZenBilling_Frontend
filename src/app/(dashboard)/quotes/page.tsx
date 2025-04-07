@@ -55,6 +55,7 @@ export default function QuotesPage() {
   const [status, setStatus] = useState< 'all' | 'draft' | 'sent' | 'accepted' | 'rejected' | 'expired'>('all');
   const [page, setPage] = useState(1);
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
+  const [loadingQuoteId, setLoadingQuoteId] = useState<string | null>(null);
 
   const { data: quotesData, isLoading } = useQuotes({
     search: debouncedSearch,
@@ -67,8 +68,17 @@ export default function QuotesPage() {
     page: page,
   });
 
-  const { mutate: viewQuote, isPending: isViewQuotePending } = useViewQuote();
+  const { mutate: viewQuote } = useViewQuote();
   
+  const handleViewQuote = (quoteId: string) => {
+    setLoadingQuoteId(quoteId);
+    viewQuote(quoteId, {
+      onSettled: () => {
+        setLoadingQuoteId(null);
+      }
+    });
+  };
+
   const totalPages = quotesData?.data?.pagination?.totalPages || 1;
 
   const getStatusBadgeVariant = (status: QuoteStatus) => {
@@ -224,11 +234,11 @@ export default function QuotesPage() {
                     onClick={(e) => {
                       e.stopPropagation();
                       if (quote.quote_id) {
-                        viewQuote(quote.quote_id);
+                        handleViewQuote(quote.quote_id);
                       }
                     }}
                   >
-                    {isViewQuotePending ? (
+                    {loadingQuoteId === quote.quote_id ? (
                       <Loader2 className="w-3 h-3 animate-spin" />
                     ) : (
                       <Eye className="w-3 h-3 mr-1" />
@@ -303,10 +313,10 @@ export default function QuotesPage() {
                       <Button variant="ghost" size="icon" onClick={(e) => {
                         e.stopPropagation()
                         if (quote.quote_id) {
-                          viewQuote(quote.quote_id)
+                          handleViewQuote(quote.quote_id)
                         }
                       }}>
-                        {isViewQuotePending ? (
+                        {loadingQuoteId === quote.quote_id ? (
                           <Loader2 className="w-4 h-4 animate-spin" />
                         ) : (
                           <Eye className="w-4 h-4" />
