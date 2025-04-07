@@ -73,6 +73,8 @@ export default function InvoiceDetailsPage() {
   const addPayment = useAddPayment(params.id as string);
   const sendInvoice = useSendInvoice(params.id as string);
 
+  const totalPaid = invoiceData?.data?.payments?.reduce((acc, payment) => acc + Number(payment.amount), 0);
+
   const handleUpdateInvoice = async (data: Partial<EditInvoiceSchema>) => {
     await updateInvoice.mutateAsync(data as IUpdateInvoiceRequest);
     setIsEditDialogOpen(false);
@@ -213,6 +215,7 @@ export default function InvoiceDetailsPage() {
             onOpenChange={setIsAddPaymentDialogOpen}
             onSubmit={handleAddPayment}
             invoiceAmount={invoiceData.data?.amount_including_tax || 0}
+            totalPaid={totalPaid || 0}
             isLoading={addPayment.isPending}
             isError={addPayment.isError}
             error={{message:(addPayment.error as AxiosError<IApiErrorResponse>)?.response?.data?.message, errors:(addPayment.error as AxiosError<IApiErrorResponse>)?.response?.data?.errors}}
@@ -313,12 +316,16 @@ export default function InvoiceDetailsPage() {
                   </div>
                 </div>
               </div>
-              <div className="text-right w-full sm:w-auto">
-                <p className="text-sm text-muted-foreground">Total TTC</p>
-                <p className="text-xl sm:text-2xl font-bold">
+             
+                <div className="text-right w-full sm:w-auto">
+                  <p className="text-sm text-muted-foreground">Total TTC</p>
+                  <p className="text-xl sm:text-2xl font-bold">
                   {formatCurrency(invoiceData.data?.amount_including_tax || 0)}
                 </p>
+                <p className="text-xs text-muted-foreground">Total payé : {formatCurrency(totalPaid || 0)}</p>
               </div>
+             
+             
             </div>
           </CardContent>
         </Card>

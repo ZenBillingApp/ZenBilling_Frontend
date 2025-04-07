@@ -46,6 +46,7 @@ interface AddPaymentDialogProps {
     onOpenChange: (open: boolean) => void
     onSubmit: (data: AddPaymentSchema) => Promise<void>
     invoiceAmount: number
+    totalPaid: number
     isLoading: boolean
     isError: boolean
     error?: {
@@ -68,6 +69,7 @@ export function AddPaymentDialog({
     onOpenChange,
     onSubmit,
     invoiceAmount,
+    totalPaid,
     isLoading,
     isError,
     error
@@ -126,7 +128,7 @@ export function AddPaymentDialog({
     };
 
     const setFullAmount = () => {
-        form.setValue("amount", invoiceAmount.toString());
+        form.setValue("amount", (invoiceAmount - totalPaid).toString());
         setHasChanged(true);
     };
 
@@ -174,11 +176,11 @@ export function AddPaymentDialog({
                                                             className="h-6 px-2 text-xs"
                                                             tabIndex={-1}
                                                         >
-                                                            Montant total
+                                                            Montant restant
                                                         </Button>
                                                     </TooltipTrigger>
                                                     <TooltipContent>
-                                                        <p>Utiliser le montant total de la facture</p>
+                                                        <p>Utiliser le montant restant à payer</p>
                                                     </TooltipContent>
                                                 </Tooltip>
                                             </TooltipProvider>
