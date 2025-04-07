@@ -64,13 +64,7 @@ export default function QuoteDetailsPage() {
   const sendQuote = useSendQuote(params.id as string);
 
   const handleUpdateQuote = async (data: Partial<EditQuoteSchema>) => {
-    const updateData: IUpdateQuoteRequest = {
-      quote_date: data.quote_date,
-      validity_date: data.validity_date,
-      conditions: data.conditions || undefined,
-      notes: data.notes || undefined,
-    };
-    await updateQuote.mutateAsync(updateData);
+    await updateQuote.mutateAsync(data as IUpdateQuoteRequest);
     setIsEditDialogOpen(false);
   };
 

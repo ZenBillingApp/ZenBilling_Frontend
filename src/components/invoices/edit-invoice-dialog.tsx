@@ -86,7 +86,7 @@ export function EditInvoiceDialog({
 
     // Reset form when dialog opens/closes or defaultValues change
     useEffect(() => {
-        if (open) {
+        if (!open) {
             form.reset({
                 invoice_date: new Date(defaultValues.invoice_date),
                 due_date: new Date(defaultValues.due_date),
