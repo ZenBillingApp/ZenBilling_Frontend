@@ -52,13 +52,13 @@ export default function QuotesPage() {
   const { formatCurrency } = useFormat();
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 500);
-  const [status, setStatus] = useState<QuoteStatus | "">("");
+  const [status, setStatus] = useState< 'all' | 'draft' | 'sent' | 'accepted' | 'rejected' | 'expired'>('all');
   const [page, setPage] = useState(1);
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
 
   const { data: quotesData, isLoading } = useQuotes({
     search: debouncedSearch,
-    status: status || undefined,
+    status: status === 'all' ? undefined : status,
     start_date: dateRange?.from
       ? format(dateRange.from, "yyyy-MM-dd")
       : undefined,
@@ -134,12 +134,13 @@ export default function QuotesPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
           <Select
             value={status}
-            onValueChange={(value) => setStatus(value as QuoteStatus)}
+              onValueChange={(value : 'all' | 'draft' | 'sent' | 'accepted' | 'rejected' | 'expired') => setStatus(value as QuoteStatus)}
           >
             <SelectTrigger>
               <SelectValue placeholder="Tous les statuts" />
             </SelectTrigger>
             <SelectContent>
+            <SelectItem value="all">Tous</SelectItem>
               <SelectItem value="draft">Brouillon</SelectItem>
               <SelectItem value="sent">Envoyé</SelectItem>
               <SelectItem value="accepted">Accepté</SelectItem>
