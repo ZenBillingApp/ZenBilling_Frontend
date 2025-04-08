@@ -341,7 +341,7 @@ export default function CustomerDetailsPage() {
   ];
 
   return (
-    <div className="container mx-auto px-4 py-6 space-y-8">
+    <div className="container mx-auto px-4 py-6 space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-card rounded-lg p-4 shadow-sm border">
         <div className="flex items-center space-x-4">
           <TooltipProvider>
