@@ -13,7 +13,9 @@ import type { EditQuoteSchema } from "@/components/quotes/edit-quote-dialog";
 import type { IApiErrorResponse } from "@/types/api.types";
 import type { IQuoteItem } from "@/types/QuoteItem.interface";
 import type { IUpdateQuoteRequest } from "@/types/Quote.request.interface";
+import type { QuoteStatus } from "@/types/Quote.interface";
 import { vatRateToNumber } from "@/types/Product.interface";
+import { getQuoteStatusBadgeVariant, getQuoteStatusLabel } from "@/utils/quoteStatus";
 
 import {
   Card,
@@ -74,40 +76,6 @@ export default function QuoteDetailsPage() {
     await updateQuote.mutateAsync({ status });
   };
 
-  const getStatusBadgeVariant = (status: string) => {
-    switch (status) {
-      case "accepted":
-        return "default";
-      case "sent":
-        return "secondary";
-      case "draft":
-        return "outline";
-      case "rejected":
-        return "destructive";
-      case "expired":
-        return "destructive";
-      default:
-        return "secondary";
-    }
-  };
-
-  const getStatusLabel = (status: string) => {
-    switch (status) {
-      case "draft":
-        return "Brouillon";
-      case "sent":
-        return "Envoyé";
-      case "accepted":
-        return "Accepté";
-      case "rejected":
-        return "Refusé";
-      case "expired":
-        return "Expiré";
-      default:
-        return status;
-    }
-  };
-
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "accepted":
@@ -127,7 +95,7 @@ export default function QuoteDetailsPage() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto px-4 py-6 max-w-5xl">
+      <div className="container mx-auto px-4 py-6">
         <div className="animate-pulse space-y-6">
           <div className="h-8 bg-muted rounded w-1/4"></div>
           <div className="h-[200px] bg-muted rounded"></div>
@@ -139,7 +107,7 @@ export default function QuoteDetailsPage() {
 
   if (!quoteData) {
     return (
-      <div className="container mx-auto px-4 py-6 max-w-5xl">
+      <div className="container mx-auto px-4 py-6">
         <Card>
           <CardHeader>
             <CardTitle>Devis introuvable</CardTitle>
@@ -159,7 +127,7 @@ export default function QuoteDetailsPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-6 space-y-6 max-w-5xl">
+    <div className="container mx-auto px-4 py-6 space-y-6">
       {/* Header */}
       <div className="flex flex-col justify-between items-start gap-4">
         <div className="flex items-center gap-2 w-full sm:w-auto">
@@ -267,12 +235,12 @@ export default function QuoteDetailsPage() {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full">
                 <Badge
-                  variant={getStatusBadgeVariant(quoteData.data?.status || "")}
+                  variant={getQuoteStatusBadgeVariant(quoteData.data?.status as QuoteStatus)}
                   className="px-4 py-1.5 text-sm w-fit"
                 >
                   <span className="flex items-center gap-2">
-                    {getStatusIcon(quoteData.data?.status || "")}
-                    {getStatusLabel(quoteData.data?.status || "")}
+                    {getStatusIcon(quoteData.data?.status as QuoteStatus)}
+                    {getQuoteStatusLabel(quoteData.data?.status as QuoteStatus)}
                   </span>
                 </Badge>
                 <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 text-sm text-muted-foreground w-full">

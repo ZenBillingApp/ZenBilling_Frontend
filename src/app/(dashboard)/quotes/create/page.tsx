@@ -135,7 +135,7 @@ export default function CreateQuotePage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-6 space-y-6 max-w-5xl">
+    <div className="container mx-auto px-4 py-6 space-y-6">
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-2">
           <Button variant="outline" size="icon" onClick={() => router.back()}>
