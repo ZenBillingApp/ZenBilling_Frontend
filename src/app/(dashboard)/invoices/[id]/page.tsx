@@ -10,6 +10,7 @@ import {
 } from "@/hooks/useInvoice";
 import { useFormat } from "@/hooks/useFormat";
 import { useState } from "react";
+import { getInvoiceStatusBadgeVariant, getInvoiceStatusLabel } from "@/utils/invoiceStatus";
 import type { EditInvoiceSchema } from "@/components/invoices/edit-invoice-dialog";
 import type { AddPaymentSchema } from "@/components/invoices/add-payment-dialog";
 import type { IApiErrorResponse } from "@/types/api.types";
@@ -18,6 +19,7 @@ import type { IPayment } from "@/types/Payment.interface";
 import type { IUpdateInvoiceRequest } from "@/types/Invoice.request.interface";
 import type { IInvoiceItem } from "@/types/InvoiceItem.interface";
 import { vatRateToNumber } from "@/types/Product.interface";
+import type { InvoiceStatus } from "@/types/Invoice.interface";
 
 import {
   Card,
@@ -85,40 +87,6 @@ export default function InvoiceDetailsPage() {
     setIsAddPaymentDialogOpen(false);
   };
 
-  const getStatusBadgeVariant = (status: string) => {
-    switch (status) {
-      case "paid":
-        return "default";
-      case "pending":
-        return "secondary";
-      case "sent":
-        return "secondary";
-      case "late":
-        return "destructive";
-      case "cancelled":
-        return "destructive";
-      default:
-        return "secondary";
-    }
-  };
-
-  const getStatusLabel = (status: string) => {
-    switch (status) {
-      case "pending":
-        return "En attente";
-      case "sent":
-        return "Envoyée";
-      case "paid":
-        return "Payée";
-      case "late":
-        return "En retard";
-      case "cancelled":
-        return "Annulée";
-      default:
-        return status;
-    }
-  };
-
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "paid":
@@ -151,7 +119,7 @@ export default function InvoiceDetailsPage() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto px-4 py-6 max-w-5xl">
+      <div className="container mx-auto px-4 py-6">
         <div className="animate-pulse space-y-4">
           <div className="h-8 bg-muted rounded w-1/4"></div>
           <div className="h-[200px] bg-muted rounded"></div>
@@ -163,7 +131,7 @@ export default function InvoiceDetailsPage() {
 
   if (!invoiceData) {
     return (
-      <div className="container mx-auto px-4 py-6 max-w-5xl">
+      <div className="container mx-auto px-4 py-6">
         <Card>
           <CardHeader>
             <CardTitle>Facture introuvable</CardTitle>
@@ -183,7 +151,7 @@ export default function InvoiceDetailsPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-6 space-y-6 max-w-5xl">
+    <div className="container mx-auto px-4 py-6 space-y-6">
       {/* Header */}
       <div className="flex flex-col justify-between items-start gap-4">
         <div className="flex items-center gap-2 w-full sm:w-auto">
@@ -291,12 +259,12 @@ export default function InvoiceDetailsPage() {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full">
                 <Badge
-                  variant={getStatusBadgeVariant(invoiceData.data?.status || "")}
+                  variant={getInvoiceStatusBadgeVariant(invoiceData.data?.status as InvoiceStatus)}
                   className="px-4 py-1"
                 >
                   <span className="flex items-center gap-2">
-                    {getStatusIcon(invoiceData.data?.status || "")}
-                    {getStatusLabel(invoiceData.data?.status || "")}
+                    {getStatusIcon(invoiceData.data?.status as InvoiceStatus)}
+                    {getInvoiceStatusLabel(invoiceData.data?.status as InvoiceStatus)}
                   </span>
                 </Badge>
                 <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 text-sm text-muted-foreground w-full">
