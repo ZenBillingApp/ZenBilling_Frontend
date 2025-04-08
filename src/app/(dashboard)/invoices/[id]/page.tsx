@@ -155,7 +155,7 @@ export default function InvoiceDetailsPage() {
       {/* Header */}
       <div className="flex flex-col justify-between items-start gap-4">
         <div className="flex items-center gap-2 w-full sm:w-auto">
-          <Button variant="outline" size="icon" onClick={() => router.back()}>
+          <Button variant="outline" className="rounded-full" size="icon" onClick={() => router.back()}>
             <ArrowLeft className="w-4 h-4" />
           </Button>
           <h1 className="text-xl sm:text-2xl font-bold font-dmSans flex items-center">
