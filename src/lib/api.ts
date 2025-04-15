@@ -40,7 +40,9 @@ axiosInstance.interceptors.response.use(
           message = 'Session expirée. Veuillez vous reconnecter.';
           console.error('Session expirée');
           // Rediriger vers la page de connexion
-          window.location.href = '/login';
+          if (window.location.pathname !== '/login') {
+            window.location.href = '/login';
+          }
           break;
         case 403:
           message = 'Accès interdit. Vous n\'avez pas les droits nécessaires.';
