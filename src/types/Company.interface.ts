@@ -1,6 +1,11 @@
 import { IUser } from '@/types/User.interface';
 
-export type ICompanyLegalForm = 'SAS' | 'SARL' | 'EURL' | 'SASU' | 'SA' | 'SNC' | 'SOCIETE_CIVILE' | 'ENTREPRISE_INDIVIDUELLE';
+export type LegalForm = 'SAS' | 'SARL' | 'EURL' | 'SASU' | 'SA' | 'SNC' | 'SOCIETE_CIVILE' | 'ENTREPRISE_INDIVIDUELLE';
+
+export interface ILegalForm {
+  legalForms: LegalForm[];
+}
+
 
 export interface ICompany {
   company_id: string;
@@ -12,7 +17,7 @@ export interface ICompany {
   RCS_city: string;
   capital: number;
   siren: string;
-  legal_form: ICompanyLegalForm;
+  legal_form: LegalForm;
   // Informations d'adresse
   address: string;
   postal_code: string;

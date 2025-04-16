@@ -5,9 +5,8 @@ import { z } from "zod";
 import Image from "next/image";
 
 import { ICreateCompanyRequest } from "@/types/Company.request.interface";
-import { useCreateCompany } from "@/hooks/useCompany";
-import { ICompanyLegalForm } from "@/types/Company.interface";
-
+import { useCreateCompany, useLegalForm } from "@/hooks/useCompany";
+import { LegalForm } from "@/types/Company.interface";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -43,6 +42,7 @@ const companySchema = z.object({
 
 export function CompanyForm() {
     const handleCreateCompany = useCreateCompany();
+    const { data: legalForm } = useLegalForm();
 
     const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm<ICreateCompanyRequest>({
         resolver: zodResolver(companySchema),
@@ -61,7 +61,6 @@ export function CompanyForm() {
         handleCreateCompany.mutate(formattedData);
     }
 
-    const legalForm = watch("legal_form");
 
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -99,22 +98,16 @@ export function CompanyForm() {
                     <div className="flex flex-col items-start gap-2">
                         <Label htmlFor="legal_form">Forme juridique</Label>
                         <Select 
-                            value={legalForm} 
-                            onValueChange={(value) => setValue("legal_form", value as ICompanyLegalForm, { shouldValidate: true })}
+                            value={watch("legal_form")}
+                            onValueChange={(value) => setValue("legal_form", value as LegalForm, { shouldValidate: true })}
                         >
                             <SelectTrigger className="w-full">
                                 <SelectValue placeholder="Sélectionnez..." />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="SARL">SARL</SelectItem>
-                                <SelectItem value="SAS">SAS</SelectItem>
-                                <SelectItem value="SASU">SASU</SelectItem>
-                                <SelectItem value="EURL">EURL</SelectItem>
-                                <SelectItem value="SA">SA</SelectItem>
-                                <SelectItem value="SNC">SNC</SelectItem>
-                                <SelectItem value="SOCIETE_CIVILE">Société Civile</SelectItem>
-                                <SelectItem value="ENTREPRISE_INDIVIDUELLE">Entreprise Individuelle</SelectItem>
-                                
+                                {legalForm?.data?.legalForms.map((form, index) => (
+                                    <SelectItem key={index} value={form}>{form}</SelectItem>
+                                ))}
                             </SelectContent>
                         </Select>
                         {errors.legal_form && <p className="text-red-500 text-xs italic">{errors.legal_form.message}</p>}
