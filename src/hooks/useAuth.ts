@@ -9,7 +9,6 @@ import { IApiErrorResponse, IApiSuccessResponse } from '@/types/api.types';
 import { useToast } from '@/hooks/use-toast';
 import { useAuthStore } from '@/stores/authStores';
 import { IUser } from '@/types/User.interface';
-import { useUser } from '@/hooks/useUser';
 
 // Hook de connexion
 export const useLogin = () => {
@@ -77,13 +76,12 @@ export const useRegister = () => {
 export const useOnboardingFinish = () => {
   const { toast } = useToast();
   const router = useRouter();
-  const { refetch } = useUser();
+    const queryClient = useQueryClient();
   
   return useMutation({
     mutationFn: () => api.post<IApiSuccessResponse<void>>('/users/onboarding-finish'),
     onSuccess: async () => {
-      // Rafraîchir les données utilisateur pour mettre à jour l'état
-      await refetch();
+      await queryClient.invalidateQueries({ queryKey: ["user"] });
       router.replace('/dashboard');
     },
     onError: (error: AxiosError<IApiErrorResponse>) => {

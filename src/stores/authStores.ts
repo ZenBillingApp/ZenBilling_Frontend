@@ -1,7 +1,7 @@
 "use client"
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import type { IUser } from "@/types/User.interface";
+import type { IUser,IOnboardingStep } from "@/types/User.interface";
 import {
   getCookie,
   setCookie,
@@ -18,7 +18,6 @@ interface IAuthState {
 interface IAuthActions {
   setAuth: (data: IUser) => void;
   clearAuth: () => void;
-  updateUser: (user: Partial<IUser>) => void;
 }
 const cookieStorage = createJSONStorage(() => ({
   getItem: async (name): Promise<string | null> => {
@@ -49,7 +48,7 @@ export const useAuthStore = create<IAuthState & IAuthActions>()(
             last_name: data.last_name,
             company_id: data.company_id,
             onboarding_completed: data.onboarding_completed,
-            onboarding_step: data.onboarding_step as "CHOOSING_COMPANY" | "FINISH"
+            onboarding_step: data.onboarding_step as IOnboardingStep
           },
           isAuthenticated: true,
         });
@@ -62,11 +61,6 @@ export const useAuthStore = create<IAuthState & IAuthActions>()(
         });
         deleteCookie("auth-storage");
       },
-
-      updateUser: (userData: Partial<IUser>) =>
-        set((state) => ({
-          user: state.user ? { ...state.user, ...userData } : null,
-        })),
     }),
     {
       name: "auth-storage",
