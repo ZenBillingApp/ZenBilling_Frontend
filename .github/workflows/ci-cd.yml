@@ -48,22 +48,6 @@ jobs:
               with:
                   ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-            - name: Create docker-compose.yml with environment variables
-              run: |
-                cat > docker-compose.yml << 'EOL'
-                version: '3'
-                services:
-                  zenbilling_frontend:
-                    image: hvssvn78/zenbilling:latest
-                    container_name: zenbilling_frontend
-                    restart: always
-                    ports:
-                      - "3000:3000"
-                    environment:
-                      - NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
-                      - JWT_SECRET=${{ secrets.JWT_SECRET }}
-                EOL
-
             - name: Transfer docker-compose.yml to server
               run: |
                   scp -o StrictHostKeyChecking=no docker-compose.yml ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/zenbilling/zenbilling_frontend/docker-compose.yml
