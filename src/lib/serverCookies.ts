@@ -2,32 +2,7 @@
 
 import { cookies } from 'next/headers';
 import type { ResponseCookie } from 'next/dist/compiled/@edge-runtime/cookies';
-import * as jose from 'jose';
-
-// Secret pour le chiffrement JWT (à remplacer par une variable d'environnement)
-const JWT_SECRET = process.env.JWT_SECRET || 'votre_clé_secrète_à_changer_en_production';
-const secretEncoder = new TextEncoder().encode(JWT_SECRET);
-
-
-const encryptData = async (data: Record<string, unknown>) => {
-  return await new jose.SignJWT(data)
-    .setProtectedHeader({ alg: 'HS256' })
-    .sign(secretEncoder);
-}
-
-const decryptData = async (token: string) => {
-  try {
-    const { payload } = await jose.jwtVerify(token, secretEncoder);
-    return payload;
-  } catch (error) {
-    console.error('Erreur lors du déchiffrement du token:', error);
-    throw error;
-  }
-}
-
-/**
- * Utilitaire pour gérer les cookies côté serveur via server actions
- */
+import { encryptData, decryptData } from './encryption';
 
 // Options standard pour les cookies
 export type CookieOptions = Omit<ResponseCookie, 'name' | 'value'>;
