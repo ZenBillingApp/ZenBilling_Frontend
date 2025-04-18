@@ -11,7 +11,7 @@ export const useUser = () => {
         queryFn: async () => {
             const response = await api.get<IApiSuccessResponse<IUser>>("/users/profile");
             if (response.data) {
-                setUser(response.data);
+                await setUser(response.data);
             }
             return response.data;
         },

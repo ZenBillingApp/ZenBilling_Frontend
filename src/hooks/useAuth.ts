@@ -18,8 +18,8 @@ export const useLogin = () => {
   return useMutation({
     mutationFn: (credentials: ILoginRequest) => api.post<IApiSuccessResponse<IAuthResponse>>('/users/login', credentials),
     onSuccess: async (data: IApiSuccessResponse<IAuthResponse>) => {
-      setAuth(data.data?.user as IUser);
-      router.push('/dashboard');
+      await setAuth(data.data?.user as IUser);
+      router.replace('/dashboard');
     },
     onError: (error: AxiosError<IApiErrorResponse>) => {
       toast({
@@ -40,9 +40,8 @@ export const useLogout = () => {
   return useMutation({
     mutationFn: () => api.post('/users/logout'),
     onSuccess: async () => {
-      // await deleteAuthCookies();
-      clearAuth();
-      queryClient.clear();
+      await clearAuth();
+      await queryClient.clear();
       router.replace('/login');
     }
   });
@@ -77,11 +76,11 @@ export const useRegister = () => {
 export const useOnboardingFinish = () => {
   const { toast } = useToast();
   const router = useRouter();
-  const updateUser = useAuthStore((state) => state.updateUser);
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: () => api.post<IApiSuccessResponse<void>>('/users/onboarding-finish'),
     onSuccess: async () => {
-      await updateUser({ onboarding_completed: true, onboarding_step: "FINISH" });
+      await queryClient.invalidateQueries({ queryKey: ['user'] });
       router.replace('/dashboard');
     },
     onError: (error: AxiosError<IApiErrorResponse>) => {

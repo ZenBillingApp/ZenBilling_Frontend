@@ -14,12 +14,12 @@ import { api } from "@/lib/api";
 export const useCreateCompany = () => {
     const { toast } = useToast();
     const router = useRouter();
-    const updateUser = useAuthStore((state) => state.updateUser);
+    const queryClient = useQueryClient();
     return useMutation<IApiSuccessResponse<ICompany>, AxiosError<IApiErrorResponse>, ICreateCompanyRequest>({
         mutationFn: (data: ICreateCompanyRequest) => api.post("/companies", data),
-        onSuccess: () => {
-            updateUser({ onboarding_completed: false, onboarding_step: "FINISH" });
-            router.push("/onboarding/finish");
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: ["user"] });
+            router.replace("/onboarding/finish");
         },
         onError: (error: AxiosError<IApiErrorResponse>) => {
             if (error.response?.data.message) {

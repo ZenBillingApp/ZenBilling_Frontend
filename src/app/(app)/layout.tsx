@@ -2,7 +2,11 @@
 
 import { useUser } from "@/hooks/useUser"
 export default function DashboardLayout({children}: {children: React.ReactNode}) {
-  useUser()
-    return <>{children}</>
+  const { data: user } = useUser()
+  
+  if (!user) {
+    return <div>Loading...</div>
+  }
+  return <>{children}</>
 }
 

@@ -42,7 +42,7 @@ axiosInstance.interceptors.response.use(
           message = 'Session expirée. Veuillez vous reconnecter.';
           console.error('Session expirée');
           // Rediriger vers la page de connexion
-          clearAuth();
+          await clearAuth();
           if (window.location.pathname !== '/login') {
             window.location.href = '/login';
           }
