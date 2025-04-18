@@ -52,6 +52,10 @@ jobs:
               run: |
                   scp -o StrictHostKeyChecking=no docker-compose.yml ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/zenbilling/zenbilling_frontend/docker-compose.yml
 
+            - name: Create environment variables on server
+              run: |
+                  ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "mkdir -p /zenbilling/zenbilling_frontend && echo 'NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}' > /zenbilling/zenbilling_frontend/.env && echo 'JWT_SECRET=${{ secrets.JWT_SECRET }}' >> /zenbilling/zenbilling_frontend/.env"
+
             - name: Deploy with Docker Compose
               run: |
                   ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd /zenbilling/zenbilling_frontend && docker compose down && docker compose pull && docker compose up -d"
