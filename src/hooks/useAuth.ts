@@ -80,8 +80,8 @@ export const useOnboardingFinish = () => {
   const updateUser = useAuthStore((state) => state.updateUser);
   return useMutation({
     mutationFn: () => api.post<IApiSuccessResponse<void>>('/users/onboarding-finish'),
-    onSuccess: () => {
-      updateUser({ onboarding_completed: true, onboarding_step: "FINISH" });
+    onSuccess: async () => {
+      await updateUser({ onboarding_completed: true, onboarding_step: "FINISH" });
       router.replace('/dashboard');
     },
     onError: (error: AxiosError<IApiErrorResponse>) => {
