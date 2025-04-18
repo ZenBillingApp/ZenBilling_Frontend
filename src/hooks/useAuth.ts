@@ -1,40 +1,25 @@
 "use client"
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
-import { useAuthStore } from '@/stores/authStores';
 import { useRouter } from 'next/navigation';
 import { ILoginRequest, IRegisterRequest, IAuthResponse } from '@/types/Auth.interface';
-import { IUser } from '@/types/User.interface';
 import { AxiosError } from 'axios';
 import { IApiErrorResponse, IApiSuccessResponse } from '@/types/api.types';
 import { useToast } from '@/hooks/use-toast';
+import { useAuthStore } from '@/stores/authStores';
+import { IUser } from '@/types/User.interface';
 
 // Hook de connexion
 export const useLogin = () => {
-  const setAuth = useAuthStore((state) => state.setAuth);
   const router = useRouter();
   const { toast } = useToast();
+  const setAuth = useAuthStore((state) => state.setAuth);
   return useMutation({
     mutationFn: (credentials: ILoginRequest) => api.post<IApiSuccessResponse<IAuthResponse>>('/users/login', credentials),
     onSuccess: async (data: IApiSuccessResponse<IAuthResponse>) => {
-      setAuth(data.data as IAuthResponse)
-      
-      // Vérifier si l'utilisateur a terminé l'onboarding
-      if (data?.data?.user?.onboarding_completed) {
-        router.push('/dashboard');
-      } else {
-        // Rediriger vers l'étape d'onboarding appropriée
-        const onboardingStep = data?.data?.user?.onboarding_step;
-        if (onboardingStep === 'CHOOSING_COMPANY') {
-          router.push('/onboarding/company');
-        } else if (onboardingStep === 'FINISH') {
-          router.push('/onboarding/finish');
-        } else {
-          // Par défaut, rediriger vers la première étape
-          router.push('/onboarding/company');
-        }
-      }
+      setAuth(data.data?.user as IUser);
+      router.push('/dashboard');
     },
     onError: (error: AxiosError<IApiErrorResponse>) => {
       toast({
@@ -89,22 +74,14 @@ export const useRegister = () => {
 
 };
 
-export const useProfile = () => {
-  return useQuery<IApiSuccessResponse<IUser>>({
-    queryKey: ['user'],
-    queryFn: () => api.get<IApiSuccessResponse<IUser>>('/users/profile'),
-  });
-};
-
-
 export const useOnboardingFinish = () => {
   const { toast } = useToast();
   const router = useRouter();
-  const queryClient = useQueryClient();
+  const updateUser = useAuthStore((state) => state.updateUser);
   return useMutation({
     mutationFn: () => api.post<IApiSuccessResponse<void>>('/users/onboarding-finish'),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['user'] });
+      updateUser({ onboarding_completed: true, onboarding_step: "FINISH" });
       router.replace('/dashboard');
     },
     onError: (error: AxiosError<IApiErrorResponse>) => {

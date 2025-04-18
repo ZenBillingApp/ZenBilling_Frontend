@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
 import { ICreateCompanyRequest, IUpdateCompanyRequest } from "@/types/Company.request.interface";
-import { ICompany, ILegalForm } from "@/types/Company.interface";
+import { ICompany, ICompanyLegalForm } from "@/types/Company.interface";
 import { AxiosError } from "axios";
 import type { IApiErrorResponse, IApiSuccessResponse } from "@/types/api.types";
 
@@ -14,9 +14,11 @@ import { api } from "@/lib/api";
 export const useCreateCompany = () => {
     const { toast } = useToast();
     const router = useRouter();
+    const updateUser = useAuthStore((state) => state.updateUser);
     return useMutation<IApiSuccessResponse<ICompany>, AxiosError<IApiErrorResponse>, ICreateCompanyRequest>({
         mutationFn: (data: ICreateCompanyRequest) => api.post("/companies", data),
         onSuccess: () => {
+            updateUser({ onboarding_completed: false, onboarding_step: "FINISH" });
             router.push("/onboarding/finish");
         },
         onError: (error: AxiosError<IApiErrorResponse>) => {
@@ -68,8 +70,8 @@ export const useUpdateCompany = () => {
 }
 
 export const useLegalForm = () => {
-    return useQuery<IApiSuccessResponse<ILegalForm>>({
+    return useQuery<IApiSuccessResponse<ICompanyLegalForm>>({
         queryKey: ["legalForm"],
-        queryFn: () => api.get<IApiSuccessResponse<ILegalForm>>("/companies/legal-forms"),
+        queryFn: () => api.get<IApiSuccessResponse<ICompanyLegalForm>>("/companies/legal-forms"),
     });
 }

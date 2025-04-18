@@ -1,4 +1,4 @@
-import { ICompanyLegalForm } from "./Company.interface";
+import { LegalForm } from "./Company.interface";
 
 export interface ICreateCompanyRequest {
   company_id?: string;
@@ -10,7 +10,7 @@ export interface ICreateCompanyRequest {
   RCS_city: string;
   capital?: number;
   siren: string;
-  legal_form: ICompanyLegalForm;
+  legal_form: LegalForm;
   // Informations d'adresse
   address: string;
   postal_code: string;

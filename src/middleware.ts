@@ -1,9 +1,15 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-
+import { IOnboardingStep } from '@/types/User.interface'
 
 // Routes publiques qui ne nécessitent pas d'authentification
 const PUBLIC_ROUTES = ['/login', '/register']
+const ONBOARDING_ROUTES = ['/onboarding/company', '/onboarding/finish']
+
+const ONBOARDING_STEPS: Record<IOnboardingStep, string> = {
+  CHOOSING_COMPANY: "/onboarding/company",
+  FINISH: "/onboarding/finish",
+} as const;
 
 /**
  * Fonction utilitaire pour les redirections
@@ -13,25 +19,63 @@ function redirectTo(request: NextRequest, path: string): NextResponse {
 }
 
 /**
+ * Fonction utilitaire pour parser les données utilisateur de manière sécurisée
+ */
+function parseUserData(cookieValue: string | undefined) {
+  try {
+    return cookieValue ? JSON.parse(cookieValue) : {};
+  } catch (error) {
+    console.error('Erreur lors du parsing des données utilisateur:', error);
+    return {};
+  }
+}
+
+/**
  * Middleware principal pour la gestion de l'authentification
  */
 export default async function middleware(request: NextRequest) {
   const hasRefreshToken = request.cookies.has('refresh_token');
+  const hasAccessToken = request.cookies.has('access_token');
   const isPublicRoute = PUBLIC_ROUTES.some(route => request.nextUrl.pathname.startsWith(route));
+  const isOnboardingRoute = ONBOARDING_ROUTES.some(route => request.nextUrl.pathname.startsWith(route));
+  
+  const userCookie = request.cookies.get('auth-storage')?.value;
+  const userData = parseUserData(userCookie);
+  const { onboarding_completed, onboarding_step } = userData.state?.user || {};
 
-  // Si l'utilisateur est sur une route publique et a un token, rediriger vers /invoices
-  if (isPublicRoute && hasRefreshToken) {
-    return redirectTo(request, '/dashboard');
-  }
-
-  // Si l'utilisateur n'est pas sur une route publique et n'a pas de token, rediriger vers login
-  if (!isPublicRoute && !hasRefreshToken) {
+  // Redirection vers login si non authentifié
+  if (!isPublicRoute && (!hasRefreshToken && !hasAccessToken)) {
     const loginUrl = new URL('/login', request.url);
     loginUrl.searchParams.set('from', request.nextUrl.pathname);
-    return redirectTo(request, loginUrl.toString());
+    const response = redirectTo(request, loginUrl.toString());
+    response.cookies.delete('auth-storage');
+    return response;
   }
 
-  // Dans tous les autres cas, continuer normalement
+  // Gestion de l'onboarding
+  if (hasRefreshToken && userData.state?.user) {
+    // Redirection vers le dashboard si l'onboarding est complété et l'utilisateur est sur une route publique
+    if (isPublicRoute && onboarding_completed) {
+      return redirectTo(request, '/dashboard');
+    }
+
+    // Redirection vers l'étape appropriée de l'onboarding
+    if (!onboarding_completed) {
+      const nextStep = onboarding_step && ONBOARDING_STEPS[onboarding_step as IOnboardingStep] 
+        ? ONBOARDING_STEPS[onboarding_step as IOnboardingStep] 
+        : ONBOARDING_STEPS.CHOOSING_COMPANY;
+
+      if (!isOnboardingRoute || request.nextUrl.pathname !== nextStep) {
+        return redirectTo(request, nextStep);
+      }
+    }
+
+    // Redirection vers le dashboard si l'onboarding est complété
+    if (onboarding_completed && isOnboardingRoute) {
+      return redirectTo(request, '/dashboard');
+    }
+  }
+
   return NextResponse.next();
 }
 

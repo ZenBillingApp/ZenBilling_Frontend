@@ -2,8 +2,8 @@ import { IUser } from '@/types/User.interface';
 
 export type LegalForm = 'SAS' | 'SARL' | 'EURL' | 'SASU' | 'SA' | 'SNC' | 'SOCIETE_CIVILE' | 'ENTREPRISE_INDIVIDUELLE';
 
-export interface ILegalForm {
-  legalForms: LegalForm[];
+export interface ICompanyLegalForm {
+  legalForms: LegalForm [];
 }
 
 

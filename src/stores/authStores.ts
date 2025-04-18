@@ -1,7 +1,14 @@
+"use client"
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
-import type { IAuthResponse } from "@/types/Auth.interface";
+import { persist, createJSONStorage } from "zustand/middleware";
 import type { IUser } from "@/types/User.interface";
+import {
+  getCookie,
+  setCookie,
+  deleteCookie,
+} from 'cookies-next/client';
+
+
 
 interface IAuthState {
   user: Partial<IUser> | null;
@@ -9,11 +16,22 @@ interface IAuthState {
 }
 
 interface IAuthActions {
-  setAuth: (data: IAuthResponse) => void;
+  setAuth: (data: IUser) => void;
   clearAuth: () => void;
   updateUser: (user: Partial<IUser>) => void;
 }
-
+const cookieStorage = createJSONStorage(() => ({
+  getItem: async (name): Promise<string | null> => {
+    const value = getCookie(name, { path: "/", sameSite: "strict", secure: true, maxAge: 60 * 60 });
+    return value ?? null;
+  },
+  setItem: async (name, value) => {
+    setCookie(name, value, { path: "/", sameSite: "strict", secure: true, maxAge: 60 * 60 });
+  },
+  removeItem: async (name) => {
+      deleteCookie(name, { path: "/", sameSite: "strict", secure: true, maxAge: 60 * 60 });
+  },
+}));
 export const useAuthStore = create<IAuthState & IAuthActions>()(
   persist(
     (set) => ({
@@ -22,16 +40,16 @@ export const useAuthStore = create<IAuthState & IAuthActions>()(
       isAuthenticated: false,
 
       // Actions
-      setAuth: (data: IAuthResponse) => {
+      setAuth: (data: IUser) => {
         set({
           user: {
-            user_id: data.user.user_id,
-            email: data.user.email,
-            first_name: data.user.first_name,
-            last_name: data.user.last_name,
-            company_id: data.user.company_id,
-            onboarding_completed: data.user.onboarding_completed,
-            onboarding_step: data.user.onboarding_step as "CHOOSING_COMPANY" | "FINISH"
+            user_id: data.user_id,
+            email: data.email,
+            first_name: data.first_name,
+            last_name: data.last_name,
+            company_id: data.company_id,
+            onboarding_completed: data.onboarding_completed,
+            onboarding_step: data.onboarding_step as "CHOOSING_COMPANY" | "FINISH"
           },
           isAuthenticated: true,
         });
@@ -42,6 +60,7 @@ export const useAuthStore = create<IAuthState & IAuthActions>()(
           user: null,
           isAuthenticated: false,
         });
+        deleteCookie("auth-storage");
       },
 
       updateUser: (userData: Partial<IUser>) =>
@@ -55,6 +74,7 @@ export const useAuthStore = create<IAuthState & IAuthActions>()(
         user: state.user,
         isAuthenticated: state.isAuthenticated,
       }),
+      storage: cookieStorage,
     }
   )
 );

@@ -1,6 +1,7 @@
 "use client"
 import axios, { AxiosInstance, AxiosError, AxiosRequestConfig } from 'axios';
 import { toast } from '@/hooks/use-toast';
+import { useAuthStore } from '@/stores/authStores';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
 
@@ -32,6 +33,7 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
     let message = 'Une erreur est survenue';
+    const clearAuth = useAuthStore.getState().clearAuth;
     
     if (error.response) {
       // La requête a été faite et le serveur a répondu avec un code d'erreur
@@ -40,6 +42,7 @@ axiosInstance.interceptors.response.use(
           message = 'Session expirée. Veuillez vous reconnecter.';
           console.error('Session expirée');
           // Rediriger vers la page de connexion
+          clearAuth();
           if (window.location.pathname !== '/login') {
             window.location.href = '/login';
           }

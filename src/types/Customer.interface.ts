@@ -1,6 +1,8 @@
 import { IBusinessCustomer } from './BusinessCustomer.interface';
 import { IIndividualCustomer } from './IndividualCustomer.interface';
 import { IPagination } from './pagination.interface';
+
+
 export interface ICustomer {
   customer_id?: string;
   user_id: string;
