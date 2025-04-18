@@ -21,14 +21,14 @@ interface IAuthActions {
   updateUser: (user: Partial<IUser>) => void;
 }
 const cookieStorage = createJSONStorage(() => ({
-  getItem: (name): string | null => {
+  getItem: async (name): Promise<string | null> => {
     const value = getCookie(name, { path: "/", sameSite: "strict", secure: true, maxAge: 60 * 60 });
     return value ?? null;
   },
-  setItem: (name, value) => {
+  setItem: async (name, value) => {
     setCookie(name, value, { path: "/", sameSite: "strict", secure: true, maxAge: 60 * 60 });
   },
-  removeItem: (name) => {
+  removeItem: async (name) => {
       deleteCookie(name, { path: "/", sameSite: "strict", secure: true, maxAge: 60 * 60 });
   },
 }));
