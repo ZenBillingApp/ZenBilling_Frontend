@@ -28,6 +28,9 @@ jobs:
                   file: ./Dockerfile
                   push: true
                   tags: hvssvn78/zenbilling:latest
+                  build-args: |
+                    NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
+                    JWT_SECRET=${{ secrets.JWT_SECRET }}
 
             - name: Clean up dangling Docker images
               run: |
@@ -44,6 +47,22 @@ jobs:
               uses: webfactory/ssh-agent@v0.8.0
               with:
                   ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+            - name: Create docker-compose.yml with environment variables
+              run: |
+                cat > docker-compose.yml << 'EOL'
+                version: '3'
+                services:
+                  zenbilling_frontend:
+                    image: hvssvn78/zenbilling:latest
+                    container_name: zenbilling_frontend
+                    restart: always
+                    ports:
+                      - "3000:3000"
+                    environment:
+                      - NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
+                      - JWT_SECRET=${{ secrets.JWT_SECRET }}
+                EOL
 
             - name: Transfer docker-compose.yml to server
               run: |

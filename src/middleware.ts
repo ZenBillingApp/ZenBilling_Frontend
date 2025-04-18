@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { IOnboardingStep } from '@/types/User.interface'
+import { getCookie } from '@/lib/serverCookies'
 
 // Routes publiques qui ne nécessitent pas d'authentification
 const PUBLIC_ROUTES = ['/login', '/register']
@@ -39,7 +40,7 @@ export default async function middleware(request: NextRequest) {
   const isPublicRoute = PUBLIC_ROUTES.some(route => request.nextUrl.pathname.startsWith(route));
   const isOnboardingRoute = ONBOARDING_ROUTES.some(route => request.nextUrl.pathname.startsWith(route));
   
-  const userCookie = request.cookies.get('auth-storage')?.value;
+  const userCookie = await getCookie('auth-storage');
   const userData = parseUserData(userCookie);
   const { onboarding_completed, onboarding_step } = userData.state?.user || {};
 
