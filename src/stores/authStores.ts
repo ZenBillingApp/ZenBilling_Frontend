@@ -2,11 +2,8 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import type { IUser,IOnboardingStep } from "@/types/User.interface";
-import {
-  getCookie,
-  setCookie,
-  deleteCookie,
-} from 'cookies-next/client';
+
+import { getCookie, setCookie, deleteCookie } from '@/lib/serverCookies';
 
 
 
@@ -21,14 +18,14 @@ interface IAuthActions {
 }
 const cookieStorage = createJSONStorage(() => ({
   getItem: async (name): Promise<string | null> => {
-    const value = getCookie(name, { path: "/", sameSite: "strict", secure: true, maxAge: 60 * 60 });
+    const value = await getCookie(name);
     return value ?? null;
   },
   setItem: async (name, value) => {
     setCookie(name, value, { path: "/", sameSite: "strict", secure: true, maxAge: 60 * 60 });
   },
   removeItem: async (name) => {
-      deleteCookie(name, { path: "/", sameSite: "strict", secure: true, maxAge: 60 * 60 });
+      deleteCookie(name);
   },
 }));
 export const useAuthStore = create<IAuthState & IAuthActions>()(
@@ -55,10 +52,7 @@ export const useAuthStore = create<IAuthState & IAuthActions>()(
       },
 
       clearAuth: () => {
-        set({
-          user: null,
-          isAuthenticated: false,
-        });
+
         deleteCookie("auth-storage");
       },
     }),
