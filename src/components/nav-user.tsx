@@ -3,6 +3,7 @@
 import {
   ChevronsUpDown,
   LogOut,
+  User
 } from "lucide-react"
 
 import { useAuthStore } from "@/stores/authStores"
@@ -20,6 +21,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuGroup,
 } from "@/components/ui/dropdown-menu"
 import {
   SidebarMenu,
@@ -27,11 +29,12 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-
+import { useRouter } from "next/navigation"
 export function NavUser() {
   const { isMobile } = useSidebar()
   const { user } = useAuthStore()
   const logout = useLogout()
+  const router = useRouter()
 
   return (
     <SidebarMenu>
@@ -85,20 +88,20 @@ export function NavUser() {
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator /> */}
-            {/* <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <BadgeCheck />
-                Account
+            <DropdownMenuGroup>
+              <DropdownMenuItem onClick={() => router.push("/profile")}>
+                <User />
+                Profil
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              {/* <DropdownMenuItem>
                 <CreditCard />
                 Billing
               </DropdownMenuItem>
-              {/* <DropdownMenuItem>
+                <DropdownMenuItem>
                 <Bell />
                 Notifications
-              </DropdownMenuItem> 
-            </DropdownMenuGroup> */}
+              </DropdownMenuItem>  */}
+            </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => logout.mutate()}>
               <LogOut />

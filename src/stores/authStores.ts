@@ -14,6 +14,7 @@ interface IAuthState {
 
 interface IAuthActions {
   setAuth: (data: IUser) => void;
+  updateUser: (data: IUser) => void;
   clearAuth: () => void;
 }
 const cookieStorage = createJSONStorage(() => ({
@@ -50,9 +51,20 @@ export const useAuthStore = create<IAuthState & IAuthActions>()(
           isAuthenticated: true,
         });
       },
+      updateUser: (data: Partial<IUser>) => {
+        set((state) => ({
+          user: {
+            ...state.user,
+            ...data,
+          },
+        }));
+      },
 
       clearAuth: () => {
-
+        set({
+          user: null,
+          isAuthenticated: false,
+        });
         deleteCookie("auth-storage");
       },
     }),

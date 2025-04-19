@@ -16,7 +16,7 @@ export interface IUser {
 export interface IUpdateUserRequest {
   first_name?: string;
   last_name?: string;
-  email?: string;
+  // email?: string;
 }
 
 export interface IUserResponse {
