@@ -21,6 +21,8 @@ export interface IQuote {
   // Relations
   customer?: ICustomer;
   items?: IQuoteItem[];
+  createdAt: Date;
+  updatedAt: Date;
 } 
 
 export interface IQuotePagination {

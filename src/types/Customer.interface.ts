@@ -14,8 +14,8 @@ export interface ICustomer {
   city: string | null;
   postal_code: string | null;
   country: string;
-  created_at: string;
-  updated_at: string;
+  createdAt: Date;
+  updatedAt: Date;
   business?: IBusinessCustomer;
   individual?: IIndividualCustomer;
 } 

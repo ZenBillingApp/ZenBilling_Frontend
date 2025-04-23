@@ -28,4 +28,6 @@ export interface ICompany {
   phone: string;
   website?: string;
   users?: IUser[];
+  createdAt: Date;
+  updatedAt: Date;
 } 

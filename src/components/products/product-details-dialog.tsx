@@ -114,9 +114,9 @@ export function ProductDetailsDialog({
                         Créé le
                       </span>
                       <span className="font-medium">
-                        {displayProduct?.created_at
+                        {displayProduct?.createdAt
                           ? new Date(
-                              displayProduct.created_at
+                              displayProduct.createdAt
                             ).toLocaleDateString()
                           : "N/A"}
                       </span>
@@ -127,9 +127,9 @@ export function ProductDetailsDialog({
                         Dernière modification
                       </span>
                       <span className="font-medium">
-                        {displayProduct?.updated_at
+                        {displayProduct?.updatedAt
                           ? new Date(
-                              displayProduct.updated_at
+                              displayProduct.updatedAt
                             ).toLocaleDateString()
                           : "N/A"}
                       </span>

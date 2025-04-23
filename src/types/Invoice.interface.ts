@@ -25,6 +25,8 @@ export interface IInvoice {
   items?: IInvoiceItem[];
   payments?: IPayment[];
   company?: ICompany;
+  createdAt: Date;
+  updatedAt: Date;
 } 
 
 

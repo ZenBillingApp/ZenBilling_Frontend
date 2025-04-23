@@ -1,9 +1,24 @@
 "use client"
 import axios, { AxiosInstance, AxiosError, AxiosRequestConfig } from 'axios';
 import { toast } from '@/hooks/use-toast';
+import { authClient } from '@/lib/auth-client';
 import { useAuthStore } from '@/stores/authStores';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
+
+// Fonction de déconnexion pour l'intercepteur
+const logoutAndRedirect = async () => {
+  const clearAuth = useAuthStore.getState().clearAuth;
+  
+  await authClient.signOut({
+    fetchOptions: {
+      onSuccess: async () => {
+        await clearAuth();
+        window.location.href = '/login';
+      },
+    },
+  });
+};
 
 // Création de l'instance Axios
 const axiosInstance: AxiosInstance = axios.create({
@@ -33,7 +48,6 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
     let message = 'Une erreur est survenue';
-    const clearAuth = useAuthStore.getState().clearAuth;
     
     if (error.response) {
       // La requête a été faite et le serveur a répondu avec un code d'erreur
@@ -42,10 +56,7 @@ axiosInstance.interceptors.response.use(
           message = 'Session expirée. Veuillez vous reconnecter.';
           console.error('Session expirée');
           // Rediriger vers la page de connexion
-          await clearAuth();
-          if (window.location.pathname !== '/login') {
-            window.location.href = '/login';
-          }
+          await logoutAndRedirect();
           break;
         case 403:
           message = 'Accès interdit. Vous n\'avez pas les droits nécessaires.';

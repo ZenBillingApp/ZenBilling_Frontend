@@ -2,16 +2,16 @@
 
 import { LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useLogout } from "@/hooks/useAuth"
+import { useLogout } from "@/hooks/use-logout"
 
 export function LogoutButton() {
-  const logout = useLogout()
-
+  const { logout } = useLogout()
+  
   return (
     <Button
       variant="ghost"
       size="icon"
-      onClick={() => logout.mutate()}
+      onClick={() => logout()}
       className="h-8 w-8"
     >
       <LogOut className="h-4 w-4" />

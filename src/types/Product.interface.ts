@@ -42,8 +42,8 @@ export interface IProduct {
   price_excluding_tax: number;
   vat_rate: VatRate;
   unit: ProductUnit;
-  created_at: string;
-  updated_at: string;
+  createdAt: Date;
+  updatedAt: Date;
 } 
 
 export interface IProductPagination {

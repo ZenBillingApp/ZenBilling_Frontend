@@ -6,14 +6,13 @@ import Image from "next/image";
 
 import { ILoginRequest } from "@/types/Auth.interface";
 
-import { useLogin } from "@/hooks/useAuth";
+import { authClient,getErrorMessageFR } from "@/lib/auth-client";
 
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-
+import { useToast } from "@/hooks/use-toast";
 import logo from "@/assets/logo.png";
-
 
 const loginSchema = z.object({
     email: z.string().email("email invalide").min(1, "email est requis"),
@@ -23,14 +22,28 @@ const loginSchema = z.object({
 
 
 export function LoginForm() {
-    const handleLogin = useLogin();
+    const { toast } = useToast(); 
 
     const { register, handleSubmit, formState: { errors } } = useForm<ILoginRequest>({
         resolver: zodResolver(loginSchema),
     });
 
-    const onSubmit = (data: ILoginRequest) => {
-       handleLogin.mutate(data);
+    const onSubmit = async (data: ILoginRequest) => {
+       const{ error } = await authClient.signIn.email({
+        email: data.email,
+        password: data.password,
+        callbackURL: '/dashboard'
+        
+       })
+
+       if(error?.code){
+        toast({
+            title: "Erreur de connexion",
+            description: getErrorMessageFR(error.code),
+            variant: "destructive"
+        })
+       }
+
     }
 
     return (
@@ -70,7 +83,7 @@ export function LoginForm() {
                     {errors.password && <p className="text-red-500 text-xs italic">{errors.password.message}</p>}
                 </div>
                
-                <Button type="submit" disabled={handleLogin.isPending}>{handleLogin.isPending ? "Connexion en cours..." : "Connexion"}</Button>
+                <Button type="submit">Connexion</Button>
             </div>
         </form>
     )

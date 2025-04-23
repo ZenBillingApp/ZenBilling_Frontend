@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
+import { NextResponse, NextRequest } from 'next/server'
+import { getSessionCookie } from "better-auth/cookies";
 import { IOnboardingStep } from '@/types/User.interface'
 import { getCookie } from '@/lib/serverCookies'
 
@@ -35,17 +35,17 @@ function parseUserData(cookieValue: string | undefined) {
  * Middleware principal pour la gestion de l'authentification
  */
 export default async function middleware(request: NextRequest) {
-  const hasRefreshToken = request.cookies.has('refresh_token');
-  const hasAccessToken = request.cookies.has('access_token');
+  const sessionCookie = getSessionCookie(request);
   const isPublicRoute = PUBLIC_ROUTES.some(route => request.nextUrl.pathname.startsWith(route));
   const isOnboardingRoute = ONBOARDING_ROUTES.some(route => request.nextUrl.pathname.startsWith(route));
   
   const userCookie = await getCookie('auth-storage');
   const userData = parseUserData(userCookie);
+  const userExists = userData.state?.user !== undefined && userData.state?.user !== null;
   const { onboarding_completed, onboarding_step } = userData.state?.user || {};
 
   // Redirection vers login si non authentifié
-  if (!isPublicRoute && (!hasRefreshToken && !hasAccessToken)) {
+  if (!isPublicRoute && !sessionCookie) {
     const loginUrl = new URL('/login', request.url);
     loginUrl.searchParams.set('from', request.nextUrl.pathname);
     const response = redirectTo(request, loginUrl.toString());
@@ -53,8 +53,8 @@ export default async function middleware(request: NextRequest) {
     return response;
   }
 
-  // Gestion de l'onboarding
-  if (hasRefreshToken && userData.state?.user) {
+  // Gestion de l'onboarding (seulement si les données utilisateur sont disponibles)
+  if (sessionCookie && userExists) {
     // Redirection vers le dashboard si l'onboarding est complété et l'utilisateur est sur une route publique
     if (isPublicRoute && onboarding_completed) {
       return redirectTo(request, '/dashboard');
@@ -91,8 +91,8 @@ export const config = {
     '/products/:path*',
     '/customers/:path*',
     '/quotes/:path*',
+    '/onboarding/:path*',
     '/login',
-    '/register',
-    '/onboarding/:path*'
+    '/register'
   ]
 }

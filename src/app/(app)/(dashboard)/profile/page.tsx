@@ -229,7 +229,7 @@ export default function ProfilePage() {
         {!isEditing && (
           <CardFooter className="bg-muted/10 pt-4">
             <div className="text-sm text-muted-foreground">
-              <p>Dernière mise à jour: {new Date(user?.updated_at || "").toLocaleDateString("fr-FR", {
+              <p>Dernière mise à jour: {new Date(user?.updatedAt || "").toLocaleDateString("fr-FR", {
                 day: "numeric",
                 month: "long",
                 year: "numeric",

@@ -170,14 +170,6 @@ export default function CustomerDetailsPage() {
     );
   }
   
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("fr-FR", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    });
-  };
-
   const invoiceColumns: Column<IInvoice>[] = [
     {
       header: "N° Facture",
@@ -380,7 +372,7 @@ export default function CustomerDetailsPage() {
             <div className="flex items-center space-x-2 mt-1">
               <span className="text-sm text-muted-foreground flex items-center">
                 <Calendar className="w-3 h-3 mr-1" />
-                Créé le {formatDate(customer.created_at)}
+                Créé le {new Date(customer.createdAt).toLocaleDateString()}
               </span>
             </div>
           </div>
@@ -577,14 +569,14 @@ export default function CustomerDetailsPage() {
                   <Calendar className="h-4 w-4 text-muted-foreground" />
                   <div>
                     <p className="text-sm text-muted-foreground">Créé le</p>
-                    <p className="font-medium">{formatDate(customer.created_at)}</p>
+                    <p className="font-medium">{new Date(customer.createdAt).toLocaleDateString()}</p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-2 p-2 rounded-md hover:bg-muted/50 transition-colors">
                   <Calendar className="h-4 w-4 text-muted-foreground" />
                   <div>
                     <p className="text-sm text-muted-foreground">Dernière modification</p>
-                    <p className="font-medium">{formatDate(customer.updated_at)}</p>
+                    <p className="font-medium">{new Date(customer.updatedAt).toLocaleDateString()}</p>
                   </div>
                 </div>
               </CardContent>

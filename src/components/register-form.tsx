@@ -5,15 +5,13 @@ import { z } from "zod";
 import Image from "next/image";
 import { IRegisterRequest } from "@/types/Auth.interface";
 
-import { useRegister } from "@/hooks/useAuth";
+import { authClient, getErrorMessageFR } from "@/lib/auth-client";
 
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-
-import { AlertCircle } from "lucide-react";
-
+import { useToast } from "@/hooks/use-toast";
+import { redirect } from "next/navigation";
 import logo from "@/assets/logo.png";
 
 const registerSchema = z.object({
@@ -26,14 +24,36 @@ const registerSchema = z.object({
 
 
 export function RegisterForm() {
-    const handleRegister = useRegister();
-
+    const { toast } = useToast();
     const { register, handleSubmit, formState: { errors } } = useForm<IRegisterRequest>({
         resolver: zodResolver(registerSchema),
     });
 
-    const onSubmit = (data: IRegisterRequest) => {
-        handleRegister.mutate(data);
+    const onSubmit = async (data: IRegisterRequest) => {
+        const { error } = await authClient.signUp.email({
+          email: data.email,
+          password: data.password,
+          first_name: data.first_name,
+          last_name: data.last_name,
+          name: `${data.first_name} ${data.last_name}`,
+          
+        },{
+          onSuccess: () => {
+            toast({
+              title: "Compte créé avec succès",
+              description: "Votre compte a été créé avec succès",
+              
+            })
+            redirect('/dashboard')
+          }
+        })
+        if(error?.code){
+            toast({
+                title: "Erreur de création de compte",
+                description: getErrorMessageFR(error.code),
+                variant: "destructive"
+            })
+    }
     }
 
     return (
@@ -61,7 +81,7 @@ export function RegisterForm() {
               </a>
             </div>
           </div>
-          {handleRegister.error && handleRegister.error.response?.data.errors && (
+          {/* {handleRegister.error && handleRegister.error.response?.data.errors && (
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
               <AlertTitle>Une erreur est survenue lors de la création du compte</AlertTitle>
@@ -73,7 +93,7 @@ export function RegisterForm() {
                 </ul>
               </AlertDescription>
             </Alert>
-          )}
+          )} */}
                 <div className="flex gap-2">
                     <div className="flex flex-col w-1/2 items-start gap-2">
                         <Label htmlFor="first_name">Prénom</Label>
@@ -97,7 +117,7 @@ export function RegisterForm() {
                     {errors.password && <p className="text-red-500 text-xs italic">{errors.password.message}</p>}
                 </div>
                
-                <Button type="submit" disabled={handleRegister.isPending}>{handleRegister.isPending ? "Création en cours..." : "S'inscrire"}</Button>
+                <Button type="submit">S&apos;inscrire</Button>
             </div>
         </form>
     )

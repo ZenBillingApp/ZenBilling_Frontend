@@ -7,7 +7,7 @@ import {
 } from "lucide-react"
 
 import { useAuthStore } from "@/stores/authStores"
-import { useLogout } from "@/hooks/useAuth"
+import { useLogout } from "@/hooks/use-logout"
 
 import {
   Avatar,
@@ -30,11 +30,12 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { useRouter } from "next/navigation"
+
 export function NavUser() {
   const { isMobile } = useSidebar()
   const { user } = useAuthStore()
-  const logout = useLogout()
   const router = useRouter()
+  const { logout } = useLogout()
 
   return (
     <SidebarMenu>
@@ -103,7 +104,7 @@ export function NavUser() {
               </DropdownMenuItem>  */}
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => logout.mutate()}>
+            <DropdownMenuItem onClick={() => logout()}>
               <LogOut />
               Log out
             </DropdownMenuItem>
