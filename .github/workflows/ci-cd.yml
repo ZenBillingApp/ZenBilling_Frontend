@@ -28,6 +28,11 @@ jobs:
                   file: ./Dockerfile
                   push: true
                   tags: hvssvn78/zenbilling:latest
+                  build-args: |
+                    NEXT_PUBLIC_BETTER_AUTH_API_URL=${{ secrets.NEXT_PUBLIC_BETTER_AUTH_API_URL }}
+                    NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
+                    JWT_SECRET=${{ secrets.JWT_SECRET }}
+
             - name: Clean up dangling Docker images
               run: |
                   docker image prune -f
