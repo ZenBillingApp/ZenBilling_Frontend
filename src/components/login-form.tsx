@@ -43,8 +43,10 @@ export function LoginForm() {
         onSuccess:()=>{
             setIsLoading(false);
             redirect("/dashboard");
+        },
+        onError:()=>{
+            setIsLoading(false);
         }
-        
        })
 
        if(error?.code){

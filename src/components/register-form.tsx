@@ -55,6 +55,9 @@ export function RegisterForm() {
               
             })
             redirect('/dashboard')
+          },
+          onError:()=>{
+            setIsLoading(false);
           }
         })
         if(error?.code){
