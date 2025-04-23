@@ -3,15 +3,18 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import Image from "next/image";
-
+import { redirect } from "next/navigation";
 import { ILoginRequest } from "@/types/Auth.interface";
-
+import { useState } from "react";
 import { authClient,getErrorMessageFR } from "@/lib/auth-client";
 
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+
+import { Loader2 } from "lucide-react";
+
 import logo from "@/assets/logo.png";
 
 const loginSchema = z.object({
@@ -23,6 +26,7 @@ const loginSchema = z.object({
 
 export function LoginForm() {
     const { toast } = useToast(); 
+    const [isLoading, setIsLoading] = useState(false);
 
     const { register, handleSubmit, formState: { errors } } = useForm<ILoginRequest>({
         resolver: zodResolver(loginSchema),
@@ -32,7 +36,14 @@ export function LoginForm() {
        const{ error } = await authClient.signIn.email({
         email: data.email,
         password: data.password,
-        callbackURL: '/dashboard'
+       },{
+        onRequest:()=>{
+            setIsLoading(true);
+        },
+        onSuccess:()=>{
+            setIsLoading(false);
+            redirect("/dashboard");
+        }
         
        })
 
@@ -83,7 +94,9 @@ export function LoginForm() {
                     {errors.password && <p className="text-red-500 text-xs italic">{errors.password.message}</p>}
                 </div>
                
-                <Button type="submit">Connexion</Button>
+                <Button type="submit" disabled={isLoading}>
+                    {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Connexion"}
+                </Button>
             </div>
         </form>
     )

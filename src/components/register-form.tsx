@@ -3,6 +3,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import Image from "next/image";
+import { useState } from "react";
+
 import { IRegisterRequest } from "@/types/Auth.interface";
 
 import { authClient, getErrorMessageFR } from "@/lib/auth-client";
@@ -12,6 +14,9 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { redirect } from "next/navigation";
+
+import { Loader2 } from "lucide-react";
+
 import logo from "@/assets/logo.png";
 
 const registerSchema = z.object({
@@ -25,6 +30,7 @@ const registerSchema = z.object({
 
 export function RegisterForm() {
     const { toast } = useToast();
+    const [isLoading, setIsLoading] = useState(false);
     const { register, handleSubmit, formState: { errors } } = useForm<IRegisterRequest>({
         resolver: zodResolver(registerSchema),
     });
@@ -38,7 +44,11 @@ export function RegisterForm() {
           name: `${data.first_name} ${data.last_name}`,
           
         },{
+          onRequest: () => {
+            setIsLoading(true);
+          },
           onSuccess: () => {
+            setIsLoading(false);
             toast({
               title: "Compte créé avec succès",
               description: "Votre compte a été créé avec succès",
@@ -117,7 +127,9 @@ export function RegisterForm() {
                     {errors.password && <p className="text-red-500 text-xs italic">{errors.password.message}</p>}
                 </div>
                
-                <Button type="submit">S&apos;inscrire</Button>
+                <Button type="submit" disabled={isLoading}>
+                    {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "S&apos;inscrire"}
+                </Button>
             </div>
         </form>
     )
