@@ -52,7 +52,7 @@ jobs:
 
             - name: Transfer files to server
               run: |
-                      scp -o StrictHostKeyChecking=no docker-compose.yml .env${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/zenbilling/zenbilling_frontend/
+                      scp -o StrictHostKeyChecking=no docker-compose.yml .env ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/zenbilling/zenbilling_frontend/
 
             - name: Deploy with Docker Compose
               run: |
