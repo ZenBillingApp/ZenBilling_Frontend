@@ -28,10 +28,6 @@ jobs:
                   file: ./Dockerfile
                   push: true
                   tags: hvssvn78/zenbilling:latest
-                  build-args: |
-                    NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
-                    JWT_SECRET=${{ secrets.JWT_SECRET }}
-                    NEXT_PUBLIC_AUTH_API_URL=${{ secrets.NEXT_PUBLIC_AUTH_API_URL }}
             - name: Clean up dangling Docker images
               run: |
                   docker image prune -f
@@ -47,16 +43,16 @@ jobs:
               run: |
                   echo "NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}" >> .env
                   echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
-                  echo "NEXT_PUBLIC_AUTH_API_URL=${{ secrets.NEXT_PUBLIC_AUTH_API_URL }}" >> .env
+                  echo "NEXT_PUBLIC_BETTER_AUTH_API_URL=${{ secrets.NEXT_PUBLIC_BETTER_AUTH_API_URL }}" >> .env
 
             - name: Set up SSH
               uses: webfactory/ssh-agent@v0.8.0
               with:
                   ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-            - name: Transfer docker-compose.yml to server
+            - name: Transfer files to server
               run: |
-                  scp -o StrictHostKeyChecking=no docker-compose.yml .env ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/zenbilling/zenbilling_frontend/
+                      scp -o StrictHostKeyChecking=no docker-compose.yml .env${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/zenbilling/zenbilling_frontend/
 
             - name: Deploy with Docker Compose
               run: |
