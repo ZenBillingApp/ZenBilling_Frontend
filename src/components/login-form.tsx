@@ -127,12 +127,12 @@ export function LoginForm() {
                     </div>
                     
                     <div className="space-y-2">
-                        {/* <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-between">
                             <Label htmlFor="password">Mot de passe</Label>
-                            <Link href="/forgot-password" className="text-xs font-medium text-primary hover:underline">
+                            {/* <Link href="/forgot-password" className="text-xs font-medium text-primary hover:underline">
                                 Mot de passe oublié?
-                            </Link>
-                        </div> */}
+                            </Link> */}
+                        </div>
                         <Input 
                             type="password" 
                             id="password" 
