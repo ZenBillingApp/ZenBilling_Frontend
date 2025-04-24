@@ -5,6 +5,7 @@ export interface IUser {
   first_name: string;
   last_name: string;
   email: string;
+  image: string;
   company_id?: string;
   onboarding_completed: boolean;
   onboarding_step: IOnboardingStep;
