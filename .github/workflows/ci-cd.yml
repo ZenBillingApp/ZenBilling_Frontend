@@ -32,6 +32,7 @@ jobs:
                     NEXT_PUBLIC_BETTER_AUTH_API_URL=${{ secrets.NEXT_PUBLIC_BETTER_AUTH_API_URL }}
                     NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
                     JWT_SECRET=${{ secrets.JWT_SECRET }}
+                    NEXT_PUBLIC_CLIENT_URL=${{ secrets.NEXT_PUBLIC_CLIENT_URL }}
 
             - name: Clean up dangling Docker images
               run: |
@@ -49,7 +50,7 @@ jobs:
                   echo "NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}" >> .env
                   echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
                   echo "NEXT_PUBLIC_BETTER_AUTH_API_URL=${{ secrets.NEXT_PUBLIC_BETTER_AUTH_API_URL }}" >> .env
-
+                  echo "NEXT_PUBLIC_CLIENT_URL=${{ secrets.NEXT_PUBLIC_CLIENT_URL }}" >> .env
             - name: Set up SSH
               uses: webfactory/ssh-agent@v0.8.0
               with:
