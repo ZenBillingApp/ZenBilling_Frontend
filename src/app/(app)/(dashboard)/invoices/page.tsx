@@ -193,7 +193,7 @@ export default function InvoicesPage() {
             <div className="flex justify-between items-center">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Total factures</p>
-                <h3 className="text-2xl font-bold">{invoices?.data?.stats.statusCounts.total}</h3>
+                <h3 className="text-2xl font-bold">{invoices?.data?.stats.statusCounts.total || 0}</h3>
               </div>
               <div className="p-2 bg-gray-100 dark:bg-gray-900/30 rounded-full">
                 <FileStack className="h-5 w-5 text-gray-500" />
@@ -207,7 +207,7 @@ export default function InvoicesPage() {
             <div className="flex justify-between items-center">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Factures payées</p>
-                <h3 className="text-2xl font-bold">{invoices?.data?.stats.statusCounts.paid}</h3>
+                <h3 className="text-2xl font-bold">{invoices?.data?.stats.statusCounts.paid || 0}</h3>
               </div>
               <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-full">
                 <Check className="h-5 w-5 text-green-500" />
@@ -221,7 +221,7 @@ export default function InvoicesPage() {
             <div className="flex justify-between items-center">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">En attente</p>
-                <h3 className="text-2xl font-bold">{invoices?.data?.stats.statusCounts.pending}</h3>
+                <h3 className="text-2xl font-bold">{invoices?.data?.stats.statusCounts.pending || 0}</h3>
               </div>
               <div className="p-2 bg-yellow-100 dark:bg-yellow-900/30 rounded-full">
                 <Clock className="h-5 w-5 text-yellow-500" />
@@ -235,7 +235,7 @@ export default function InvoicesPage() {
             <div className="flex justify-between items-center">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Envoyées</p>
-                <h3 className="text-2xl font-bold">{invoices?.data?.stats.statusCounts.sent}</h3>
+                <h3 className="text-2xl font-bold">{invoices?.data?.stats.statusCounts.sent || 0}</h3>
               </div>
               <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-full">
                 <Mail className="h-5 w-5 text-blue-500" />
@@ -251,7 +251,7 @@ export default function InvoicesPage() {
             <div className="flex justify-between items-center">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">En retard</p>
-                <h3 className="text-2xl font-bold">{invoices?.data?.stats.statusCounts.late}</h3>
+                <h3 className="text-2xl font-bold">{invoices?.data?.stats.statusCounts.late || 0}</h3>
               </div>
               <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-full">
                 <AlertCircle className="h-5 w-5 text-red-500" />

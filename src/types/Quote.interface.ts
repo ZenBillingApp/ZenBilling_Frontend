@@ -28,4 +28,14 @@ export interface IQuote {
 export interface IQuotePagination {
   quotes: IQuote[];
   pagination: IPagination;
+  stats: {
+    statusCounts: {
+      draft: number;
+      sent: number;
+      accepted: number;
+      rejected: number;
+      expired: number;
+      total: number;
+    };
+  };
 }

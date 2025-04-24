@@ -9,7 +9,7 @@ import { DateRange } from "react-day-picker";
 import { format } from "date-fns";
 import { getQuoteStatusBadgeVariant, getQuoteStatusLabel } from "@/utils/quoteStatus";
 
-import { FileText, ShoppingCart, Search, Plus, Eye, CalendarDays, Clock, User, Building, Loader2 } from "lucide-react";
+import { FileText, ShoppingCart, Search, Plus, Eye, CalendarDays, Clock, User, Building, Loader2, FileStack ,Check,AlertCircle,Mail} from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -184,6 +184,78 @@ export default function QuotesPage() {
           Nouveau devis
         </Button>
       </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4 mb-8">
+        <Card className="border-l-4 border-l-gray-500">
+          <CardContent className="pt-6">
+            <div className="flex justify-between items-center">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Total devis</p>
+                <h3 className="text-2xl font-bold">{quotes?.data?.stats.statusCounts.total   || 0}</h3>
+              </div>
+              <div className="p-2 bg-gray-100 dark:bg-gray-900/30 rounded-full">
+                <FileStack className="h-5 w-5 text-gray-500" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-l-4 border-l-blue-500">
+          <CardContent className="pt-6">
+            <div className="flex justify-between items-center">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Devis envoyés</p>
+                <h3 className="text-2xl font-bold">{quotes?.data?.stats.statusCounts.sent || 0}</h3>
+              </div>
+              <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-full">
+                <Mail className="h-5 w-5 text-blue-500" />
+              </div>
+            </div>
+          </CardContent>
+        </Card> 
+
+        <Card className="border-l-4 border-l-green-500">
+          <CardContent className="pt-6">
+            <div className="flex justify-between items-center">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Devis acceptés</p>
+                <h3 className="text-2xl font-bold">{quotes?.data?.stats.statusCounts.accepted || 0}</h3>
+              </div>
+              <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-full">
+                <Check className="h-5 w-5 text-green-500" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-l-4 border-l-red-500">
+          <CardContent className="pt-6">
+            <div className="flex justify-between items-center">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Devis refusés</p>
+                <h3 className="text-2xl font-bold">{quotes?.data?.stats.statusCounts.rejected || 0}</h3>
+              </div>
+              <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-full">
+                <AlertCircle className="h-5 w-5 text-red-500" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-l-4 border-l-yellow-500">
+          <CardContent className="pt-6">
+            <div className="flex justify-between items-center">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Devis expirés</p>
+                <h3 className="text-2xl font-bold">{quotes?.data?.stats.statusCounts.expired || 0}</h3>
+              </div>
+              <div className="p-2 bg-yellow-100 dark:bg-yellow-900/30 rounded-full">
+                <FileText className="h-5 w-5 text-yellow-500" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        </div>
 
       <Card className="overflow-hidden border shadow-sm hover:shadow-md transition-shadow">
         <CardHeader className="bg-muted/50">
