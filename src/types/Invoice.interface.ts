@@ -32,5 +32,15 @@ export interface IInvoice {
 
 export interface IInvoicePagination {
   invoices: IInvoice[];
+  stats:{
+    statusCounts: {
+      pending: number;
+      sent: number;
+      paid: number;
+      cancelled: number;
+      late: number;
+      total: number;
+    }
+  }
   pagination: IPagination;
 }

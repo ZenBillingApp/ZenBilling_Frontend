@@ -136,7 +136,7 @@ export default function CreateInvoicePage() {
     <div className="container mx-auto px-4 py-6 space-y-6">
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="icon" onClick={() => router.back()}>
+          <Button variant="outline" className="rounded-full" size="icon" onClick={() => router.back()}>
             <ArrowLeft className="w-4 h-4" />
           </Button>
           <h1 className="text-2xl font-bold font-dmSans flex items-center">
