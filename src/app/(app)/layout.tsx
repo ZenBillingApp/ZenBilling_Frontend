@@ -35,7 +35,7 @@ export default function DashboardLayout({children}: {children: React.ReactNode})
       <div className="flex flex-col items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-white mb-4"></div>
         <h2 className="text-xl font-semibold text-white">Chargement de votre compte...</h2>
-        <p className="text-white mt-2">Veuillez patienter pendant que nous récupérons vos informations</p>
+        <p className="text-white mt-2 text-sm font-dmSans text-center">Veuillez patienter pendant que nous récupérons vos informations</p>
       </div>
     )
   }
