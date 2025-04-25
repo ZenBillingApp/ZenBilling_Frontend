@@ -24,6 +24,15 @@ import {
 import { DatePickerWithRange } from "@/components/ui/date-range-picker";
 import { DataTable, StatusBadge, Column } from "@/components/ui/data-table";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+  PaginationEllipsis,
+} from "@/components/ui/pagination";
 
 import type { IQuote } from "@/types/Quote.interface";
 
@@ -36,6 +45,7 @@ export default function QuotesPage() {
   >("all");
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const [loadingQuoteId, setLoadingQuoteId] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState<number>(1);
 
   const debouncedSearch = useDebounce(search, 300);
 
@@ -47,7 +57,7 @@ export default function QuotesPage() {
       : undefined,
     end_date: dateRange?.to ? format(dateRange.to, "yyyy-MM-dd") : undefined,
     limit: 25,
-    page: 1,
+    page: currentPage,
   });
 
   const { mutate: viewQuote } = useViewQuote();
@@ -168,6 +178,81 @@ export default function QuotesPage() {
       className: "hidden sm:table-cell",
     },
   ];
+
+  // Fonction pour générer les liens de pagination
+  const renderPaginationLinks = () => {
+    if (!quotes?.data?.pagination) return null;
+    
+    const { currentPage, totalPages } = quotes.data.pagination;
+    const pages = [];
+    
+    // Déterminer quelles pages afficher
+    if (totalPages <= 7) {
+      // Moins de 7 pages: afficher toutes les pages
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      // Plus de 7 pages: afficher intelligemment
+      if (currentPage <= 3) {
+        // Début de la pagination
+        for (let i = 1; i <= 5; i++) {
+          pages.push(i);
+        }
+        pages.push(null); // Ellipsis
+        pages.push(totalPages);
+      } else if (currentPage >= totalPages - 2) {
+        // Fin de la pagination
+        pages.push(1);
+        pages.push(null); // Ellipsis
+        for (let i = totalPages - 4; i <= totalPages; i++) {
+          pages.push(i);
+        }
+      } else {
+        // Milieu de la pagination
+        pages.push(1);
+        pages.push(null); // Ellipsis
+        for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+          pages.push(i);
+        }
+        pages.push(null); // Ellipsis
+        pages.push(totalPages);
+      }
+    }
+    
+    return pages.map((page, index) => {
+      if (page === null) {
+        return (
+          <PaginationItem key={`ellipsis-${index}`}>
+            <PaginationEllipsis />
+          </PaginationItem>
+        );
+      }
+      
+      return (
+        <PaginationItem key={page}>
+          <PaginationLink 
+            href="#" 
+            isActive={page === currentPage}
+            onClick={(e) => {
+              e.preventDefault();
+              setCurrentPage(page as number);
+            }}
+          >
+            {page}
+          </PaginationLink>
+        </PaginationItem>
+      );
+    });
+  };
+
+  // Fonction pour changer de page
+  const handlePageChange = (newPage: number) => {
+    if (newPage < 1 || (quotes?.data?.pagination && newPage > quotes.data.pagination.totalPages)) {
+      return;
+    }
+    setCurrentPage(newPage);
+  };
 
   return (
     <div className="container mx-auto px-4 py-6 space-y-6">
@@ -307,6 +392,43 @@ export default function QuotesPage() {
             emptyMessage="Aucun devis trouvé"
             onRowClick={(quote: IQuote) => router.push(`/quotes/${quote.quote_id}`)}
           />
+        </CardContent>
+        <CardContent className="pt-0">
+          {quotes?.data?.pagination && quotes.data.pagination.totalPages > 1 && (
+            <div className="flex flex-col sm:flex-row justify-between items-center w-full gap-4 mt-4">
+              <p className="text-sm text-muted-foreground">
+                {quotes?.data?.pagination.total} devis trouvés
+              </p>
+              
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious 
+                      href="#" 
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handlePageChange(currentPage - 1);
+                      }}
+                      className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+                    />
+                  </PaginationItem>
+                  
+                  {renderPaginationLinks()}
+                  
+                  <PaginationItem>
+                    <PaginationNext 
+                      href="#" 
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handlePageChange(currentPage + 1);
+                      }}
+                      className={currentPage === quotes.data.pagination.totalPages ? "pointer-events-none opacity-50" : ""}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
