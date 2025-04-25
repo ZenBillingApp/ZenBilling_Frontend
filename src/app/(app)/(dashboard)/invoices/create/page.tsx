@@ -29,7 +29,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { DatePicker } from "@/components/ui/date-picker";
 import { CustomerSelectSheet } from "@/components/customers/customer-select-sheet";
 import { ProductSelectDialog } from "@/components/products/product-select-dialog";
-import { Building, User, Plus, X, FileText, ArrowLeft } from "lucide-react";
+import { Building, User, Plus, X, FileText, ArrowLeft, Loader2 } from "lucide-react";
 
 import type { ICustomer } from "@/types/Customer.interface";
 import { IProduct, vatRateToNumber } from "@/types/Product.interface";
@@ -146,9 +146,17 @@ export default function CreateInvoicePage() {
         </div>
         <Button
           onClick={handleCreateInvoice}
-          disabled={!selectedCustomer || items.length === 0}
+          disabled={!selectedCustomer || items.length === 0 || createInvoice.isPending}
+
         >
-          Créer la facture
+          {createInvoice.isPending ? (
+            <>
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              Création en cours...
+            </>
+          ) : (
+            "Créer la facture"
+          )}
         </Button>
       </div>
 

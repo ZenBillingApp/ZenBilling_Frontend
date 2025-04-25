@@ -36,7 +36,7 @@ const companySchema = z.object({
   country: z.string().min(1, "Le pays est requis"),
   email: z.string().email("Email invalide").optional(),
   phone: z.string().optional(),
-  website: z.string().url("URL invalide").optional(),
+  website: z.string().url("URL invalide").optional().nullable(),
 });
 
 export function CompanyDetails() {
