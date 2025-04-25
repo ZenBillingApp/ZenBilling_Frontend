@@ -15,8 +15,11 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Building, User, Search } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Building, User, Search, Plus } from "lucide-react";
+import NiceModal from "@ebay/nice-modal-react";
 
+import CreateCustomerDialog from "./create-customer-dialog";
 import type { ICustomer } from "@/types/Customer.interface";
 
 interface CustomerSelectSheetProps {
@@ -37,11 +40,17 @@ export function CustomerSelectSheet({
 
   const debouncedSearch = useDebounce(search, 300);
 
-  const { data: customersData, isLoading } = useCustomers({
+  const { data: customersData, isLoading, refetch } = useCustomers({
     search: debouncedSearch,
     type: customerType === "all" ? undefined : customerType,
     limit: 50,
   });
+
+  const handleCreateCustomer = () => {
+    NiceModal.show(CreateCustomerDialog).then(() => {
+      refetch();
+    });
+  };
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -68,18 +77,28 @@ export function CustomerSelectSheet({
                   className="pl-8"
                 />
               </div>
-              <Tabs
-                value={customerType}
-                onValueChange={(value) =>
-                  setCustomerType(value as "all" | "individual" | "company")
-                }
-              >
-                <TabsList>
-                  <TabsTrigger value="all">Tous</TabsTrigger>
-                  <TabsTrigger value="individual">Particuliers</TabsTrigger>
-                  <TabsTrigger value="company">Entreprises</TabsTrigger>
-                </TabsList>
-              </Tabs>
+              <div className="flex justify-between items-center">
+                <Tabs
+                  value={customerType}
+                  onValueChange={(value) =>
+                    setCustomerType(value as "all" | "individual" | "company")
+                  }
+                >
+                  <TabsList>
+                    <TabsTrigger value="all">Tous</TabsTrigger>
+                    <TabsTrigger value="individual">Particuliers</TabsTrigger>
+                    <TabsTrigger value="company">Entreprises</TabsTrigger>
+                  </TabsList>
+                </Tabs>
+                <Button 
+                  onClick={handleCreateCustomer}
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-1"
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           </div>
 
