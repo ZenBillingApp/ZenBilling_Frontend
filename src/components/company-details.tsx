@@ -6,7 +6,6 @@ import { z } from "zod";
 
 import { useCompany, useUpdateCompany, useLegalForm } from "@/hooks/useCompany";
 import { IUpdateCompanyRequest } from "@/types/Company.request.interface";
-import { LegalForm } from "@/types/Company.interface";
 
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -17,15 +16,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle, Loader2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 
 const companySchema = z.object({
   name: z.string().min(1, "Le nom est requis"),
   siret: z.string().length(14, "Le SIRET doit contenir 14 caractères"),
-  tva_intra: z.string().optional(),
+  tva_intra: z.string().optional().nullable(),
   tva_applicable: z.boolean(),
   RCS_number: z.string().min(1, "Le numéro RCS est requis"),
   RCS_city: z.string().min(1, "La ville RCS est requise"),
-  capital: z.coerce.number().optional(),
+  capital: z.coerce.number().optional().nullable(),
   siren: z.string().length(9, "Le SIREN doit contenir 9 caractères"),
   legal_form: z.enum(['SAS', 'SARL', 'EURL', 'SASU', 'SA', 'SNC', 'SOCIETE_CIVILE', 'ENTREPRISE_INDIVIDUELLE'], {
     required_error: "La forme juridique est requise",
@@ -36,7 +36,7 @@ const companySchema = z.object({
   country: z.string().min(1, "Le pays est requis"),
   email: z.string().email("Email invalide").optional(),
   phone: z.string().optional(),
-  website: z.string().url("URL invalide").optional().nullable(),
+  website: z.union([z.string().url("URL invalide"), z.literal("")]).optional().nullable(),
 });
 
 export function CompanyDetails() {
@@ -45,7 +45,7 @@ export function CompanyDetails() {
   const { data: legalForm } = useLegalForm();
   const updateCompany = useUpdateCompany();
 
-  const { register, handleSubmit, formState: { errors }, setValue, watch, reset } = useForm<IUpdateCompanyRequest>({
+  const form = useForm<IUpdateCompanyRequest>({
     resolver: zodResolver(companySchema),
     defaultValues: {
       tva_applicable: false,
@@ -56,20 +56,20 @@ export function CompanyDetails() {
   useEffect(() => {
     if (companyData?.data) {
       const { website, tva_intra, ...rest } = companyData.data;
-      reset({
+      form.reset({
         ...rest,
-        capital: rest.capital || undefined,
-        tva_intra: tva_intra || undefined,
-        website: website || undefined,
+        capital: rest.capital || null,
+        tva_intra: tva_intra || null,
+        website: website || null,
       });
     }
-  }, [companyData, reset]);
+  }, [companyData, form]);
 
   const onSubmit = (data: IUpdateCompanyRequest) => {
     const formattedData = {
       ...data,
-      tva_intra: data.tva_intra === "" ? undefined : data.tva_intra,
-      website: data.website === "" ? undefined : data.website,
+      tva_intra: data.tva_intra === "" ? null : data.tva_intra,
+      website: data.website === "" ? null : data.website,
     };
     updateCompany.mutate(formattedData, {
       onSuccess: () => {
@@ -135,142 +135,281 @@ export function CompanyDetails() {
           </TabsList>
 
           {isEditing ? (
-            <form onSubmit={handleSubmit(onSubmit)}>
-              <TabsContent value="informations">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="flex flex-col items-start gap-2">
-                    <Label htmlFor="name">Nom de l&apos;entreprise</Label>
-                    <Input id="name" {...register("name")} />
-                    {errors.name && <p className="text-red-500 text-xs italic">{errors.name.message}</p>}
-                  </div>
-
-                  <div className="flex flex-col items-start gap-2">
-                    <Label htmlFor="legal_form">Forme juridique</Label>
-                    <Select 
-                      value={watch("legal_form")}
-                      onValueChange={(value) => setValue("legal_form", value as LegalForm, { shouldValidate: true })}
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Sélectionnez..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {legalForm?.data?.legalForms.map((form, index) => (
-                          <SelectItem key={index} value={form}>{form}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    {errors.legal_form && <p className="text-red-500 text-xs italic">{errors.legal_form.message}</p>}
-                  </div>
-
-                  <div className="flex flex-col items-start gap-2">
-                    <Label htmlFor="siret">SIRET</Label>
-                    <Input id="siret" {...register("siret")} />
-                    {errors.siret && <p className="text-red-500 text-xs italic">{errors.siret.message}</p>}
-                  </div>
-
-                  <div className="flex flex-col items-start gap-2">
-                    <Label htmlFor="siren">SIREN</Label>
-                    <Input id="siren" {...register("siren")} />
-                    {errors.siren && <p className="text-red-500 text-xs italic">{errors.siren.message}</p>}
-                  </div>
-
-                  <div className="flex flex-col items-start gap-2">
-                    <Label htmlFor="RCS_number">Numéro RCS</Label>
-                    <Input id="RCS_number" {...register("RCS_number")} />
-                    {errors.RCS_number && <p className="text-red-500 text-xs italic">{errors.RCS_number.message}</p>}
-                  </div>
-
-                  <div className="flex flex-col items-start gap-2">
-                    <Label htmlFor="RCS_city">Ville RCS</Label>
-                    <Input id="RCS_city" {...register("RCS_city")} />
-                    {errors.RCS_city && <p className="text-red-500 text-xs italic">{errors.RCS_city.message}</p>}
-                  </div>
-
-                  <div className="flex flex-col items-start gap-2">
-                    <Label htmlFor="capital">Capital</Label>
-                    <Input id="capital" type="number" {...register("capital")} />
-                    {errors.capital && <p className="text-red-500 text-xs italic">{errors.capital.message}</p>}
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <Checkbox 
-                      id="tva_applicable" 
-                      checked={watch("tva_applicable")} 
-                      onCheckedChange={(checked) => setValue("tva_applicable", checked as boolean)} 
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                <TabsContent value="informations">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="name"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Nom de l&apos;entreprise</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
-                    <Label htmlFor="tva_applicable">TVA Applicable</Label>
-                  </div>
 
-                  <div className="flex flex-col items-start gap-2">
-                    <Label htmlFor="tva_intra">Numéro de TVA Intracommunautaire</Label>
-                    <Input id="tva_intra" {...register("tva_intra")} />
-                    {errors.tva_intra && <p className="text-red-500 text-xs italic">{errors.tva_intra.message}</p>}
+                    <FormField
+                      control={form.control}
+                      name="legal_form"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Forme juridique</FormLabel>
+                          <Select 
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Sélectionnez..." />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {legalForm?.data?.legalForms.map((form, index) => (
+                                <SelectItem key={index} value={form}>{form}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="siret"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>SIRET</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="siren"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>SIREN</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="RCS_number"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Numéro RCS</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="RCS_city"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Ville RCS</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="capital"
+                      render={({ field: { value, onChange, ...rest } }) => (
+                        <FormItem>
+                          <FormLabel>Capital</FormLabel>
+                          <FormControl>
+                            <Input type="number" {...rest} value={value || ""} onChange={onChange} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="tva_applicable"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 py-4">
+                          <FormControl>
+                            <Checkbox 
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel>TVA Applicable</FormLabel>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="tva_intra"
+                      render={({ field: { value, onChange, ...rest } }) => (
+                        <FormItem>
+                          <FormLabel>Numéro de TVA Intracommunautaire</FormLabel>
+                          <FormControl>
+                            <Input 
+                              {...rest}
+                              value={value || ""}
+                              onChange={onChange}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   </div>
+                </TabsContent>
+
+                <TabsContent value="adresse">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="address"
+                      render={({ field }) => (
+                        <FormItem className="sm:col-span-2">
+                          <FormLabel>Adresse</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="postal_code"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Code postal</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="city"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Ville</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="country"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Pays</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="contact">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Email</FormLabel>
+                          <FormControl>
+                            <Input {...field} value={field.value || ""} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="phone"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Téléphone</FormLabel>
+                          <FormControl>
+                            <Input {...field} value={field.value || ""} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="website"
+                      render={({ field: { value, onChange, ...rest } }) => (
+                        <FormItem className="sm:col-span-2">
+                          <FormLabel>Site web</FormLabel>
+                          <FormControl>
+                            <Input 
+                              {...rest}
+                              value={value || ""}
+                              onChange={onChange}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </TabsContent>
+
+                <div className="flex gap-2 mt-6">
+                  <Button type="submit" disabled={updateCompany.isPending}>
+                    {updateCompany.isPending ? "Mise à jour..." : "Enregistrer"}
+                  </Button>
+                  <Button type="button" variant="outline" onClick={() => {
+                    setIsEditing(false);
+                    form.reset(company);
+                  }}>
+                    Annuler
+                  </Button>
                 </div>
-              </TabsContent>
-
-              <TabsContent value="adresse">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="sm:col-span-2 flex flex-col items-start gap-2">
-                    <Label htmlFor="address">Adresse</Label>
-                    <Input id="address" {...register("address")} />
-                    {errors.address && <p className="text-red-500 text-xs italic">{errors.address.message}</p>}
-                  </div>
-
-                  <div className="flex flex-col items-start gap-2">
-                    <Label htmlFor="postal_code">Code postal</Label>
-                    <Input id="postal_code" {...register("postal_code")} />
-                    {errors.postal_code && <p className="text-red-500 text-xs italic">{errors.postal_code.message}</p>}
-                  </div>
-
-                  <div className="flex flex-col items-start gap-2">
-                    <Label htmlFor="city">Ville</Label>
-                    <Input id="city" {...register("city")} />
-                    {errors.city && <p className="text-red-500 text-xs italic">{errors.city.message}</p>}
-                  </div>
-
-                  <div className="flex flex-col items-start gap-2">
-                    <Label htmlFor="country">Pays</Label>
-                    <Input id="country" {...register("country")} />
-                    {errors.country && <p className="text-red-500 text-xs italic">{errors.country.message}</p>}
-                  </div>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="contact">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="flex flex-col items-start gap-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input type="email" id="email" {...register("email")} />
-                    {errors.email && <p className="text-red-500 text-xs italic">{errors.email.message}</p>}
-                  </div>
-
-                  <div className="flex flex-col items-start gap-2">
-                    <Label htmlFor="phone">Téléphone</Label>
-                    <Input id="phone" {...register("phone")} />
-                    {errors.phone && <p className="text-red-500 text-xs italic">{errors.phone.message}</p>}
-                  </div>
-
-                  <div className="sm:col-span-2 flex flex-col items-start gap-2">
-                    <Label htmlFor="website">Site web</Label>
-                    <Input id="website" {...register("website")} />
-                    {errors.website && <p className="text-red-500 text-xs italic">{errors.website.message}</p>}
-                  </div>
-                </div>
-              </TabsContent>
-
-              <div className="flex gap-2 mt-6">
-                <Button type="submit" disabled={updateCompany.isPending}>
-                  {updateCompany.isPending ? "Mise à jour..." : "Enregistrer"}
-                </Button>
-                <Button type="button" variant="outline" onClick={() => {
-                  setIsEditing(false);
-                  reset(company);
-                }}>
-                  Annuler
-                </Button>
-              </div>
-            </form>
+              </form>
+            </Form>
           ) : (
             <>
               <TabsContent value="informations">

@@ -15,7 +15,7 @@ export interface ICompany {
   tva_applicable: boolean;
   RCS_number: string;
   RCS_city: string;
-  capital: number;
+  capital: number | null;
   siren: string;
   legal_form: LegalForm;
   // Informations d'adresse
@@ -26,7 +26,7 @@ export interface ICompany {
   // Informations de contact
   email: string;
   phone: string;
-  website?: string;
+  website: string | null;
   users?: IUser[];
   createdAt: Date;
   updatedAt: Date;
