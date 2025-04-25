@@ -155,8 +155,9 @@ export default function CreateInvoicePage() {
               Création en cours...
             </>
           ) : (
-            "Créer la facture"
+            <FileText className="w-4 h-4 mr-2" />
           )}
+          {createInvoice.isPending ? "Création en cours..." : "Créer la facture"}
         </Button>
       </div>
 
