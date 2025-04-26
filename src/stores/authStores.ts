@@ -46,7 +46,8 @@ export const useAuthStore = create<IAuthState & IAuthActions>()(
             last_name: data.last_name,
             company_id: data.company_id,
             onboarding_completed: data.onboarding_completed,
-            onboarding_step: data.onboarding_step as IOnboardingStep
+            onboarding_step: data.onboarding_step as IOnboardingStep,
+            image: data.image
           },
           isAuthenticated: true,
         });
