@@ -6,6 +6,7 @@ import { useToast } from "@/hooks/use-toast"
 import { IInvoice,IInvoicePagination } from "@/types/Invoice.interface"
 import type { IApiErrorResponse, IApiSuccessResponse } from "@/types/api.types"
 import { AxiosError } from "axios"
+import { useRouter } from "next/navigation"
 
 export const useInvoices = (params: IInvoiceQueryParams = {}) => {
     const { page = 1, limit = 10, search = "", status, customer_id, start_date, end_date, sortBy = 'invoice_date', sortOrder = 'DESC' } = params;
@@ -72,10 +73,18 @@ export const useUpdateInvoice = (invoiceId: string) => {
 export const useDeleteInvoice = () => {
     const queryClient = useQueryClient()
     const { toast } = useToast()
+    const router = useRouter()
     return useMutation<IApiSuccessResponse<IInvoice>, AxiosError<IApiErrorResponse>, string>({
         mutationFn: (invoiceId: string) =>
             api.delete(`/invoices/${invoiceId}`),
-        onSuccess: () => {
+        onSuccess: (_, invoiceId) => {
+
+            router.replace('/invoices')
+
+            // Supprime explicitement les données du cache pour cette facture
+            queryClient.removeQueries({ queryKey: ["invoices", invoiceId] })
+            
+            // Invalide la liste des factures pour la mettre à jour
             queryClient.invalidateQueries({ queryKey: ["invoices"] })
 
             toast({
@@ -209,5 +218,28 @@ export const useCustomerInvoices = (customerId: string, params: IInvoiceQueryPar
             return api.get<IApiSuccessResponse<IInvoicePagination>>(url);
         },
         staleTime: 1000 * 60 * 5, // 5 minutes
+    })
+}
+
+export const useCancelInvoice = (invoiceId: string) => {
+    const queryClient = useQueryClient()
+    const { toast } = useToast()
+    return useMutation<IApiSuccessResponse<IInvoice>, AxiosError<IApiErrorResponse>, void>({
+        mutationFn: () => 
+            api.put(`/invoices/${invoiceId}`, { status: 'cancelled' }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["invoices", invoiceId] })
+            queryClient.invalidateQueries({ queryKey: ["invoices"] })
+            toast({
+                title: "Facture annulée avec succès",
+                description: "La facture a été annulée avec succès",
+            })
+        },
+        onError: (error: AxiosError<IApiErrorResponse>) => {
+            toast({
+                title: "Erreur lors de l'annulation de la facture",
+                description: error.response?.data?.message,
+            })
+        },
     })
 }

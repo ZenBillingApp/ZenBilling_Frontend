@@ -150,10 +150,7 @@ export default function CreateInvoicePage() {
 
         >
           {createInvoice.isPending ? (
-            <>
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Création en cours...
-            </>
           ) : (
             <FileText className="w-4 h-4 mr-2" />
           )}

@@ -7,6 +7,8 @@ import {
   useUpdateInvoice,
   useAddPayment,
   useSendInvoice,
+  useDeleteInvoice,
+  useCancelInvoice,
 } from "@/hooks/useInvoice";
 import { useFormat } from "@/hooks/useFormat";
 import { useState } from "react";
@@ -54,9 +56,13 @@ import {
   Pencil,
   Plus,
   Send,
+  Trash2,
+  XCircle,
 } from "lucide-react";
 import { EditInvoiceDialog } from "@/components/invoices/edit-invoice-dialog";
 import { AddPaymentDialog } from "@/components/invoices/add-payment-dialog";
+import { DeleteInvoiceDialog } from "@/components/invoices/delete-invoice-dialog";
+import { CancelInvoiceDialog } from "@/components/invoices/cancel-invoice-dialog";
 import { AxiosError } from "axios";
 
 
@@ -66,6 +72,8 @@ export default function InvoiceDetailsPage() {
   const { formatCurrency, formatPercent } = useFormat();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isAddPaymentDialogOpen, setIsAddPaymentDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
 
   const { data: invoiceData, isLoading } = useInvoice(params.id as string);
   const downloadPdf = useDownloadInvoicePdf(
@@ -74,6 +82,8 @@ export default function InvoiceDetailsPage() {
   const updateInvoice = useUpdateInvoice(params.id as string);
   const addPayment = useAddPayment(params.id as string);
   const sendInvoice = useSendInvoice(params.id as string);
+  const deleteInvoice = useDeleteInvoice();
+  const cancelInvoice = useCancelInvoice(params.id as string);
 
   const totalPaid = invoiceData?.data?.payments?.reduce((acc, payment) => acc + Number(payment.amount), 0);
 
@@ -85,6 +95,18 @@ export default function InvoiceDetailsPage() {
   const handleAddPayment = async (data: AddPaymentSchema) => {
     await addPayment.mutateAsync(data);
     setIsAddPaymentDialogOpen(false);
+  };
+
+  const handleDeleteInvoice = () => {
+    deleteInvoice.mutate(params.id as string);
+  };
+
+  const handleCancelInvoice = () => {
+    cancelInvoice.mutate(undefined, {
+      onSuccess: () => {
+        setIsCancelDialogOpen(false);
+      }
+    });
   };
 
   const getStatusIcon = (status: string) => {
@@ -188,6 +210,18 @@ export default function InvoiceDetailsPage() {
             isError={addPayment.isError}
             error={{message:(addPayment.error as AxiosError<IApiErrorResponse>)?.response?.data?.message, errors:(addPayment.error as AxiosError<IApiErrorResponse>)?.response?.data?.errors}}
           />
+          <DeleteInvoiceDialog
+            open={isDeleteDialogOpen}
+            onOpenChange={setIsDeleteDialogOpen}
+            onConfirm={handleDeleteInvoice}
+            isLoading={deleteInvoice.isPending}
+          />
+          <CancelInvoiceDialog
+            open={isCancelDialogOpen}
+            onOpenChange={setIsCancelDialogOpen}
+            onConfirm={handleCancelInvoice}
+            isLoading={cancelInvoice.isPending}
+          />
           <div className="flex flex-wrap gap-2 w-full">
             {invoiceData.data?.status !== "cancelled" &&
               invoiceData.data?.status !== "paid" && (
@@ -247,6 +281,28 @@ export default function InvoiceDetailsPage() {
                 <Download className="w-4 h-4 mr-2" />
               )}
               <span className="hidden sm:inline">Télécharger</span>
+            </Button>
+          </div>
+          
+          {/* Boutons de suppression et d'annulation */}
+          <div className="flex flex-wrap gap-2 w-full mt-2">
+            {invoiceData.data?.status !== "cancelled" && (
+              <Button
+                variant="destructive"
+                onClick={() => setIsCancelDialogOpen(true)}
+                className="flex-1 sm:flex-none"
+              >
+                <XCircle className="w-4 h-4 mr-2" />
+                <span className="hidden sm:inline">Annuler la facture</span>
+              </Button>
+            )}
+            <Button
+              variant="destructive"
+              onClick={() => setIsDeleteDialogOpen(true)}
+              className="flex-1 sm:flex-none"
+            >
+              <Trash2 className="w-4 h-4 mr-2" />
+              <span className="hidden sm:inline">Supprimer</span>
             </Button>
           </div>
         </div>
