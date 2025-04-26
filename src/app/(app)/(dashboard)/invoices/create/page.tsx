@@ -115,11 +115,6 @@ export default function CreateInvoicePage() {
         items,
         conditions: conditions || undefined,
         late_payment_penalty: latePenalty || undefined,
-      },
-      {
-        onSuccess: (data) => {
-          router.push(`/invoices/${data.data?.invoice_id}`);
-        },
       }
     );
   };

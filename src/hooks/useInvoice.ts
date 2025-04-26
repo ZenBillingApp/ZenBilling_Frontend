@@ -37,10 +37,11 @@ export const useInvoice = (invoiceId: string) => {
 export const useCreateInvoice = () => {
     const queryClient = useQueryClient()
     const { toast } = useToast()
+    const router = useRouter()
     return useMutation<IApiSuccessResponse<IInvoice>, AxiosError<IApiErrorResponse>, ICreateInvoiceRequest>({
         mutationFn: (data: ICreateInvoiceRequest) => 
             api.post("/invoices", data),
-        onSuccess: () => {
+        onSuccess: (invoice) => {
             queryClient.invalidateQueries({ queryKey: ["invoices"] })
             queryClient.invalidateQueries({ queryKey: ["products"] })
             queryClient.invalidateQueries({ queryKey: ["customers"] })
@@ -48,6 +49,7 @@ export const useCreateInvoice = () => {
                 title: "Facture créée avec succès",
                 description: "La facture a été créée avec succès",
             })
+            router.replace(`/invoices/${invoice.data?.invoice_id}`)
         },
     })
 }
