@@ -31,6 +31,7 @@ import {
   User,
 } from "lucide-react";
 import type { InvoiceStatusCount, TopCustomer } from "@/types/Dashboard.interface";
+import { getInvoiceStatusLabel } from "@/utils/invoiceStatus";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -179,7 +180,7 @@ export default function DashboardPage() {
                     <TableCell>
                       <div className="flex items-center gap-2">
                         {getStatusIcon(status.status)}
-                        <span className="capitalize">{status.status}</span>
+                        <span className="capitalize">{getInvoiceStatusLabel(status.status)}</span>
                       </div>
                     </TableCell>
                     <TableCell className="text-right">{status._count}</TableCell>
