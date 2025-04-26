@@ -10,12 +10,17 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
 const logoutAndRedirect = async () => {
   const clearAuth = useAuthStore.getState().clearAuth;
   
-  await authClient.signOut({
-    fetchOptions: {
-      onSuccess: async () => {
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: async () => {
         await clearAuth();
         window.location.href = '/login';
       },
+      onError: async (error) => {
+        console.error('Erreur lors de la déconnexion:', error);
+        await clearAuth();
+        window.location.href = '/login';
+      }
     },
   });
 };
