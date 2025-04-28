@@ -183,11 +183,16 @@ export function CompanyForm() {
                     <FormField
                         control={form.control}
                         name="capital"
-                        render={({ field }) => (
+                        render={({ field: { value, onChange, ...rest } }) => (
                             <FormItem>
                                 <FormLabel>Capital</FormLabel>
                                 <FormControl>
-                                    <Input type="number" {...field} />
+                                    <Input 
+                                        type="number" 
+                                        {...rest}
+                                        value={value || ""}
+                                        onChange={onChange}
+                                    />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
