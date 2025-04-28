@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/select"
 import { useState, useEffect } from "react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import type { PaymentMethod } from "@/types/Invoice.request.interface"
+import type { PaymentMethod } from "@/types/Payment.interface"
 import * as React from "react"
 
 const addPaymentSchema = z.object({
