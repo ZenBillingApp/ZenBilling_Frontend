@@ -1,11 +1,6 @@
 # Choisir une image de base
 FROM node:18-alpine
 
-# Définir des arguments de construction qui seront fournis à la construction
-ARG NEXT_PUBLIC_API_URL
-ARG JWT_SECRET
-ARG NEXT_PUBLIC_BETTER_AUTH_API_URL
-ARG NEXT_PUBLIC_CLIENT_URL
 # Définir le répertoire de travail
 WORKDIR /app
 
@@ -16,11 +11,6 @@ RUN npm install --legacy-peer-deps
 # Copier le reste du code source de l'application
 COPY . .
 
-# Définir les variables d'environnement à partir des arguments
-ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
-ENV JWT_SECRET=${JWT_SECRET}
-ENV NEXT_PUBLIC_BETTER_AUTH_API_URL=${NEXT_PUBLIC_BETTER_AUTH_API_URL}
-ENV NEXT_PUBLIC_CLIENT_URL=${NEXT_PUBLIC_CLIENT_URL}
 # Construire l'application
 RUN npm run build
 
