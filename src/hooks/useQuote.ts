@@ -5,6 +5,7 @@ import { useToast } from "@/hooks/use-toast"
 import { IQuote,IQuotePagination } from "@/types/Quote.interface"
 import type { IApiErrorResponse,IApiSuccessResponse } from "@/types/api.types"
 import { AxiosError } from "axios"
+import { useRouter } from "next/navigation"
 
 export const useQuotes = (params: IQuoteQueryParams = {}) => {
     const { page = 1, limit = 10, search = "", status, customer_id, start_date, end_date, sortBy = 'quote_date', sortOrder = 'DESC' } = params;
@@ -37,14 +38,15 @@ export const useQuote = (quoteId: string) => {
 export const useCreateQuote = () => {
     const queryClient = useQueryClient()
     const { toast } = useToast()
-
+    const router = useRouter()
     return useMutation<IApiSuccessResponse<IQuote>, AxiosError<IApiErrorResponse>, ICreateQuoteRequest>({
         mutationFn: (data: ICreateQuoteRequest) => 
             api.post("/quotes", data),
-        onSuccess: () => {
+        onSuccess: (data) => {
             queryClient.invalidateQueries({ queryKey: ["quotes"] })
             queryClient.invalidateQueries({ queryKey: ["products"] })
             queryClient.invalidateQueries({ queryKey: ["customers"] })
+            router.replace(`/quotes/${data.data?.quote_id}`)
             toast({
                 title: "Devis créé avec succès",
                 description: "Le devis a été créé avec succès",
@@ -80,10 +82,18 @@ export const useUpdateQuote = (quoteId: string) => {
 export const useDeleteQuote = () => {
     const queryClient = useQueryClient()
     const { toast } = useToast()
+    const router = useRouter()
     return useMutation<IApiSuccessResponse<IQuote>, AxiosError<IApiErrorResponse>, string>({
         mutationFn: (quoteId: string) =>
             api.delete(`/quotes/${quoteId}`),
-        onSuccess: () => {
+        onSuccess: (_, quoteId) => {
+            // Redirection vers la liste des devis
+            router.replace('/quotes')
+            
+            // Supprime explicitement les données du cache pour ce devis
+            queryClient.removeQueries({ queryKey: ["quotes", quoteId] })
+            
+            // Invalide la liste des devis pour la mettre à jour
             queryClient.invalidateQueries({ queryKey: ["quotes"] })
 
             toast({

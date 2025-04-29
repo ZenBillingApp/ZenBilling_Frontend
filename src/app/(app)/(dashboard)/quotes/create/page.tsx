@@ -117,11 +117,6 @@ export default function CreateQuotePage() {
         items,
         conditions: conditions || undefined,
         notes: notes || undefined,
-      },
-      {
-        onSuccess: (data) => {
-          router.push(`/quotes/${data?.data?.quote_id}`);
-        },
       }
     );
   };

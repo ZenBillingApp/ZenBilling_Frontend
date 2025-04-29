@@ -6,6 +6,7 @@ import {
   useDownloadQuotePdf,
   useUpdateQuote,
   useSendQuote,
+  useDeleteQuote,
 } from "@/hooks/useQuote";
 import { useFormat } from "@/hooks/useFormat";
 import { useState } from "react";
@@ -51,19 +52,24 @@ import {
   Send,
   ThumbsUp,
   ThumbsDown,
+  Trash2,
 } from "lucide-react";
 import { EditQuoteDialog } from "@/components/quotes/edit-quote-dialog";
+import { DeleteQuoteDialog } from "@/components/quotes/delete-quote-dialog";
 import { AxiosError } from "axios";
+
 export default function QuoteDetailsPage() {
   const params = useParams();
   const router = useRouter();
   const { formatCurrency, formatPercent } = useFormat();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const { data: quoteData, isLoading } = useQuote(params.id as string);
   const downloadPdf = useDownloadQuotePdf(quoteData?.data?.quote_number as string);
   const updateQuote = useUpdateQuote(params.id as string);
   const sendQuote = useSendQuote(params.id as string);
+  const deleteQuote = useDeleteQuote();
 
   const handleUpdateQuote = async (data: Partial<EditQuoteSchema>) => {
     await updateQuote.mutateAsync(data as IUpdateQuoteRequest);
@@ -74,6 +80,11 @@ export default function QuoteDetailsPage() {
     status: "sent" | "accepted" | "rejected"
   ) => {
     await updateQuote.mutateAsync({ status });
+  };
+
+  const handleDeleteQuote = () => {
+    deleteQuote.mutate(params.id as string);
+    setIsDeleteDialogOpen(false);
   };
 
   const getStatusIcon = (status: string) => {
@@ -154,6 +165,12 @@ export default function QuoteDetailsPage() {
             isError={updateQuote.isError}
             error={{message:(updateQuote.error as AxiosError<IApiErrorResponse>)?.response?.data?.message, errors:(updateQuote.error as AxiosError<IApiErrorResponse>)?.response?.data?.errors}}
           />
+          <DeleteQuoteDialog
+            open={isDeleteDialogOpen}
+            onOpenChange={setIsDeleteDialogOpen}
+            onConfirm={handleDeleteQuote}
+            isLoading={deleteQuote.isPending}
+          />
           <div className="flex flex-wrap gap-2 w-full">
             {quoteData.data?.status === "draft" && (
               <>
@@ -223,6 +240,14 @@ export default function QuoteDetailsPage() {
                 <Download className="w-4 h-4 mr-2" />
               )}
               <span className="hidden sm:inline">Télécharger</span>
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => setIsDeleteDialogOpen(true)}
+              className="flex-1 sm:flex-none"
+            >
+              <Trash2 className="w-4 h-4 mr-2" />
+              <span className="hidden sm:inline">Supprimer</span>
             </Button>
           </div>
         </div>
