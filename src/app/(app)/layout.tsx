@@ -17,6 +17,7 @@ export default function DashboardLayout({children}: {children: React.ReactNode})
         const onboardingRoutes = {
           CHOOSING_COMPANY: "/onboarding/company",
           FINISH: "/onboarding/finish",
+          STRIPE_SETUP: "/onboarding/stripe",
         }
         
         const currentPath = window.location.pathname
