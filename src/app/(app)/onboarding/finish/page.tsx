@@ -5,12 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useOnboardingFinish } from "@/hooks/useAuth";
 import { LogoutButton } from "@/components/logout-button";
+import { useAuthStore } from "@/stores/authStores";
 
 import logo from "@/assets/logo.png";
 import { CheckCircle, ArrowRight } from "lucide-react";
 
 export default function OnboardingFinish() {
   const { mutate: onboardingFinish } = useOnboardingFinish();
+  const { user } = useAuthStore();
   const handleStartUsing = () => {
     onboardingFinish();
   };
@@ -63,6 +65,23 @@ export default function OnboardingFinish() {
                   <p className="text-sm text-muted-foreground">Les informations de votre entreprise sont enregistrées</p>
                 </div>
               </div>
+              {user?.stripe_account_id && (
+                <div className="flex items-center gap-3 rounded-lg border p-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+                    <CheckCircle className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="font-medium">Compte Stripe créé</p>
+                    {user?.stripe_onboarded ? (
+                      <p className="text-sm text-muted-foreground">Votre compte Stripe est prêt pour les paiements</p>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">
+                        Votre compte Stripe n&apos;est pas prêt pour les paiements, veuillez compléter l&apos;onboarding
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           </CardContent>
           <CardFooter>

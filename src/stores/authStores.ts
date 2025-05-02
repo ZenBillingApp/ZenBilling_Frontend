@@ -47,6 +47,8 @@ export const useAuthStore = create<IAuthState & IAuthActions>()(
             company_id: data.company_id,
             onboarding_completed: data.onboarding_completed,
             onboarding_step: data.onboarding_step as IOnboardingStep,
+            stripe_account_id: data.stripe_account_id,
+            stripe_onboarded: data.stripe_onboarded,
             image: data.image
           },
           isAuthenticated: true,

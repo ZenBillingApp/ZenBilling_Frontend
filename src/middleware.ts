@@ -5,11 +5,12 @@ import { getCookie } from '@/lib/serverCookies'
 
 // Routes publiques qui ne nécessitent pas d'authentification
 const PUBLIC_ROUTES = ['/login', '/register']
-const ONBOARDING_ROUTES = ['/onboarding/company', '/onboarding/finish']
+const ONBOARDING_ROUTES = ['/onboarding/company', '/onboarding/finish', '/onboarding/stripe']
 
 const ONBOARDING_STEPS: Record<IOnboardingStep, string> = {
   CHOOSING_COMPANY: "/onboarding/company",
   FINISH: "/onboarding/finish",
+  STRIPE_SETUP: "/onboarding/stripe",
 } as const;
 
 /**

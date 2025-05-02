@@ -1,4 +1,4 @@
-export type IOnboardingStep = 'CHOOSING_COMPANY' | 'FINISH';
+export type IOnboardingStep = 'CHOOSING_COMPANY' | 'STRIPE_SETUP' | 'FINISH';
 
 export interface IUser {
   user_id: string;
@@ -11,6 +11,8 @@ export interface IUser {
   onboarding_step: IOnboardingStep;
   createdAt: Date;
   updatedAt: Date;
+  stripe_account_id?: string | null;
+  stripe_onboarded: boolean;
 }
 
 export interface IUpdateUserRequest {
