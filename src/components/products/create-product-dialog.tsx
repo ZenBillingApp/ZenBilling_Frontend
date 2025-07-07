@@ -9,6 +9,8 @@ import {
   useCreateProduct,
   useProductUnits,
   useProductVatRates,
+  useGenerateProductDescription,
+  useGenerateProductDescriptionSuggestions,
 } from "@/hooks/useProduct";
 import { useFormat } from "@/hooks/useFormat";
 
@@ -31,6 +33,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Sparkles, Loader2, RotateCcw } from "lucide-react";
 
 import {
   ProductUnit,
@@ -84,16 +88,22 @@ export function CreateProductDialog({
   trigger,
 }: CreateProductDialogProps) {
   const createProduct = useCreateProduct();
+  const generateDescription = useGenerateProductDescription();
+  const generateSuggestions = useGenerateProductDescriptionSuggestions();
   const { data: units } = useProductUnits();
   const { data: vatRates } = useProductVatRates();
   const { formatPercent } = useFormat();
   const [apiErrors, setApiErrors] = useState<ApiError[]>([]);
+  const [suggestions, setSuggestions] = useState<{description: string; tone: string}[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [additionalInfo, setAdditionalInfo] = useState("");
 
   const {
     register,
     handleSubmit,
     setValue,
     reset,
+    watch,
     formState: { errors },
   } = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
@@ -106,11 +116,65 @@ export function CreateProductDialog({
     },
   });
 
+  const productName = watch("name");
+
+  const handleGenerateDescription = () => {
+    if (!productName.trim()) {
+      setApiErrors([{ message: "Veuillez saisir un nom de produit avant de générer une description" }]);
+      return;
+    }
+
+    generateDescription.mutate({
+      productName: productName.trim(),
+      additionalInfo: additionalInfo.trim() || undefined,
+    }, {
+      onSuccess: (response) => {
+        if (response.data?.description) {
+          setValue("description", response.data.description);
+        }
+        setApiErrors([]);
+      }
+    });
+  };
+
+  const handleGenerateSuggestions = () => {
+    if (!productName.trim()) {
+      setApiErrors([{ message: "Veuillez saisir un nom de produit avant de générer des suggestions" }]);
+      return;
+    }
+
+    generateSuggestions.mutate({
+      productName: productName.trim(),
+      additionalInfo: additionalInfo.trim() || undefined,
+    }, {
+      onSuccess: (response) => {
+        if (response.data?.suggestions) {
+          setSuggestions(response.data.suggestions);
+          setShowSuggestions(true);
+        }
+        setApiErrors([]);
+      }
+    });
+  };
+
+  const handleSelectSuggestion = (suggestion: string) => {
+    setValue("description", suggestion);
+    setShowSuggestions(false);
+    setSuggestions([]);
+  };
+
+  const resetAI = () => {
+    setSuggestions([]);
+    setShowSuggestions(false);
+    setAdditionalInfo("");
+  };
+
   const onSubmit = (data: ProductFormData) => {
     setApiErrors([]);
     createProduct.mutate(data, {
       onSuccess: () => {
         reset();
+        resetAI();
         onOpenChange(false);
       },
       onError: (error: Error) => {
@@ -127,7 +191,7 @@ export function CreateProductDialog({
       <DialogTrigger asChild>
         {trigger}
       </DialogTrigger>
-      <DialogContent className="w-[90%] max-w-md max-h-[90vh] overflow-y-auto">
+      <DialogContent className="w-[90%] max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Créer un nouveau produit</DialogTitle>
         </DialogHeader>
@@ -152,15 +216,107 @@ export function CreateProductDialog({
               <p className="text-red-500 text-xs">{errors.name.message}</p>
             )}
           </div>
+
+          {/* Section IA pour la description */}
           <div className="grid gap-2">
-            <Label htmlFor="description">Description</Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="description">Description</Label>
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={resetAI}
+                  disabled={generateDescription.isPending || generateSuggestions.isPending}
+                >
+                  <RotateCcw className="h-3 w-3 mr-1" />
+                  Reset
+                </Button>
+              </div>
+            </div>
+            
+            {/* Champ d'informations additionnelles pour l'IA */}
+            <div className="space-y-2">
+              <Input
+                placeholder="Informations additionnelles pour l'IA (catégorie, caractéristiques...)"
+                value={additionalInfo}
+                onChange={(e) => setAdditionalInfo(e.target.value)}
+                className="text-sm"
+              />
+              <div className="flex flex-col sm:flex-row gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleGenerateDescription}
+                  disabled={generateDescription.isPending || generateSuggestions.isPending || !productName.trim()}
+                  className="flex-1"
+                >
+                  {generateDescription.isPending ? (
+                    <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                  ) : (
+                    <Sparkles className="h-3 w-3 mr-1" />
+                  )}
+                  Générer description
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleGenerateSuggestions}
+                  disabled={generateDescription.isPending || generateSuggestions.isPending || !productName.trim()}
+                  className="flex-1"
+                >
+                  {generateSuggestions.isPending ? (
+                    <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                  ) : (
+                    <Sparkles className="h-3 w-3 mr-1" />
+                  )}
+                  Suggestions IA
+                </Button>
+              </div>
+            </div>
+
             <Textarea id="description" {...register("description")} />
             {errors.description && (
               <p className="text-red-500 italic text-xs">
                 {errors.description.message}
               </p>
             )}
+
+            {/* Affichage des suggestions */}
+            {showSuggestions && suggestions.length > 0 && (
+              <div className="space-y-2 p-3 border rounded-lg bg-muted/50">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-sm font-medium">Suggestions IA :</h4>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowSuggestions(false)}
+                  >
+                    ×
+                  </Button>
+                </div>
+                {suggestions.map((suggestion, index) => (
+                  <div
+                    key={index}
+                    className="p-2 border rounded cursor-pointer hover:bg-background transition-colors"
+                    onClick={() => handleSelectSuggestion(suggestion.description)}
+                  >
+                    <div className="flex items-center gap-2 mb-1">
+                      <Badge variant="secondary" className="text-xs">
+                        {suggestion.tone}
+                      </Badge>
+                    </div>
+                    <p className="text-sm">{suggestion.description}</p>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
+
+          {/* Reste du formulaire inchangé */}
           <div className="grid gap-2">
             <Label htmlFor="price">Prix HT</Label>
             <Input

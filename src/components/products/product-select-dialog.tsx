@@ -5,6 +5,8 @@ import {
   useProducts,
   useProductUnits,
   useProductVatRates,
+  useGenerateProductDescription,
+  useGenerateProductDescriptionSuggestions,
 } from "@/hooks/useProduct";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useFormat } from "@/hooks/useFormat";
@@ -47,7 +49,8 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Search } from "lucide-react";
+import { Search, Sparkles, Loader2, RotateCcw } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 import type { IProduct } from "@/types/Product.interface";
 
@@ -82,6 +85,11 @@ export function ProductSelectDialog({
   const { formatCurrency, formatPercent } = useFormat();
   const { data: units } = useProductUnits();
   const { data: vatRates } = useProductVatRates();
+  const generateDescription = useGenerateProductDescription();
+  const generateSuggestions = useGenerateProductDescriptionSuggestions();
+  const [suggestions, setSuggestions] = useState<{description: string; tone: string}[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [additionalInfo, setAdditionalInfo] = useState("");
 
   const debouncedSearch = useDebounce(search, 300);
 
@@ -102,9 +110,59 @@ export function ProductSelectDialog({
     limit: 50,
   });
 
+  const productName = form.watch("name");
+
+  const handleGenerateDescription = () => {
+    if (!productName?.trim()) {
+      return;
+    }
+
+    generateDescription.mutate({
+      productName: productName.trim(),
+      additionalInfo: additionalInfo.trim() || undefined,
+    }, {
+      onSuccess: (response) => {
+        if (response.data?.description) {
+          form.setValue("description", response.data.description);
+        }
+      }
+    });
+  };
+
+  const handleGenerateSuggestions = () => {
+    if (!productName?.trim()) {
+      return;
+    }
+
+    generateSuggestions.mutate({
+      productName: productName.trim(),
+      additionalInfo: additionalInfo.trim() || undefined,
+    }, {
+      onSuccess: (response) => {
+        if (response.data?.suggestions) {
+          setSuggestions(response.data.suggestions);
+          setShowSuggestions(true);
+        }
+      }
+    });
+  };
+
+  const handleSelectSuggestion = (suggestion: string) => {
+    form.setValue("description", suggestion);
+    setShowSuggestions(false);
+    setSuggestions([]);
+  };
+
+  const resetAI = () => {
+    setSuggestions([]);
+    setShowSuggestions(false);
+    setAdditionalInfo("");
+  };
+
   const handleCreateCustom = (data: NewProductSchema) => {
     onCreateCustom(data);
     form.reset();
+    resetAI();
     onOpenChange(false);
   };
 
@@ -215,11 +273,94 @@ export function ProductSelectDialog({
                     >;
                   }) => (
                     <FormItem>
-                      <FormLabel>Description</FormLabel>
+                      <div className="flex items-center justify-between">
+                        <FormLabel>Description</FormLabel>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={resetAI}
+                            disabled={generateDescription.isPending || generateSuggestions.isPending}
+                          >
+                            <RotateCcw className="h-3 w-3 mr-1" />
+                            Reset
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Input
+                          placeholder="Informations additionnelles pour l'IA (catégorie, caractéristiques...)"
+                          value={additionalInfo}
+                          onChange={(e) => setAdditionalInfo(e.target.value)}
+                          className="text-sm"
+                        />
+                        <div className="flex flex-col sm:flex-row gap-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={handleGenerateDescription}
+                            disabled={generateDescription.isPending || generateSuggestions.isPending || !productName?.trim()}
+                            className="flex-1"
+                          >
+                            {generateDescription.isPending ? (
+                              <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                            ) : (
+                              <Sparkles className="h-3 w-3 mr-1" />
+                            )}
+                            Générer description
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={handleGenerateSuggestions}
+                            disabled={generateDescription.isPending || generateSuggestions.isPending || !productName?.trim()}
+                            className="flex-1"
+                          >
+                            {generateSuggestions.isPending ? (
+                              <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                            ) : (
+                              <Sparkles className="h-3 w-3 mr-1" />
+                            )}
+                            Suggestions IA
+                          </Button>
+                        </div>
+                      </div>
                       <FormControl>
                         <Textarea {...field} />
                       </FormControl>
                       <FormMessage />
+                      {showSuggestions && suggestions.length > 0 && (
+                        <div className="space-y-2 p-3 border rounded-lg bg-muted/50">
+                          <div className="flex items-center justify-between">
+                            <h4 className="text-sm font-medium">Suggestions IA :</h4>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setShowSuggestions(false)}
+                            >
+                              ×
+                            </Button>
+                          </div>
+                          {suggestions.map((suggestion, index) => (
+                            <div
+                              key={index}
+                              className="p-2 border rounded cursor-pointer hover:bg-background transition-colors"
+                              onClick={() => handleSelectSuggestion(suggestion.description)}
+                            >
+                              <div className="flex items-center gap-2 mb-1">
+                                <Badge variant="secondary" className="text-xs">
+                                  {suggestion.tone}
+                                </Badge>
+                              </div>
+                              <p className="text-sm">{suggestion.description}</p>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </FormItem>
                   )}
                 />
@@ -315,6 +456,7 @@ export function ProductSelectDialog({
                     variant="outline"
                     onClick={() => {
                       form.reset();
+                      resetAI();
                       onOpenChange(false);
                     }}
                   >

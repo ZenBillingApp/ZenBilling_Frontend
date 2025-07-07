@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { api } from "@/lib/api"
-import type { ICreateProductRequest, IUpdateProductRequest, IProductQueryParams } from "@/types/Product.request.interface"
+import type { ICreateProductRequest, IUpdateProductRequest, IProductQueryParams, IGenerateDescriptionRequest, IGenerateDescriptionResponse, IGenerateDescriptionSuggestionsResponse } from "@/types/Product.request.interface"
 import { useToast } from "@/hooks/use-toast"
 import type { IApiErrorResponse,IApiSuccessResponse } from "@/types/api.types"
 import { AxiosError } from "axios"
@@ -106,5 +106,36 @@ export const useProductVatRates = () => {
         return useQuery<IApiSuccessResponse<IProductVatRate>>({
         queryKey: ["product-vat-rates"],
         queryFn: () => api.get<IApiSuccessResponse<IProductVatRate>>("/products/vat-rates"),
+    })
+}
+
+// Nouveaux hooks pour l'IA
+export const useGenerateProductDescription = () => {
+    const { toast } = useToast()
+    return useMutation<IApiSuccessResponse<IGenerateDescriptionResponse>, AxiosError<IApiErrorResponse>, IGenerateDescriptionRequest>({
+        mutationFn: (data: IGenerateDescriptionRequest) => 
+            api.post("/products/generate-description", data),
+        onError: (error: AxiosError<IApiErrorResponse>) => {
+            toast({
+                title: "Erreur lors de la génération",
+                description: error.response?.data?.message || "Une erreur est survenue lors de la génération de la description",
+                variant: "destructive"
+            })
+        },
+    })
+}
+
+export const useGenerateProductDescriptionSuggestions = () => {
+    const { toast } = useToast()
+    return useMutation<IApiSuccessResponse<IGenerateDescriptionSuggestionsResponse>, AxiosError<IApiErrorResponse>, IGenerateDescriptionRequest>({
+        mutationFn: (data: IGenerateDescriptionRequest) => 
+            api.post("/products/generate-description-suggestions", data),
+        onError: (error: AxiosError<IApiErrorResponse>) => {
+            toast({
+                title: "Erreur lors de la génération",
+                description: error.response?.data?.message || "Une erreur est survenue lors de la génération des suggestions",
+                variant: "destructive"
+            })
+        },
     })
 }
