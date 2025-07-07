@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { api } from "@/lib/api"
-import type { ICreateInvoiceRequest, IUpdateInvoiceRequest, IInvoiceQueryParams } from "@/types/Invoice.request.interface"
+import type { ICreateInvoiceRequest, IUpdateInvoiceRequest, IInvoiceQueryParams, ISendInvoiceWithPaymentLinkRequest, ISendInvoiceWithPaymentLinkResponse } from "@/types/Invoice.request.interface"
 import type { AddPaymentSchema } from "@/components/invoices/add-payment-dialog"
 import { useToast } from "@/hooks/use-toast"
 import { IInvoice,IInvoicePagination } from "@/types/Invoice.interface"
@@ -241,6 +241,36 @@ export const useCancelInvoice = (invoiceId: string) => {
             toast({
                 title: "Erreur lors de l'annulation de la facture",
                 description: error.response?.data?.message,
+            })
+        },
+    })
+}
+
+// Nouveau hook pour l'envoi avec lien de paiement
+export const useSendInvoiceWithPaymentLink = (invoiceId: string) => {
+    const queryClient = useQueryClient()
+    const { toast } = useToast()
+    return useMutation<IApiSuccessResponse<ISendInvoiceWithPaymentLinkResponse>, AxiosError<IApiErrorResponse>, ISendInvoiceWithPaymentLinkRequest>({
+        mutationFn: (data: ISendInvoiceWithPaymentLinkRequest) => 
+            api.post(`/invoices/${invoiceId}/send-with-payment-link`, data),
+        onSuccess: (response) => {
+            queryClient.invalidateQueries({ queryKey: ["invoices", invoiceId] })
+            queryClient.invalidateQueries({ queryKey: ["invoices"] })
+            
+            const message = response.data?.paymentLinkCreated 
+                ? "Facture envoyée avec lien de paiement avec succès"
+                : "Facture envoyée avec succès"
+            
+            toast({
+                title: "Envoi réussi",
+                description: message,
+            })
+        },
+        onError: (error: AxiosError<IApiErrorResponse>) => {
+            toast({
+                title: "Erreur lors de l'envoi de la facture",
+                description: error.response?.data?.message || "Une erreur est survenue lors de l'envoi",
+                variant: "destructive"
             })
         },
     })

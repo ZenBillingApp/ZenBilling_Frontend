@@ -49,4 +49,18 @@ export interface ICreatePaymentRequest {
   payment_method: PaymentMethod;
   description?: string;
   reference?: string;
+}
+
+// Nouveaux types pour l'envoi avec lien de paiement
+export interface ISendInvoiceWithPaymentLinkRequest {
+  includePaymentLink?: boolean;
+  successUrl?: string;
+  cancelUrl?: string;
+}
+
+export interface ISendInvoiceWithPaymentLinkResponse {
+  message: string;
+  emailSent: boolean;
+  paymentLinkCreated?: boolean;
+  paymentLinkUrl?: string;
 } 

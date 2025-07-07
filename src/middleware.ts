@@ -4,7 +4,7 @@ import { IOnboardingStep } from '@/types/User.interface'
 import { getCookie } from '@/lib/serverCookies'
 
 // Routes publiques qui ne nécessitent pas d'authentification
-const PUBLIC_ROUTES = ['/login', '/register']
+const PUBLIC_ROUTES = ['/login', '/register', '/payment']
 const ONBOARDING_ROUTES = ['/onboarding/company', '/onboarding/finish', '/onboarding/stripe']
 
 const ONBOARDING_STEPS: Record<IOnboardingStep, string> = {
@@ -93,6 +93,7 @@ export const config = {
     '/customers/:path*',
     '/quotes/:path*',
     '/onboarding/:path*',
+    '/payment/:path*',
     '/login',
     '/register'
   ]

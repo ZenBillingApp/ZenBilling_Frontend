@@ -6,7 +6,6 @@ import {
   useDownloadInvoicePdf,
   useUpdateInvoice,
   useAddPayment,
-  useSendInvoice,
   useDeleteInvoice,
   useCancelInvoice,
 } from "@/hooks/useInvoice";
@@ -63,6 +62,7 @@ import { EditInvoiceDialog } from "@/components/invoices/edit-invoice-dialog";
 import { AddPaymentDialog } from "@/components/invoices/add-payment-dialog";
 import { DeleteInvoiceDialog } from "@/components/invoices/delete-invoice-dialog";
 import { CancelInvoiceDialog } from "@/components/invoices/cancel-invoice-dialog";
+import { SendInvoiceWithPaymentLinkDialog } from "@/components/invoices/send-invoice-with-payment-link-dialog";
 import { AxiosError } from "axios";
 
 
@@ -74,6 +74,7 @@ export default function InvoiceDetailsPage() {
   const [isAddPaymentDialogOpen, setIsAddPaymentDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
+  const [isSendWithPaymentLinkDialogOpen, setIsSendWithPaymentLinkDialogOpen] = useState(false);
 
   const { data: invoiceData, isLoading } = useInvoice(params.id as string);
   const downloadPdf = useDownloadInvoicePdf(
@@ -81,7 +82,6 @@ export default function InvoiceDetailsPage() {
   );
   const updateInvoice = useUpdateInvoice(params.id as string);
   const addPayment = useAddPayment(params.id as string);
-  const sendInvoice = useSendInvoice(params.id as string);
   const deleteInvoice = useDeleteInvoice();
   const cancelInvoice = useCancelInvoice(params.id as string);
 
@@ -222,6 +222,19 @@ export default function InvoiceDetailsPage() {
             onConfirm={handleCancelInvoice}
             isLoading={cancelInvoice.isPending}
           />
+          <SendInvoiceWithPaymentLinkDialog
+            open={isSendWithPaymentLinkDialogOpen}
+            onOpenChange={setIsSendWithPaymentLinkDialogOpen}
+            invoiceId={params.id as string}
+            invoiceNumber={invoiceData.data?.invoice_number || ""}
+            customerName={
+              invoiceData.data?.customer?.type === "company"
+                ? invoiceData.data?.customer?.business?.name || ""
+                : `${invoiceData.data?.customer?.individual?.first_name || ""} ${invoiceData.data?.customer?.individual?.last_name || ""}`
+            }
+            customerType={invoiceData.data?.customer?.type || "individual"}
+            invoiceAmount={invoiceData.data?.amount_including_tax || 0}
+          />
           <div className="flex flex-wrap gap-2 w-full">
             {invoiceData.data?.status !== "cancelled" &&
               invoiceData.data?.status !== "paid" && (
@@ -247,25 +260,13 @@ export default function InvoiceDetailsPage() {
                   </Button>
                   <Button
                     variant="outline"
-                    onClick={() => sendInvoice.mutate(invoiceData.data?.invoice_id || "")}
-                    disabled={sendInvoice.isPending}
+                    onClick={() => setIsSendWithPaymentLinkDialogOpen(true)}
                     className="flex-1 sm:flex-none"
                   >
-                    {sendInvoice.isPending ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        <span className="hidden sm:inline">
-                          Envoi en cours...
-                        </span>
-                      </>
-                    ) : (
-                      <>
-                        <Send className="w-4 h-4 mr-2" />
-                        <span className="hidden sm:inline">
-                          Envoyer au client
-                        </span>
-                      </>
-                    )}
+                    <Send className="w-4 h-4 mr-2" />
+                    <span className="hidden sm:inline">
+                      Envoyer au client
+                    </span>
                   </Button>
                 </>
               )}
