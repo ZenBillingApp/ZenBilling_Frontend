@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
@@ -32,7 +33,7 @@ interface PaymentSuccessData {
   sessionId?: string;
 }
 
-export default function PaymentSuccessPage() {
+function PaymentSuccessContent() {
   const searchParams = useSearchParams();
   const [paymentData, setPaymentData] = useState<PaymentSuccessData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -238,5 +239,24 @@ export default function PaymentSuccessPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+function PaymentSuccessLoading() {
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="animate-pulse text-center">
+        <div className="h-8 w-48 bg-muted rounded mx-auto mb-4"></div>
+        <div className="h-4 w-32 bg-muted rounded mx-auto"></div>
+      </div>
+    </div>
+  );
+}
+
+export default function PaymentSuccessPage() {
+  return (
+    <Suspense fallback={<PaymentSuccessLoading />}>
+      <PaymentSuccessContent />
+    </Suspense>
   );
 } 
