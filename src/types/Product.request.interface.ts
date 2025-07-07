@@ -36,10 +36,7 @@ export interface IGenerateDescriptionResponse {
 }
 
 export interface IGenerateDescriptionSuggestionsResponse {
-  suggestions: {
-    description: string;
-    tone: string;
-  }[];
+  suggestions: string[];
   generatedAt: string;
   productName: string;
 } 

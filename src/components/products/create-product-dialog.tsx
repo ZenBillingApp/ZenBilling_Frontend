@@ -33,7 +33,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
 import { Sparkles, Loader2, RotateCcw } from "lucide-react";
 
 import {
@@ -94,7 +93,7 @@ export function CreateProductDialog({
   const { data: vatRates } = useProductVatRates();
   const { formatPercent } = useFormat();
   const [apiErrors, setApiErrors] = useState<ApiError[]>([]);
-  const [suggestions, setSuggestions] = useState<{description: string; tone: string}[]>([]);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [additionalInfo, setAdditionalInfo] = useState("");
 
@@ -302,14 +301,9 @@ export function CreateProductDialog({
                   <div
                     key={index}
                     className="p-2 border rounded cursor-pointer hover:bg-background transition-colors"
-                    onClick={() => handleSelectSuggestion(suggestion.description)}
+                    onClick={() => handleSelectSuggestion(suggestion)}
                   >
-                    <div className="flex items-center gap-2 mb-1">
-                      <Badge variant="secondary" className="text-xs">
-                        {suggestion.tone}
-                      </Badge>
-                    </div>
-                    <p className="text-sm">{suggestion.description}</p>
+                    <p className="text-sm">{suggestion}</p>
                   </div>
                 ))}
               </div>
