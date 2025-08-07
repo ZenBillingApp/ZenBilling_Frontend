@@ -10,7 +10,7 @@ export const useUser = () => {
     return useQuery<IUser | undefined>({
         queryKey: ["user"],
         queryFn: async () => {
-            const response = await api.get<IApiSuccessResponse<IUser>>("/users/profile");
+            const response = await api.get<IApiSuccessResponse<IUser>>("/user/profile");
             if (response.data) {
                 await setUser(response.data);
             }
@@ -23,7 +23,7 @@ export const useUpdateUser = () => {
     const updateUser = useAuthStore((state) => state.updateUser);
 
     return useMutation<IApiSuccessResponse<IUser> , Error, IUpdateUserRequest>({
-        mutationFn: (user: IUpdateUserRequest) => api.put<IApiSuccessResponse<IUser> >("/users/profile", user),
+        mutationFn: (user: IUpdateUserRequest) => api.put<IApiSuccessResponse<IUser> >("/user/profile", user),
         onSuccess: async (data: IApiSuccessResponse<IUser>) => {
             if (data.data) {
                 await updateUser(data.data);

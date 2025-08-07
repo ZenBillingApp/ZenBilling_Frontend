@@ -13,7 +13,7 @@ export const useCustomers = (params: ICustomerQueryParams = {}) => {
     return useQuery<IApiSuccessResponse<ICustomerPagination>>({
         queryKey: ["customers", { page, limit, search, type }],
         queryFn: () => {
-            let url = `/customers?page=${page}&limit=${limit}`;
+            let url = `/customer?page=${page}&limit=${limit}`;
             if (search) url += `&search=${search}`;
             if (type) url += `&type=${type}`;
             return api.get<IApiSuccessResponse<ICustomerPagination>>(url);
@@ -25,7 +25,7 @@ export const useCustomers = (params: ICustomerQueryParams = {}) => {
 export const useCustomer = (customerId: string) => {
     return useQuery<IApiSuccessResponse<ICustomer>>({
         queryKey: ["customers", customerId],
-        queryFn: () => api.get<IApiSuccessResponse<ICustomer>>(`/customers/${customerId}`),
+        queryFn: () => api.get<IApiSuccessResponse<ICustomer>>(`/customer/${customerId}`),
         enabled: !!customerId,
     })
 }
@@ -35,7 +35,7 @@ export const useCreateCustomer = () => {
     const { toast } = useToast()
     return useMutation<IApiSuccessResponse<ICustomer>, AxiosError<IApiErrorResponse>, ICreateCustomerRequest>({
         mutationFn: (data: ICreateCustomerRequest) => 
-            api.post("/customers", data),
+            api.post("/customer", data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["customers"] })
             toast({
@@ -52,7 +52,7 @@ export const useUpdateCustomer = (customerId: string | undefined) => {
     return useMutation<IApiSuccessResponse<ICustomer>, AxiosError<IApiErrorResponse>, IUpdateCustomerRequest>({
 
         mutationFn: (data: IUpdateCustomerRequest) =>
-            api.put(`/customers/${customerId}`, data),
+            api.put(`/customer/${customerId}`, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["customers", customerId] })
             queryClient.invalidateQueries({ queryKey: ["customers"] })
@@ -69,7 +69,7 @@ export const useDeleteCustomer = () => {
     const { toast } = useToast()
     return useMutation<IApiSuccessResponse<ICustomer>, AxiosError<IApiErrorResponse>, string>({
         mutationFn: (customerId: string) =>
-            api.delete(`/customers/${customerId}`),
+            api.delete(`/customer/${customerId}`),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["customers"] })
 

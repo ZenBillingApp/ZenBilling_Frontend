@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
 import { useCompany, useUpdateCompany, useLegalForm } from "@/hooks/useCompany";
+import { useStripeConnect, useStripeAccountLink, useStripeCreateDashboardLink } from "@/hooks/useStripe";
 import { IUpdateCompanyRequest } from "@/types/Company.request.interface";
 
 import { Label } from "@/components/ui/label";
@@ -14,9 +15,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle, Loader2 } from "lucide-react";
+import { AlertCircle, Loader2, CreditCard, ExternalLink, CheckCircle2, XCircle } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { useAuthStore } from "@/stores/authStores";
+import { usePathname } from "next/navigation";
 
 const companySchema = z.object({
   name: z.string().min(1, "Le nom est requis"),
@@ -44,6 +47,16 @@ export function CompanyDetails() {
   const { data: companyData, isLoading: isCompanyLoading } = useCompany();
   const { data: legalForm } = useLegalForm();
   const updateCompany = useUpdateCompany();
+  const { user } = useAuthStore();
+  const pathname = usePathname();
+  
+  // Stripe hooks
+  const stripeConnect = useStripeConnect();
+  const stripeAccountLink = useStripeAccountLink(
+    process.env.NEXT_PUBLIC_CLIENT_URL + pathname,
+    process.env.NEXT_PUBLIC_CLIENT_URL + pathname,
+  );
+  const stripeCreateDashboardLink = useStripeCreateDashboardLink();
 
   const form = useForm<IUpdateCompanyRequest>({
     resolver: zodResolver(companySchema),
@@ -76,6 +89,19 @@ export function CompanyDetails() {
         setIsEditing(false);
       }
     });
+  };
+
+  // Stripe handlers
+  const handleCreateStripeAccount = async () => {
+    await stripeConnect.mutateAsync();
+  };
+
+  const handleContinueStripeOnboarding = async () => {
+    await stripeAccountLink.mutateAsync();
+  };
+
+  const handleOpenStripeDashboard = async () => {
+    await stripeCreateDashboardLink.mutateAsync();
   };
 
   if (isCompanyLoading) {
@@ -132,6 +158,7 @@ export function CompanyDetails() {
             <TabsTrigger value="informations">Informations</TabsTrigger>
             <TabsTrigger value="adresse">Adresse</TabsTrigger>
             <TabsTrigger value="contact">Contact</TabsTrigger>
+            <TabsTrigger value="stripe">Stripe</TabsTrigger>
           </TabsList>
 
           {isEditing ? (
@@ -397,6 +424,17 @@ export function CompanyDetails() {
                   </div>
                 </TabsContent>
 
+                <TabsContent value="stripe">
+                  <div className="text-center py-8">
+                    <p className="text-muted-foreground">
+                      Vous ne pouvez pas modifier les informations Stripe en mode édition.
+                    </p>
+                    <p className="text-sm text-muted-foreground mt-2">
+                      Annulez l'édition pour accéder aux options Stripe.
+                    </p>
+                  </div>
+                </TabsContent>
+
                 <div className="flex gap-2 mt-6">
                   <Button type="submit" disabled={updateCompany.isPending}>
                     {updateCompany.isPending ? "Mise à jour..." : "Enregistrer"}
@@ -496,6 +534,117 @@ export function CompanyDetails() {
                       </a>
                     ) : "-"}</p>
                   </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="stripe">
+                <div className="space-y-6">
+                  {/* Statut du compte Stripe */}
+                  <div className="flex items-center gap-3 p-4 border rounded-lg">
+                    <CreditCard className="h-5 w-5 text-muted-foreground" />
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">Compte Stripe</span>
+                        {user?.stripe_account_id ? (
+                          <div className="flex items-center gap-1">
+                            <CheckCircle2 className="h-4 w-4 text-green-600" />
+                            <span className="text-sm text-green-600">Créé</span>
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-1">
+                            <XCircle className="h-4 w-4 text-red-600" />
+                            <span className="text-sm text-red-600">Non créé</span>
+                          </div>
+                        )}
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        {user?.stripe_account_id 
+                          ? `ID: ${user.stripe_account_id}`
+                          : "Aucun compte Stripe associé"
+                        }
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Statut de l'onboarding */}
+                  <div className="flex items-center gap-3 p-4 border rounded-lg">
+                    <CheckCircle2 className="h-5 w-5 text-muted-foreground" />
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">Onboarding Stripe</span>
+                        {user?.stripe_onboarded ? (
+                          <div className="flex items-center gap-1">
+                            <CheckCircle2 className="h-4 w-4 text-green-600" />
+                            <span className="text-sm text-green-600">Terminé</span>
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-1">
+                            <XCircle className="h-4 w-4 text-orange-600" />
+                            <span className="text-sm text-orange-600">À compléter</span>
+                          </div>
+                        )}
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        {user?.stripe_onboarded 
+                          ? "Votre compte est configuré et prêt à recevoir des paiements"
+                          : "Complétez l'onboarding pour accepter des paiements"
+                        }
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Actions Stripe */}
+                  <div className="space-y-4">
+                    <h4 className="font-medium">Actions disponibles</h4>
+                    
+                    {!user?.stripe_account_id ? (
+                      <div className="space-y-3">
+                        <p className="text-sm text-muted-foreground">
+                          Pour commencer à accepter des paiements, vous devez d'abord créer un compte Stripe.
+                        </p>
+                        <Button 
+                          onClick={handleCreateStripeAccount}
+                          disabled={stripeConnect.isPending}
+                          className="w-full sm:w-auto"
+                        >
+                          <CreditCard className="mr-2 h-4 w-4" />
+                          {stripeConnect.isPending ? "Création en cours..." : "Créer un compte Stripe"}
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        {!user?.stripe_onboarded && (
+                          <Button 
+                            onClick={handleContinueStripeOnboarding}
+                            disabled={stripeAccountLink.isPending}
+                            variant="default"
+                          >
+                            <CheckCircle2 className="mr-2 h-4 w-4" />
+                            {stripeAccountLink.isPending ? "Chargement..." : "Continuer l'onboarding"}
+                          </Button>
+                        )}
+                        
+                        <Button 
+                          onClick={handleOpenStripeDashboard}
+                          disabled={stripeCreateDashboardLink.isPending}
+                          variant="outline"
+                        >
+                          <ExternalLink className="mr-2 h-4 w-4" />
+                          {stripeCreateDashboardLink.isPending ? "Ouverture..." : "Ouvrir le dashboard Stripe"}
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Informations utiles */}
+                  <Alert>
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertTitle>À propos de Stripe</AlertTitle>
+                    <AlertDescription>
+                      Stripe vous permet d'accepter des paiements en ligne directement depuis vos factures. 
+                      L'onboarding est nécessaire pour vérifier votre identité et configurer vos méthodes de paiement.
+                    </AlertDescription>
+                  </Alert>
                 </div>
               </TabsContent>
             </>

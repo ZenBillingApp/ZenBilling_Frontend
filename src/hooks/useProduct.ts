@@ -12,7 +12,7 @@ export const useProducts = (params: IProductQueryParams = {}) => {
     return useQuery({
         queryKey: ["products", { page, limit, search }],
         queryFn: () => {
-            let url = `/products?page=${page}&limit=${limit}`;
+            let url = `/product?page=${page}&limit=${limit}`;
             if (search) url += `&search=${search}`;
             return api.get<IApiSuccessResponse<IProductPagination>>(url);
         },
@@ -23,7 +23,7 @@ export const useProducts = (params: IProductQueryParams = {}) => {
 export const useProduct = (productId: string) => {
     return useQuery<IApiSuccessResponse<IProduct>>({
         queryKey: ["products", productId],
-        queryFn: () => api.get<IApiSuccessResponse<IProduct>>(`/products/${productId}`),
+        queryFn: () => api.get<IApiSuccessResponse<IProduct>>(`/product/${productId}`),
         enabled: !!productId,
     })
 }
@@ -34,7 +34,7 @@ export const useCreateProduct = () => {
     const { toast } = useToast()
     return useMutation<IApiSuccessResponse<IProduct>, AxiosError<IApiErrorResponse>, ICreateProductRequest>({
         mutationFn: (data: ICreateProductRequest) => 
-            api.post("/products", data),
+            api.post("/product", data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["products"] })
             toast({
@@ -51,7 +51,7 @@ export const useUpdateProduct = (productId: string) => {
     return useMutation<IApiSuccessResponse<IProduct>, AxiosError<IApiErrorResponse>, IUpdateProductRequest>({
 
         mutationFn: (data: IUpdateProductRequest) =>
-            api.put(`/products/${productId}`, data),
+            api.put(`/product/${productId}`, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["products"] })
             queryClient.invalidateQueries({ queryKey: ["product-details", productId] })
@@ -69,7 +69,7 @@ export const useDeleteProduct = () => {
     const { toast } = useToast()
     return useMutation<IApiSuccessResponse<IProduct>, AxiosError<IApiErrorResponse>, string>({
         mutationFn: (productId: string) =>
-            api.delete(`/products/${productId}`),
+            api.delete(`/product/${productId}`),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["products"] })
 
@@ -90,7 +90,7 @@ export const useDeleteProduct = () => {
 export const useProductDetails = (productId: string) => {
     return useQuery<IApiSuccessResponse<IProduct>>({
         queryKey: ["product-details", productId],
-        queryFn: () => api.get<IApiSuccessResponse<IProduct>>(`/products/${productId}`),
+        queryFn: () => api.get<IApiSuccessResponse<IProduct>>(`/product/${productId}`),
         enabled: !!productId,
     })
 }
@@ -98,14 +98,14 @@ export const useProductDetails = (productId: string) => {
 export const useProductUnits = () => {
     return useQuery<IApiSuccessResponse<IProductUnit>>({
         queryKey: ["product-units"],
-        queryFn: () => api.get<IApiSuccessResponse<IProductUnit>>("/products/units"),
+        queryFn: () => api.get<IApiSuccessResponse<IProductUnit>>("/product/units"),
     })
 }
 
 export const useProductVatRates = () => {
         return useQuery<IApiSuccessResponse<IProductVatRate>>({
         queryKey: ["product-vat-rates"],
-        queryFn: () => api.get<IApiSuccessResponse<IProductVatRate>>("/products/vat-rates"),
+        queryFn: () => api.get<IApiSuccessResponse<IProductVatRate>>("/product/vat-rates"),
     })
 }
 
@@ -114,7 +114,7 @@ export const useGenerateProductDescription = () => {
     const { toast } = useToast()
     return useMutation<IApiSuccessResponse<IGenerateDescriptionResponse>, AxiosError<IApiErrorResponse>, IGenerateDescriptionRequest>({
         mutationFn: (data: IGenerateDescriptionRequest) => 
-            api.post("/products/generate-description", data),
+            api.post("/product/generate-description", data),
         onError: (error: AxiosError<IApiErrorResponse>) => {
             toast({
                 title: "Erreur lors de la génération",
@@ -129,7 +129,7 @@ export const useGenerateProductDescriptionSuggestions = () => {
     const { toast } = useToast()
     return useMutation<IApiSuccessResponse<IGenerateDescriptionSuggestionsResponse>, AxiosError<IApiErrorResponse>, IGenerateDescriptionRequest>({
         mutationFn: (data: IGenerateDescriptionRequest) => 
-            api.post("/products/generate-description-suggestions", data),
+            api.post("/product/generate-description-suggestions", data),
         onError: (error: AxiosError<IApiErrorResponse>) => {
             toast({
                 title: "Erreur lors de la génération",

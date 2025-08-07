@@ -16,7 +16,7 @@ export const useCreateCompany = () => {
     const router = useRouter();
     const queryClient = useQueryClient();
     return useMutation<IApiSuccessResponse<ICompany>, AxiosError<IApiErrorResponse>, ICreateCompanyRequest>({
-        mutationFn: (data: ICreateCompanyRequest) => api.post("/companies", data),
+        mutationFn: (data: ICreateCompanyRequest) => api.post("/company", data),
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ["user"] });
             router.replace("/onboarding/finish");
@@ -38,7 +38,7 @@ export const useCompany = () => {
     
     return useQuery<IApiSuccessResponse<ICompany>>({
         queryKey: ["company", companyId],
-        queryFn: () => api.get<IApiSuccessResponse<ICompany>>(`/companies`),
+        queryFn: () => api.get<IApiSuccessResponse<ICompany>>(`/company`),
         enabled: !!companyId,
     });
 }
@@ -49,7 +49,7 @@ export const useUpdateCompany = () => {
     const companyId = useAuthStore((state) => state.user?.company_id);
     
     return useMutation<IApiSuccessResponse<ICompany>, AxiosError<IApiErrorResponse>, IUpdateCompanyRequest>({
-        mutationFn: (data: IUpdateCompanyRequest) => api.put(`/companies`, data),
+        mutationFn: (data: IUpdateCompanyRequest) => api.put(`/company`, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["company", companyId] });
             toast({
@@ -72,6 +72,6 @@ export const useUpdateCompany = () => {
 export const useLegalForm = () => {
     return useQuery<IApiSuccessResponse<ICompanyLegalForm>>({
         queryKey: ["legalForm"],
-        queryFn: () => api.get<IApiSuccessResponse<ICompanyLegalForm>>("/companies/legal-forms"),
+        queryFn: () => api.get<IApiSuccessResponse<ICompanyLegalForm>>("/company/legal-forms"),
     });
 }

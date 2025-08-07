@@ -23,7 +23,7 @@ import {
   FormDescription,
 } from "@/components/ui/form";
 import { Mail, Loader2, CreditCard, Info } from "lucide-react";
-import { useSendInvoiceWithPaymentLink } from "@/hooks/useInvoice";
+import { useSendInvoice, useSendInvoiceWithPaymentLink } from "@/hooks/useInvoice";
 import type { ISendInvoiceWithPaymentLinkRequest } from "@/types/Invoice.request.interface";
 
 const sendInvoiceSchema = z.object({
@@ -51,7 +51,8 @@ export function SendInvoiceWithPaymentLinkDialog({
   customerType,
   invoiceAmount,
 }: SendInvoiceWithPaymentLinkDialogProps) {
-  const sendInvoice = useSendInvoiceWithPaymentLink(invoiceId);
+  const sendInvoiceWithPaymentLink = useSendInvoiceWithPaymentLink(invoiceId);
+  const sendInvoiceWithoutPaymentLink = useSendInvoice(invoiceId);
 
   const form = useForm<SendInvoiceFormData>({
     resolver: zodResolver(sendInvoiceSchema),
@@ -85,18 +86,30 @@ export function SendInvoiceWithPaymentLinkDialog({
       includePaymentLink: data.includePaymentLink,
     };
 
+    console.log("requestData", requestData);
+    console.log("data", data);
+
     if (data.includePaymentLink) {
+      console.log("includePaymentLink");
       const urls = generatePaymentUrls();
       requestData.successUrl = urls.successUrl;
       requestData.cancelUrl = urls.cancelUrl;
+
+      sendInvoiceWithPaymentLink.mutate(requestData, {
+        onSuccess: () => {
+          form.reset();
+          onOpenChange(false);
+        },
+      });
+    } else {
+        sendInvoiceWithoutPaymentLink.mutate(invoiceId, {
+            onSuccess: () => {
+              form.reset();
+              onOpenChange(false);
+            },
+          });
     }
 
-    sendInvoice.mutate(requestData, {
-      onSuccess: () => {
-        form.reset();
-        onOpenChange(false);
-      },
-    });
   };
 
   const handleClose = () => {
@@ -177,16 +190,16 @@ export function SendInvoiceWithPaymentLinkDialog({
                 type="button"
                 variant="outline"
                 onClick={handleClose}
-                disabled={sendInvoice.isPending}
+                disabled={sendInvoiceWithPaymentLink.isPending || sendInvoiceWithoutPaymentLink.isPending}
               >
                 Annuler
               </Button>
               <Button
                 type="submit"
-                disabled={sendInvoice.isPending}
+                disabled={sendInvoiceWithPaymentLink.isPending || sendInvoiceWithoutPaymentLink.isPending}
                 className="min-w-[120px]"
               >
-                {sendInvoice.isPending ? (
+                {sendInvoiceWithPaymentLink.isPending || sendInvoiceWithoutPaymentLink.isPending ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                     Envoi...
