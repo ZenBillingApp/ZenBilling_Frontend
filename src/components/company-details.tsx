@@ -430,7 +430,7 @@ export function CompanyDetails() {
                       Vous ne pouvez pas modifier les informations Stripe en mode édition.
                     </p>
                     <p className="text-sm text-muted-foreground mt-2">
-                      Annulez l'édition pour accéder aux options Stripe.
+                      Annulez l&apos;édition pour accéder aux options Stripe.
                     </p>
                   </div>
                 </TabsContent>
@@ -600,7 +600,7 @@ export function CompanyDetails() {
                     {!user?.stripe_account_id ? (
                       <div className="space-y-3">
                         <p className="text-sm text-muted-foreground">
-                          Pour commencer à accepter des paiements, vous devez d'abord créer un compte Stripe.
+                          Pour commencer à accepter des paiements, vous devez d&apos;abord créer un compte Stripe.
                         </p>
                         <Button 
                           onClick={handleCreateStripeAccount}
@@ -641,8 +641,8 @@ export function CompanyDetails() {
                     <AlertCircle className="h-4 w-4" />
                     <AlertTitle>À propos de Stripe</AlertTitle>
                     <AlertDescription>
-                      Stripe vous permet d'accepter des paiements en ligne directement depuis vos factures. 
-                      L'onboarding est nécessaire pour vérifier votre identité et configurer vos méthodes de paiement.
+                      Stripe vous permet d&apos;accepter des paiements en ligne directement depuis vos factures. 
+                      L&apos;onboarding est nécessaire pour vérifier votre identité et configurer vos méthodes de paiement.
                     </AlertDescription>
                   </Alert>
                 </div>
