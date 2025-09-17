@@ -13,7 +13,7 @@ export const useOnboardingFinish = () => {
     const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: () => api.post<IApiSuccessResponse<void>>('/users/onboarding-finish'),
+    mutationFn: () => api.post<IApiSuccessResponse<void>>('/user/onboarding-finish'),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["user"] });
       router.replace('/dashboard');
