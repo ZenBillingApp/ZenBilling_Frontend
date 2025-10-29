@@ -129,7 +129,7 @@ export const useGenerateProductDescriptionSuggestions = () => {
     const { toast } = useToast()
     return useMutation<IApiSuccessResponse<IGenerateDescriptionSuggestionsResponse>, AxiosError<IApiErrorResponse>, IGenerateDescriptionRequest>({
         mutationFn: (data: IGenerateDescriptionRequest) => 
-            api.post("/product/ai/generate-description-suggestions", data),
+            api.post("/product/ai/generate-suggestions", data),
         onError: (error: AxiosError<IApiErrorResponse>) => {
             toast({
                 title: "Erreur lors de la génération",

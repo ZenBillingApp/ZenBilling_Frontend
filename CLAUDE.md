@@ -4,11 +4,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Development Commands
 
-- **Development server**: `npm run dev` (uses Turbopack for faster builds)
+- **Development server**: `npm run dev` (uses Turbopack for faster builds, runs on localhost:3000)
 - **Build**: `npm run build`
+- **Start production**: `npm run start`
 - **Type checking**: `npm run typecheck`
 - **Linting**: `npm run lint`
 - **Formatting**: `npm run format` (write) or `npm run format:check` (check only)
+
+### Git Hooks
+- Husky is configured with lint-staged
+- Pre-commit hooks automatically format and lint modified files
+- JavaScript/TypeScript files: prettier + eslint
+- JSON/CSS/Markdown files: prettier only
 
 ## Project Architecture
 
@@ -27,16 +34,20 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### Application Structure
 
 #### Authentication & Authorization
-- Cookie-based authentication using Better Auth
-- Zustand store (`src/stores/authStores.ts`) manages auth state with cookie persistence
-- Middleware (`src/middleware.ts`) handles route protection and onboarding flow
+- Cookie-based authentication using Better Auth with session cookies
+- Zustand store (`src/stores/authStores.ts`) manages auth state with custom cookie persistence (not localStorage)
+- Auth state is persisted in `auth-storage` cookie with strict sameSite and secure flags
+- Middleware (`src/middleware.ts`) handles route protection and enforces onboarding flow based on user state
 - Auth client (`src/lib/auth-client.ts`) manages authentication operations
+- Onboarding flow: CHOOSING_COMPANY -> FINISH -> STRIPE_SETUP (tracked via user's onboarding_step)
 
 #### API Layer
-- Centralized API client (`src/lib/api.ts`) with Axios
-- Automatic error handling with toast notifications
-- Session management with automatic logout on 401 responses
+- Centralized API client (`src/lib/api.ts`) with Axios (15s timeout, withCredentials enabled)
+- Automatic error handling with toast notifications for all error types
+- Session management with automatic logout and redirect on 401 responses
 - Type-safe API calls with TypeScript interfaces
+- Special methods: `api.getBinary()` for file downloads (invoices PDF, etc.) with blob response type
+- Base URL from `NEXT_PUBLIC_API_URL` env var (defaults to http://localhost:8080/api)
 
 #### Route Structure
 - **App Router**: `src/app/` directory with nested layouts
@@ -54,10 +65,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Responsive Design**: Mobile-first with shadcn/ui sidebar component
 
 #### Data Management
-- **Custom Hooks**: Domain-specific hooks in `src/hooks/` (useInvoice, useCustomer, etc.)
+- **Custom Hooks**: Domain-specific hooks in `src/hooks/`:
+  - `useAuth`: Authentication operations (login, register, session)
+  - `useInvoice`: Invoice CRUD operations
+  - `useCustomer`: Customer management
+  - `useProduct`: Product management with AI features
+  - `useQuote`: Quote/devis management
+  - `useCompany`: Company profile and settings
+  - `useStripe`: Stripe account and payment operations
+  - `useDashboard`: Dashboard statistics
+  - `useUser`: User profile management
 - **Type Definitions**: Comprehensive interfaces in `src/types/`
 - **Server State**: TanStack Query for caching and synchronization
-- **Error Handling**: Centralized error handling with toast notifications
+- **Error Handling**: Centralized error handling with toast notifications via Axios interceptors
 
 #### Key Features
 - Multi-entity billing system (invoices, quotes, customers, products)
@@ -100,9 +120,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Use auth store for accessing current user data
 
 ### Environment Configuration
-- `NEXT_PUBLIC_API_URL`: Backend API URL (defaults to localhost:8080/api)
-- Better Auth configuration for authentication
-- Stripe configuration for payment processing
+Required environment variables (see `.env.example`):
+- `NEXT_PUBLIC_API_URL`: Backend API URL (defaults to http://localhost:8080/api)
+- `JWT_SECRET`: Secret key for JWT signing (Better Auth)
+- Stripe configuration (API keys) for payment processing
 
 ### Important Patterns
 
