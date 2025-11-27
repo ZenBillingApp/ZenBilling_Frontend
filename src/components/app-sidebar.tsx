@@ -21,7 +21,7 @@ import {
   import { NavUser } from "@/components/nav-user"
   import { OrganizationSwitcher } from "@/components/organization-switcher"
 
-  import { User2Icon,FileStack,Boxes, FileText, Home, Building2 } from "lucide-react"
+  import { User2Icon,FileStack,Boxes, FileText, Home, Building2, Settings } from "lucide-react"
 
   import { cn } from "@/lib/utils"
 
@@ -103,6 +103,14 @@ import {
             <SidebarGroupContent>
                 <SidebarGroupLabel>Paramètres</SidebarGroupLabel>
                 <SidebarMenu>
+                    <SidebarMenuItem>
+                        <SidebarMenuButton asChild isActive={pathname.startsWith("/organization")} onClick={() => setOpenMobile(false)}>
+                            <Link href="/organization">
+                                <Settings className="w-4 h-4 mr-2" />
+                                Organisation
+                            </Link>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
                     <SidebarMenuItem>
                         <SidebarMenuButton asChild isActive={pathname.startsWith("/company")} onClick={() => setOpenMobile(false)}>
                             <Link href="/company">

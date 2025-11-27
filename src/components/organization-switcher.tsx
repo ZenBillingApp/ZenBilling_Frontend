@@ -157,7 +157,6 @@ export function OrganizationSwitcher() {
                       {organization.legal_form}
                     </span>
                   </div>
-                  {index < 9 && <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>}
                 </DropdownMenuItem>
               ))}
               <DropdownMenuSeparator />
@@ -239,7 +238,6 @@ export function OrganizationSwitcher() {
                       {organization.legal_form}
                     </span>
                   </div>
-                  {index < 9 && <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>}
                 </DropdownMenuItem>
               );
             })}

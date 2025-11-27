@@ -97,7 +97,15 @@ export const useUpdateOrganization = () => {
     mutationFn: async (data: IUpdateOrganizationRequest) => {
       const response = await authClient.organization.update({
         organizationId: data.organizationId,
-        data,
+        data: {
+          ...data,
+          logo: data.logo || undefined,
+          tva_intra: data.tva_intra || undefined,
+          capital: data.capital || undefined,
+          email: data.email || undefined,
+          phone: data.phone || undefined,
+          website: data.website || undefined,
+        }
       });
       if (response.error) {
         throw new Error(response.error.message || "Erreur lors de la mise à jour");
