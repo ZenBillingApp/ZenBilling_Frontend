@@ -100,6 +100,14 @@ export const authClient = createAuthClient({
                             type: "string",
                             required: false,
                         },
+                        stripe_account_id: {
+                            type: "string",
+                            required: false,
+                        },
+                        stripe_onboarded: {
+                            type: "boolean",
+                            required: false,
+                        },
                     },
                 },
             },

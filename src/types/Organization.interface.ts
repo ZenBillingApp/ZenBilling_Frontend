@@ -32,6 +32,8 @@ export interface IOrganization {
   email?: string | null;
   phone?: string | null;
   website?: string | null;
+  stripe_account_id?: string | null;
+  stripe_onboarded: boolean;
 }
 
 // Interface pour un membre d'organisation
