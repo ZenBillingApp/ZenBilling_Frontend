@@ -19,7 +19,7 @@ import {
   } from "@/components/ui/sidebar"
 
   import { NavUser } from "@/components/nav-user"
-
+  import { OrganizationSwitcher } from "@/components/organization-switcher"
 
   import { User2Icon,FileStack,Boxes, FileText, Home, Building2 } from "lucide-react"
 
@@ -32,13 +32,14 @@ import {
     return (
       <Sidebar>
         <SidebarHeader >
-            <div className="flex items-center justify-center flex-col">
-                <h1 className={cn("text-xl text-left pt-4 mx-auto font-arimo")}    > 
+            <div className="flex items-center justify-center flex-col mb-2">
+                <h1 className={cn("text-xl text-left pt-4 mx-auto font-arimo")}    >
                     <span className="font-extralight">Zen</span>
                     <span className="font-bold">Billing</span>
             </h1>
             <p className="text-xs text-left mx-auto font-arimo">Gestion de Facturation Simplifiée</p>
             </div>
+            <OrganizationSwitcher />
         </SidebarHeader>
         <SidebarContent>
           <SidebarGroup>

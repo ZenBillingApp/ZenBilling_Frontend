@@ -75,6 +75,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
   - `useStripe`: Stripe account and payment operations
   - `useDashboard`: Dashboard statistics
   - `useUser`: User profile management
+  - `useOrganization`: Organization management (multi-tenant support)
 - **Type Definitions**: Comprehensive interfaces in `src/types/`
 - **Server State**: TanStack Query for caching and synchronization
 - **Error Handling**: Centralized error handling with toast notifications via Axios interceptors
@@ -83,6 +84,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Multi-entity billing system (invoices, quotes, customers, products)
 - Stripe payment integration with payment links
 - Company and user profile management
+- Multi-tenant organization management with Better Auth
 - AI-powered product suggestions and descriptions
 - Multi-step onboarding process
 - Dark/light theme support
@@ -147,3 +149,18 @@ Each domain has dedicated hooks (e.g., `useInvoice.ts`, `useCustomer.ts`) that e
 - API errors are handled globally through Axios interceptors
 - User-friendly error messages via toast notifications
 - Automatic session management on authentication errors
+
+#### Organization Management
+- Multi-tenant architecture using Better Auth's organization plugin
+- Organization switching via `OrganizationSwitcher` component in sidebar
+- Active organization tracked in auth store (`activeOrganizationId`)
+- Organization-specific hooks in `useOrganization.ts`:
+  - `useOrganizations()`: List all user's organizations
+  - `useActiveOrganization()`: Get current active organization
+  - `useFullOrganization()`: Get complete organization with members
+  - `useCreateOrganization()`: Create new organization
+  - `useUpdateOrganization()`: Update organization details
+  - `useSetActiveOrganization()`: Switch active organization
+  - Member management: invite, update role, remove members
+- Organization data includes French business fields (SIRET, SIREN, TVA, RCS, etc.)
+- All organization operations use Better Auth client (`authClient.organization.*`)

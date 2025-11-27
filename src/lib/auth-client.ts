@@ -1,5 +1,5 @@
 import { createAuthClient } from "better-auth/react";
-import { inferAdditionalFields } from "better-auth/client/plugins";
+import { inferAdditionalFields, inferOrgAdditionalFields, organizationClient } from "better-auth/client/plugins";
 
 export const authClient = createAuthClient({
     baseURL: process.env.NEXT_PUBLIC_BETTER_AUTH_API_URL,
@@ -8,9 +8,15 @@ export const authClient = createAuthClient({
             user: {
                 first_name: {
                     type: "string",
+                    required: true,
                 },
                 last_name: {
                     type: "string",
+                    required: true,
+                },
+                company_id: {
+                    type: "string",
+                    required: false,
                 },
                 onboarding_completed: {
                     type: "boolean",
@@ -30,6 +36,75 @@ export const authClient = createAuthClient({
                 },
             },
         }),
+        organizationClient({
+             schema: inferOrgAdditionalFields({
+        organization: {
+          additionalFields: {
+                        siret: {
+                            type: "string",
+                            required: true,
+                        },
+                        tva_intra: {
+                            type: "string",
+                            required: false,
+                        },
+                        tva_applicable: {
+                            type: "boolean",
+                            required: true,
+                        },
+                        RCS_number: {
+                            type: "string",
+                            required: true,
+                        },
+                        RCS_city: {
+                            type: "string",
+                            required: true,
+                        },
+                        capital: {
+                            type: "number",
+                            required: false,
+                        },
+                        siren: {
+                            type: "string",
+                            required: true,
+                        },
+                        legal_form: {
+                            type: "string",
+                            required: true,
+                        },
+                        address: {
+                            type: "string",
+                            required: true,
+                        },
+                        postal_code: {
+                            type: "string",
+                            required: true,
+                        },
+                        city: {
+                            type: "string",
+                            required: true,
+                        },
+                        country: {
+                            type: "string",
+                            required: true,
+                        },
+                        email: {
+                            type: "string",
+                            required: false,
+                        },
+                        phone: {
+                            type: "string",
+                            required: false,
+                        },
+                        website: {
+                            type: "string",
+                            required: false,
+                        },
+                    },
+                },
+            },
+        
+)}), 
     ],
 });
 

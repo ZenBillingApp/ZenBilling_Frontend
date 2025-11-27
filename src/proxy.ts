@@ -2,6 +2,8 @@ import { NextResponse, NextRequest } from 'next/server'
 import { getSessionCookie } from "better-auth/cookies";
 import { IOnboardingStep } from '@/types/User.interface'
 import { getCookie } from '@/lib/serverCookies'
+import { authClient } from './lib/auth-client';
+
 
 // Routes publiques qui ne nécessitent pas d'authentification
 const PUBLIC_ROUTES = ['/login', '/register', '/payment']
@@ -35,7 +37,7 @@ function parseUserData(cookieValue: string | undefined) {
 /**
  * Middleware principal pour la gestion de l'authentification
  */
-export default async function middleware(request: NextRequest) {
+export default async function proxy(request: NextRequest) {
   const sessionCookie = getSessionCookie(request);
   const isPublicRoute = PUBLIC_ROUTES.some(route => request.nextUrl.pathname.startsWith(route));
   const isOnboardingRoute = ONBOARDING_ROUTES.some(route => request.nextUrl.pathname.startsWith(route));
@@ -53,6 +55,7 @@ export default async function middleware(request: NextRequest) {
     response.cookies.delete('auth-storage');
     return response;
   }
+
 
   // Gestion de l'onboarding (seulement si les données utilisateur sont disponibles)
   if (sessionCookie && userExists) {
