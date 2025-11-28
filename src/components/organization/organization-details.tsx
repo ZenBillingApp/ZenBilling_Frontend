@@ -6,6 +6,7 @@ import { z } from "zod";
 
 import { useFullOrganization, useUpdateOrganization } from "@/hooks/useOrganization";
 import { IUpdateOrganizationRequest } from "@/types/Organization.request.interface";
+import { useStripeConnect, useStripeAccountLink, useStripeCreateDashboardLink } from "@/hooks/useStripe";
 
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -49,7 +50,28 @@ export function OrganizationDetails({ organizationId }: OrganizationDetailsProps
   const { data: organizationData, isLoading: isOrganizationLoading } = useFullOrganization(organizationId);
   const updateOrganization = useUpdateOrganization();
 
+  // Stripe hooks
+  const stripeConnect = useStripeConnect();
+  const stripeAccountLink = useStripeAccountLink(
+    `${process.env.NEXT_PUBLIC_CLIENT_URL}/organization`,
+    `${process.env.NEXT_PUBLIC_CLIENT_URL}/organization`
+  );
+  const stripeDashboardLink = useStripeCreateDashboardLink();
+
   const legalForms = ['SAS', 'SARL', 'EURL', 'SASU', 'SA', 'SNC', 'SOCIETE_CIVILE', 'ENTREPRISE_INDIVIDUELLE'];
+
+  // Handlers pour les actions Stripe
+  const handleCreateStripeAccount = async () => {
+    await stripeConnect.mutateAsync();
+  };
+
+  const handleCompleteOnboarding = async () => {
+    await stripeAccountLink.mutateAsync();
+  };
+
+  const handleOpenStripeDashboard = async () => {
+    await stripeDashboardLink.mutateAsync();
+  };
 
   const form = useForm<Omit<IUpdateOrganizationRequest, 'organizationId'>>({
     resolver: zodResolver(organizationSchema),
@@ -519,6 +541,7 @@ export function OrganizationDetails({ organizationId }: OrganizationDetailsProps
 
               <TabsContent value="stripe">
                 <div className="space-y-6">
+                  {/* Statut du compte Stripe */}
                   <div className="flex items-center gap-3 p-4 border rounded-lg">
                     <CreditCard className="h-5 w-5 text-muted-foreground" />
                     <div className="flex-1">
@@ -536,7 +559,7 @@ export function OrganizationDetails({ organizationId }: OrganizationDetailsProps
                           </div>
                         )}
                       </div>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm text-muted-foreground mt-1">
                         {organization.stripe_account_id
                           ? `ID: ${organization.stripe_account_id}`
                           : "Aucun compte Stripe associé"
@@ -545,6 +568,7 @@ export function OrganizationDetails({ organizationId }: OrganizationDetailsProps
                     </div>
                   </div>
 
+                  {/* Statut de l'onboarding */}
                   <div className="flex items-center gap-3 p-4 border rounded-lg">
                     <CheckCircle2 className="h-5 w-5 text-muted-foreground" />
                     <div className="flex-1">
@@ -562,7 +586,7 @@ export function OrganizationDetails({ organizationId }: OrganizationDetailsProps
                           </div>
                         )}
                       </div>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm text-muted-foreground mt-1">
                         {organization.stripe_onboarded
                           ? "Le compte est configuré et prêt à recevoir des paiements"
                           : "Complétez l'onboarding pour accepter des paiements"
@@ -571,11 +595,106 @@ export function OrganizationDetails({ organizationId }: OrganizationDetailsProps
                     </div>
                   </div>
 
+                  {/* Actions Stripe */}
+                  <div className="space-y-3">
+                    {!organization.stripe_account_id ? (
+                      /* Pas de compte Stripe créé */
+                      <Card className="border-primary/20">
+                        <CardHeader>
+                          <CardTitle className="text-base">Créer un compte Stripe Connect</CardTitle>
+                          <CardDescription>
+                            Créez votre compte Stripe Connect pour commencer à accepter les paiements en ligne.
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <Button
+                            onClick={handleCreateStripeAccount}
+                            disabled={stripeConnect.isPending}
+                            className="w-full sm:w-auto"
+                          >
+                            {stripeConnect.isPending ? (
+                              <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Création en cours...
+                              </>
+                            ) : (
+                              <>
+                                <CreditCard className="mr-2 h-4 w-4" />
+                                Créer mon compte Stripe
+                              </>
+                            )}
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    ) : !organization.stripe_onboarded ? (
+                      /* Compte créé mais pas onboardé */
+                      <Card className="border-orange-500/20">
+                        <CardHeader>
+                          <CardTitle className="text-base">Compléter la configuration Stripe</CardTitle>
+                          <CardDescription>
+                            Finalisez la configuration de votre compte pour pouvoir accepter des paiements.
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <Button
+                            onClick={handleCompleteOnboarding}
+                            disabled={stripeAccountLink.isPending}
+                            className="w-full sm:w-auto"
+                          >
+                            {stripeAccountLink.isPending ? (
+                              <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Chargement...
+                              </>
+                            ) : (
+                              <>
+                                <CheckCircle2 className="mr-2 h-4 w-4" />
+                                Compléter l&apos;onboarding
+                              </>
+                            )}
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    ) : (
+                      /* Compte onboardé */
+                      <Card className="border-green-500/20">
+                        <CardHeader>
+                          <CardTitle className="text-base flex items-center gap-2">
+                            <CheckCircle2 className="h-5 w-5 text-green-600" />
+                            Compte Stripe configuré
+                          </CardTitle>
+                          <CardDescription>
+                            Votre compte Stripe est opérationnel. Accédez à votre tableau de bord pour gérer vos paiements.
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <Button
+                            onClick={handleOpenStripeDashboard}
+                            disabled={stripeDashboardLink.isPending}
+                            className="w-full sm:w-auto"
+                          >
+                            {stripeDashboardLink.isPending ? (
+                              <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Chargement...
+                              </>
+                            ) : (
+                              <>
+                                <ExternalLink className="mr-2 h-4 w-4" />
+                                Accéder au dashboard Stripe
+                              </>
+                            )}
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    )}
+                  </div>
+
                   <Alert>
                     <AlertCircle className="h-4 w-4" />
                     <AlertTitle>À propos de Stripe</AlertTitle>
                     <AlertDescription>
-                      Les informations Stripe sont en lecture seule. La configuration Stripe est gérée au niveau de l&apos;organisation.
+                      Stripe Connect vous permet d&apos;accepter des paiements directement sur vos factures. Les fonds sont versés sur votre compte bancaire après traitement par Stripe.
                     </AlertDescription>
                   </Alert>
                 </div>

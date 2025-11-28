@@ -12,7 +12,7 @@ export const useStripeConnect = () => {
   return useMutation({
         mutationFn: async () => api.post<IApiSuccessResponse<ConnectAccountResponse>>("/stripe/connect"),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["user"] });
+            queryClient.invalidateQueries({ queryKey: ["fullOrganization"] });
             toast({
                 title: "Compte créé avec succès",
                 description: "Votre compte Stripe a été créé avec succès",
@@ -92,7 +92,7 @@ export const useStripeSkippingOnboarding = () => {
 
     mutationFn: async () => api.post<IApiSuccessResponse<SkipStripeSetupResponse>>("/stripe/skip-setup"),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["user"] });
+      queryClient.invalidateQueries({ queryKey: ["fullOrganization"] });
       toast({
         title: "Onboarding passé",
         description: "Vous avez passé l'onboarding avec succès",

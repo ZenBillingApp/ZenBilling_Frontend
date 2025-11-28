@@ -25,7 +25,7 @@ export const useOrganizations = () => {
  * Hook pour récupérer l'organisation active de l'utilisateur
  */
 export const useActiveOrganization = () => {
-  return authClient.useActiveOrganization();
+  return  authClient.useActiveOrganization();
 };
 
 /**
@@ -64,13 +64,8 @@ export const useCreateOrganization = () => {
     },
     onSuccess: async (data) => {
       await queryClient.invalidateQueries({ queryKey: ["organizations"] });
-
-      // Définir automatiquement comme organisation active
-      await authClient.organization.setActive({
-        organizationId: data.id,
-      });
-      await queryClient.invalidateQueries({ queryKey: ["activeOrganization"] });
-
+      await queryClient.invalidateQueries({ queryKey: ["organization", data.id] });
+      await queryClient.invalidateQueries({ queryKey: ["fullOrganization", data.id] });
       toast({
         title: "Organisation créée",
         description: `L'organisation "${data.name}" a été créée avec succès`,
@@ -114,8 +109,8 @@ export const useUpdateOrganization = () => {
     },
     onSuccess: async (data) => {
       await queryClient.invalidateQueries({ queryKey: ["organizations"] });
+      await queryClient.invalidateQueries({ queryKey: ["organization", data.id] });
       await queryClient.invalidateQueries({ queryKey: ["fullOrganization", data.id] });
-
       toast({
         title: "Organisation mise à jour",
         description: "Les modifications ont été enregistrées avec succès",
@@ -150,6 +145,7 @@ export const useSetActiveOrganization = () => {
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["activeOrganization"] });
+    
       toast({
         title: "Organisation changée",
         description: "L'organisation active a été mise à jour",
