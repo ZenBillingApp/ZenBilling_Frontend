@@ -10,6 +10,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuthStore } from "@/stores/authStores";
 
 import { api } from "@/lib/api";
+import { useActiveOrganizationId } from "./useOrganization";
+import { queryKeys } from "@/lib/queryKeys";
 
 export const useCreateCompany = () => {
     const { toast } = useToast();
@@ -35,23 +37,24 @@ export const useCreateCompany = () => {
 
 export const useCompany = () => {
     const companyId = useAuthStore((state) => state.user?.company_id);
-    
+    const organizationId = useActiveOrganizationId();
+
     return useQuery<IApiSuccessResponse<ICompany>>({
-        queryKey: ["company", companyId],
+        queryKey: queryKeys.company.all(organizationId),
         queryFn: () => api.get<IApiSuccessResponse<ICompany>>(`/company`),
-        enabled: !!companyId,
+        enabled: !!companyId && !!organizationId,
     });
 }
 
 export const useUpdateCompany = () => {
     const queryClient = useQueryClient();
     const { toast } = useToast();
-    const companyId = useAuthStore((state) => state.user?.company_id);
-    
+    const organizationId = useActiveOrganizationId();
+
     return useMutation<IApiSuccessResponse<ICompany>, AxiosError<IApiErrorResponse>, IUpdateCompanyRequest>({
         mutationFn: (data: IUpdateCompanyRequest) => api.put(`/company`, data),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["company", companyId] });
+            queryClient.invalidateQueries({ queryKey: queryKeys.company.all(organizationId) });
             toast({
                 title: "Entreprise mise à jour",
                 description: "Les informations de l'entreprise ont été mises à jour avec succès",
@@ -71,7 +74,7 @@ export const useUpdateCompany = () => {
 
 export const useLegalForm = () => {
     return useQuery<IApiSuccessResponse<ICompanyLegalForm>>({
-        queryKey: ["legalForm"],
+        queryKey: queryKeys.company.legalForms(),
         queryFn: () => api.get<IApiSuccessResponse<ICompanyLegalForm>>("/company/legal-forms"),
     });
 }

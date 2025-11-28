@@ -6,12 +6,15 @@ import { IQuote,IQuotePagination } from "@/types/Quote.interface"
 import type { IApiErrorResponse,IApiSuccessResponse } from "@/types/api.types"
 import { AxiosError } from "axios"
 import { useRouter } from "next/navigation"
+import { useActiveOrganizationId } from "./useOrganization"
+import { queryKeys } from "@/lib/queryKeys"
 
 export const useQuotes = (params: IQuoteQueryParams = {}) => {
     const { page = 1, limit = 10, search = "", status, customer_id, start_date, end_date, sortBy = 'quote_date', sortOrder = 'DESC' } = params;
+    const organizationId = useActiveOrganizationId();
 
     return useQuery<IApiSuccessResponse<IQuotePagination>>({
-        queryKey: ["quotes", { page, limit, search, status, customer_id, start_date, end_date, sortBy, sortOrder }],
+        queryKey: queryKeys.quotes.list(organizationId, { page, limit, search, status, customer_id, start_date, end_date, sortBy, sortOrder }),
         queryFn: () => {
             let url = `/quote?page=${page}&limit=${limit}&sortBy=${sortBy}&sortOrder=${sortOrder}`;
             if (search) url += `&search=${search}`;
@@ -21,16 +24,19 @@ export const useQuotes = (params: IQuoteQueryParams = {}) => {
             if (end_date) url += `&end_date=${end_date}`;
             return api.get<IApiSuccessResponse<IQuotePagination>>(url);
         },
+        enabled: !!organizationId,
         staleTime: 1000 * 60 * 5, // 5 minutes
     })
 }
 
 export const useQuote = (quoteId: string) => {
+    const organizationId = useActiveOrganizationId();
+
     return useQuery<IApiSuccessResponse<IQuote>>({
-        queryKey: ["quotes", quoteId],
+        queryKey: queryKeys.quotes.detail(organizationId, quoteId),
         queryFn: () => api.get<IApiSuccessResponse<IQuote>>(`/quote/${quoteId}`),
-        
-        enabled: !!quoteId,
+
+        enabled: !!quoteId && !!organizationId,
     })
 }
 
@@ -39,13 +45,15 @@ export const useCreateQuote = () => {
     const queryClient = useQueryClient()
     const { toast } = useToast()
     const router = useRouter()
+    const organizationId = useActiveOrganizationId()
+
     return useMutation<IApiSuccessResponse<IQuote>, AxiosError<IApiErrorResponse>, ICreateQuoteRequest>({
-        mutationFn: (data: ICreateQuoteRequest) => 
+        mutationFn: (data: ICreateQuoteRequest) =>
             api.post("/quote", data),
         onSuccess: (data) => {
-            queryClient.invalidateQueries({ queryKey: ["quotes"] })
-            queryClient.invalidateQueries({ queryKey: ["products"] })
-            queryClient.invalidateQueries({ queryKey: ["customers"] })
+            queryClient.invalidateQueries({ queryKey: queryKeys.quotes.all(organizationId) })
+            queryClient.invalidateQueries({ queryKey: queryKeys.products.all(organizationId) })
+            queryClient.invalidateQueries({ queryKey: queryKeys.customers.all(organizationId) })
             router.replace(`/quotes/${data.data?.quote_id}`)
             toast({
                 title: "Devis créé avec succès",
@@ -58,13 +66,15 @@ export const useCreateQuote = () => {
 export const useUpdateQuote = (quoteId: string) => {
     const queryClient = useQueryClient()
     const { toast } = useToast()
+    const organizationId = useActiveOrganizationId()
+
     return useMutation<IApiSuccessResponse<IQuote>, AxiosError<IApiErrorResponse>, IUpdateQuoteRequest>({
 
         mutationFn: (data: IUpdateQuoteRequest) =>
             api.put(`/quote/${quoteId}`, data),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["quotes", quoteId] })
-            queryClient.invalidateQueries({ queryKey: ["quotes"] })
+            queryClient.invalidateQueries({ queryKey: queryKeys.quotes.detail(organizationId, quoteId) })
+            queryClient.invalidateQueries({ queryKey: queryKeys.quotes.all(organizationId) })
             toast({
                 title: "Devis modifié avec succès",
                 description: "Le devis a été modifié avec succès",
@@ -83,18 +93,20 @@ export const useDeleteQuote = () => {
     const queryClient = useQueryClient()
     const { toast } = useToast()
     const router = useRouter()
+    const organizationId = useActiveOrganizationId()
+
     return useMutation<IApiSuccessResponse<IQuote>, AxiosError<IApiErrorResponse>, string>({
         mutationFn: (quoteId: string) =>
             api.delete(`/quote/${quoteId}`),
         onSuccess: (_, quoteId) => {
             // Redirection vers la liste des devis
             router.replace('/quotes')
-            
+
             // Supprime explicitement les données du cache pour ce devis
-            queryClient.removeQueries({ queryKey: ["quotes", quoteId] })
-            
+            queryClient.removeQueries({ queryKey: queryKeys.quotes.detail(organizationId, quoteId) })
+
             // Invalide la liste des devis pour la mettre à jour
-            queryClient.invalidateQueries({ queryKey: ["quotes"] })
+            queryClient.invalidateQueries({ queryKey: queryKeys.quotes.all(organizationId) })
 
             toast({
                 title: "Devis supprimé avec succès",
@@ -152,11 +164,13 @@ export const useDownloadQuotePdf = (quoteNumber: string) => {
 export const useSendQuote = (quoteId: string) => {
     const queryClient = useQueryClient()
     const { toast } = useToast()
+    const organizationId = useActiveOrganizationId()
+
     return useMutation({
         mutationFn: () => api.post(`/quote/${quoteId}/send`),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["quotes", quoteId] })
-            queryClient.invalidateQueries({ queryKey: ["quotes"] })
+            queryClient.invalidateQueries({ queryKey: queryKeys.quotes.detail(organizationId, quoteId) })
+            queryClient.invalidateQueries({ queryKey: queryKeys.quotes.all(organizationId) })
             toast({
                 title: "Fichier PDF envoyé avec succès",
                 description: "Le fichier PDF a été envoyé avec succès",
@@ -169,7 +183,7 @@ export const useSendQuote = (quoteId: string) => {
             })
         },
     })
-} 
+}
 
 
 export const useViewQuote = () => {
@@ -192,9 +206,10 @@ export const useViewQuote = () => {
 
 export const useCustomerQuotes = (customerId: string, params: IQuoteQueryParams = {}) => {
     const { page = 1, limit = 10, search = "", status, customer_id, start_date, end_date, sortBy = 'quote_date', sortOrder = 'DESC' } = params;
+    const organizationId = useActiveOrganizationId();
 
     return useQuery<IApiSuccessResponse<IQuotePagination>, AxiosError<IApiErrorResponse>>({
-        queryKey: [`customer-quotes-${customerId}`, { page, limit, search, status, customer_id, start_date, end_date, sortBy, sortOrder }],
+        queryKey: queryKeys.quotes.customerQuotes(organizationId, customerId, { page, limit, search, status, customer_id, start_date, end_date, sortBy, sortOrder }),
         queryFn: () => {
             let url = `/quote/customer/${customerId}?page=${page}&limit=${limit}&sortBy=${sortBy}&sortOrder=${sortOrder}`;
             if (search) url += `&search=${search}`;
@@ -204,6 +219,7 @@ export const useCustomerQuotes = (customerId: string, params: IQuoteQueryParams 
             if (end_date) url += `&end_date=${end_date}`;
             return api.get<IApiSuccessResponse<IQuotePagination>>(url);
         },
+        enabled: !!customerId && !!organizationId,
         staleTime: 1000 * 60 * 5, // 5 minutes
     })
 }

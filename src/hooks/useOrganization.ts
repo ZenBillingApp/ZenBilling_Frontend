@@ -25,7 +25,16 @@ export const useOrganizations = () => {
  * Hook pour récupérer l'organisation active de l'utilisateur
  */
 export const useActiveOrganization = () => {
-  return  authClient.useActiveOrganization();
+  return authClient.useActiveOrganization();
+};
+
+/**
+ * Hook pour récupérer l'ID de l'organisation active
+ * Retourne l'ID de l'organisation active ou undefined si aucune organisation n'est active
+ */
+export const useActiveOrganizationId = () => {
+  const { data } = useActiveOrganization();
+  return data?.id;
 };
 
 /**
@@ -144,8 +153,10 @@ export const useSetActiveOrganization = () => {
       return response.data;
     },
     onSuccess: async () => {
+      // Invalider uniquement l'organisation active
+      // Les autres queries se rafraîchiront automatiquement car leurs query keys incluent l'organization_id
       await queryClient.invalidateQueries({ queryKey: ["activeOrganization"] });
-    
+
       toast({
         title: "Organisation changée",
         description: "L'organisation active a été mise à jour",

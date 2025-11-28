@@ -7,12 +7,15 @@ import { IInvoice,IInvoicePagination } from "@/types/Invoice.interface"
 import type { IApiErrorResponse, IApiSuccessResponse } from "@/types/api.types"
 import { AxiosError } from "axios"
 import { useRouter } from "next/navigation"
+import { useActiveOrganizationId } from "./useOrganization"
+import { queryKeys } from "@/lib/queryKeys"
 
 export const useInvoices = (params: IInvoiceQueryParams = {}) => {
     const { page = 1, limit = 10, search = "", status, customer_id, start_date, end_date, sortBy = 'invoice_date', sortOrder = 'DESC' } = params;
+    const organizationId = useActiveOrganizationId();
 
     return useQuery({
-        queryKey: ["invoices", { page, limit, search, status, customer_id, start_date, end_date, sortBy, sortOrder }],
+        queryKey: queryKeys.invoices.list(organizationId, { page, limit, search, status, customer_id, start_date, end_date, sortBy, sortOrder }),
         queryFn: () => {
             let url = `/invoice?page=${page}&limit=${limit}&sortBy=${sortBy}&sortOrder=${sortOrder}`;
             if (search) url += `&search=${search}`;
@@ -22,15 +25,18 @@ export const useInvoices = (params: IInvoiceQueryParams = {}) => {
             if (end_date) url += `&end_date=${end_date}`;
             return api.get<IApiSuccessResponse<IInvoicePagination>>(url);
         },
+        enabled: !!organizationId,
         staleTime: 1000 * 60 * 5, // 5 minutes
     })
 }
 
 export const useInvoice = (invoiceId: string) => {
+    const organizationId = useActiveOrganizationId();
+
     return useQuery<IApiSuccessResponse<IInvoice>>({
-        queryKey: ["invoices", invoiceId],
+        queryKey: queryKeys.invoices.detail(organizationId, invoiceId),
         queryFn: () => api.get<IApiSuccessResponse<IInvoice>>(`/invoice/${invoiceId}`),
-        enabled: !!invoiceId,
+        enabled: !!invoiceId && !!organizationId,
     })
 }
 
@@ -38,13 +44,15 @@ export const useCreateInvoice = () => {
     const queryClient = useQueryClient()
     const { toast } = useToast()
     const router = useRouter()
+    const organizationId = useActiveOrganizationId()
+
     return useMutation<IApiSuccessResponse<IInvoice>, AxiosError<IApiErrorResponse>, ICreateInvoiceRequest>({
-        mutationFn: (data: ICreateInvoiceRequest) => 
+        mutationFn: (data: ICreateInvoiceRequest) =>
             api.post("/invoice", data),
         onSuccess: (invoice) => {
-            queryClient.invalidateQueries({ queryKey: ["invoices"] })
-            queryClient.invalidateQueries({ queryKey: ["products"] })
-            queryClient.invalidateQueries({ queryKey: ["customers"] })
+            queryClient.invalidateQueries({ queryKey: queryKeys.invoices.all(organizationId) })
+            queryClient.invalidateQueries({ queryKey: queryKeys.products.all(organizationId) })
+            queryClient.invalidateQueries({ queryKey: queryKeys.customers.all(organizationId) })
             toast({
                 title: "Facture créée avec succès",
                 description: "La facture a été créée avec succès",
@@ -57,13 +65,15 @@ export const useCreateInvoice = () => {
 export const useUpdateInvoice = (invoiceId: string) => {
     const queryClient = useQueryClient()
     const { toast } = useToast()
+    const organizationId = useActiveOrganizationId()
+
     return useMutation<IApiSuccessResponse<IInvoice>, AxiosError<IApiErrorResponse>, IUpdateInvoiceRequest>({
 
         mutationFn: (data: IUpdateInvoiceRequest) =>
             api.put(`/invoice/${invoiceId}`, data),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["invoices", invoiceId] })
-            queryClient.invalidateQueries({ queryKey: ["invoices"] })
+            queryClient.invalidateQueries({ queryKey: queryKeys.invoices.detail(organizationId, invoiceId) })
+            queryClient.invalidateQueries({ queryKey: queryKeys.invoices.all(organizationId) })
             toast({
                 title: "Facture modifiée avec succès",
                 description: "La facture a été modifiée avec succès",
@@ -76,6 +86,8 @@ export const useDeleteInvoice = () => {
     const queryClient = useQueryClient()
     const { toast } = useToast()
     const router = useRouter()
+    const organizationId = useActiveOrganizationId()
+
     return useMutation<IApiSuccessResponse<IInvoice>, AxiosError<IApiErrorResponse>, string>({
         mutationFn: (invoiceId: string) =>
             api.delete(`/invoice/${invoiceId}`),
@@ -84,10 +96,10 @@ export const useDeleteInvoice = () => {
             router.replace('/invoices')
 
             // Supprime explicitement les données du cache pour cette facture
-            queryClient.removeQueries({ queryKey: ["invoices", invoiceId] })
-            
+            queryClient.removeQueries({ queryKey: queryKeys.invoices.detail(organizationId, invoiceId) })
+
             // Invalide la liste des factures pour la mettre à jour
-            queryClient.invalidateQueries({ queryKey: ["invoices"] })
+            queryClient.invalidateQueries({ queryKey: queryKeys.invoices.all(organizationId) })
 
             toast({
                 title: "Facture supprimée avec succès",
@@ -145,6 +157,8 @@ export const useDownloadInvoicePdf = (invoiceNumber: string) => {
 export const useAddPayment = (invoiceId: string) => {
     const queryClient = useQueryClient()
     const { toast } = useToast()
+    const organizationId = useActiveOrganizationId()
+
     return useMutation<IApiSuccessResponse<IInvoice>, AxiosError<IApiErrorResponse>, AddPaymentSchema>({
 
         mutationFn: (data: AddPaymentSchema) =>
@@ -153,8 +167,8 @@ export const useAddPayment = (invoiceId: string) => {
                 amount: Number(data.amount)
             }),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["invoices", invoiceId] })
-            queryClient.invalidateQueries({ queryKey: ["invoices"] })
+            queryClient.invalidateQueries({ queryKey: queryKeys.invoices.detail(organizationId, invoiceId) })
+            queryClient.invalidateQueries({ queryKey: queryKeys.invoices.all(organizationId) })
             toast({
                 title: "Paiement ajouté avec succès",
                 description: "Le paiement a été ajouté avec succès",
@@ -166,12 +180,14 @@ export const useAddPayment = (invoiceId: string) => {
 export const useSendInvoice = (invoiceId: string) => {
     const queryClient = useQueryClient()
     const { toast } = useToast()
+    const organizationId = useActiveOrganizationId()
+
     return useMutation<IApiSuccessResponse<IInvoice>, AxiosError<IApiErrorResponse>, string>({
 
         mutationFn: () => api.post(`/invoice/${invoiceId}/send`),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["invoices", invoiceId] })
-            queryClient.invalidateQueries({ queryKey: ["invoices"] })
+            queryClient.invalidateQueries({ queryKey: queryKeys.invoices.detail(organizationId, invoiceId) })
+            queryClient.invalidateQueries({ queryKey: queryKeys.invoices.all(organizationId) })
             toast({
                 title: "Fichier PDF envoyé avec succès",
                 description: "Le fichier PDF a été envoyé avec succès",
@@ -207,9 +223,10 @@ export const useViewInvoice = () => {
 
 export const useCustomerInvoices = (customerId: string, params: IInvoiceQueryParams = {}) => {
     const { page = 1, limit = 10, search = "", status, customer_id, start_date, end_date, sortBy = 'invoice_date', sortOrder = 'DESC' } = params;
+    const organizationId = useActiveOrganizationId();
 
     return useQuery<IApiSuccessResponse<IInvoicePagination>, AxiosError<IApiErrorResponse>> ({
-        queryKey: [`customer-invoices-${customerId}`, { page, limit, search, status, customer_id, start_date, end_date, sortBy, sortOrder }],
+        queryKey: queryKeys.invoices.customerInvoices(organizationId, customerId, { page, limit, search, status, customer_id, start_date, end_date, sortBy, sortOrder }),
         queryFn: () => {
             let url = `/invoice/customer/${customerId}?page=${page}&limit=${limit}&sortBy=${sortBy}&sortOrder=${sortOrder}`;
             if (search) url += `&search=${search}`;
@@ -219,6 +236,7 @@ export const useCustomerInvoices = (customerId: string, params: IInvoiceQueryPar
             if (end_date) url += `&end_date=${end_date}`;
             return api.get<IApiSuccessResponse<IInvoicePagination>>(url);
         },
+        enabled: !!customerId && !!organizationId,
         staleTime: 1000 * 60 * 5, // 5 minutes
     })
 }
@@ -226,12 +244,14 @@ export const useCustomerInvoices = (customerId: string, params: IInvoiceQueryPar
 export const useCancelInvoice = (invoiceId: string) => {
     const queryClient = useQueryClient()
     const { toast } = useToast()
+    const organizationId = useActiveOrganizationId()
+
     return useMutation<IApiSuccessResponse<IInvoice>, AxiosError<IApiErrorResponse>, void>({
-        mutationFn: () => 
+        mutationFn: () =>
             api.put(`/invoice/${invoiceId}`, { status: 'cancelled' }),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["invoices", invoiceId] })
-            queryClient.invalidateQueries({ queryKey: ["invoices"] })
+            queryClient.invalidateQueries({ queryKey: queryKeys.invoices.detail(organizationId, invoiceId) })
+            queryClient.invalidateQueries({ queryKey: queryKeys.invoices.all(organizationId) })
             toast({
                 title: "Facture annulée avec succès",
                 description: "La facture a été annulée avec succès",
@@ -250,17 +270,19 @@ export const useCancelInvoice = (invoiceId: string) => {
 export const useSendInvoiceWithPaymentLink = (invoiceId: string) => {
     const queryClient = useQueryClient()
     const { toast } = useToast()
+    const organizationId = useActiveOrganizationId()
+
     return useMutation<IApiSuccessResponse<ISendInvoiceWithPaymentLinkResponse>, AxiosError<IApiErrorResponse>, ISendInvoiceWithPaymentLinkRequest>({
-        mutationFn: (data: ISendInvoiceWithPaymentLinkRequest) => 
+        mutationFn: (data: ISendInvoiceWithPaymentLinkRequest) =>
                 api.post(`/invoice/${invoiceId}/send-with-payment-link`, data),
         onSuccess: (response) => {
-            queryClient.invalidateQueries({ queryKey: ["invoices", invoiceId] })
-            queryClient.invalidateQueries({ queryKey: ["invoices"] })
-            
-            const message = response.data?.paymentLinkCreated 
+            queryClient.invalidateQueries({ queryKey: queryKeys.invoices.detail(organizationId, invoiceId) })
+            queryClient.invalidateQueries({ queryKey: queryKeys.invoices.all(organizationId) })
+
+            const message = response.data?.paymentLinkCreated
                 ? "Facture envoyée avec lien de paiement avec succès"
                 : "Facture envoyée avec succès"
-            
+
             toast({
                 title: "Envoi réussi",
                 description: message,
