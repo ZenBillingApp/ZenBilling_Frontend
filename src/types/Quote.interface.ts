@@ -7,7 +7,7 @@ export interface IQuote {
   quote_id?: string;
   customer_id: string;
   user_id: string;
-  company_id: string | null;
+  organization_id: string | null;
   quote_number: string;
   quote_date: Date;
   validity_date: Date;

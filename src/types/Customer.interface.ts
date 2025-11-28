@@ -6,7 +6,7 @@ import { IPagination } from './pagination.interface';
 export interface ICustomer {
   customer_id?: string;
   user_id: string;
-  company_id: string;
+  organization_id: string;
   type: 'individual' | 'company';
   email: string | null;
   phone: string | null;

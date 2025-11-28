@@ -1,7 +1,7 @@
 import { ICustomer } from './Customer.interface';
 import { IInvoiceItem } from './InvoiceItem.interface';
 import { IPayment } from './Payment.interface';
-import { ICompany } from './Company.interface';
+import { IOrganization } from './Organization.interface';
 import { IPagination } from './pagination.interface';
 export type InvoiceStatus = 'pending' | 'sent' | 'paid' | 'cancelled' | 'late';
 
@@ -9,7 +9,7 @@ export interface IInvoice {
   invoice_id?: string;
   customer_id: string | null;
   user_id: string;
-  company_id: string | null;
+  organization_id: string | null;
   invoice_number: string;
   invoice_date: Date;
   due_date: Date;
@@ -24,7 +24,7 @@ export interface IInvoice {
   customer?: ICustomer;
   items?: IInvoiceItem[];
   payments?: IPayment[];
-  company?: ICompany;
+  organization?: IOrganization;
   createdAt: Date;
   updatedAt: Date;
 } 
