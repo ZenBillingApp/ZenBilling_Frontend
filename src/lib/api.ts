@@ -9,20 +9,19 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
 // Fonction de déconnexion pour l'intercepteur
 const logoutAndRedirect = async () => {
   const clearAuth = useAuthStore.getState().clearAuth;
-  
-    await authClient.signOut({
-      fetchOptions: {
-        onSuccess: async () => {
-        await clearAuth();
-        window.location.href = '/login';
-      },
-      onError: async (error) => {
-        console.error('Erreur lors de la déconnexion:', error);
-        await clearAuth();
-        window.location.href = '/login';
-      }
-    },
-  });
+
+  // Supprimer immédiatement les infos utilisateur du store
+  clearAuth();
+
+  // Tenter de déconnecter du serveur (meilleur effort)
+  try {
+    await authClient.signOut();
+  } catch (error) {
+    console.error('Erreur lors de la déconnexion du serveur:', error);
+  }
+
+  // Rediriger vers la page de connexion
+  window.location.href = '/login';
 };
 
 // Création de l'instance Axios
