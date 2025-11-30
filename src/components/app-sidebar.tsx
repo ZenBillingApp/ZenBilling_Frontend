@@ -106,16 +106,8 @@ import {
                     <SidebarMenuItem>
                         <SidebarMenuButton asChild isActive={pathname.startsWith("/organization")} onClick={() => setOpenMobile(false)}>
                             <Link href="/organization">
-                                <Settings className="w-4 h-4 mr-2" />
+                            <Building2 className="w-4 h-4 mr-2" />
                                 Organisation
-                            </Link>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                    <SidebarMenuItem>
-                        <SidebarMenuButton asChild isActive={pathname.startsWith("/company")} onClick={() => setOpenMobile(false)}>
-                            <Link href="/company">
-                                <Building2 className="w-4 h-4 mr-2" />
-                                Entreprise
                             </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
