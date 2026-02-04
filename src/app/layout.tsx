@@ -3,6 +3,7 @@ import { DM_Sans,Roboto,Arimo } from "next/font/google";
 import "./globals.css";
 import { QueryProvider } from "@/providers/QueryProvider";
 import { NiceModalProvider } from "@/providers/NiceModalProvider";
+import { AuthProvider } from "@/providers/AuthProvider";
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
 
@@ -76,7 +77,9 @@ export default function RootLayout({
             disableTransitionOnChange
           >
           <QueryProvider>
-            <NiceModalProvider>{children}</NiceModalProvider>
+            <AuthProvider>
+              <NiceModalProvider>{children}</NiceModalProvider>
+            </AuthProvider>
             <Toaster />
           </QueryProvider>
         </ThemeProvider>

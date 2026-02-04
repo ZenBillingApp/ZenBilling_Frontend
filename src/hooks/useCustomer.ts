@@ -16,7 +16,7 @@ export const useCustomers = (params: ICustomerQueryParams = {}) => {
     return useQuery<IApiSuccessResponse<ICustomerPagination>>({
         queryKey: queryKeys.customers.list(organizationId, { page, limit, search, type }),
         queryFn: () => {
-            let url = `/customer?page=${page}&limit=${limit}`;
+            let url = `/customers?page=${page}&limit=${limit}`;
             if (search) url += `&search=${search}`;
             if (type) url += `&type=${type}`;
             return api.get<IApiSuccessResponse<ICustomerPagination>>(url);
@@ -31,7 +31,7 @@ export const useCustomer = (customerId: string) => {
 
     return useQuery<IApiSuccessResponse<ICustomer>>({
         queryKey: queryKeys.customers.detail(organizationId, customerId),
-        queryFn: () => api.get<IApiSuccessResponse<ICustomer>>(`/customer/${customerId}`),
+        queryFn: () => api.get<IApiSuccessResponse<ICustomer>>(`/customers/${customerId}`),
         enabled: !!customerId && !!organizationId,
     })
 }
@@ -43,7 +43,7 @@ export const useCreateCustomer = () => {
 
     return useMutation<IApiSuccessResponse<ICustomer>, AxiosError<IApiErrorResponse>, ICreateCustomerRequest>({
         mutationFn: (data: ICreateCustomerRequest) =>
-            api.post("/customer", data),
+            api.post("/customers", data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: queryKeys.customers.all(organizationId) })
             toast({
@@ -62,7 +62,7 @@ export const useUpdateCustomer = (customerId: string | undefined) => {
     return useMutation<IApiSuccessResponse<ICustomer>, AxiosError<IApiErrorResponse>, IUpdateCustomerRequest>({
 
         mutationFn: (data: IUpdateCustomerRequest) =>
-            api.put(`/customer/${customerId}`, data),
+            api.put(`/customers/${customerId}`, data),
         onSuccess: () => {
             if (customerId) {
                 queryClient.invalidateQueries({ queryKey: queryKeys.customers.detail(organizationId, customerId) })
@@ -83,7 +83,7 @@ export const useDeleteCustomer = () => {
 
     return useMutation<IApiSuccessResponse<ICustomer>, AxiosError<IApiErrorResponse>, string>({
         mutationFn: (customerId: string) =>
-            api.delete(`/customer/${customerId}`),
+            api.delete(`/customers/${customerId}`),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: queryKeys.customers.all(organizationId) })
 

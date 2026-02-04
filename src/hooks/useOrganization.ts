@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { authClient } from "@/lib/auth-client";
+import { authClient, invalidateTokenCache } from "@/lib/auth-client";
 import { useToast } from "@/hooks/use-toast";
 import {
   ICreateOrganizationRequest,
@@ -153,6 +153,10 @@ export const useSetActiveOrganization = () => {
       return response.data;
     },
     onSuccess: async () => {
+      // Invalider le cache JWT car l'organisation a changé
+      // Le prochain appel API obtiendra un nouveau token avec le bon activeOrganizationId
+      invalidateTokenCache();
+
       // Invalider uniquement l'organisation active
       // Les autres queries se rafraîchiront automatiquement car leurs query keys incluent l'organization_id
       await queryClient.invalidateQueries({ queryKey: ["activeOrganization"] });

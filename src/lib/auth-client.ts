@@ -1,9 +1,75 @@
 import { createAuthClient } from "better-auth/react";
-import { inferAdditionalFields, inferOrgAdditionalFields, organizationClient } from "better-auth/client/plugins";
+import { inferAdditionalFields, inferOrgAdditionalFields, organizationClient, jwtClient } from "better-auth/client/plugins";
+
+/**
+ * Auth Client Configuration - State of the Art
+ *
+ * Principes appliqués:
+ * 1. PAS de stockage du JWT côté client (vulnérable XSS)
+ * 2. Better Auth gère les sessions via cookies httpOnly (sécurisé)
+ * 3. Le JWT est récupéré à la demande via authClient.token()
+ * 4. Cache mémoire court terme pour éviter les appels répétés
+ */
+
+// Cache mémoire pour le JWT (pas de persistance, sécurisé)
+let tokenCache: { token: string; expiresAt: number } | null = null;
+const TOKEN_CACHE_DURATION = 4 * 60 * 1000; // 4 minutes (avant expiration typique de 5min)
+
+/**
+ * Récupère le JWT avec cache mémoire
+ * Le token n'est JAMAIS persisté dans localStorage/sessionStorage
+ */
+export async function getJwtToken(): Promise<string | null> {
+    // Vérifier le cache mémoire
+    if (tokenCache && Date.now() < tokenCache.expiresAt) {
+        return tokenCache.token;
+    }
+
+    try {
+        const { data, error } = await authClient.token();
+
+        if (error || !data?.token) {
+            tokenCache = null;
+            return null;
+        }
+
+        // Mettre en cache mémoire (court terme)
+        tokenCache = {
+            token: data.token,
+            expiresAt: Date.now() + TOKEN_CACHE_DURATION,
+        };
+
+        return data.token;
+    } catch {
+        tokenCache = null;
+        return null;
+    }
+}
+
+/**
+ * Invalide le cache du token (à appeler lors du logout)
+ */
+export function invalidateTokenCache(): void {
+    tokenCache = null;
+}
+
+/**
+ * Vérifie si l'utilisateur a une session active
+ * Utilise le cookie httpOnly géré par Better Auth
+ */
+export async function hasActiveSession(): Promise<boolean> {
+    try {
+        const session = await authClient.getSession();
+        return !!session.data?.session;
+    } catch {
+        return false;
+    }
+}
 
 export const authClient = createAuthClient({
     baseURL: process.env.NEXT_PUBLIC_BETTER_AUTH_API_URL,
     plugins: [
+        jwtClient(),
         inferAdditionalFields({
             user: {
                 first_name: {

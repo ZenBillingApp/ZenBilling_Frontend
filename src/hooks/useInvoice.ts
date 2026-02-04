@@ -17,7 +17,7 @@ export const useInvoices = (params: IInvoiceQueryParams = {}) => {
     return useQuery({
         queryKey: queryKeys.invoices.list(organizationId, { page, limit, search, status, customer_id, start_date, end_date, sortBy, sortOrder }),
         queryFn: () => {
-            let url = `/invoice?page=${page}&limit=${limit}&sortBy=${sortBy}&sortOrder=${sortOrder}`;
+            let url = `/invoices?page=${page}&limit=${limit}&sortBy=${sortBy}&sortOrder=${sortOrder}`;
             if (search) url += `&search=${search}`;
             if (status) url += `&status=${status}`;
             if (customer_id) url += `&customer_id=${customer_id}`;
@@ -35,7 +35,7 @@ export const useInvoice = (invoiceId: string) => {
 
     return useQuery<IApiSuccessResponse<IInvoice>>({
         queryKey: queryKeys.invoices.detail(organizationId, invoiceId),
-        queryFn: () => api.get<IApiSuccessResponse<IInvoice>>(`/invoice/${invoiceId}`),
+        queryFn: () => api.get<IApiSuccessResponse<IInvoice>>(`/invoices/${invoiceId}`),
         enabled: !!invoiceId && !!organizationId,
     })
 }
@@ -48,7 +48,7 @@ export const useCreateInvoice = () => {
 
     return useMutation<IApiSuccessResponse<IInvoice>, AxiosError<IApiErrorResponse>, ICreateInvoiceRequest>({
         mutationFn: (data: ICreateInvoiceRequest) =>
-            api.post("/invoice", data),
+            api.post("/invoices", data),
         onSuccess: (invoice) => {
             queryClient.invalidateQueries({ queryKey: queryKeys.invoices.all(organizationId) })
             queryClient.invalidateQueries({ queryKey: queryKeys.products.all(organizationId) })
@@ -70,7 +70,7 @@ export const useUpdateInvoice = (invoiceId: string) => {
     return useMutation<IApiSuccessResponse<IInvoice>, AxiosError<IApiErrorResponse>, IUpdateInvoiceRequest>({
 
         mutationFn: (data: IUpdateInvoiceRequest) =>
-            api.put(`/invoice/${invoiceId}`, data),
+            api.put(`/invoices/${invoiceId}`, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: queryKeys.invoices.detail(organizationId, invoiceId) })
             queryClient.invalidateQueries({ queryKey: queryKeys.invoices.all(organizationId) })
@@ -90,7 +90,7 @@ export const useDeleteInvoice = () => {
 
     return useMutation<IApiSuccessResponse<IInvoice>, AxiosError<IApiErrorResponse>, string>({
         mutationFn: (invoiceId: string) =>
-            api.delete(`/invoice/${invoiceId}`),
+            api.delete(`/invoices/${invoiceId}`),
         onSuccess: (_, invoiceId) => {
 
             router.replace('/invoices')
@@ -119,7 +119,7 @@ export const useDownloadInvoicePdf = (invoiceNumber: string) => {
     const { toast } = useToast()
     return useMutation({
         mutationFn: async (invoiceId: string) => {
-            const response = await api.getBinary(`/invoice/${invoiceId}/pdf`)
+            const response = await api.getBinary(`/invoices/${invoiceId}/pdf`)
             
 
             // Créer un URL pour le blob
@@ -162,7 +162,7 @@ export const useAddPayment = (invoiceId: string) => {
     return useMutation<IApiSuccessResponse<IInvoice>, AxiosError<IApiErrorResponse>, AddPaymentSchema>({
 
         mutationFn: (data: AddPaymentSchema) =>
-            api.post(`/invoice/${invoiceId}/payments`, {
+            api.post(`/invoices/${invoiceId}/payments`, {
                 ...data,
                 amount: Number(data.amount)
             }),
@@ -184,7 +184,7 @@ export const useSendInvoice = (invoiceId: string) => {
 
     return useMutation<IApiSuccessResponse<IInvoice>, AxiosError<IApiErrorResponse>, string>({
 
-        mutationFn: () => api.post(`/invoice/${invoiceId}/send`),
+        mutationFn: () => api.post(`/invoices/${invoiceId}/send`),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: queryKeys.invoices.detail(organizationId, invoiceId) })
             queryClient.invalidateQueries({ queryKey: queryKeys.invoices.all(organizationId) })
@@ -206,7 +206,7 @@ export const useSendInvoice = (invoiceId: string) => {
 export const useViewInvoice = () => {
     const { toast } = useToast()
     return useMutation({
-        mutationFn: (invoiceId: string) => api.getBinary(`/invoice/${invoiceId}/pdf`),
+        mutationFn: (invoiceId: string) => api.getBinary(`/invoices/${invoiceId}/pdf`),
         onSuccess: (data) => {
             const blob = new Blob([data.data], { type: 'application/pdf' })
             const url = window.URL.createObjectURL(blob)
@@ -228,7 +228,7 @@ export const useCustomerInvoices = (customerId: string, params: IInvoiceQueryPar
     return useQuery<IApiSuccessResponse<IInvoicePagination>, AxiosError<IApiErrorResponse>> ({
         queryKey: queryKeys.invoices.customerInvoices(organizationId, customerId, { page, limit, search, status, customer_id, start_date, end_date, sortBy, sortOrder }),
         queryFn: () => {
-            let url = `/invoice/customer/${customerId}?page=${page}&limit=${limit}&sortBy=${sortBy}&sortOrder=${sortOrder}`;
+            let url = `/invoices/customer/${customerId}?page=${page}&limit=${limit}&sortBy=${sortBy}&sortOrder=${sortOrder}`;
             if (search) url += `&search=${search}`;
             if (status) url += `&status=${status}`;
             if (customer_id) url += `&customer_id=${customer_id}`;
@@ -248,7 +248,7 @@ export const useCancelInvoice = (invoiceId: string) => {
 
     return useMutation<IApiSuccessResponse<IInvoice>, AxiosError<IApiErrorResponse>, void>({
         mutationFn: () =>
-            api.put(`/invoice/${invoiceId}`, { status: 'cancelled' }),
+            api.put(`/invoices/${invoiceId}`, { status: 'cancelled' }),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: queryKeys.invoices.detail(organizationId, invoiceId) })
             queryClient.invalidateQueries({ queryKey: queryKeys.invoices.all(organizationId) })
@@ -274,7 +274,7 @@ export const useSendInvoiceWithPaymentLink = (invoiceId: string) => {
 
     return useMutation<IApiSuccessResponse<ISendInvoiceWithPaymentLinkResponse>, AxiosError<IApiErrorResponse>, ISendInvoiceWithPaymentLinkRequest>({
         mutationFn: (data: ISendInvoiceWithPaymentLinkRequest) =>
-                api.post(`/invoice/${invoiceId}/send-with-payment-link`, data),
+                api.post(`/invoices/${invoiceId}/send-with-payment-link`, data),
         onSuccess: (response) => {
             queryClient.invalidateQueries({ queryKey: queryKeys.invoices.detail(organizationId, invoiceId) })
             queryClient.invalidateQueries({ queryKey: queryKeys.invoices.all(organizationId) })
