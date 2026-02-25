@@ -5,6 +5,8 @@ import { QueryProvider } from "@/providers/QueryProvider";
 import { NiceModalProvider } from "@/providers/NiceModalProvider";
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
+import { SkipLink } from "@/components/ui/skip-link"
+import { AccessibilityAnnouncer } from "@/components/ui/announcer"
 
 
 const arimo = Arimo({
@@ -63,22 +65,25 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="fr" suppressHydrationWarning>
       <head>
         <link rel="icon" href="/favicon.png" type="image/png" sizes="32x32" />
         <script defer src="https://cloud.umami.is/script.js" data-website-id="593cad2b-493c-48ad-acd4-4fbdc5aebe54"></script>
       </head>
       <body suppressHydrationWarning className={`${dmSans.variable} ${roboto.variable} ${arimo.variable} antialiased`}>
+      <SkipLink />
       <ThemeProvider
             attribute="class"
             defaultTheme="system"
             enableSystem
             disableTransitionOnChange
           >
-          <QueryProvider>
-            <NiceModalProvider>{children}</NiceModalProvider>
-            <Toaster />
-          </QueryProvider>
+          <AccessibilityAnnouncer>
+            <QueryProvider>
+              <NiceModalProvider>{children}</NiceModalProvider>
+              <Toaster />
+            </QueryProvider>
+          </AccessibilityAnnouncer>
         </ThemeProvider>
       </body>
     </html>

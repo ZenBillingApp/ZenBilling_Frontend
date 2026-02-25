@@ -104,7 +104,7 @@ export function RegisterForm() {
                             <FormItem className="w-1/2">
                                 <FormLabel>Prénom</FormLabel>
                                 <FormControl>
-                                    <Input {...field} />
+                                    <Input autoComplete="given-name" {...field} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -118,7 +118,7 @@ export function RegisterForm() {
                             <FormItem className="w-1/2">
                                 <FormLabel>Nom</FormLabel>
                                 <FormControl>
-                                    <Input {...field} />
+                                    <Input autoComplete="family-name" {...field} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -133,7 +133,7 @@ export function RegisterForm() {
                         <FormItem>
                             <FormLabel>Email</FormLabel>
                             <FormControl>
-                                <Input type="email" {...field} />
+                                <Input type="email" autoComplete="email" {...field} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -147,7 +147,7 @@ export function RegisterForm() {
                         <FormItem>
                             <FormLabel>Mot de passe</FormLabel>
                             <FormControl>
-                                <Input type="password" {...field} />
+                                <Input type="password" autoComplete="new-password" {...field} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>

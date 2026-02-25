@@ -33,8 +33,8 @@ export default function DashboardLayout({children}: {children: React.ReactNode})
   
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-white mb-4"></div>
+      <div className="flex flex-col items-center justify-center min-h-screen" role="status">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-white mb-4" aria-hidden="true"></div>
         <h2 className="text-xl font-semibold text-white">Chargement de votre compte...</h2>
         <p className="text-white mt-2 text-sm font-dmSans text-center">Veuillez patienter pendant que nous récupérons vos informations</p>
       </div>
@@ -42,8 +42,9 @@ export default function DashboardLayout({children}: {children: React.ReactNode})
   }
   
   if (!user) {
-    return <div className="flex flex-col items-center justify-center min-h-screen">
-    <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-white mb-4"></div>
+    return <div className="flex flex-col items-center justify-center min-h-screen" role="status">
+    <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-white mb-4" aria-hidden="true"></div>
+    <span className="sr-only">Chargement en cours...</span>
   </div>
   }
   

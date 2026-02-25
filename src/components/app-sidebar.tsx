@@ -40,7 +40,7 @@ import {
             <p className="text-xs text-left mx-auto font-arimo">Gestion de Facturation Simplifiée</p>
             </div>
         </SidebarHeader>
-        <SidebarContent>
+        <SidebarContent aria-label="Navigation principale">
           <SidebarGroup>
             <SidebarGroupContent className="mt-4">
                 <SidebarGroupLabel>Gestion</SidebarGroupLabel>

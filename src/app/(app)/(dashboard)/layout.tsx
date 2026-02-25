@@ -6,11 +6,11 @@ import { ModeToggle } from "@/components/theme-toggle"
 export default function DashboardLayout({children}: {children: React.ReactNode}) {
     return <SidebarProvider>
     <AppSidebar />
-    <main className="flex flex-col w-full h-screen">
-      <div className="flex w-full justify-between items-center p-2 border-b border-gray-200">
+    <main id="main-content" className="flex flex-col w-full h-screen">
+      <header role="banner" className="flex w-full justify-between items-center p-2 border-b border-gray-200">
       <SidebarTrigger />
       <ModeToggle />
-      </div>
+      </header>
       {children}
     </main>
   </SidebarProvider>

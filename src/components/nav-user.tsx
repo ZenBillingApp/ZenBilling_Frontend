@@ -47,7 +47,7 @@ export function NavUser() {
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarImage src={user?.image} alt={"profil image"} />
+                <AvatarImage src={user?.image} alt={`${user?.first_name ?? ""} ${user?.last_name ?? ""}`} />
                 <AvatarFallback className="rounded-lg">
                     {user?.first_name?.charAt(0)}
                     {user?.last_name?.charAt(0)}
@@ -69,7 +69,7 @@ export function NavUser() {
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={user?.image} alt={"profil image"} />
+                  <AvatarImage src={user?.image} alt={`${user?.first_name ?? ""} ${user?.last_name ?? ""}`} />
                   <AvatarFallback className="rounded-lg">
                     {user?.first_name?.charAt(0)}
                     {user?.last_name?.charAt(0)}
@@ -106,7 +106,7 @@ export function NavUser() {
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => logout()}>
               <LogOut />
-              Log out
+              Se deconnecter
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

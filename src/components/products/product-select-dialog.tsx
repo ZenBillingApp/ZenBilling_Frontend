@@ -187,6 +187,7 @@ export function ProductSelectDialog({
                   <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                   <Input
                     placeholder="Rechercher un produit..."
+                    aria-label="Rechercher un produit"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     className="pl-8"

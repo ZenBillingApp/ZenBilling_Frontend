@@ -356,6 +356,7 @@ export default function QuotesPage() {
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Rechercher un devis..."
+                aria-label="Rechercher un devis"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="pl-8 w-full"

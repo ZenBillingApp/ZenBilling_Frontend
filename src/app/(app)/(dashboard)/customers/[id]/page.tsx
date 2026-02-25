@@ -599,6 +599,7 @@ export default function CustomerDetailsPage() {
                   <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                   <Input
                     placeholder="Rechercher une facture..."
+                    aria-label="Rechercher une facture"
                     value={invoiceSearch}
                     onChange={(e) => setInvoiceSearch(e.target.value)}
                     className="pl-8 w-full"
@@ -652,6 +653,7 @@ export default function CustomerDetailsPage() {
                   <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                   <Input
                     placeholder="Rechercher un devis..."
+                    aria-label="Rechercher un devis"
                     value={quoteSearch}
                     onChange={(e) => setQuoteSearch(e.target.value)}
                     className="pl-8 w-full"

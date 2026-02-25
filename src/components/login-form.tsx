@@ -134,10 +134,11 @@ export function LoginForm() {
                                 <FormItem className="space-y-2">
                                     <FormLabel>Email</FormLabel>
                                     <FormControl>
-                                        <Input 
-                                            type="email" 
+                                        <Input
+                                            type="email"
                                             placeholder="votre@email.com"
-                                            {...field} 
+                                            autoComplete="email"
+                                            {...field}
                                         />
                                     </FormControl>
                                     <FormMessage />
@@ -157,10 +158,11 @@ export function LoginForm() {
                                         </Link> */}
                                     </div>
                                     <FormControl>
-                                        <Input 
-                                            type="password" 
+                                        <Input
+                                            type="password"
                                             placeholder="••••••••"
-                                            {...field} 
+                                            autoComplete="current-password"
+                                            {...field}
                                         />
                                     </FormControl>
                                     <FormMessage />

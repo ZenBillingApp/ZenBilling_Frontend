@@ -72,6 +72,7 @@ export function CustomerSelectSheet({
                 <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Rechercher un client..."
+                  aria-label="Rechercher un client"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   className="pl-8"

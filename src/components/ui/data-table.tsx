@@ -37,8 +37,9 @@ export function DataTable<T>({
 }: DataTableProps<T>) {
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center py-8">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="flex justify-center items-center py-8" role="status">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" aria-hidden="true" />
+        <span className="sr-only">Chargement en cours...</span>
       </div>
     );
   }
@@ -70,9 +71,21 @@ export function DataTable<T>({
             <TableRow
               key={rowIndex}
               className={cn(
-                onRowClick && "cursor-pointer hover:bg-muted/50 transition-colors"
+                onRowClick && "cursor-pointer hover:bg-muted/50 focus-within:bg-muted/50 transition-colors"
               )}
+              tabIndex={onRowClick ? 0 : undefined}
+              role={onRowClick ? "link" : undefined}
               onClick={() => onRowClick && onRowClick(item)}
+              onKeyDown={
+                onRowClick
+                  ? (e: React.KeyboardEvent) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        onRowClick(item);
+                      }
+                    }
+                  : undefined
+              }
             >
               {columns
                 .filter((column) => !column.hidden)

@@ -360,6 +360,7 @@ export default function InvoicesPage() {
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Rechercher une facture..."
+                aria-label="Rechercher une facture"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="pl-8 w-full"
